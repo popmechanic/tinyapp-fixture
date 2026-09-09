@@ -29,9 +29,11 @@
 //     number greater than or equal to 0.
 // M5. A response whose status is not 2xx, or whose JSON has `success` false, makes
 //     `renderMove` reject with a message beginning `render failed:`.
-// M6. The root `package.json` `devDependencies` carries `node-html-parser`, `bun.lock` records
-//     it, and `bun install --frozen-lockfile` exits 0 on the tree. (The install itself is the
-//     Proof's `Run:`; this file checks the two manifests it must find on the tree.)
+// M6. The tree declares `node-html-parser` — the sealed `packages/tinyapp-exam/package.json`
+//     owns it as a `dependencies` entry, so the root `package.json` does not repeat it — and
+//     `bun.lock` records it, so `bun install --frozen-lockfile` exits 0 on the tree. (The
+//     install itself is the Proof's `Run:`; this file checks the two manifests it must find on
+//     the tree.)
 
 import {afterAll, expect, test} from 'bun:test';
 import {mkdtempSync, readFileSync, rmSync} from 'node:fs';
@@ -467,14 +469,20 @@ test(
 
 // ------------------------------------------------------------------ M6
 
-test('leg (j) [M6]: the root manifests carry node-html-parser', () => {
+test('leg (j) [M6]: the tree manifests carry node-html-parser', () => {
+  // The helper package is sealed: it owns the dependency, and the root does not repeat it.
   const manifest = JSON.parse(
-    readFileSync(resolve(repoRoot, 'package.json'), 'utf8'),
-  ) as {devDependencies?: Record<string, string>};
-  const range = manifest.devDependencies?.['node-html-parser'];
+    readFileSync(resolve(repoRoot, 'packages/tinyapp-exam/package.json'), 'utf8'),
+  ) as {dependencies?: Record<string, string>};
+  const range = manifest.dependencies?.['node-html-parser'];
 
   expect(typeof range).toBe('string');
   expect((range as string).length).toBeGreaterThan(0);
+
+  const root = JSON.parse(readFileSync(resolve(repoRoot, 'package.json'), 'utf8')) as {
+    devDependencies?: Record<string, string>;
+  };
+  expect(root.devDependencies?.['node-html-parser']).toBeUndefined();
 
   expect(readFileSync(resolve(repoRoot, 'bun.lock'), 'utf8')).toContain(
     '"node-html-parser"',

@@ -1,0 +1,11 @@
+{
+  "name": "tinyapp-exam",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "tinybase": "^9.7.0",
+    "node-html-parser": "^9.0.4"
+  }
+}

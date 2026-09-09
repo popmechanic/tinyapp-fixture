@@ -4,12 +4,12 @@
   "version": "0.1.0",
   "workspaces": ["client", "server", "packages/*"],
   "scripts": {
-    "typecheck": "bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit",
+    "typecheck": "bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit",
     "test": "bun run typecheck && bun test"
   },
   "devDependencies": {
     "@types/bun": "^1.3.0",
-    "node-html-parser": "^9.0.4",
+    "tinyapp-exam": "workspace:*",
     "typescript": "^6.0.3"
   }
 }
