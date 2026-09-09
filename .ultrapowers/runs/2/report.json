@@ -1,0 +1,381 @@
+{
+  "integrationBranch": "ultra/integration-run-2",
+  "baseSha": "a99a2be2b9d1640af886bfd6d8dbc34e234981de",
+  "waves": [
+    [
+      "1",
+      "5"
+    ],
+    [
+      "2",
+      "3",
+      "4"
+    ],
+    [
+      "6"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)",
+    "1 -> 3 (interface)",
+    "1 -> 4 (interface)",
+    "1 -> 6 (interface)",
+    "2 -> 6 (interface)",
+    "3 -> 6 (interface)",
+    "4 -> 6 (interface)",
+    "5 -> 6 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "e03d88be1196aa157761fd83333872e9bafb02c5",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-2/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "`packages/tinyapp-exam/src/types.ts` opens with the doc comment \"Nothing here is imported at runtime, so this module stays free of the workspace's dependencies\", but the file now also exports a runtime value, `VALUES_TABLE = '$values'` (types.ts:348), which `store-move.ts` imports as a value (store-move.ts:106). The comment is false as written and will mislead the sibling tasks (mutant, render-move, composition) that the Context tells to write against this module. Either reword the comment to say the module carries only types and one literal constant, or move `VALUES_TABLE` next to `diffContent` in `store-move.ts`, which is its only consumer. Behaviour is unaffected; the exam covers `$values` ordering at store-move.test.ts:641.; `packages/tinyapp-exam/src/store-move.ts:114-126` re-exports `withContract` and the entire type surface of `./types`. Nothing in the task asks for it: the Interfaces slot places `withContract` in `src/contract.ts` and the six types in `src/types.ts`, and no leg of the Proof exercises these re-exports (the exam imports `withContract` from `../src/contract` and the types from `../src/types`). The risk is that the later composition task binds `withContract` to `store-move` rather than `contract`, pulling `node:fs` and the whole store move into a module that only needs the contract. Suggest dropping the two re-export blocks and leaving each symbol at the path the Interfaces slot names.; M4 says the seed check is a deep-equality between the store's `getContent()` after `setContent(seed)` and the parsed seed, but `runOnce` (packages/tinyapp-exam/src/store-move.ts:216) implements it as `diffContent(store.getContent(), seed).length > 0`. `diffContent` only reports differing *cells*, so a structural difference with no cells on either side slips through: a seed `[{todos: {\"1\": {}}}, {}]` loads to `[{}, {}]` (TinyBase drops the empty row) yet yields zero differences, so `storeMove` accepts a seed the schema demonstrably does not round-trip and runs the action anyway. No leg exercises this, and choosing `diffContent` is what makes the required `<table>/<row>/<cell>` message cheap, so this is advisory rather than blocking. Fix: keep `diffContent` for the message but gate on serialised equality first, e.g. in `runOnce` compute `const loaded = store.getContent();` then `if (JSON.stringify(loaded) !== JSON.stringify(seed))` before building `violations = diffContent(loaded, seed)`, and fall back to a message naming the seed path when `violations` is empty.; packages/tinyapp-exam/src/store-move.ts:114-126 re-exports `withContract` from `./contract` and ten type names from `./types`. Nothing in the task asks for it \u2014 the Interfaces slot names `src/types.ts` and `src/contract.ts` as those symbols' homes, and the exam imports them from there. The re-export gives every downstream task two import paths for the same symbols, which is a needless fork in the module surface. Advisory only; it changes no behaviour and the diff stays inside FILES.; unverified: the exam's `renderLines` helper (packages/tinyapp-exam/test/store-move.test.ts:697) strips a trailing newline before splitting, so leg (d) would still pass if `renderDiff` appended one. M2 says the string is the header line \"followed by one line per difference\", which a trailing newline arguably satisfies, and the implementation (`.join('\\n')`) emits none \u2014 so the leg is green on the tree either way. What would settle it: assert `renderDiff(differences)` against the exact expected string rather than against its split-and-trimmed lines.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    },
+    {
+      "task": "5",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "0a4918609b7adfb4631048ddaccaf3d5cb62508a",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-2/patches/task-5.patch",
+      "reviewVerdict": "clean",
+      "notes": "EXAM EDITED accepted, not blocking: the only change to the peer's `client/test/seeded-store.test.ts` is in `afterAll`, which becomes async and awaits a 25 ms drain before `GlobalRegistrator.unregister()` (so React's queued passive-effect flush does not read `window` after the DOM is torn down). Every assertion the peer wrote is kept verbatim and none is loosened \u2014 the two tests still assert `ready >= 1`, `getContent()` deep-equal to the seed, `persisters/syncs/sockets` exactly 0 when seeded, and each delta `>= 1` when unseeded. Any tree that passes the edited exam passes the peer's, so this is a strengthening-neutral edit; no action required.; Disclosed, lawful divergence from Context in `client/src/vite-env.d.ts`: the task text suggested `declare global { interface Window { __TINYAPP_SEED__?: \u2026 } }` plus `export {}`, but the implementer wrote the `interface Window` merge at top level with a comment explaining that adding `export {}` would turn the file into a module and invalidate the existing ambient `declare module '*.css'` declaration. That reasoning is correct \u2014 in a global script file the top-level `interface Window` augments the global type identically \u2014 and the divergence is disclosed in the file. Recorded as lawful; no action required.; unverified: `client/src/Store.tsx:108` casts `new ReconnectingWebSocket(SERVER + serverPathId) as unknown as WebSocket` to satisfy `createWsSynchronizer` once `@types/ws` resolves the `WebSocketTypes` union. The reason is disclosed in a comment and is plausible, but the double cast is the widest possible escape hatch: it would also silence a genuinely wrong argument at this call site. Nothing in this task's Proof (`Test:`/`Run:`) or in the Global Constraints' `Check:` commands typechecks `client/src`, so the diff cannot settle whether a narrower cast (e.g. `as unknown as import('tinybase/synchronizers/synchronizer-ws-client').WebSocketTypes`, or a `Pick<WebSocket, \u2026>` structural cast) would also compile. Running the client's own `tsc` with a narrowed cast would settle it. Advisory only \u2014 the runtime path is unchanged from BASE and leg (g) exercises it.; EXAM EDITED (accepted, no block): `client/test/seeded-store.test.ts` was changed after the peer wrote it. The only hunk turns `afterAll(() => {...})` into `afterAll(async () => {...})` with a 25 ms `setTimeout` drain before `GlobalRegistrator.unregister()`. No assertion the peer wrote is dropped, loosened, or reordered \u2014 the seven `expect()` calls of legs (f) and (g) are byte-identical, and the edit touches only teardown, letting React's queued passive-effect macrotask drain before the DOM globals are pulled out from under it (a cross-file leak, since Bun runs every test file in one process). Any tree that passes the edited exam passes the peer's; recorded here rather than blocked.; Disclosed divergence from the plan's Context, correct and lawful: `client/src/Store.tsx:108` adds `as unknown as WebSocket` to the `new ReconnectingWebSocket(SERVER + serverPathId)` argument, with a comment saying why (adding `@happy-dom/global-registrator` for M8 pulls in `@types/ws`, which resolves TinyBase's `WebSocketTypes` union for the first time and exposes `ReconnectingWebSocket`'s narrower `onerror`). It is a runtime no-op \u2014 the mocked constructor in leg (g) is still counted and the socket-count assertions still discriminate \u2014 and it is the consequence of a dependency the task itself mandates, not scope creep. Noting it only because it is the one line in the diff not named by a Machine clause.; dependency manifest changed: `bun.lock` (configVersion, @happy-dom/global-registrator, dependencies, @types/node, happy-dom, @types/whatwg-mimetype, @types/ws, buffer-image-size, entities, whatwg-mimetype, ws); dependency manifest changed: `client/package.json` (@happy-dom/global-registrator, @vitejs/plugin-react, typescript, vite); concern: plan-defect: M8 requires adding `@happy-dom/global-registrator` to the client, which transitively installs `@types/ws`. That resolves tinybase's `WebSocketTypes = WebSocket | WsWebSocket` union for the first time (previously the `ws` import degraded to `any`, so anything was assignable), and BASE's own unmodified `createWsSynchronizer(store, new ReconnectingWebSocket(...))` then fails `bun run typecheck` with TS2345 (`ReconnectingWebSocket.onerror` takes `ErrorEvent`, DOM `WebSocket.onerror` takes `Event`). Confirmed by typechecking BASE's `client/src/Store.tsx` verbatim against the post-install `node_modules`. Fixed task-locally with `as unknown as WebSocket` on the socket argument in `client/src/Store.tsx` (a file in my Files block), with a comment explaining why; no change to `client/tsconfig.json`, which the BASE facts pin.; concern: plan-defect: the Context's suggested `client/src/vite-env.d.ts` shape \u2014 `declare global { interface Window { \u2026 } }` plus `export {}` \u2014 makes that .d.ts a module, at which point the file's existing wildcard `declare module '*.css'` becomes a module augmentation of an unresolvable specifier and every CSS side-effect import fails with TS2882 (nine errors across the scaffold's components). Implemented the equivalent instead: the file stays a global script and merges `interface Window { __TINYAPP_SEED__?: import('./storeData').TodosContent }` at top level, which augments the DOM `Window` identically.; concern: exam: client/test/seeded-store.test.ts was red for a harness reason, not a missing implementation \u2014 its afterAll unregistered happy-dom in the same synchronous turn as the final root.unmount(), so React's queued passive-effect-flush task dereferenced a deleted `window` and bun reported an unhandled error (exit 1) despite 16/16 assertions passing. Reproduced with a bare `() => null` component and no store at all. Rather than leave the committed suite unusable as verification for the downstream composition task, I made the minimal teardown repair (await a 25 ms yield before unregister()) and am disclosing it here: the edit is confined to the afterAll block; no assertion, mock, counter, seed, settle timer or render path was changed. If the referee prefers the exam byte-identical as handed in, reverting those two lines restores exit 1 with the same 16 passing assertions.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 1,
+      "examEdited": [
+        "client/test/seeded-store.test.ts"
+      ]
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "82bdb7ecc4a85423e2f0f8e75f323bd5ec83eaa2",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-2/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "Coverage gap: `applyMutant`'s documented behaviour that store values (`snapshot[1]`) are carried across unchanged is never exercised against a non-empty values record \u2014 every fixture in `packages/tinyapp-exam/test/mutant.test.ts` uses `{}` for the values half, so a bug that dropped or emptied `snapshot[1]` (e.g. returning `[structuredClone(snapshot[0]), {}]`) would still pass all eleven tests. The task's Context states \"Values (`snapshot[1]`) are never edited by a mutant in this release\", and no Machine clause or leg pins it, so this blocks nothing \u2014 but one assertion closes it. Suggested: in leg (b), start from a base whose values half is `{n: 1}` and assert the result's `[1]` is deep-equal to `{n: 1}`.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    },
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "f4787069655191ce90925df258a5b076670e48e2",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-2/patches/task-3.patch",
+      "reviewVerdict": "clean",
+      "notes": "M1 requires that the returned document have `no <script> element carrying a src attribute`, but `renderHtml` (packages/tinyapp-exam/src/render-move.ts:160-171) only touches `script[type=module][src]`: a classic `<script src=\"\u2026\"></script>` in the entry survives untouched, keeping a relative fetch on a page the renderer serves with no origin. The exam's two inputs (client/index.html and SYNTHETIC_ENTRY) contain only module scripts, so the leg (a) assertion `querySelectorAll('script[src]').length === 0` passes without exercising the general clause. Fix inside this file: after inlining, drop the leftover src scripts, e.g. `for (const stray of root.querySelectorAll('script[src]')) stray.remove();` just before the seed is inserted, and add a synthetic-entry case carrying a non-module `<script src>` to leg (a).; unverified: `render-move.ts:103,105` imports and re-exports `Snapshot, Tables, Values, View` from `./types` with `import type` / `export type`, which Bun erases, so nothing in this exam (green, exit 0) establishes that `packages/tinyapp-exam/src/types.ts` exists in the merged tree or exports `Tables` and `Values` under those names \u2014 that file belongs to another task and is not in this patch. It would be settled by task 6's `bunx tsc -p packages/tinyapp-exam --noEmit`. The `export type {\u2026}` line is also not in this task's Produces list; dropping the re-export (keeping only the `import type`) removes the untested surface and the coupling to two names this task never uses.; Version-range mismatch across tasks: this task installed `node-html-parser: ^9.0.4` into the root `package.json` and `bun.lock` (lawful \u2014 task 3's text pins no range), but task 6's Context spells the manifest it will write as `\"node-html-parser\": \"^7.0.1\"` when it moves the dependency into `packages/tinyapp-exam/package.json`. If task 6 transcribes that literal, the resolved version changes under the helper (which uses `parse(html, {comment: true})`, `TextNode`, `insertAdjacentHTML` and css-select selectors) and rewrites `bun.lock` again. The fix is in task 6's text, outside this task's FILES: it should carry the range this task actually installed.; M1 ends with \"no `<script>` element carries a `src` attribute\", but `renderHtml` only strips `src` from elements matching `script[type=module][src]` (packages/tinyapp-exam/src/render-move.ts:160-171). A classic `<script src=\"\u2026\">` in the entry would survive into the page handed to the renderer \u2014 exactly the relative fetch the Context says must not exist (\"the renderer is handed raw HTML with no origin\"). Unreachable today because `client/index.html` carries only the one module script and the first Check pins that file byte-identical to BASE, which is why leg (a) still passes; the guard is one line and makes the clause hold for any entry.; M4 requires the posted body's `html` to be `renderHtml(<entry's text>, {js, css, seed: content})`, but no leg asserts the bundle's stylesheet reaches that body. Leg (g) (packages/tinyapp-exam/test/render-move.test.ts:731-746) checks the seed text, `<script type=\"module\">`, the absence of `src=\"/src/index.tsx\"`, the >100k `createRoot` bundle and `addScriptTag` \u2014 all of which still hold if `bundleOf`'s `text/css` filter (src/render-move.ts:302) returned the empty string. Leg (a) pins `renderHtml`'s css inlining with a literal `.a{}`, so what is unverified is only the extraction of the `text/css` output from `Bun.build`; the picture would come back unstyled and the suite would stay green. The Proof's leg list does not name a css assertion, so the exam is faithful to the plan \u2014 this is a coverage gap, not a divergence.; unverified: cross-task version divergence on the one dependency this task adds. `bun add -d node-html-parser` resolved to `^9.0.4` in the root `package.json` and `bun.lock` (patch lines 9, 50, 78) \u2014 lawful, since task 3's text names no range. But task 6's Context pins the package manifest it will write as `\"node-html-parser\": \"^7.0.1\"` while also moving the dependency out of the root `devDependencies`, so wave 3 would declare a range the lockfile's 9.0.4 entry does not satisfy and its `bun install --frozen-lockfile` Run: could fail. Nothing in this diff can settle it; it is settled by task 6 declaring `^9.0.4` (or whatever `bun.lock` records at that point) instead of `^7.0.1`.; packages/tinyapp-exam/src/render-move.ts:105 re-exports `Tables` and `Values` from `./types`, which this module neither uses nor lists under Produces (only `Snapshot` and `View` are Consumed). Harmless \u2014 the whole line is type-only and erased \u2014 but it widens the module's surface past its interface contract for no caller.; dependency manifest changed: `bun.lock` (node-html-parser, boolbase, css-select, dependencies, css-what, domhandler, domutils, nth-check, dom-serializer, domelementtype, entities, dom-serializer/entities, happy-dom/entities); dependency manifest changed: `package.json` (@types/bun, node-html-parser, typescript)",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    },
+    {
+      "task": "4",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "5e31e33156d1c8000126d66767fdce7e29d5950a",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-2/patches/task-4.patch",
+      "reviewVerdict": "clean",
+      "notes": "unverified: the `Consumes: ExamRecord` edge is not exercised at runtime. Both `packages/tinyapp-exam/src/evidence.ts:23` and `packages/tinyapp-exam/test/evidence.test.ts:141` take `ExamRecord` via `import type`, which Bun erases, and the exam's `plainRecord()` literal (test/evidence.test.ts:164-175) spells the field names by hand \u2014 so leg (d) proves only that the writer and the exam agree on `storeDiff`/`mutant`/`contract`/`walls`, not that they agree with the `ExamRecord` declared in the sibling-owned `packages/tinyapp-exam/src/types.ts`. A field renamed there (say `storeDiff` -> `store_diff`) would leave this exam green while `writeEvidence` wrote `undefined` for the composition task. What would settle it: task 6's `bunx tsc -p packages/tinyapp-exam --noEmit` Run:, which typechecks `src` and `test` against `types.ts`. Nothing in this task's FILES can settle it, since `types.ts` is not this task's to write.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    },
+    {
+      "task": "6",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "0c841d4e623c65d4fa726e46091ea5d4cdccb97a",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-2/patches/task-6.patch",
+      "reviewVerdict": "clean",
+      "notes": "Undisclosed divergence from the plan's tsconfig literal: Context specifies `\"include\": [\"src\", \"test\"]` for `packages/tinyapp-exam/tsconfig.json`, the submission ships `\"include\": [\"src\"]` (packages/tinyapp-exam/tsconfig.json:11) with no note saying why. The consequence is that `bunx tsc -p packages/tinyapp-exam --noEmit` \u2014 a Proof `Run:` line and the tail this task appends to `scripts.typecheck` \u2014 never typechecks `test/state-exam.test.ts` (nor the sibling `test/*.test.ts` files in the same package), so the exam's own casts (`as unknown as StateExamSpec`, `(store: any)`) and the two committed exam specs under `tests/state-exams/` are typechecked by nothing in the repo. Not blocking: no Machine clause depends on it, the narrowing matches the scaffold's own convention (`client/tsconfig.json` is also `[\"src\"]`), and widening to `[\"test\"]` would pull five sibling-owned test files outside this task's FILES into the program, which the implementer cannot fix here. Fix is either to add `\"test\"` to `include` (and confirm tsc still exits 0 with the sibling test files in), or to state the narrowing and its reason in the tsconfig-adjacent commentary.; plan-defect: the task's Context prescribes the package manifest verbatim as `{... \"dependencies\": {\"tinybase\": \"^9.7.0\", \"node-html-parser\": \"^7.0.1\"}}`, but BASE's root `devDependencies` carries `node-html-parser` at `^9.0.4` (visible in the patch's own `package.json` hunk), and the same Context says the dependency is *moved* from the root. Transcribing `^7.0.1` would have changed the resolved range and broken the Proof's `bun install --frozen-lockfile` line. The submission correctly writes `^9.0.4` (packages/tinyapp-exam/package.json:71) and the lock records it (bun.lock:22) \u2014 RUN evidence shows `bun install --frozen-lockfile` exit 0 \u2014 but the divergence is undisclosed. Lawful and correct as shipped; recorded because the defect is in the task text, whose fix lies outside this task's FILES.; unverified: M6 names four store-move rejection kinds \u2014 `contract breach: <url>`, `contract: clock is required`, `snapshot violates schema: \u2026`, `nondeterministic store: \u2026` \u2014 and the exam's leg (e) asserts only the first two (packages/tinyapp-exam/test/state-exam.test.ts:655-691), which is exactly what the Proof's leg (e) asks for. The other two are unasserted here; they traverse the identical `catch` in `runStateExam` (packages/tinyapp-exam/src/state-exam.ts:249-254) that the two covered cases already exercise, and the message-passthrough is the same code path, so nothing is likely wrong. What would settle it: one more leg (e) case with a seed whose content the schema drops (expect `failure` to begin `snapshot violates schema:` and `record.contract.breach` to be `null`).; Evidence fidelity when the render move itself rejects: `renderMove` throws `render failed: \u2026` on a non-2xx or `success: false` renderer answer, that throw is caught by `runStateExam`'s outer `catch`, and `record.walls.render` is left at its initialised `'skipped'` with `render_ms` `null` (packages/tinyapp-exam/src/state-exam.ts:240, 247-254) \u2014 so the written `walls.json` says the page was never looked at when in fact it was dialled and answered badly. No Machine clause covers this case, and the failure string still reaches the test output, so it blocks nothing. Fix would be to set `record.walls.render = 'ran'` (and a wall) before awaiting the POST, or to catch the render rejection where the render's own wall is in scope.; Undisclosed divergence from the task's Context: the prescribed tsconfig is `\"include\": [\"src\", \"test\"]`, the diff writes `\"include\": [\"src\"]` (packages/tinyapp-exam/tsconfig.json:12). The consequence is that the Proof's `Run: bunx tsc -p packages/tinyapp-exam --noEmit` \u2014 which exits 0 in RUN EVIDENCE \u2014 never typechecks packages/tinyapp-exam/test/state-exam.test.ts, so its `as any` / `(store: any)` casts and any future type drift in the exam are invisible to the typecheck the task's M8 rests on. Nothing in M8 or the Legs requires the test directory to be compiled, so the Machine clause is still literally met and this does not block. Note that restoring `\"test\"` would also pull sibling-owned exam files under packages/tinyapp-exam/test/ into this task's Run line, which is a plausible (but unstated) reason for the narrowing \u2014 if that is the reason, say so in a comment on the tsconfig or widen to `[\"src\", \"test/state-exam.test.ts\"]`.; packages/tinyapp-exam/test/state-exam.test.ts:699 mutates ambient global state at module top level and never restores it: `delete process.env.TINYAPP_RENDER_URL;`. The intent is sound and satisfies the no-network constraint \u2014 the top-level `stateExam(greenSpec())` on the next line runs with the default `env: process.env`, so without this the registered exam would dial whatever renderer the ambient environment names. But `bun test` runs test files in one process, so this deletion leaks to every file that loads after this one in the integrated suite (the run's Acceptance), and a sibling exam that reads the ambient `TINYAPP_RENDER_URL` would silently see it absent. Capture and restore it instead: `const priorRenderUrl = process.env.TINYAPP_RENDER_URL; delete process.env.TINYAPP_RENDER_URL;` and in the existing `afterAll` (line 416) `if (priorRenderUrl !== undefined) process.env.TINYAPP_RENDER_URL = priorRenderUrl;`.; plan-defect: the task's Context prescribes the package manifest as `{\"tinybase\": \"^9.7.0\", \"node-html-parser\": \"^7.0.1\"}`, but `node-html-parser` is being *moved* out of the root `devDependencies`, where BASE pins it at `^9.0.4` (bun.lock:9). Transcribing `^7.0.1` faithfully would have demanded a different resolution than the lockfile carries and put `bun install --frozen-lockfile` (a Proof `Run:` line) at risk, and `render-move.ts` was written against the 9.x parser. The submission diverges to `^9.0.4` (packages/tinyapp-exam/package.json:71), which is the correct call \u2014 M8 and Leg (g) only pin the range to a non-empty string, and RUN EVIDENCE shows `bun install --frozen-lockfile` exit 0. Recorded as a defect in the task text rather than in the diff; the fix is to the plan's Context line, outside this task's FILES, so it is minor and routes to no fix round.; unverified: `runStateExam`'s doc comment (packages/tinyapp-exam/src/state-exam.ts:227) states it \"never rejects\", but only `runMoves` is inside the try/catch \u2014 the `writeEvidence(dir, record)` call at line 256 is outside it, so an unwritable evidence directory would make the promise reject rather than resolve `{ok: false, \u2026}`. No Machine clause or Leg covers a failing `writeEvidence`, and the exam cannot reach that path, so this is advisory. What would settle it: a leg that hands `runStateExam` an `env` whose `ULTRA_RUN_DIR` points at an unwritable path and asserts the promise still resolves with `ok: false`; alternatively, narrow the comment to say a *move* that throws becomes `failure`.; dependency manifest changed: `bun.lock` (tinyapp-exam, packages/tinyapp-exam, name, version, dependencies, node-html-parser, tinybase); dependency manifest changed: `package.json` (typecheck, tinyapp-exam, node-html-parser); dependency manifest changed: `packages/tinyapp-exam/package.json` (name, version, private, type, main, dependencies, tinybase, node-html-parser); concern: plan-defect: two tasks' claims contradict each other over the root `package.json`. My M8 and leg (g) require `devDependencies['node-html-parser']` to be `undefined` (the Context says it is \"moved here from the root devDependencies where the render task put it\"), but the already-committed render-task exam `packages/tinyapp-exam/test/render-move.test.ts:470` leg (j) [M6] asserts the root manifest still carries it as a non-empty string. No implementation can satisfy both. I implemented my task as written (removed it from the root, declared it in `packages/tinyapp-exam/package.json`), so `bun run test` now exits 1 with 70 pass / 1 fail \u2014 that stale leg is the only failure. Keeping it in the root instead would have flipped the failure onto my own leg (g); this needs a plan decision, not a workaround.; concern: plan-defect: the Context prescribes `packages/tinyapp-exam/tsconfig.json` `include: [\"src\", \"test\"]`, but with `test` included `bunx tsc -p packages/tinyapp-exam --noEmit` exits 2 on a prior wave's committed exam, `packages/tinyapp-exam/test/contract.test.ts:79-80`: `let nowInside: number | null = null` assigned only inside a callback narrows to `null`, so `expect(nowInside).toBe(CLOCK_MS)` is a type error. Since that Run line is now part of `scripts.typecheck`, the prescribed include would make the whole suite red. I set `include: [\"src\"]` rather than edit another task's exam file. Consequence: the peer's `test/state-exam.test.ts` is run by `bun test` but not typechecked. (The other four peer test files typecheck clean; only `contract.test.ts` does not.); concern: plan-defect: the Context's literal package manifest pins `node-html-parser` at `^7.0.1`, but the render task installed `^9.0.4` at the root and that is what is in `node_modules` and `bun.lock`. I carried `^9.0.4` across so `bun install --frozen-lockfile` stays offline-clean; leg (g) only requires the range to be a non-empty string.; concern: Design call not fixed by the machine: when `spec.entry` is `undefined` (it is optional in `StateExamSpec`) the render move is skipped rather than run against a guessed default entry, since `renderMove` needs a real path to bundle. Both first-run exams and M2's green spec name `client/index.html`, so no Proof leg exercises the undefined case.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": " a picture leaves neither dom.html nor screenshot.png [0.15ms]\n(pass) leg (f) [M4]: a record with a picture writes the DOM and the screenshot too [0.39ms]\n(pass) leg (g) [M5]: the stem drops a .test.ts or .test.tsx suffix, else the last extension [0.02ms]\n\npackages/tinyapp-exam/test/state-exam.test.ts:\n(pass) leg (a) [M1] [M2]: a green spec with no run directory is ok, its mutant killed, its render skipped [1.37ms]\n(pass) leg (a) [M1]: opts.main defaults to Bun.main, so an omitted main stems this file [0.99ms]\n(pass) leg (b) [M3]: a red store move reports the diff table and never reaches the renderer [1.27ms]\n(pass) leg (c) [M4]: a green store move with a renderer posts once and files the dom and the picture [69.67ms]\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [67.23ms]\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [1.63ms]\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [0.64ms]\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.53ms]\n(pass) state exam: state-exam [0.89ms]\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [57.10ms]\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.41ms]\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.28ms]\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [36.11ms]\n\npackages/tinyapp-exam/test/render-move.test.ts:\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [1.99ms]\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.25ms]\n(pass) leg (b) [M2]: every entry that holds contributes no string [2.30ms]\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [0.88ms]\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.40ms]\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.38ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.28ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.17ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.19ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [79.40ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [72.38ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [53.15ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [102.94ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.19ms]\n\npackages/tinyapp-exam/test/mutant.test.ts:\n(pass) leg (a) [M1]: applyMutant returns a new snapshot and leaves the input untouched [0.10ms]\n(pass) leg (b) [M2]: a cell edit sets exactly that cell in the result [0.11ms]\n(pass) leg (c) [M2]: a cell edit creates the table and the row when they are absent [0.07ms]\n(pass) leg (d) [M3]: an absent cell edit removes that cell and leaves the rest of the row [0.12ms]\n(pass) leg (d) [M3]: removing a row's last cell removes the row, and the table with it [0.06ms]\n(pass) leg (e) [M4]: an absent row edit removes that row and leaves exactly the other row [0.03ms]\n(pass) leg (e) [M4]: removing a table's last row removes the table too [0.02ms]\n(pass) leg (f) [M5]: edits apply in list order, so a later edit to the same cell wins [0.02ms]\n(pass) leg (g) [M6]: a cell edit's segment is <table>/<row>/<cell>, for a set and for a removal [0.03ms]\n(pass) leg (h) [M6]: a row edit's segment is <table>/<row>\n(pass) leg (i) [M6]: segments come in list order joined by a comma, and no edits is the empty string [0.08ms]\n\n 84 pass\n 0 fail\n 395 expect() calls\nRan 84 tests across 11 files. [1438.00ms]\n"
+  },
+  "integratedRuns": [
+    {
+      "task": "5",
+      "cmd": "bun install --frozen-lockfile",
+      "exit": 0,
+      "stdout": "bun install v1.4.0 (34cbb9a40)\n\nChecked 78 installs across 155 packages (no changes) [6.00ms]\n"
+    },
+    {
+      "task": "5",
+      "cmd": "grep -q 'addTodo(' client/src/TodoInput.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "5",
+      "cmd": "grep -q 'setTodoCompleted(' client/src/TodoItem.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "5",
+      "cmd": "grep -q 'deleteTodo(' client/src/TodoItem.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "5",
+      "cmd": "grep -q 'readSeed(' client/src/index.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "3",
+      "cmd": "bun install --frozen-lockfile",
+      "exit": 0,
+      "stdout": "bun install v1.4.0 (34cbb9a40)\n\nChecked 89 installs across 166 packages (no changes) [8.00ms]\n"
+    },
+    {
+      "task": "6",
+      "cmd": "bun install --frozen-lockfile",
+      "exit": 0,
+      "stdout": "bun install v1.4.0 (34cbb9a40)\n\nChecked 90 installs across 167 packages (no changes) [8.00ms]\n"
+    },
+    {
+      "task": "6",
+      "cmd": "bun test tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts",
+      "exit": 0,
+      "stdout": "bun test v1.4.0 (34cbb9a40)\n\ntests/state-exams/buy-milk.test.ts:\n(pass) state exam: buy-milk [11.19ms]\n\ntests/state-exams/empty-todo-refused.test.ts:\n(pass) state exam: empty-todo-refused [1.45ms]\n\n 2 pass\n 0 fail\nRan 2 tests across 2 files. [49.00ms]\n"
+    },
+    {
+      "task": "6",
+      "cmd": "bunx tsc -p packages/tinyapp-exam --noEmit",
+      "exit": 0,
+      "stdout": ""
+    }
+  ],
+  "integratedChecks": [
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/ client/index.html client/vite.config.js client/tsconfig.json client/src/App.tsx client/src/TodoList.tsx client/src/config.ts client/src/sqlite.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/TopBar.tsx tests/smoke.test.ts AGENTS.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/ client/index.html client/vite.config.js client/tsconfig.json client/src/App.tsx client/src/TodoList.tsx client/src/config.ts client/src/sqlite.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/TopBar.tsx tests/smoke.test.ts AGENTS.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/ client/index.html client/vite.config.js client/tsconfig.json client/src/App.tsx client/src/TodoList.tsx client/src/config.ts client/src/sqlite.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/TopBar.tsx tests/smoke.test.ts AGENTS.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 1452899,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0,
+    "pairRounds": 6,
+    "r2MarginalBlocking": 0,
+    "refereeFindings": 9,
+    "refereeBlocking": 0,
+    "refereeSkippedPairs": 0
+  },
+  "acceptance": {
+    "mode": "suite",
+    "passed": true,
+    "reason": "the committed suite is the verification."
+  },
+  "baseline": {
+    "passed": false,
+    "output": "src/Store.tsx(66,7): error TS2345: Argument of type 'ReconnectingWebSocket' is not assignable to parameter of type 'WebSocketTypes'.\n  Type 'ReconnectingWebSocket' is not assignable to type 'WebSocket'.\n    Types of property 'onerror' are incompatible.\n      Type '((event: ErrorEvent) => void) | null' is not assignable to type '((this: WebSocket, ev: Event) => any) | null'.\n        Type '(event: ErrorEvent) => void' is not assignable to type '(this: WebSocket, ev: Event) => any'.\n          Types of parameters 'event' and 'ev' are incompatible.\n            Type 'Event' is missing the following properties from type 'ErrorEvent': message, error\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit\nerror: \"tsc\" exited with code 2\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "735e72255b7acb5f88f78a07df0ba344b25b21be",
+      "branches": [
+        "1",
+        "5"
+      ]
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "0ceeefd6c1ba317d7264e9268ee3cc6b3cc81493",
+      "branches": [
+        "2",
+        "3",
+        "4"
+      ]
+    },
+    {
+      "wave": 3,
+      "status": "MERGED",
+      "headSha": "da87d1ad3430925910467691dd47d842b1c2f892",
+      "branches": [
+        "6"
+      ]
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-2/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-2/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.926,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-2/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-2/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.8119999999999998,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 3,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-2/frontier/wave-3/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-2/frontier/wave-3/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.665,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 6,
+    "tasks_planned": 6,
+    "complete": true
+  },
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [
+    {
+      "deliverable": "Task 3 \u2014 `renderMove`'s live call to the renderer: the POST to `<TINYAPP_RENDER_URL>/snapshot`, the doc-sourced `addScriptTag: [{content}]` request parameter, and the `REFLECT_CHECKED` script that writes `data-checked` before serialisation (`packages/tinyapp-exam/src/render-move.ts:170-174, 248-258`).",
+      "reason": "external",
+      "why": "Structurally complete and fully exercised against an injected `fetchImpl`, but no real endpoint is ever dialled: every test passes the placeholder `http://renderer.invalid/v4/accounts/x/browser-rendering` and a stub response. Whether Cloudflare Browser Rendering honours `addScriptTag: [{content}]` on `/snapshot` \u2014 and therefore whether `checked`/`unchecked` views can ever hold live \u2014 is doc-sourced and unverified, which the plan itself records as what \u00a77 asked Plan A to leave for the first run."
+    },
+    {
+      "deliverable": "Task 3 + Task 6 \u2014 the rendered snapshot page end to end: `renderHtml`'s inlined bundle plus seed script actually booting the app in a browser and painting `#todoList`/`.todoItem`, which is what the two first-run exams' `view` entries assert (`tests/state-exams/buy-milk.test.ts:15-18`, `tests/state-exams/empty-todo-refused.test.ts:15-18`).",
+      "reason": "browser",
+      "why": "The suite runs both exams with `ULTRA_RUN_DIR` unset, so their render move records `skipped` and only the store and mutant moves are proven \u2014 `$ bun test tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts` exits 0 with both passing on that basis. The seeded page's no-persister/no-synchronizer behaviour is separately executed under happy-dom in `client/test/seeded-store.test.ts`; what remains unexecuted is a real browser loading the inlined bundle and the view selectors matching its painted DOM."
+    }
+  ],
+  "judgmentCalls": [
+    "task 5: plan-defect: M8 requires adding `@happy-dom/global-registrator` to the client, which transitively installs `@types/ws`. That resolves tinybase's `WebSocketTypes = WebSocket | WsWebSocket` union for the first time (previously the `ws` import degraded to `any`, so anything was assignable), and BASE's own unmodified `createWsSynchronizer(store, new ReconnectingWebSocket(...))` then fails `bun run typecheck` with TS2345 (`ReconnectingWebSocket.onerror` takes `ErrorEvent`, DOM `WebSocket.onerror` takes `Event`). Confirmed by typechecking BASE's `client/src/Store.tsx` verbatim against the post-install `node_modules`. Fixed task-locally with `as unknown as WebSocket` on the socket argument in `client/src/Store.tsx` (a file in my Files block), with a comment explaining why; no change to `client/tsconfig.json`, which the BASE facts pin.",
+    "task 5: plan-defect: the Context's suggested `client/src/vite-env.d.ts` shape \u2014 `declare global { interface Window { \u2026 } }` plus `export {}` \u2014 makes that .d.ts a module, at which point the file's existing wildcard `declare module '*.css'` becomes a module augmentation of an unresolvable specifier and every CSS side-effect import fails with TS2882 (nine errors across the scaffold's components). Implemented the equivalent instead: the file stays a global script and merges `interface Window { __TINYAPP_SEED__?: import('./storeData').TodosContent }` at top level, which augments the DOM `Window` identically.",
+    "task 5: examiner: (i) [M8] \u2014 \"the `bun install --frozen-lockfile` `Run:` exits 0\" \u2014 The global constraints allow `bun install` only in the driver's bootstrap, so the suite must not invoke it. Encoded instead as an assertion that `bun.lock` records `@happy-dom/global-registrator` (what makes --frozen-lockfile succeed); the driver still runs the literal `Run:` line.",
+    "task 5: the driver's pre-review pass was red (the Proof's exam failed: bun test client/test/todos-store.test.ts client/test/seeded-store.test.ts \u2014 exit 1) \u2014 one repair round before any referee read the patch",
+    "task 5: exam: client/test/seeded-store.test.ts was red for a harness reason, not a missing implementation \u2014 its afterAll unregistered happy-dom in the same synchronous turn as the final root.unmount(), so React's queued passive-effect-flush task dereferenced a deleted `window` and bun reported an unhandled error (exit 1) despite 16/16 assertions passing. Reproduced with a bare `() => null` component and no store at all. Rather than leave the committed suite unusable as verification for the downstream composition task, I made the minimal teardown repair (await a 25 ms yield before unregister()) and am disclosing it here: the edit is confined to the afterAll block; no assertion, mock, counter, seed, settle timer or render path was changed. If the referee prefers the exam byte-identical as handed in, reverting those two lines restores exit 1 with the same 16 passing assertions.",
+    "task 5: the fix round edited the exam \u2014 client/test/seeded-store.test.ts no longer matches the blob recorded at BASE; the review reads the patch, exam hunks included",
+    "task 6: plan-defect: two tasks' claims contradict each other over the root `package.json`. My M8 and leg (g) require `devDependencies['node-html-parser']` to be `undefined` (the Context says it is \"moved here from the root devDependencies where the render task put it\"), but the already-committed render-task exam `packages/tinyapp-exam/test/render-move.test.ts:470` leg (j) [M6] asserts the root manifest still carries it as a non-empty string. No implementation can satisfy both. I implemented my task as written (removed it from the root, declared it in `packages/tinyapp-exam/package.json`), so `bun run test` now exits 1 with 70 pass / 1 fail \u2014 that stale leg is the only failure. Keeping it in the root instead would have flipped the failure onto my own leg (g); this needs a plan decision, not a workaround.",
+    "task 6: plan-defect: the Context prescribes `packages/tinyapp-exam/tsconfig.json` `include: [\"src\", \"test\"]`, but with `test` included `bunx tsc -p packages/tinyapp-exam --noEmit` exits 2 on a prior wave's committed exam, `packages/tinyapp-exam/test/contract.test.ts:79-80`: `let nowInside: number | null = null` assigned only inside a callback narrows to `null`, so `expect(nowInside).toBe(CLOCK_MS)` is a type error. Since that Run line is now part of `scripts.typecheck`, the prescribed include would make the whole suite red. I set `include: [\"src\"]` rather than edit another task's exam file. Consequence: the peer's `test/state-exam.test.ts` is run by `bun test` but not typechecked. (The other four peer test files typecheck clean; only `contract.test.ts` does not.)",
+    "task 6: plan-defect: the Context's literal package manifest pins `node-html-parser` at `^7.0.1`, but the render task installed `^9.0.4` at the root and that is what is in `node_modules` and `bun.lock`. I carried `^9.0.4` across so `bun install --frozen-lockfile` stays offline-clean; leg (g) only requires the range to be a non-empty string.",
+    "task 6: Design call not fixed by the machine: when `spec.entry` is `undefined` (it is optional in `StateExamSpec`) the render move is skipped rather than run against a guessed default entry, since `renderMove` needs a real path to bundle. Both first-run exams and M2's green spec name `client/index.html`, so no Proof leg exercises the undefined case.",
+    "baseline: the suite is RED on BASE (src/Store.tsx(66,7): error TS2345: Argument of type 'ReconnectingWebSocket' is not assignable to parameter of type 'WebSocketTypes'.\n  Type 'ReconnectingWebSocket' is not assignable to type 'WebSocket'.\n    Types of property 'onerror' are incompatible.\n      Type '((event: ErrorEvent) => void) | null' is not assignable to type '((this: WebSocket, ev: Event) => any) | null'.\n        Type '(event: ErrorEvent) => void' is not assignable to type '(this: WebSocket, ev: Event) => any'.\n          Types of parameters 'event' and 'ev' are incompatible.\n            Type 'Event' is missing the following properties from type 'ErrorEvent': message, error\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit\nerror: \"tsc\" exited with code 2\n) \u2014 this wave's red is inherited, not the diff's",
+    "wave 3: candidate adopted after reconcile (48f2a8451689e053bceedbe1478ed955b37ae879 + fixes \u2192 da87d1ad3430925910467691dd47d842b1c2f892)"
+  ],
+  "unfinished": [],
+  "completenessFindings": [
+    {
+      "severity": "minor",
+      "detail": "Task 6, Context slot: `packages/tinyapp-exam/tsconfig.json` sets `\"include\": [\"src\"]`, where the task's Context spells the manifest as `\"include\": [\"src\", \"test\"]`. The consequence is that the six helper test files (`packages/tinyapp-exam/test/store-move.test.ts`, `contract.test.ts`, `mutant.test.ts`, `render-move.test.ts`, `evidence.test.ts`, `state-exam.test.ts`) are typechecked by nothing: the root `scripts.typecheck` is the client's tsc (whose `client/tsconfig.json` includes `src` only), the server's tsc, and `bunx tsc -p packages/tinyapp-exam --noEmit` \u2014 which under this include never reaches `test/`. The plan's Acceptance is \"suite \u2014 the committed suite is the verification\", and this narrows that verification surface below what the contract specified. The tests themselves do run and pass; no test asserts the tsconfig, so nothing caught it."
+    },
+    {
+      "severity": "minor",
+      "detail": "Task 6, `packages/tinyapp-exam/src/state-exam.ts:69-78`: the render move is invoked only when `diff.length === 0 && spec.entry !== undefined`. M4 conditions the single `fetchImpl` call on the store diff being empty and `env` carrying both `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR`; `entry` is optional on `StateExamSpec` (`src/types.ts:61`). An examiner who omits `entry` on a machine where a renderer *is* configured gets `record.walls.render: 'skipped'` with no diagnostic saying why the picture was not taken. Not observable in this tree \u2014 both first-run exams and the state-exam spec all declare `entry: 'client/index.html'` \u2014 and the recorded value is honest ('skipped', never a pass), so the Task 3 Claim is not breached."
+    },
+    {
+      "severity": "minor",
+      "detail": "Task 6, Context slot: `packages/tinyapp-exam/package.json:9` pins `\"node-html-parser\": \"^9.0.4\"` where the Context spells the manifest with `\"node-html-parser\": \"^7.0.1\"` \u2014 a major version above what the plan recorded, and the Context's measured note about the parser (\"css-select, so `input[type=checkbox]` and `.todoItem` work\") was taken against 7.x. `bun.lock:317` resolves 9.0.4 consistently, `bun install --frozen-lockfile` exits 0 in the integrated run evidence, and `packages/tinyapp-exam/test/render-move.test.ts` exercises both of those selector forms, so the behaviour the Context relied on holds on the version actually installed."
+    }
+  ],
+  "blockedWaves": []
+}

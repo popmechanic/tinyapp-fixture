@@ -1,0 +1,64 @@
+{
+  "mode": "gate",
+  "stamp": "run-2",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-2/report.json",
+  "branch": "ultra/integration-run-2",
+  "gateCheck": {
+    "verdict": "NEEDS_ACK",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "acks": [
+      {
+        "type": "deferred:external",
+        "detail": "Task 3 \u2014 `renderMove`'s live call to the renderer: the POST to `<TINYAPP_RENDER_URL>/snapshot`, the doc-sourced `addScriptTag: [{content}]` request parameter, and the `REFLECT_CHECKED` script that writes `data-checked` before serialisation (`packages/tinyapp-exam/src/render-move.ts:170-174, 248-258`). \u2014 Structurally complete and fully exercised against an injected `fetchImpl`, but no real endpoint is ever dialled: every test passes the placeholder `http://renderer.invalid/v4/accounts/x/browser-rendering` and a stub response. Whether Cloudflare Browser Rendering honours `addScriptTag: [{content}]` on `/snapshot` \u2014 and therefore whether `checked`/`unchecked` views can ever hold live \u2014 is doc-sourced and unverified, which the plan itself records as what \u00a77 asked Plan A to leave for the first run. [structural false-green: sandbox could not execute it against the target]"
+      },
+      {
+        "type": "deferred:browser",
+        "detail": "Task 3 + Task 6 \u2014 the rendered snapshot page end to end: `renderHtml`'s inlined bundle plus seed script actually booting the app in a browser and painting `#todoList`/`.todoItem`, which is what the two first-run exams' `view` entries assert (`tests/state-exams/buy-milk.test.ts:15-18`, `tests/state-exams/empty-todo-refused.test.ts:15-18`). \u2014 The suite runs both exams with `ULTRA_RUN_DIR` unset, so their render move records `skipped` and only the store and mutant moves are proven \u2014 `$ bun test tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts` exits 0 with both passing on that basis. The seeded page's no-persister/no-synchronizer behaviour is separately executed under happy-dom in `client/test/seeded-store.test.ts`; what remains unexecuted is a real browser loading the inlined bundle and the view selectors matching its painted DOM."
+      }
+    ],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 2,
+  "acceptance": {
+    "disposition": "suite",
+    "exit": 0,
+    "output": "5ms]\\n(pass) leg (f) [M4]: a record with a picture writes the DOM and the screenshot too [0.55ms]\\n(pass) leg (g) [M5]: the stem drops a .test.ts or .test.tsx suffix, else the last extension [0.03ms]\\n\\npackages/tinyapp-exam/test/state-exam.test.ts:\\n(pass) leg (a) [M1] [M2]: a green spec with no run directory is ok, its mutant killed, its render skipped [2.24ms]\\n(pass) leg (a) [M1]: opts.main defaults to Bun.main, so an omitted main stems this file [1.53ms]\\n(pass) leg (b) [M3]: a red store move reports the diff table and never reaches the renderer [2.00ms]\\n(pass) leg (c) [M4]: a green store move with a renderer posts once and files the dom and the picture [78.66ms]\\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [69.68ms]\\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [2.24ms]\\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [1.05ms]\\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.82ms]\\n(pass) state exam: state-exam [1.12ms]\\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [40.00ms]\\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.60ms]\\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.29ms]\\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [30.59ms]\\n\\npackages/tinyapp-exam/test/render-move.test.ts:\\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [1.40ms]\\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [0.88ms]\\n(pass) leg (b) [M2]: every entry that holds contributes no string [1.27ms]\\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [0.59ms]\\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.48ms]\\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.43ms]\\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.37ms]\\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.22ms]\\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.25ms]\\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [83.22ms]\\n(pass) leg (g) [M4]: failures are assertView of the returned dom [90.91ms]\\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [63.18ms]\\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [139.13ms]\\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.23ms]\\n\\npackages/tinyapp-exam/test/mutant.test.ts:\\n(pass) leg (a) [M1]: applyMutant returns a new snapshot and leaves the input untouched [0.12ms]\\n(pass) leg (b) [M2]: a cell edit sets exactly that cell in the result [0.11ms]\\n(pass) leg (c) [M2]: a cell edit creates the table and the row when they are absent [0.06ms]\\n(pass) leg (d) [M3]: an absent cell edit removes that cell and leaves the rest of the row [0.11ms]\\n(pass) leg (d) [M3]: removing a row's last cell removes the row, and the table with it [0.07ms]\\n(pass) leg (e) [M4]: an absent row edit removes that row and leaves exactly the other row [0.05ms]\\n(pass) leg (e) [M4]: removing a table's last row removes the table too [0.03ms]\\n(pass) leg (f) [M5]: edits apply in list order, so a later edit to the same cell wins [0.04ms]\\n(pass) leg (g) [M6]: a cell edit's segment is <table>/<row>/<cell>, for a set and for a removal [0.03ms]\\n(pass) leg (h) [M6]: a row edit's segment is <table>/<row> [0.01ms]\\n(pass) leg (i) [M6]: segments come in list order joined by a comma, and no edits is the empty string [0.05ms]\\n\\n 84 pass\\n 0 fail\\n 395 expect() calls\\nRan 84 tests across 11 files. [1.52s]\"}\n"
+  },
+  "verdict": "NEEDS_ACK"
+}
