@@ -1,0 +1,12 @@
+{"kind":"run:open","runId":"run-1","base":"","source":"fleet/run-main.mjs","id":"01M22F864S00002E75AHCSYYC7","ts":1788936984729}
+{"kind":"driver:stage","stage":"tiers","detail":"6 null tier slot(s) stamped mostCapable (uniform driver fill; per-task tier is the intent document's slot, #243)","id":"01M22F864V0000MBF4VR86T43E","ts":1788936984731}
+{"kind":"driver:stage","stage":"provision","detail":"BASE a99a2be2b9d1640af886bfd6d8dbc34e234981de; 6 task clone(s) + integration","id":"01M22F86W10000CSEVM5JPHDSB","ts":1788936985473}
+{"kind":"driver:auth","authMethod":"oauth_token","apiKeySource":null,"subscriptionType":null,"id":"01M22F87860000K92VX769W6M2","ts":1788936985862}
+{"kind":"driver:stage","stage":"engine","detail":"waves 2/3/1, width bound 12, patch input armed","id":"01M22F87860001N5HZQKVG5FVF","ts":1788936985862}
+{"kind":"engine:phase","phase":"Setup","id":"01M22F878B0000N0G6T2KP69XA","ts":1788936985867}
+{"kind":"engine:log","line":"setup: branch ultra/integration-run-1 at a99a2be2b9d1640af886bfd6d8dbc34e234981de","id":"01M22F884500003JNX5H4ADJBD","ts":1788936986757}
+{"kind":"engine:phase","phase":"Wave 1","id":"01M22F88450001TZPMD4BZMGY8","ts":1788936986757}
+{"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"206d6c4c-340e-447c-9215-2cf339669d35","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-1/clones/exam-1","model":"opus","id":"01M22F88AN0000YC422AH7WWXB","ts":1788936986965}
+{"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"8e9b949c-4d47-4fa0-ab20-77cb874198a6","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-1/clones/task-1","model":"opus","id":"01M22F88AR0000DFR9F1JQCM92","ts":1788936986968}
+{"kind":"worker:start","label":"exam:5","role":"examiner","sessionId":"b04dd468-c3b2-45e7-937e-888476ae3461","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-1/clones/exam-5","model":"opus","id":"01M22F88AT0000KQHDDG0Y2YA3","ts":1788936986970}
+{"kind":"worker:start","label":"impl:5","role":"implementer","sessionId":"26f99dd9-c75a-430b-8c37-8aaf9ebe1bac","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-1/clones/task-5","model":"opus","id":"01M22F88AW0000S386VF2ENE7E","ts":1788936986972}
