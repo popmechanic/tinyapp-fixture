@@ -43,6 +43,7 @@ import {join, resolve} from 'node:path';
 import {parse} from 'node-html-parser';
 
 import {assertView, renderHtml, renderMove} from '../src/render-move';
+import * as renderMoveModule from '../src/render-move';
 import type {Snapshot, View} from '../src/types';
 
 // ---------------------------------------------------------------- fixtures
@@ -487,4 +488,170 @@ test('leg (j) [M6]: the tree manifests carry node-html-parser', () => {
   expect(readFileSync(resolve(repoRoot, 'bun.lock'), 'utf8')).toContain(
     '"node-html-parser"',
   );
+});
+
+// =====================================================================================
+// Exam for task 1 — "The render branch — an explicit timeout on the registration, a
+// reflection that writes only on change" — legs (b), (c), (d), (e) and (f).
+//
+// M2. `packages/tinyapp-exam/src/render-move.ts` exports `REFLECT_CHECKED`, a string;
+//     evaluated as a script under happy-dom in a document whose body holds exactly two
+//     `<input type="checkbox">` elements, the second with the `checked` attribute: after
+//     the evaluation settles, the first input's `data-checked` attribute is `false`, the
+//     second's is `true`, and a spy on `Element.prototype.setAttribute` installed before
+//     the evaluation counted exactly 2 calls; after a `<span>` is then appended to
+//     `document.body` and the observer settles, the count is still 2; after the first
+//     input's `checked` property is set to `true` and another `<span>` is appended and the
+//     observer settles, the count is exactly 3 and the first input's `data-checked`
+//     attribute is `true`.
+// M3. The character `'` (U+0027) is absent from `REFLECT_CHECKED`; `REFLECT_CHECKED`
+//     contains each of `data-checked`, `querySelectorAll` and `MutationObserver`; and the
+//     body `renderMove` posts on the ran branch carries `addScriptTag` deep-equal to
+//     `[{content: REFLECT_CHECKED}]`.
+// M4. `packages/tinyapp-exam/package.json` `devDependencies` carries
+//     `@happy-dom/global-registrator` as a non-empty string, `bun.lock` records
+//     `@happy-dom/global-registrator` under the `packages/tinyapp-exam` workspace's
+//     `devDependencies`, and `bun install --frozen-lockfile` exits 0 on the tree. (The
+//     install is the Proof's own `Run:`; this file checks the two manifests it rests on.)
+//
+// Nothing here dials: the happy-dom leg is a document in this process and the ran-branch
+// leg injects a `fetchImpl` against the same `.invalid` placeholder the legs above use.
+// happy-dom replaces `document`, `window` and `fetch` on `globalThis`, and bun runs every
+// file of one `bun test` in one process, so leg (b) registers inside its own test and
+// unregisters — and un-spies — in a `finally`.
+
+/** `REFLECT_CHECKED` as `../src/render-move` exports it; M2 says it is a string. */
+const REFLECT_CHECKED = (renderMoveModule as unknown as {REFLECT_CHECKED: string})
+  .REFLECT_CHECKED;
+
+/** One macrotask: happy-dom delivers observer callbacks asynchronously. */
+const settleObserver = (): Promise<void> =>
+  new Promise((done) => {
+    setTimeout(done, 20);
+  });
+
+/** The body M2 pins: two checkboxes, the second checked in the markup. */
+const TWO_BOXES = '<input id="a" type="checkbox"><input id="b" type="checkbox" checked>';
+
+// ------------------------------------------------------------------ (b) [M2]
+
+test('task 1, leg (b) [M2]: the reflection writes each box once and then only on a change', async () => {
+  expect(typeof REFLECT_CHECKED).toBe('string');
+
+  // Computed so an unresolved dependency reddens this leg alone, not the file's load.
+  const specifier = '@happy-dom/global-registrator';
+  const {GlobalRegistrator} = (await import(specifier)) as {
+    GlobalRegistrator: {register: () => void; unregister: () => Promise<void>};
+  };
+
+  GlobalRegistrator.register();
+  const ElementClass = (globalThis as unknown as {Element: {prototype: any}}).Element;
+  const realSetAttribute = ElementClass.prototype.setAttribute;
+  let writes = 0;
+
+  try {
+    // The spy goes on after this parse and before the evaluation, so it counts the
+    // script's writes and not the parser's.
+    document.body.innerHTML = TWO_BOXES;
+    ElementClass.prototype.setAttribute = function (this: unknown, ...args: unknown[]) {
+      writes += 1;
+      return realSetAttribute.apply(this, args);
+    };
+
+    // Indirect `eval`: the renderer runs this text as a script, not as a module.
+    (0, eval)(REFLECT_CHECKED);
+    await settleObserver();
+
+    const first = document.querySelector('#a')!;
+    const second = document.querySelector('#b')!;
+    expect(first.getAttribute('data-checked')).toBe('false');
+    expect(second.getAttribute('data-checked')).toBe('true');
+    expect(writes).toBe(2);
+
+    // A mutation that leaves both boxes as they were settles without another write —
+    // this is the loop the guard closes.
+    document.body.appendChild(document.createElement('span'));
+    await settleObserver();
+    expect(writes).toBe(2);
+
+    // A box whose property really changed is written exactly once more.
+    (first as unknown as {checked: boolean}).checked = true;
+    document.body.appendChild(document.createElement('span'));
+    await settleObserver();
+    expect(writes).toBe(3);
+    expect(first.getAttribute('data-checked')).toBe('true');
+  } finally {
+    ElementClass.prototype.setAttribute = realSetAttribute;
+    await GlobalRegistrator.unregister();
+  }
+});
+
+// ------------------------------------------------------------------ (c) [M3]
+
+test('task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED', () => {
+  expect(typeof REFLECT_CHECKED).toBe('string');
+  expect(REFLECT_CHECKED.length).toBeGreaterThan(0);
+
+  // The same character the `bun -e` `Run:` throws on, spelled two ways.
+  expect(REFLECT_CHECKED.includes("'")).toBe(false);
+  expect(REFLECT_CHECKED.split("'").length).toBe(1);
+});
+
+// ------------------------------------------------------------------ (d) [M3]
+
+test('task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes', () => {
+  expect(typeof REFLECT_CHECKED).toBe('string');
+
+  expect(REFLECT_CHECKED.includes('data-checked')).toBe(true);
+  expect(REFLECT_CHECKED.includes('querySelectorAll')).toBe(true);
+  expect(REFLECT_CHECKED.includes('MutationObserver')).toBe(true);
+});
+
+// ------------------------------------------------------------------ (e) [M3]
+
+test(
+  'task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}]',
+  async () => {
+    expect(typeof REFLECT_CHECKED).toBe('string');
+
+    const {calls, fetchImpl} = recorder(() => okResponse());
+    const result = await renderMove({
+      entry: ENTRY_PATH,
+      content: SEED,
+      env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
+      fetchImpl,
+    });
+
+    expect(result.render).toBe('ran');
+    expect(calls.length).toBe(1);
+
+    const body = JSON.parse(String(calls[0]!.init?.body)) as {addScriptTag: unknown};
+    // The renderer is handed the exported text itself — one tag, nothing else in it.
+    expect(body.addScriptTag).toEqual([{content: REFLECT_CHECKED}]);
+  },
+  60000,
+);
+
+// ------------------------------------------------------------------ (f) [M4]
+
+test('task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package', () => {
+  const manifest = JSON.parse(
+    readFileSync(resolve(repoRoot, 'packages/tinyapp-exam/package.json'), 'utf8'),
+  ) as {devDependencies?: Record<string, string>};
+  const range = manifest.devDependencies?.['@happy-dom/global-registrator'];
+
+  expect(typeof range).toBe('string');
+  expect((range as string).length).toBeGreaterThan(0);
+
+  // The lock carries trailing commas, so it is read as text: the workspace's own block,
+  // from its heading to the next one, must be where the dev dependency is recorded.
+  const lock = readFileSync(resolve(repoRoot, 'bun.lock'), 'utf8');
+  const start = lock.indexOf('"packages/tinyapp-exam": {');
+  expect(start).toBeGreaterThanOrEqual(0);
+  const end = lock.indexOf('"server": {', start);
+  expect(end).toBeGreaterThan(start);
+
+  const block = lock.slice(start, end);
+  expect(block).toContain('"devDependencies"');
+  expect(block).toContain('"@happy-dom/global-registrator"');
 });

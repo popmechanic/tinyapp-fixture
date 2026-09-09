@@ -37,6 +37,9 @@
         "node-html-parser": "^9.0.4",
         "tinybase": "^9.7.0",
       },
+      "devDependencies": {
+        "@happy-dom/global-registrator": "^20.14.0",
+      },
     },
     "server": {
       "name": "tinyapp-fixture-server",

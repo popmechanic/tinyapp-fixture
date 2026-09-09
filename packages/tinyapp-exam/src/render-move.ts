@@ -166,10 +166,19 @@ export const assertView = (
  * The script the renderer injects before it serialises: it copies each input's
  * `checked` property onto a `data-checked` attribute, and keeps copying, since
  * the app paints after load.
+ *
+ * The write is guarded on the value already there. `setAttribute` queues a
+ * mutation record even when it changes nothing, so an unguarded copy feeds its
+ * own observer: the page never goes quiet and the renderer gives up waiting for
+ * it. With the guard the observer runs to a fixed point on the first pass and
+ * only wakes again for a real change.
+ *
+ * It carries no `'`, so a caller may quote the whole text either way.
  */
-const REFLECT_CHECKED =
-  "(function(){var f=function(){document.querySelectorAll('input')" +
-  ".forEach(function(i){i.setAttribute('data-checked', i.checked ? 'true' : 'false')})};" +
+export const REFLECT_CHECKED =
+  '(function(){var f=function(){document.querySelectorAll("input")' +
+  '.forEach(function(i){var v=i.checked?"true":"false";' +
+  'if(i.getAttribute("data-checked")!==v){i.setAttribute("data-checked",v)}})};' +
   'f();new MutationObserver(f).observe(document.documentElement,' +
   '{subtree:true,childList:true,attributes:true})})()';
 

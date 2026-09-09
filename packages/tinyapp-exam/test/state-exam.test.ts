@@ -58,6 +58,8 @@ import {basename, join, relative, resolve} from 'node:path';
 import {addTodo, createTodosStore} from '../../../client/src/storeData';
 import {renderDiff} from '../src/store-move';
 import {runStateExam, stateExam} from '../src/state-exam';
+import * as stateExamModule from '../src/state-exam';
+import * as helperIndex from '../src/index';
 import type {Difference, MutantEdit, StateExamSpec} from '../src/types';
 
 // ---------------------------------------------------------------- fixtures
@@ -558,6 +560,112 @@ test(
     expect(exitCode).toBe(0);
     expect(output).toContain('0 fail');
     expect(Number(/(\d+) pass/.exec(output)?.[1] ?? '0')).toBeGreaterThanOrEqual(2);
+  },
+  120000,
+);
+
+// =====================================================================================
+// Exam for task 1 — "The render branch — an explicit timeout on the registration, a
+// reflection that writes only on change" — leg (a).
+//
+// M1. `packages/tinyapp-exam/src/state-exam.ts` exports `STATE_EXAM_TIMEOUT_MS` equal to
+//     `120000`, `packages/tinyapp-exam/src/index.ts` re-exports it, and `stateExam(spec)`
+//     registers its one bun test with the options argument
+//     `{timeout: STATE_EXAM_TIMEOUT_MS}` — so a test file that calls `stateExam` with a
+//     green spec whose action awaits 300 ms, run as `bun test --timeout 50 <that file>`
+//     with `ULTRA_RUN_DIR` empty, exits 0 with no `timed out` in its output, while a
+//     sibling file registering a plain `test` that awaits 300 ms, run the same way, exits
+//     non-zero with `timed out after 50ms` in its output.
+//
+// Neither spawn dials anything: both run with `ULTRA_RUN_DIR` and `TINYAPP_RENDER_URL`
+// empty, so the exam the slow file registers takes the render move's skipped branch.
+
+/** `STATE_EXAM_TIMEOUT_MS` off a module namespace — `undefined` until it is exported. */
+const timeoutOf = (module: object): unknown =>
+  (module as Record<string, unknown>).STATE_EXAM_TIMEOUT_MS;
+
+/** The slow file M1 spawns: one `stateExam` whose action sleeps 300 ms before it acts. */
+const slowSource = (): string =>
+  [
+    `import {stateExam} from ${JSON.stringify(
+      join(repoRoot, 'packages/tinyapp-exam/src/index.ts'),
+    )};`,
+    `import {addTodo, createTodosStore} from ${JSON.stringify(
+      join(repoRoot, 'client/src/storeData.ts'),
+    )};`,
+    '',
+    'stateExam({',
+    `  clock: ${JSON.stringify(CLOCK)},`,
+    "  entry: 'client/index.html',",
+    "  seed: 'state-exams/seeds/empty.json',",
+    '  store: createTodosStore,',
+    "  action: async (store) => { await Bun.sleep(300); addTodo(store, 'buy milk'); },",
+    "  expected: 'state-exams/expected/one-open-todo.json',",
+    `  mutant: ${JSON.stringify(MUTANT)},`,
+    '} as any);',
+    '',
+  ].join('\n');
+
+/** The sibling M1 spawns beside it: one plain `test` sleeping the same 300 ms. */
+const plainSource = (): string =>
+  [
+    "import {test} from 'bun:test';",
+    '',
+    "test('a plain test that sleeps 300 ms', async () => {",
+    '  await Bun.sleep(300);',
+    '});',
+    '',
+  ].join('\n');
+
+/** `bun test --timeout 50 <path>` from the repository root, run directory and renderer off. */
+const bunTestAt50 = (path: string) => {
+  const spawned = Bun.spawnSync(['bun', 'test', '--timeout', '50', path], {
+    cwd: repoRoot,
+    env: {...process.env, ULTRA_RUN_DIR: '', TINYAPP_RENDER_URL: ''},
+  });
+  return {
+    exitCode: spawned.exitCode,
+    output: `${spawned.stdout.toString()}${spawned.stderr.toString()}`,
+  };
+};
+
+test('task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index', () => {
+  expect(timeoutOf(stateExamModule)).toBe(120000);
+  expect(timeoutOf(helperIndex)).toBe(120000);
+  expect(timeoutOf(helperIndex)).toBe(timeoutOf(stateExamModule));
+
+  // What the `grep -c "timeout: STATE_EXAM_TIMEOUT_MS"
+  // packages/tinyapp-exam/src/state-exam.ts` `Run:` prints: exactly one line registers
+  // with that option.
+  const source = readFileSync(
+    resolve(repoRoot, 'packages/tinyapp-exam/src/state-exam.ts'),
+    'utf8',
+  );
+  const carrying = source
+    .split('\n')
+    .filter((line) => line.includes('timeout: STATE_EXAM_TIMEOUT_MS'));
+  expect(carrying.length).toBe(1);
+});
+
+test(
+  'task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not',
+  () => {
+    const dir = scratch('slow-exam');
+    const slowPath = join(dir, 'slow.test.ts');
+    const plainPath = join(dir, 'plain.test.ts');
+    writeFileSync(slowPath, slowSource());
+    writeFileSync(plainPath, plainSource());
+
+    // The per-test option beats the CLI flag: the exam's two store runs take ~0.6 s and
+    // the file still exits 0, with nothing about a timeout in what it printed.
+    const slow = bunTestAt50(slowPath);
+    expect(slow.exitCode).toBe(0);
+    expect(slow.output).not.toContain('timed out');
+
+    // The sibling, registered with no option, is the control the flag does kill.
+    const plain = bunTestAt50(plainPath);
+    expect(plain.exitCode).not.toBe(0);
+    expect(plain.output).toContain('timed out after 50ms');
   },
   120000,
 );
