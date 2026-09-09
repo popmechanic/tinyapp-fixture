@@ -1,0 +1,253 @@
+{
+  "integrationBranch": "ultra/integration-run-5",
+  "baseSha": "207e3bdca102c80dfc9ac3fc87e856fdb9bc3729",
+  "waves": [
+    [
+      "1",
+      "2"
+    ]
+  ],
+  "dependencyEdges": [],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "0fcfee90efda422614e1a350dce5a74a68afb050",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-5/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "Dead code in the exam file: `tests/state-exams/clear-completed.test.ts` declares `const SEED: TodosContent = [...]` (\"The seed of M3, as the file must parse.\") but never references it \u2014 leg (a) builds its store from an inline literal and leg (d) compares against an inline literal. The `type TodosContent` import exists only to type that unused constant. Nothing in the task requires it, and it invites drift between the constant and the literals the legs actually assert. Removing the constant and the now-unused type import leaves every leg unchanged (all seven tests still assert the same values).; Dead code in the exam file: `const SEED: TodosContent = [...]` (tests/state-exams/clear-completed.test.ts:25-33) and the `type TodosContent` import it is the only consumer of (line 21) are never referenced \u2014 leg (a) and leg (d) each build the seed literal inline instead. It is harmless (tests/ is outside the `typecheck` script's three projects, so no unused-local error) but it is leftover scaffolding, and worse, it is a second copy of a literal that already appears twice in the file. Either use `SEED` in leg (a)'s `createTodosStore(...)` and leg (d)'s `toEqual(...)` \u2014 which would also remove the duplication \u2014 or delete it.; Stale comment in client/src/storeData.ts:41 \u2014 \"The three mutations below are the single code path shared by the UI's buttons and by any headless caller\" now sits above four mutations, since `clearCompleted` was inserted after `deleteTodo` exactly where the task's Context asked. The count is the only wrong word; the claim it makes is still the one this task upholds.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "stateExams": [
+        {
+          "exam": "clear-completed",
+          "store_ms": 8.661378,
+          "render_ms": 1580.536128,
+          "render": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "94932ead8777293df708c688479ca8a8dee849cd",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-5/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "unverified: the page half of M5 \u2014 the run's live question, whether the renderer honours the helper's injected `data-checked` reflection \u2014 is not settled by the exam's `exit 0` alone. `stateExam` asserts the five-entry `view` only when both `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` are set; otherwise it records `\"render\": \"skipped\"` and asserts nothing about the DOM. The EXAM EVIDENCE shows `state exam: done-count` passing in 2827 ms (consistent with a real render, but not proof of one), and nothing in the evidence names which branch ran. On the skipped branch the user-facing half of the Claim (`the top bar reads \"1 of 2 done\"`) rests on leg (g)'s `grep -qF '{done} of {total} done'` over `client/src/DoneCount.tsx`, not on rendered markup. What would settle it: reading `\"render\"` in `<ULTRA_RUN_DIR>/state-exams/task-2/done-count-<pass>/walls.json` (and the presence of `dom.html`) from this task's exam record. This is advisory only \u2014 M5 explicitly discharges the page half on the skipped branch, so the submission satisfies the clause either way, and no edit to this diff is called for.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "stateExams": [
+        {
+          "exam": "done-count",
+          "store_ms": 13.167602000000002,
+          "render_ms": 2798.858354,
+          "render": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "s]\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [62.07ms]\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [1.22ms]\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [0.58ms]\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.46ms]\n(pass) state exam: state-exam [0.94ms]\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [28.15ms]\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.43ms]\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.22ms]\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [31.85ms]\n(pass) task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index [0.28ms]\n(pass) task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not [692.56ms]\n\npackages/tinyapp-exam/test/render-move.test.ts:\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [4.52ms]\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.40ms]\n(pass) leg (b) [M2]: every entry that holds contributes no string [2.20ms]\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [1.03ms]\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.43ms]\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.29ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.35ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.17ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.22ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [88.37ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [53.16ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [71.06ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [132.57ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.23ms]\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [71.56ms]\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.09ms]\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.04ms]\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [88.53ms]\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.21ms]\n\npackages/tinyapp-exam/test/mutant.test.ts:\n(pass) leg (a) [M1]: applyMutant returns a new snapshot and leaves the input untouched [0.12ms]\n(pass) leg (b) [M2]: a cell edit sets exactly that cell in the result [0.13ms]\n(pass) leg (c) [M2]: a cell edit creates the table and the row when they are absent [0.11ms]\n(pass) leg (d) [M3]: an absent cell edit removes that cell and leaves the rest of the row [0.12ms]\n(pass) leg (d) [M3]: removing a row's last cell removes the row, and the table with it [0.08ms]\n(pass) leg (e) [M4]: an absent row edit removes that row and leaves exactly the other row [0.06ms]\n(pass) leg (e) [M4]: removing a table's last row removes the table too [0.06ms]\n(pass) leg (f) [M5]: edits apply in list order, so a later edit to the same cell wins [0.07ms]\n(pass) leg (g) [M6]: a cell edit's segment is <table>/<row>/<cell>, for a set and for a removal [0.04ms]\n(pass) leg (h) [M6]: a row edit's segment is <table>/<row> [0.04ms]\n(pass) leg (i) [M6]: segments come in list order joined by a comma, and no edits is the empty string [0.04ms]\n\n 114 pass\n 0 fail\n 459 expect() calls\nRan 114 tests across 13 files. [2.33s]\n"
+  },
+  "integratedRuns": [
+    {
+      "task": "1",
+      "cmd": "grep -q 'clearCompleted(' client/src/ClearCompleted.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "1",
+      "cmd": "grep -q 'id=\"clearCompleted\"' client/src/ClearCompleted.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "1",
+      "cmd": "grep -q 'Clear completed' client/src/ClearCompleted.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "1",
+      "cmd": "grep -q 'onClick=' client/src/ClearCompleted.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "1",
+      "cmd": "grep -q 'useStore(STORE_ID)' client/src/ClearCompleted.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "1",
+      "cmd": "grep -q '<ClearCompleted />' client/src/TodoList.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "grep -q 'countTodos(' client/src/DoneCount.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "grep -q 'id=\"doneCount\"' client/src/DoneCount.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "grep -q 'useTable' client/src/DoneCount.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "grep -qF '{done} of {total} done' client/src/DoneCount.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "sed -n '/<Title/,/<Info/p' client/src/TopBar.tsx | grep -q 'DoneCount'",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "sed -n '/<Provider>/,/<\\/Provider>/p' client/src/App.tsx | tr '\\n' ' ' | grep -q '<Provider>.*<TopBar.*<Main.*</Provider>'",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "test \"$(grep -c '<Provider>' client/src/App.tsx)\" -eq 1",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "test \"$(grep -c '</Provider>' client/src/App.tsx)\" -eq 1",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "grep -q 'const Main' client/src/App.tsx",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "2",
+      "cmd": "grep -q 'useTable' client/src/Store.tsx",
+      "exit": 0,
+      "stdout": ""
+    }
+  ],
+  "integratedChecks": [
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/ packages/ client/index.html client/vite.config.js client/tsconfig.json client/package.json client/public client/test client/src/TodoInput.tsx client/src/TodoItem.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/Info.tsx client/src/Title.tsx client/src/config.ts client/src/sqlite.tsx client/src/index.tsx client/src/vite-env.d.ts client/src/button.css client/src/todoItem.css client/src/todoList.css client/src/topBar.css client/src/title.css client/src/info.css package.json bun.lock tests/smoke.test.ts tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts state-exams/seeds/empty.json state-exams/expected/one-open-todo.json state-exams/expected/still-empty.json AGENTS.md README.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 302070,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0,
+    "pairRounds": 2,
+    "r2MarginalBlocking": 0,
+    "refereeFindings": 0,
+    "refereeBlocking": 0,
+    "refereeSkippedPairs": 0
+  },
+  "acceptance": {
+    "mode": "suite",
+    "passed": true,
+    "reason": "the committed suite is the verification."
+  },
+  "baseline": null,
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "c17a99a6e00aa14d0792c6fefe8a956fc2e687bf",
+      "branches": [
+        "1",
+        "2"
+      ]
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-5/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-5/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.7909999999999999,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 2,
+    "tasks_planned": 2,
+    "complete": true
+  },
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [
+    {
+      "deliverable": "The integrated page rendering both Task 1's `#clearCompleted` button and Task 2's `#doneCount` span together (client/src/App.tsx, client/src/TopBar.tsx, client/src/TodoList.tsx, client/src/DoneCount.tsx, client/src/ClearCompleted.tsx)",
+      "reason": "browser",
+      "why": "Both exam records are pass `-0` and were written before the fold: `<runDir>/state-exams/task-1/clear-completed-0/dom.html` contains `clearCompleted` and no `doneCount`, and `<runDir>/state-exams/task-2/done-count-0/dom.html` contains `doneCount` and no `clearCompleted`, so each render move ran on its own task's isolated worktree. Both walls.json read `\"render\": \"ran\"` and both store-diff.json are empty, so each half is proven on its own tree; the combined document has never been bundled and POSTed to the renderer, which needs TINYAPP_RENDER_URL and ULTRA_RUN_DIR and a network call this read-only role does not make. Static reading shows no interaction between the two \u2014 the button is a sibling of `#todoList` inside `Main`, the span is between `<Title />` and `<Info />` in `#topBar`, and both sit under the one lifted `<Provider>` \u2014 and no view entry of either exam or of the fixture's own two exams counts an element the other task adds."
+    },
+    {
+      "deliverable": "A user's actual press of the `#clearCompleted` button (client/src/ClearCompleted.tsx)",
+      "reason": "browser",
+      "why": "Task 1's Claim is about pressing the button, but no test dispatches a DOM click: the chain is the exam's headless `clearCompleted(store)` call plus M4's greps proving the button carries `onClick=`, `useStore(STORE_ID)` and `clearCompleted(` \u2014 a shape the contract pre-registers, and the render move only proves the button is on the page with the right id and text. The click-to-callback edge is verified by reading `client/src/ClearCompleted.tsx:7-14` (the handler guards on `store` and calls the one storeData callback), not by execution; this environment starts no browser to fire the event."
+    }
+  ],
+  "judgmentCalls": [],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
