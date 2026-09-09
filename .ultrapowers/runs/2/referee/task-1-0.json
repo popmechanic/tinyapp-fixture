@@ -1,0 +1,43 @@
+{
+  "task": "1",
+  "n": 0,
+  "findings": [],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `Snapshot` (type, `src/types.ts`) packages/tinyapp-exam/src/types.ts exports Snapshot; Produces: `Difference` (type, `src/types.ts`) packages/tinyapp-exam/src/types.ts exports Difference; Produces: `MutantEdit` (type, `src/types.ts`) packages/tinyapp-exam/src/types.ts exports MutantEdit; Produces: `View` (type, `src/types.ts`) packages/tinyapp-exam/src/types.ts exports View; Produces: `StateExamSpec` (type, `src/types.ts`) packages/tinyapp-exam/src/types.ts exports StateExamSpec; Produces: `ExamRecord` (type, `src/types.ts`) packages/tinyapp-exam/src/types.ts exports ExamRecord; Produces: `diffContent(got: Snapshot, wanted: Snapshot) -> Difference[]` packages/tinyapp-exam/src/store-move.ts exports diffContent; Produces: `renderDiff(differences: Difference[]) -> string` packages/tinyapp-exam/src/store-move.ts exports renderDiff; Produces: `storeMove(spec: StateExamSpec) -> Promise<{content: Snapshot, diff: Difference[], ms: number}>` packages/tinyapp-exam/src/store-move.ts exports storeMove; Produces: `withContract(clock: string, fn: () => unknown) -> Promise<void>` packages/tinyapp-exam/src/contract.ts exports withContract"
+    },
+    {
+      "check": "exam-files",
+      "detail": "packages/tinyapp-exam/test/store-move.test.ts, packages/tinyapp-exam/test/contract.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +20 / −0 across the patch"
+    },
+    {
+      "check": "dependencies",
+      "detail": "no manifest changed"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "packages/tinyapp-exam/src/contract.ts": "ts",
+    "packages/tinyapp-exam/src/store-move.ts": "ts",
+    "packages/tinyapp-exam/src/types.ts": "ts",
+    "packages/tinyapp-exam/test/contract.test.ts": "ts",
+    "packages/tinyapp-exam/test/store-move.test.ts": "ts"
+  },
+  "ms": 16
+}

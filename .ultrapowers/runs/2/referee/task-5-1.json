@@ -1,0 +1,55 @@
+{
+  "task": "5",
+  "n": 1,
+  "findings": [
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `bun.lock` (configVersion, @happy-dom/global-registrator, dependencies, @types/node, happy-dom, @types/whatwg-mimetype, @types/ws, buffer-image-size, entities, whatwg-mimetype, ws)"
+    },
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `client/package.json` (@happy-dom/global-registrator, @vitejs/plugin-react, typescript, vite)"
+    }
+  ],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `addTodo(store: TodosStore, text: string) -> string | undefined` client/src/Store.tsx exports addTodo; Produces: `setTodoCompleted(store: TodosStore, id: string, completed: boolean) -> void` client/src/Store.tsx exports setTodoCompleted; Produces: `deleteTodo(store: TodosStore, id: string) -> void` client/src/Store.tsx exports deleteTodo; Produces: `createTodosStore(seed?: TodosContent) -> TodosStore` client/src/storeData.ts exports createTodosStore; Produces: `readSeed() -> TodosContent | undefined` client/src/storeData.ts exports readSeed; Produces: `TodosStore` (type, `client/src/storeData.ts`) client/src/storeData.ts exports TodosStore"
+    },
+    {
+      "check": "exam-files",
+      "detail": "client/test/todos-store.test.ts, client/test/seeded-store.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +16 / −0 across the patch"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "client/src/Store.tsx": "ts",
+    "client/src/TodoInput.tsx": "ts",
+    "client/src/TodoItem.tsx": "ts",
+    "client/src/index.tsx": "ts",
+    "client/src/storeData.ts": "ts",
+    "client/src/vite-env.d.ts": "ts",
+    "client/test/seeded-store.test.ts": "ts",
+    "client/test/todos-store.test.ts": "ts"
+  },
+  "ms": 3
+}
