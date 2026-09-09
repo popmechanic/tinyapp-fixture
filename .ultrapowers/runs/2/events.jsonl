@@ -170,3 +170,5 @@
 {"kind":"driver:fail","verdict":"needs-ack","detail":"non-pre-authorized ack(s): deferred:browser — gate receipt is the terminal artifact","id":"01M22NSDPA0001KXYC0AE8A74P","ts":1788943840970}
 {"kind":"run:open","runId":"run-2","base":"a99a2be2b9d1640af886bfd6d8dbc34e234981de","source":"fleet/publish-fold.mjs","id":"01M22NSDXY0000PHX7BR0ZVNA1","ts":1788943841214}
 {"kind":"driver:publish-fold","run":"2","attempt":"1","base":"a99a2be2b9d1640af886bfd6d8dbc34e234981de","tip":"a99a2be2b9d1640af886bfd6d8dbc34e234981de","candidate":"da87d1ad3430925910467691dd47d842b1c2f892","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M22NSEX50000DZYKF5W4PDSK","ts":1788943842213}
+{"kind":"publish:pr","url":"https://github.com/popmechanic/tinyapp-fixture/pull/1","number":1,"draft":true,"id":"01M22NSM8C0000CNXQ47A4G924","ts":1788943847692}
+{"kind":"publish:followup","url":"https://github.com/popmechanic/tinyapp-fixture/issues/2","items":64,"id":"01M22NSNMW0000ZA1XHAZQYBKC","ts":1788943849116}
