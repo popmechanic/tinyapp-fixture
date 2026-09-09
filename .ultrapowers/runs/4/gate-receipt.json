@@ -1,0 +1,64 @@
+{
+  "mode": "gate",
+  "stamp": "run-4",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-4/report.json",
+  "branch": "ultra/integration-run-4",
+  "gateCheck": {
+    "verdict": "NEEDS_ACK",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "acks": [
+      {
+        "type": "deferred:external",
+        "detail": "Task 1 \u2014 the render-ran branch end to end against a live TINYAPP_RENDER_URL: that the 120 s registration wall and the guarded REFLECT_CHECKED together let a real state exam reach the renderer (run-3 measured 3.7 s with data-checked correct on both inputs) instead of dying at bun's 5000 ms or at Cloudflare's 422/code 6002 after ~61 s. \u2014 The global constraint forbids any test reaching the network \u2014 every fetch in the suite is an injected fetchImpl and the renderer URL is a .invalid placeholder that is never dialled \u2014 so the integrated evidence exercises the ran branch only through stubs (leg (e) checks the posted body, legs (g)-(i) the response handling). The defect this task fixes was measured against the live renderer and cannot be re-measured here. [structural false-green: sandbox could not execute it against the target]"
+      },
+      {
+        "type": "deferred:browser",
+        "detail": "Task 1 \u2014 REFLECT_CHECKED's settling behaviour under the renderer's own browser engine (Cloudflare Browser Rendering / Chromium), including that the app's post-injection paint is still captured by the observer. \u2014 The reflection is exercised by indirect eval under @happy-dom/global-registrator 20.14 in-process (leg (b)), which is a DOM emulation: it pins the guard's write counts and the fixed point, but not the real engine's mutation-record timing or the renderer's serialisation of the injected script's effects."
+      }
+    ],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 2,
+  "acceptance": {
+    "disposition": "suite",
+    "exit": 0,
+    "output": "oes not satisfy is a render failure naming its selector [57.89ms]\\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [1.47ms]\\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [0.60ms]\\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.48ms]\\n(pass) state exam: state-exam [0.77ms]\\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [45.46ms]\\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.36ms]\\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.19ms]\\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [56.55ms]\\n(pass) task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index [0.32ms]\\n(pass) task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not [702.33ms]\\n\\npackages/tinyapp-exam/test/render-move.test.ts:\\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [4.25ms]\\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.21ms]\\n(pass) leg (b) [M2]: every entry that holds contributes no string [2.21ms]\\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [1.10ms]\\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.49ms]\\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.32ms]\\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.28ms]\\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.16ms]\\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.19ms]\\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [74.94ms]\\n(pass) leg (g) [M4]: failures are assertView of the returned dom [75.19ms]\\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [66.83ms]\\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [134.60ms]\\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.32ms]\\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [84.40ms]\\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.11ms]\\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.07ms]\\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [61.06ms]\\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.18ms]\\n\\npackages/tinyapp-exam/test/mutant.test.ts:\\n(pass) leg (a) [M1]: applyMutant returns a new snapshot and leaves the input untouched [0.09ms]\\n(pass) leg (b) [M2]: a cell edit sets exactly that cell in the result [0.08ms]\\n(pass) leg (c) [M2]: a cell edit creates the table and the row when they are absent [0.04ms]\\n(pass) leg (d) [M3]: an absent cell edit removes that cell and leaves the rest of the row [0.08ms]\\n(pass) leg (d) [M3]: removing a row's last cell removes the row, and the table with it [0.04ms]\\n(pass) leg (e) [M4]: an absent row edit removes that row and leaves exactly the other row [0.03ms]\\n(pass) leg (e) [M4]: removing a table's last row removes the table too [0.03ms]\\n(pass) leg (f) [M5]: edits apply in list order, so a later edit to the same cell wins [0.02ms]\\n(pass) leg (g) [M6]: a cell edit's segment is <table>/<row>/<cell>, for a set and for a removal [0.02ms]\\n(pass) leg (h) [M6]: a row edit's segment is <table>/<row> [0.01ms]\\n(pass) leg (i) [M6]: segments come in list order joined by a comma, and no edits is the empty string [0.02ms]\\n\\n 91 pass\\n 0 fail\\n 428 expect() calls\\nRan 91 tests across 11 files. [2.36s]\"}\n"
+  },
+  "verdict": "NEEDS_ACK"
+}

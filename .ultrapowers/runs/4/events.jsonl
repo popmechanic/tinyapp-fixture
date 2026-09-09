@@ -37,3 +37,14 @@
 {"kind":"driver:integrated-check","cmd":"test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0","exit":0,"minor":false,"wave":1,"id":"01M23KG7EM00009KZANZHJY9H9","ts":1788974996948}
 {"kind":"engine:phase","phase":"Integration Review","id":"01M23KG7EM0001BZPV3F499B4G","ts":1788974996948}
 {"kind":"worker:start","label":"integration","role":"critic","sessionId":"08045e3c-104a-481f-937a-2388c9662e2c","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-4/clones/integration","model":"opus","id":"01M23KG7EN0000C6XKKC28Z2RQ","ts":1788974996949}
+{"kind":"worker:end","label":"integration","role":"critic","sessionId":"08045e3c-104a-481f-937a-2388c9662e2c","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":5655,"output":8554,"cacheRead":554306,"cacheCreation":80748,"costUsd":1.326758,"models":["claude-opus-5"]},"id":"01M23KKW850000KSCVHMA6NMGH","ts":1788975116549}
+{"kind":"transcript:slice","label":"integration","sessionId":"08045e3c-104a-481f-937a-2388c9662e2c","bytes":11465,"id":"01M23KKW8A0000G0QPRHAPCQB2","ts":1788975116554}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M23KKW8M000059Y7WJ50RAJZ","ts":1788975116564}
+{"kind":"driver:stage","stage":"finalize","id":"01M23KKW9M00006WN4DP0HY7G0","ts":1788975116596}
+{"kind":"driver:stage","stage":"acceptance-capture","detail":"gate suite tees to /home/exedev/target/.claude/ultrapowers/run-run-4/acceptance.log","id":"01M23KKWB60000MTFCEA2XKRH5","ts":1788975116646}
+{"kind":"driver:stage","stage":"gate","id":"01M23KKWB70000W62JARDE3ZX4","ts":1788975116647}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M23KM1AN0000TM6EB98Y5XD3","ts":1788975121749}
+{"kind":"driver:ack-decision","approve":false,"reason":"non-pre-authorized ack(s): deferred:browser","id":"01M23KM1AN00019BG8NKTPGAMH","ts":1788975121749}
+{"kind":"driver:fail","verdict":"needs-ack","detail":"non-pre-authorized ack(s): deferred:browser — gate receipt is the terminal artifact","id":"01M23KM1AN00026EJ2G60ND2QS","ts":1788975121749}
+{"kind":"run:open","runId":"run-4","base":"a2135f15cc2982d20d954da672f3cc62c4b67156","source":"fleet/publish-fold.mjs","id":"01M23KM1JT0000PX9CSVJ4W5WV","ts":1788975122010}
+{"kind":"driver:publish-fold","run":"4","attempt":"1","base":"a2135f15cc2982d20d954da672f3cc62c4b67156","tip":"a2135f15cc2982d20d954da672f3cc62c4b67156","candidate":"b8fa2288e7cc82c6bacd30a07c32ede86db1c52f","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M23KM2HH0000NRKMA9PH63TE","ts":1788975122993}

@@ -40,14 +40,14 @@
     {
       "stage": "base-branch",
       "ok": true,
-      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+      "detail": "detached HEAD → fell back to repo default 'main'"
     }
   ],
   "compile": {
     "tasks": [
       {
         "id": "1",
-        "title": "The render branch \u2014 an explicit timeout on the registration, a reflection that writes only on change",
+        "title": "The render branch — an explicit timeout on the registration, a reflection that writes only on change",
         "disposition": "implementation",
         "heuristic": false,
         "writes": [
@@ -82,7 +82,7 @@
       [
         {
           "id": "1",
-          "title": "The render branch \u2014 an explicit timeout on the registration, a reflection that writes only on change",
+          "title": "The render branch — an explicit timeout on the registration, a reflection that writes only on change",
           "files": [
             "bun.lock",
             "packages/tinyapp-exam/package.json",
@@ -132,7 +132,7 @@
       ]
     ],
     "waveLabels": [
-      "The render branch \u2014 an explicit timeout on the registra\u2026"
+      "The render branch — an explicit timeout on the registra…"
     ],
     "mode": "sequential",
     "degrade_reason": "Sequential mode: 1 implementation tasks",
@@ -141,7 +141,7 @@
       "mode": "suite",
       "reason": "the committed suite is the verification."
     },
-    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is an injected `fetchImpl` or the\n  contract's blocked one, no test starts a server or a Durable Object, and the renderer URL a test\n  passes is a placeholder that is never dialled. `bun install` is the only network use in the run\n  and happens only in the driver's bootstrap and the one `bun add` this task's Context names.\n- The helper's public surface grows and never shrinks: every name `packages/tinyapp-exam/src/index.ts`\n  exports at BASE is still exported, `renderMove`'s request body is still `{html, addScriptTag}`\n  with one script tag, and the skipped branch (either of `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR`\n  unset or empty) still dials nothing.\n- Every file outside this task's Files block is byte-identical to BASE (the task's `git diff --quiet $ULTRA_BASE` `Run:`); the\n  task adds no dependency but the one its Files block names, and `bun.lock` is written by this task\n  alone.\n\n**Acceptance:** suite \u2014 the committed suite is the verification.",
+    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is an injected `fetchImpl` or the\n  contract's blocked one, no test starts a server or a Durable Object, and the renderer URL a test\n  passes is a placeholder that is never dialled. `bun install` is the only network use in the run\n  and happens only in the driver's bootstrap and the one `bun add` this task's Context names.\n- The helper's public surface grows and never shrinks: every name `packages/tinyapp-exam/src/index.ts`\n  exports at BASE is still exported, `renderMove`'s request body is still `{html, addScriptTag}`\n  with one script tag, and the skipped branch (either of `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR`\n  unset or empty) still dials nothing.\n- Every file outside this task's Files block is byte-identical to BASE (the task's `git diff --quiet $ULTRA_BASE` `Run:`); the\n  task adds no dependency but the one its Files block names, and `bun.lock` is written by this task\n  alone.\n\n**Acceptance:** suite — the committed suite is the verification.",
     "constraintChecks": [
       {
         "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
@@ -160,13 +160,14 @@
   "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-4/args.json",
   "workflowName": "ultrapowers-run",
   "llmDerives": [
-    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
-    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
-    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
-    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries — never a top-level launch key)",
+    "nothing for waves[][].testCmd — the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived — knob or detection — and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd — driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth — it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
   ],
-  "testCmd": "bun run test",
+  "testCmd": "set -o pipefail; { bun run test; } 2>&1 | tee '/home/exedev/target/.claude/ultrapowers/run-run-4/acceptance.log'",
   "testCmdSource": "detected:package-json-bun",
   "bootstrapCmd": "bun install --frozen-lockfile",
-  "bootstrapCmdSource": "detected:bun-lockfile"
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "acceptanceLog": "/home/exedev/target/.claude/ultrapowers/run-run-4/acceptance.log"
 }

@@ -1,0 +1,170 @@
+{
+  "integrationBranch": "ultra/integration-run-4",
+  "baseSha": "a2135f15cc2982d20d954da672f3cc62c4b67156",
+  "waves": [
+    [
+      "1"
+    ]
+  ],
+  "dependencyEdges": [],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "935a5fa523cfff8e1de5f889dbebc80510845b49",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-4/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "Copy-pasted helpers in `packages/tinyapp-exam/test/state-exam.test.ts`. `slowSource()` (patch:344-362) is `hollowSource()` (BASE state-exam.test.ts:424-443) verbatim apart from the `action` line and the mutant constant, and `bunTestAt50()` (patch:376-385) is `bunTest()` (BASE:446-455) with two extra argv entries and one extra env key. Both would collapse into the existing helpers with a parameter \u2014 e.g. `examSource({action, mutant})` and `bunTest(paths, {args = [], env = {}})` \u2014 leaving one spawn shape and one generated-file shape for the file to maintain. Incidental divergence the parameterisation would also remove: `bunTest` concatenates `stderr + stdout` while `bunTestAt50` uses `stdout + stderr`; harmless for the `toContain` checks, but two orders for one thing.; unverified: the Claim's live-renderer half. M2's counts are measured under `@happy-dom/global-registrator` and leg (e) posts through an injected `fetchImpl` at `renderer.invalid`, so the diff establishes that the guarded script settles in a happy-dom document and that the exact exported text is what gets posted \u2014 not that Cloudflare's `/snapshot` now answers 200 in ~3.7 s where the unguarded script drew 422/`code 6002` after ~61 s, nor that 120000 ms is the right wall for a real 2-6 s render. This is forced by the no-network global constraint, so it cannot be settled inside this suite and correctly blocks nothing. What would settle it: one run of a state exam with `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` set against the live renderer, outside `bun run test`, checking the returned DOM carries `input#todo-0 data-checked=\"false\"` and `input#todo-1 data-checked=\"true\"` \u2014 the shape run-3's workers already used to measure the defect.; unverified: the Claim's live-renderer half \u2014 \"A state exam that renders gets the time it needs\" against the real `TINYAPP_RENDER_URL` (a ~1.9 MB page returning 200 with `data-checked` set on both inputs, instead of the 422/code 6002 the unguarded script produced) \u2014 is not settled by this diff and cannot be, since the first GLOBAL CONSTRAINT forbids any test dialling the renderer. The committed suite settles the in-tree proxies only: `STATE_EXAM_TIMEOUT_MS` is 120000 and beats `--timeout 50` on a spawned exam (state-exam.test.ts leg (a), exit 0), and the guarded `REFLECT_CHECKED` reaches a fixed point under happy-dom at exactly 2/2/3 `setAttribute` calls (render-move.test.ts leg (b)). The renderer-side facts rest entirely on run-3's 3/3 measurements cited in Authorized-by. What would settle it: one run of a state exam with `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` both set, outside the suite, checking the filed DOM carries `input#todo-0 data-checked=\"false\"` and `input#todo-1 data-checked=\"true\"`. Recorded for the operator; it blocks nothing, since no in-tree edit could answer it under the network constraint.; `settleObserver()` in packages/tinyapp-exam/test/render-move.test.ts is a fixed 20 ms sleep, and the middle assertion of leg (b) \u2014 `expect(writes).toBe(2)` after appending a `<span>` \u2014 is a negative one: on a loaded machine where happy-dom has not yet delivered the observer callback within 20 ms, it would hold for the wrong reason. The leg is not silently green overall, because the third step asserts the count *rises* to 3 after the same 20 ms wait, so a too-slow observer reddens the test rather than passing it vacuously; this is a flake-hardness note, not a coverage gap. The task's Context measured 20 ms and says a longer wait is fine. If it ever flakes, replace the fixed sleep with a bounded poll \u2014 e.g. loop up to ~500 ms awaiting a 20 ms timer until `writes` stops changing, then assert \u2014 which keeps the same three counts while removing the dependence on one macrotask being enough.; dependency manifest changed: `bun.lock` (devDependencies, @happy-dom/global-registrator); dependency manifest changed: `packages/tinyapp-exam/package.json` (devDependencies, @happy-dom/global-registrator)",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "stateExams": [
+        {
+          "exam": "buy-milk",
+          "store_ms": 2.5052870000000667,
+          "render_ms": 2499.218616,
+          "render": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "empty-todo-refused",
+          "store_ms": 1.2750169999999343,
+          "render_ms": 2292.04123,
+          "render": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "state-exam",
+          "store_ms": 0.5265479999999911,
+          "render_ms": null,
+          "render": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "ms]\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [70.87ms]\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [1.54ms]\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [0.63ms]\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.49ms]\n(pass) state exam: state-exam [0.76ms]\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [56.49ms]\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.60ms]\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.30ms]\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [42.57ms]\n(pass) task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index [0.35ms]\n(pass) task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not [718.61ms]\n\npackages/tinyapp-exam/test/render-move.test.ts:\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [2.15ms]\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.35ms]\n(pass) leg (b) [M2]: every entry that holds contributes no string [1.96ms]\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [0.97ms]\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.45ms]\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.29ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.26ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.14ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.23ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [101.52ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [67.49ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [56.90ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [141.71ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.23ms]\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [72.54ms]\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.25ms]\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.14ms]\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [75.65ms]\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.29ms]\n\npackages/tinyapp-exam/test/mutant.test.ts:\n(pass) leg (a) [M1]: applyMutant returns a new snapshot and leaves the input untouched [0.18ms]\n(pass) leg (b) [M2]: a cell edit sets exactly that cell in the result [0.18ms]\n(pass) leg (c) [M2]: a cell edit creates the table and the row when they are absent [0.13ms]\n(pass) leg (d) [M3]: an absent cell edit removes that cell and leaves the rest of the row [0.17ms]\n(pass) leg (d) [M3]: removing a row's last cell removes the row, and the table with it [0.12ms]\n(pass) leg (e) [M4]: an absent row edit removes that row and leaves exactly the other row [0.09ms]\n(pass) leg (e) [M4]: removing a table's last row removes the table too [0.08ms]\n(pass) leg (f) [M5]: edits apply in list order, so a later edit to the same cell wins [0.08ms]\n(pass) leg (g) [M6]: a cell edit's segment is <table>/<row>/<cell>, for a set and for a removal [0.07ms]\n(pass) leg (h) [M6]: a row edit's segment is <table>/<row> [0.03ms]\n(pass) leg (i) [M6]: segments come in list order joined by a comma, and no edits is the empty string [0.07ms]\n\n 91 pass\n 0 fail\n 428 expect() calls\nRan 91 tests across 11 files. [2.40s]\n"
+  },
+  "integratedRuns": [
+    {
+      "task": "1",
+      "cmd": "bun install --frozen-lockfile",
+      "exit": 0,
+      "stdout": "bun install v1.4.0 (34cbb9a40)\n\nChecked 90 installs across 167 packages (no changes) [7.00ms]\n"
+    },
+    {
+      "task": "1",
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/ client/ tests/ state-exams/ AGENTS.md README.md package.json packages/tinyapp-exam/tsconfig.json packages/tinyapp-exam/src/contract.ts packages/tinyapp-exam/src/evidence.ts packages/tinyapp-exam/src/mutant.ts packages/tinyapp-exam/src/store-move.ts packages/tinyapp-exam/src/types.ts",
+      "exit": 0,
+      "stdout": ""
+    },
+    {
+      "task": "1",
+      "cmd": "grep -c \"timeout: STATE_EXAM_TIMEOUT_MS\" packages/tinyapp-exam/src/state-exam.ts",
+      "exit": 0,
+      "stdout": "1\n"
+    },
+    {
+      "task": "1",
+      "cmd": "bun -e \"const m = await import('./packages/tinyapp-exam/src/render-move.ts'); if (typeof m.REFLECT_CHECKED !== 'string' || m.REFLECT_CHECKED.includes(String.fromCharCode(39))) { throw new Error('REFLECT_CHECKED missing or carries a single quote') }; console.log('no single quote in REFLECT_CHECKED')\"",
+      "exit": 0,
+      "stdout": "no single quote in REFLECT_CHECKED\n"
+    },
+    {
+      "task": "1",
+      "cmd": "bun run test",
+      "exit": 0,
+      "stdout": "6ms]\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [72.33ms]\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [2.42ms]\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [1.02ms]\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.84ms]\n(pass) state exam: state-exam [1.09ms]\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [61.25ms]\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.80ms]\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.34ms]\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [44.31ms]\n(pass) task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index [0.38ms]\n(pass) task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not [688.72ms]\n\npackages/tinyapp-exam/test/render-move.test.ts:\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [2.52ms]\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.28ms]\n(pass) leg (b) [M2]: every entry that holds contributes no string [1.99ms]\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [0.91ms]\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.46ms]\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.43ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.31ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.18ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.24ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [91.97ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [74.27ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [70.01ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [136.17ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.25ms]\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [76.43ms]\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.06ms]\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.03ms]\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [85.04ms]\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.21ms]\n\npackages/tinyapp-exam/test/mutant.test.ts:\n(pass) leg (a) [M1]: applyMutant returns a new snapshot and leaves the input untouched [0.12ms]\n(pass) leg (b) [M2]: a cell edit sets exactly that cell in the result [0.11ms]\n(pass) leg (c) [M2]: a cell edit creates the table and the row when they are absent [0.07ms]\n(pass) leg (d) [M3]: an absent cell edit removes that cell and leaves the rest of the row [0.11ms]\n(pass) leg (d) [M3]: removing a row's last cell removes the row, and the table with it [0.08ms]\n(pass) leg (e) [M4]: an absent row edit removes that row and leaves exactly the other row [0.06ms]\n(pass) leg (e) [M4]: removing a table's last row removes the table too [0.04ms]\n(pass) leg (f) [M5]: edits apply in list order, so a later edit to the same cell wins [0.04ms]\n(pass) leg (g) [M6]: a cell edit's segment is <table>/<row>/<cell>, for a set and for a removal [0.03ms]\n(pass) leg (h) [M6]: a row edit's segment is <table>/<row> [0.02ms]\n(pass) leg (i) [M6]: segments come in list order joined by a comma, and no edits is the empty string [0.03ms]\n\n 91 pass\n 0 fail\n 428 expect() calls\nRan 91 tests across 11 files. [2.39s]\n"
+    }
+  ],
+  "integratedChecks": [
+    {
+      "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 255897,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0,
+    "pairRounds": 1,
+    "r2MarginalBlocking": 0,
+    "refereeFindings": 2,
+    "refereeBlocking": 0,
+    "refereeSkippedPairs": 0
+  },
+  "acceptance": {
+    "mode": "suite",
+    "passed": true,
+    "reason": "the committed suite is the verification."
+  },
+  "baseline": null,
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "b8fa2288e7cc82c6bacd30a07c32ede86db1c52f",
+      "branches": [
+        "1"
+      ]
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-4/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-4/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.7590000000000001,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 1,
+    "tasks_planned": 1,
+    "complete": true
+  },
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [
+    {
+      "deliverable": "Task 1 \u2014 the render-ran branch end to end against a live TINYAPP_RENDER_URL: that the 120 s registration wall and the guarded REFLECT_CHECKED together let a real state exam reach the renderer (run-3 measured 3.7 s with data-checked correct on both inputs) instead of dying at bun's 5000 ms or at Cloudflare's 422/code 6002 after ~61 s.",
+      "reason": "external",
+      "why": "The global constraint forbids any test reaching the network \u2014 every fetch in the suite is an injected fetchImpl and the renderer URL is a .invalid placeholder that is never dialled \u2014 so the integrated evidence exercises the ran branch only through stubs (leg (e) checks the posted body, legs (g)-(i) the response handling). The defect this task fixes was measured against the live renderer and cannot be re-measured here."
+    },
+    {
+      "deliverable": "Task 1 \u2014 REFLECT_CHECKED's settling behaviour under the renderer's own browser engine (Cloudflare Browser Rendering / Chromium), including that the app's post-injection paint is still captured by the observer.",
+      "reason": "browser",
+      "why": "The reflection is exercised by indirect eval under @happy-dom/global-registrator 20.14 in-process (leg (b)), which is a DOM emulation: it pins the guard's write counts and the fixed point, but not the real engine's mutation-record timing or the renderer's serialisation of the injected script's effects."
+    }
+  ],
+  "judgmentCalls": [
+    "task 1: examiner: (g) [M5]: the `bun run test` Run: exits 0 and the `git diff --quiet $ULTRA_BASE` Run: exits 0 \u2014 Wholly a Run:-level leg, not an in-file assertion: invoking `bun run test` from inside a file that same command runs would recurse, and $ULTRA_BASE is a driver-side variable. The Proof's two Run: lines cover it as written; no exam text was added for it."
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
