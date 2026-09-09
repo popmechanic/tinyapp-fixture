@@ -60,6 +60,16 @@ export const deleteTodo = (store: TodosStore, id: string): void => {
   store.delRow('todos', id);
 };
 
+export const clearCompleted = (store: TodosStore): void => {
+  store.transaction(() => {
+    store.getRowIds('todos').forEach((id) => {
+      if (store.getCell('todos', id, 'completed') === true) {
+        store.delRow('todos', id);
+      }
+    });
+  });
+};
+
 // A rendered snapshot page hands its starting state over on `window`; outside
 // a browser (or without a seed) there is simply none.
 export const readSeed = (): TodosContent | undefined =>
