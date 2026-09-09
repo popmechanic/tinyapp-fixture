@@ -40,14 +40,14 @@
     {
       "stage": "base-branch",
       "ok": true,
-      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+      "detail": "detached HEAD → fell back to repo default 'main'"
     }
   ],
   "compile": {
     "tasks": [
       {
         "id": "1",
-        "title": "Clear completed \u2014 one button, one store callback",
+        "title": "Clear completed — one button, one store callback",
         "disposition": "implementation",
         "heuristic": false,
         "writes": [
@@ -107,7 +107,7 @@
       [
         {
           "id": "1",
-          "title": "Clear completed \u2014 one button, one store callback",
+          "title": "Clear completed — one button, one store callback",
           "files": [
             "client/src/ClearCompleted.tsx",
             "client/src/TodoList.tsx",
@@ -217,7 +217,7 @@
       "mode": "suite",
       "reason": "the committed suite is the verification."
     },
-    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is the helper's injected\n  `fetchImpl` or the contract's blocked one, no test starts a server or a Durable Object, and the\n  renderer is dialled only by the helper's own render move, from the one `TINYAPP_RENDER_URL`\n  the driver set. `bun install` is the only network use in the run and happens only in the\n  driver's bootstrap.\n- The app reads from nowhere but its one TinyBase `MergeableStore` (schema `todos: {text:\n  string, completed: boolean}`; the cell is `completed`, not `done`); every mutation the UI makes\n  goes through a callback in `client/src/storeData.ts`, and the counter is derived from the\n  `todos` table at render time \u2014 no new table, value, React state or module-level state holds it.\n- The rendered markup the exams read stays the scaffold's: `<div id=\"todoList\">` holding one\n  `<div class=\"todoItem\">` (plus the class `completed` when ticked) per row with\n  `<input type=\"checkbox\" id=\"todo-<id>\">`, a `<label>` carrying the text and a Delete button;\n  `<div id=\"topBar\">` holding `<h1 id=\"topBarTitle\">` and `<div id=\"info\">`.\n- The scaffold's files not named in a task's Files block are byte-identical to BASE (the first\n  Check); no task adds a dependency, and `bun.lock` and both `package.json` files are unwritten.\n\n**Acceptance:** suite \u2014 the committed suite is the verification.",
+    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is the helper's injected\n  `fetchImpl` or the contract's blocked one, no test starts a server or a Durable Object, and the\n  renderer is dialled only by the helper's own render move, from the one `TINYAPP_RENDER_URL`\n  the driver set. `bun install` is the only network use in the run and happens only in the\n  driver's bootstrap.\n- The app reads from nowhere but its one TinyBase `MergeableStore` (schema `todos: {text:\n  string, completed: boolean}`; the cell is `completed`, not `done`); every mutation the UI makes\n  goes through a callback in `client/src/storeData.ts`, and the counter is derived from the\n  `todos` table at render time — no new table, value, React state or module-level state holds it.\n- The rendered markup the exams read stays the scaffold's: `<div id=\"todoList\">` holding one\n  `<div class=\"todoItem\">` (plus the class `completed` when ticked) per row with\n  `<input type=\"checkbox\" id=\"todo-<id>\">`, a `<label>` carrying the text and a Delete button;\n  `<div id=\"topBar\">` holding `<h1 id=\"topBarTitle\">` and `<div id=\"info\">`.\n- The scaffold's files not named in a task's Files block are byte-identical to BASE (the first\n  Check); no task adds a dependency, and `bun.lock` and both `package.json` files are unwritten.\n\n**Acceptance:** suite — the committed suite is the verification.",
     "constraintChecks": [
       {
         "cmd": "git diff --quiet $ULTRA_BASE -- server/ packages/ client/index.html client/vite.config.js client/tsconfig.json client/package.json client/public client/test client/src/TodoInput.tsx client/src/TodoItem.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/Info.tsx client/src/Title.tsx client/src/config.ts client/src/sqlite.tsx client/src/index.tsx client/src/vite-env.d.ts client/src/button.css client/src/todoItem.css client/src/todoList.css client/src/topBar.css client/src/title.css client/src/info.css package.json bun.lock tests/smoke.test.ts tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts state-exams/seeds/empty.json state-exams/expected/one-open-todo.json state-exams/expected/still-empty.json AGENTS.md README.md",
@@ -240,13 +240,14 @@
   "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-3/args.json",
   "workflowName": "ultrapowers-run",
   "llmDerives": [
-    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
-    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
-    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
-    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries — never a top-level launch key)",
+    "nothing for waves[][].testCmd — the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived — knob or detection — and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd — driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth — it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
   ],
-  "testCmd": "bun run test",
+  "testCmd": "set -o pipefail; { bun run test; } 2>&1 | tee '/home/exedev/target/.claude/ultrapowers/run-run-3/acceptance.log'",
   "testCmdSource": "detected:package-json-bun",
   "bootstrapCmd": "bun install --frozen-lockfile",
-  "bootstrapCmdSource": "detected:bun-lockfile"
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "acceptanceLog": "/home/exedev/target/.claude/ultrapowers/run-run-3/acceptance.log"
 }

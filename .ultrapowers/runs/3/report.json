@@ -1,0 +1,155 @@
+{
+  "integrationBranch": "ultra/integration-run-3",
+  "baseSha": "a2135f15cc2982d20d954da672f3cc62c4b67156",
+  "waves": [
+    [
+      "1",
+      "2"
+    ]
+  ],
+  "dependencyEdges": [],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "proof-red",
+      "notes": "the Proof's exam failed: bun test tests/state-exams/clear-completed.test.ts \u2014 exit 1",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 1,
+      "examEdited": [],
+      "stateExams": [
+        {
+          "exam": "clear-completed",
+          "store_ms": null,
+          "render_ms": null,
+          "render": null,
+          "mutant_killed": null,
+          "contract": null
+        }
+      ]
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "plan-defect",
+      "notes": "plan-defect: leg (p) \u2014 the `checked: true` / `unchecked: true` view entries cannot pass on the render-ran branch, for a reason no implementation can reach. The helper's `REFLECT_CHECKED` in `packages/tinyapp-exam/src/render-move.ts:170` writes `data-checked` unconditionally from inside its own `MutationObserver(..., {attributes: true})`, so every write re-triggers the callback. On the app's ~1.9 MB bundled page that loop starves the renderer and `/snapshot` answers 422 `code 6002` (\"A timeout was reached\") after ~61 s, so `renderMove` throws `render failed: 422 \u2026` and the exam is red before any view entry is read. Measured 3/3 identical against the live TINYAPP_RENDER_URL. Isolated: the same page with NO script tag renders 200 in ~2 s with `#doneCount` = \"1 of 2 done\", 2 `.todoItem`, 1 `.todoItem.completed`; the same page with a one-shot (no-observer) reflect renders 200 in ~2 s but `data-checked` is absent on both inputs, because the app paints after `addScriptTag` runs \u2014 which is why the observer is there. Adding a single guard (`var v=i.checked?'true':'false'; if(i.getAttribute('data-checked')!==v){i.setAttribute('data-checked',v)}`) makes the whole thing pass: 200 in 3.7 s with `input#todo-0` = `data-checked=\"false\"` and `input#todo-1` = `data-checked=\"true\"`, plus all three other view entries. I did not apply that fix \u2014 `packages/tinyapp-exam/` is outside my FILES and is the measurement apparatus, not the implementation. Incidental answer to the run's live question this pins down: Cloudflare's `/snapshot` DOES honour `addScriptTag` (the injected script is present in the returned DOM and its effects are serialised).; plan-defect: leg (p), second and independent \u2014 `stateExam` registers its bun test with no timeout (`packages/tinyapp-exam/src/state-exam.ts:151`), and bun's default is 5000 ms. A healthy render move on this page costs 2\u20136 s (bundle + POST), so even with the observer fixed the exam fails as `this test timed out after 5000ms` whenever `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` are both set. Measured: my scratch copy of the task's exact `stateExam` call died at exactly 5000.81 ms; the identical call under `--timeout 120000` got as far as the renderer. The suite as configured has no `--timeout` flag, so the peer's exam needs one (or `test(..., {timeout})` inside the helper) to reach the render branch at all. On the render-skipped branch \u2014 no `ULTRA_RUN_DIR`, which is how my environment is set \u2014 neither of these bites and the exam should be green.",
+      "actor": "plan",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "stateExams": [
+        {
+          "exam": "done-count",
+          "store_ms": null,
+          "render_ms": null,
+          "render": null,
+          "mutant_killed": null,
+          "contract": null
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": false,
+    "output": "not run \u2014 no wave merged"
+  },
+  "integratedRuns": [],
+  "integratedChecks": [],
+  "reviewEconomy": {
+    "reviewerMs": 0,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0,
+    "pairRounds": 0,
+    "r2MarginalBlocking": 0,
+    "refereeFindings": 0,
+    "refereeBlocking": 0,
+    "refereeSkippedPairs": 0
+  },
+  "acceptance": {
+    "mode": "suite",
+    "passed": false,
+    "reason": "the committed suite is the verification."
+  },
+  "baseline": null,
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "SKIPPED",
+      "detail": "no mergeable results \u2014 every task in this wave failed, was blocked, or lost its coordinates; integration branch untouched",
+      "branches": []
+    }
+  ],
+  "frontier": [],
+  "coverage": {
+    "tasks_merged": 0,
+    "tasks_planned": 2,
+    "complete": false
+  },
+  "missingDeliverables": [
+    {
+      "task": "1",
+      "files": [
+        "client/src/ClearCompleted.tsx",
+        "client/src/TodoList.tsx",
+        "client/src/storeData.ts",
+        "state-exams/seeds/two-todos-one-done.json",
+        "tests/state-exams/clear-completed.test.ts"
+      ]
+    },
+    {
+      "task": "2",
+      "files": [
+        "client/src/App.tsx",
+        "client/src/DoneCount.tsx",
+        "client/src/Store.tsx",
+        "client/src/TopBar.tsx",
+        "client/src/todoCounts.ts",
+        "state-exams/expected/two-todos-one-done.json",
+        "state-exams/seeds/two-open-todos.json",
+        "tests/state-exams/done-count.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": false,
+  "ancestryMisses": [],
+  "deferredVerification": [
+    {
+      "deliverable": "2",
+      "reason": "plan-defect",
+      "why": "plan-defect: leg (p) \u2014 the `checked: true` / `unchecked: true` view entries cannot pass on the render-ran branch, for a reason no implementation can reach. The helper's `REFLECT_CHECKED` in `packages/tinyapp-exam/src/render-move.ts:170` writes `data-checked` unconditionally from inside its own `MutationObserver(..., {attributes: true})`, so every write re-triggers the callback. On the app's ~1.9 MB bundled page that loop starves the renderer and `/snapshot` answers 422 `code 6002` (\"A timeout was reached\") after ~61 s, so `renderMove` throws `render failed: 422 \u2026` and the exam is red before any view entry is read. Measured 3/3 identical against the live TINYAPP_RENDER_URL. Isolated: the same page with NO script tag renders 200 in ~2 s with `#doneCount` = \"1 of 2 done\", 2 `.todoItem`, 1 `.todoItem.completed`; the same page with a one-shot (no-observer) reflect renders 200 in ~2 s but `data-checked` is absent on both inputs, because the app paints after `addScriptTag` runs \u2014 which is why the observer is there. Adding a single guard (`var v=i.checked?'true':'false'; if(i.getAttribute('data-checked')!==v){i.setAttribute('data-checked',v)}`) makes the whole thing pass: 200 in 3.7 s with `input#todo-0` = `data-checked=\"false\"` and `input#todo-1` = `data-checked=\"true\"`, plus all three other view entries. I did not apply that fix \u2014 `packages/tinyapp-exam/` is outside my FILES and is the measurement apparatus, not the implementation. Incidental answer to the run's live question this pins down: Cloudflare's `/snapshot` DOES honour `addScriptTag` (the injected script is present in the returned DOM and its effects are serialised).; plan-defect: leg (p), second and independent \u2014 `stateExam` registers its bun test with no timeout (`packages/tinyapp-exam/src/state-exam.ts:151`), and bun's default is 5000 ms. A healthy render move on this page costs 2\u20136 s (bundle + POST), so even with the observer fixed the exam fails as `this test timed out after 5000ms` whenever `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` are both set. Measured: my scratch copy of the task's exact `stateExam` call died at exactly 5000.81 ms; the identical call under `--timeout 120000` got as far as the renderer. The suite as configured has no `--timeout` flag, so the peer's exam needs one (or `test(..., {timeout})` inside the helper) to reach the render branch at all. On the render-skipped branch \u2014 no `ULTRA_RUN_DIR`, which is how my environment is set \u2014 neither of these bites and the exam should be green."
+    }
+  ],
+  "judgmentCalls": [
+    "task 1: the driver's pre-review pass was red (the Proof's exam failed: bun test tests/state-exams/clear-completed.test.ts \u2014 exit 1) \u2014 one repair round before any referee read the patch",
+    "task 2: plan-defect: leg (p) \u2014 the `checked: true` / `unchecked: true` view entries cannot pass on the render-ran branch, for a reason no implementation can reach. The helper's `REFLECT_CHECKED` in `packages/tinyapp-exam/src/render-move.ts:170` writes `data-checked` unconditionally from inside its own `MutationObserver(..., {attributes: true})`, so every write re-triggers the callback. On the app's ~1.9 MB bundled page that loop starves the renderer and `/snapshot` answers 422 `code 6002` (\"A timeout was reached\") after ~61 s, so `renderMove` throws `render failed: 422 \u2026` and the exam is red before any view entry is read. Measured 3/3 identical against the live TINYAPP_RENDER_URL. Isolated: the same page with NO script tag renders 200 in ~2 s with `#doneCount` = \"1 of 2 done\", 2 `.todoItem`, 1 `.todoItem.completed`; the same page with a one-shot (no-observer) reflect renders 200 in ~2 s but `data-checked` is absent on both inputs, because the app paints after `addScriptTag` runs \u2014 which is why the observer is there. Adding a single guard (`var v=i.checked?'true':'false'; if(i.getAttribute('data-checked')!==v){i.setAttribute('data-checked',v)}`) makes the whole thing pass: 200 in 3.7 s with `input#todo-0` = `data-checked=\"false\"` and `input#todo-1` = `data-checked=\"true\"`, plus all three other view entries. I did not apply that fix \u2014 `packages/tinyapp-exam/` is outside my FILES and is the measurement apparatus, not the implementation. Incidental answer to the run's live question this pins down: Cloudflare's `/snapshot` DOES honour `addScriptTag` (the injected script is present in the returned DOM and its effects are serialised).",
+    "task 2: plan-defect: leg (p), second and independent \u2014 `stateExam` registers its bun test with no timeout (`packages/tinyapp-exam/src/state-exam.ts:151`), and bun's default is 5000 ms. A healthy render move on this page costs 2\u20136 s (bundle + POST), so even with the observer fixed the exam fails as `this test timed out after 5000ms` whenever `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` are both set. Measured: my scratch copy of the task's exact `stateExam` call died at exactly 5000.81 ms; the identical call under `--timeout 120000` got as far as the renderer. The suite as configured has no `--timeout` flag, so the peer's exam needs one (or `test(..., {timeout})` inside the helper) to reach the render branch at all. On the render-skipped branch \u2014 no `ULTRA_RUN_DIR`, which is how my environment is set \u2014 neither of these bites and the exam should be green.",
+    "task 2: The store and mutant moves of leg (p) were verified directly and pass: `setTodoCompleted(store, '1', true)` over `state-exams/seeds/two-open-todos.json` reaches `state-exams/expected/two-todos-one-done.json` with an empty `getContent()` diff (`store_ms` recorded, render then attempted, which only happens when the diff is empty), and the one-edit mutant is distinguished \u2014 no `hollow exam:` failure was ever raised across the runs. Only the render move is affected by the two defects above.",
+    "task 2: Leg (o) reads `TABLES_SCHEMA` from `client/src/storeData.ts`, which is sibling task 1's file. I added nothing to it \u2014 it is byte-identical to BASE in my tree, still exactly `{todos: {text, completed}}`, so the leg holds unless task 1 changes it.",
+    "task 2: plan-defect against a Proof leg named by the implementer \u2014 no fix round dispatched; failed with actor plan \u2014 plan-defect: leg (p) \u2014 the `checked: true` / `unchecked: true` view entries cannot pass on the render-ran branch, for a reason no implementation can reach. The helper's `REFLECT_CHECKED` in `packages/tinyapp-exam/src/render-move.ts:170` writes `data-checked` unconditionally from inside its own `MutationObserver(..., {attributes: true})`, so every write re-triggers the callback. On the app's ~1.9 MB bundled page that loop starves the renderer and `/snapshot` answers 422 `code 6002` (\"A timeout was reached\") after ~61 s, so `renderMove` throws `render failed: 422 \u2026` and the exam is red before any view entry is read. Measured 3/3 identical against the live TINYAPP_RENDER_URL. Isolated: the same page with NO script tag renders 200 in ~2 s with `#doneCount` = \"1 of 2 done\", 2 `.todoItem`, 1 `.todoItem.completed`; the same page with a one-shot (no-observer) reflect renders 200 in ~2 s but `data-checked` is absent on both inputs, because the app paints after `addScriptTag` runs \u2014 which is why the observer is there. Adding a single guard (`var v=i.checked?'true':'false'; if(i.getAttribute('data-checked')!==v){i.setAttribute('data-checked',v)}`) makes the whole thing pass: 200 in 3.7 s with `input#todo-0` = `data-checked=\"false\"` and `input#todo-1` = `data-checked=\"true\"`, plus all three other view entries. I did not apply that fix \u2014 `packages/tinyapp-exam/` is outside my FILES and is the measurement apparatus, not the implementation. Incidental answer to the run's live question this pins down: Cloudflare's `/snapshot` DOES honour `addScriptTag` (the injected script is present in the returned DOM and its effects are serialised).; plan-defect: leg (p), second and independent \u2014 `stateExam` registers its bun test with no timeout (`packages/tinyapp-exam/src/state-exam.ts:151`), and bun's default is 5000 ms. A healthy render move on this page costs 2\u20136 s (bundle + POST), so even with the observer fixed the exam fails as `this test timed out after 5000ms` whenever `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR` are both set. Measured: my scratch copy of the task's exact `stateExam` call died at exactly 5000.81 ms; the identical call under `--timeout 120000` got as far as the renderer. The suite as configured has no `--timeout` flag, so the peer's exam needs one (or `test(..., {timeout})` inside the helper) to reach the render branch at all. On the render-skipped branch \u2014 no `ULTRA_RUN_DIR`, which is how my environment is set \u2014 neither of these bites and the exam should be green.",
+    "task 1: exam: `state exam: clear-completed` stays red whenever the driver sets both TINYAPP_RENDER_URL and ULTRA_RUN_DIR, and no change inside this task's Files can make it green. Cause 1: packages/tinyapp-exam/src/state-exam.ts:151 registers the test with bun's default 5000ms timeout while the render move needs 1.9-3.4s at best (30-61s when the renderer stalls) \u2014 the driver's `timed out after 5000ms` is that wall. Cause 2: the renderer strips single quotes from addScriptTag content, so the helper's single-quoted REFLECT_CHECKED never runs and the `unchecked` view can never hold. Control: the fixture's own tests/state-exams/buy-milk.test.ts, run at BASE a2135f1 with no task code present, fails the same way (render failed: 422 code 6002, 61s). A fix belongs in the helper (pass a timeout to `test`, double-quote REFLECT_CHECKED), which no task's Files block owns; I left the helper, the exam and client/index.html untouched.",
+    "task 1: exam: with ULTRA_RUN_DIR unset the exam's record reads `\"render\": \"skipped\"`, M5 asserts nothing, and the TEST COMMAND is 18 pass / 0 fail \u2014 that is the state I can leave the tree in. The store and mutant moves, which the task calls the proof when the render does not run, are both green.",
+    "task 1: still red after the pre-review repair round (the Proof's exam failed: bun test tests/state-exams/clear-completed.test.ts \u2014 exit 1) \u2014 no reviewer was dispatched",
+    "suite acceptance did not pass (committed test suite failed) \u2014 gate must not Approve"
+  ],
+  "unfinished": [],
+  "completenessFindings": [
+    {
+      "severity": "blocking",
+      "detail": "no wave merged \u2014 completeness review skipped (the tree is at BASE)"
+    }
+  ],
+  "blockedWaves": []
+}

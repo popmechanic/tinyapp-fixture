@@ -1,0 +1,44 @@
+{
+  "task": "2",
+  "n": 0,
+  "findings": [],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `countTodos(table: Record<string, {text?: string, completed?: boolean}>) -> {done: number, total: number}` client/src/todoCounts.ts exports countTodos; Produces: `DoneCount() -> JSX.Element` client/src/DoneCount.tsx exports DoneCount"
+    },
+    {
+      "check": "exam-files",
+      "detail": "the exam exited 1 — already red as the exam, so an absent Test: path is not a second finding"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +15 / −0 across the patch"
+    },
+    {
+      "check": "dependencies",
+      "detail": "no manifest changed"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "client/src/App.tsx": "ts",
+    "client/src/DoneCount.tsx": "ts",
+    "client/src/Store.tsx": "ts",
+    "client/src/TopBar.tsx": "ts",
+    "client/src/todoCounts.ts": "ts",
+    "tests/state-exams/done-count.test.ts": "ts"
+  },
+  "ms": 3
+}

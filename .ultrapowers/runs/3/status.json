@@ -1,1 +1,1 @@
-{"run":"3","state":"running","phase":"Wave 1","pr":null,"prAuthor":null,"merged":null,"branch":"ultra/integration-run-3","vm":"fleet-r3-2609091645-7bbe","startedAt":"2026-09-09T16:45:40Z","updatedAt":"2026-09-09T16:46:35Z","error":null}
+{"run":"3","state":"parked","phase":"nothing to publish","pr":null,"prAuthor":null,"merged":null,"branch":"ultra/integration-run-3","vm":"fleet-r3-2609091645-7bbe","startedAt":"2026-09-09T16:45:40Z","updatedAt":"2026-09-09T17:08:50Z","error":"parked: ultra/integration-run-3 has no commits ahead of base (verdict BLOCKED)"}
