@@ -1,0 +1,172 @@
+{
+  "ok": true,
+  "stamp": "run-4",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-4"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "1 task(s) in 1 wave(s); acceptance: suite"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The render branch \u2014 an explicit timeout on the registration, a reflection that writes only on change",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "packages/tinyapp-exam/package.json",
+          "packages/tinyapp-exam/src/index.ts",
+          "packages/tinyapp-exam/src/render-move.ts",
+          "packages/tinyapp-exam/src/state-exam.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`STATE_EXAM_TIMEOUT_MS: number`",
+            "`REFLECT_CHECKED: string`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [],
+    "marker_conflicts": [],
+    "gates": [],
+    "post_merge_runbook": [],
+    "waves": [
+      [
+        "1"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The render branch \u2014 an explicit timeout on the registration, a reflection that writes only on change",
+          "files": [
+            "bun.lock",
+            "packages/tinyapp-exam/package.json",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts",
+            "packages/tinyapp-exam/test/state-exam.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`STATE_EXAM_TIMEOUT_MS: number`",
+              "`REFLECT_CHECKED: string`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "bun.lock",
+            "packages/tinyapp-exam/package.json",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/state-exam.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/state-exam.test.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/state-exam.test.ts packages/tinyapp-exam/test/render-move.test.ts",
+          "proofRuns": [
+            "bun install --frozen-lockfile",
+            "git diff --quiet $ULTRA_BASE -- server/ client/ tests/ state-exams/ AGENTS.md README.md package.json packages/tinyapp-exam/tsconfig.json packages/tinyapp-exam/src/contract.ts packages/tinyapp-exam/src/evidence.ts packages/tinyapp-exam/src/mutant.ts packages/tinyapp-exam/src/store-move.ts packages/tinyapp-exam/src/types.ts",
+            "grep -c \"timeout: STATE_EXAM_TIMEOUT_MS\" packages/tinyapp-exam/src/state-exam.ts",
+            "bun -e \"const m = await import('./packages/tinyapp-exam/src/render-move.ts'); if (typeof m.REFLECT_CHECKED !== 'string' || m.REFLECT_CHECKED.includes(String.fromCharCode(39))) { throw new Error('REFLECT_CHECKED missing or carries a single quote') }; console.log('no single quote in REFLECT_CHECKED')\"",
+            "bun run test"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/state-exam.test.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts"
+          ]
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The render branch \u2014 an explicit timeout on the registra\u2026"
+    ],
+    "mode": "sequential",
+    "degrade_reason": "Sequential mode: 1 implementation tasks",
+    "allHeuristic": false,
+    "acceptance": {
+      "mode": "suite",
+      "reason": "the committed suite is the verification."
+    },
+    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is an injected `fetchImpl` or the\n  contract's blocked one, no test starts a server or a Durable Object, and the renderer URL a test\n  passes is a placeholder that is never dialled. `bun install` is the only network use in the run\n  and happens only in the driver's bootstrap and the one `bun add` this task's Context names.\n- The helper's public surface grows and never shrinks: every name `packages/tinyapp-exam/src/index.ts`\n  exports at BASE is still exported, `renderMove`'s request body is still `{html, addScriptTag}`\n  with one script tag, and the skipped branch (either of `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR`\n  unset or empty) still dials nothing.\n- Every file outside this task's Files block is byte-identical to BASE (the task's `git diff --quiet $ULTRA_BASE` `Run:`); the\n  task adds no dependency but the one its Files block names, and `bun.lock` is written by this task\n  alone.\n\n**Acceptance:** suite \u2014 the committed suite is the verification.",
+    "constraintChecks": [
+      {
+        "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+        "minor": false
+      },
+      {
+        "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-4/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-4/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-4/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-4/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}

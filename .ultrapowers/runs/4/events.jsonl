@@ -1,0 +1,10 @@
+{"kind":"run:open","runId":"run-4","base":"","source":"fleet/run-main.mjs","id":"01M23JZ7EE00003RY2A2YESCZZ","ts":1788974439886}
+{"kind":"driver:stage","stage":"tiers","detail":"1 null tier slot(s) stamped mostCapable (uniform driver fill; per-task tier is the intent document's slot, #243)","id":"01M23JZ7EG0000SGHDZ61JDP57","ts":1788974439888}
+{"kind":"driver:stage","stage":"provision","detail":"BASE a2135f15cc2982d20d954da672f3cc62c4b67156; 1 task clone(s) + integration","id":"01M23JZ84A0000AQ8Q5GKYZ04Y","ts":1788974440586}
+{"kind":"driver:auth","authMethod":"oauth_token","apiKeySource":null,"subscriptionType":null,"id":"01M23JZ8CE0000MTGPJKSJA2YC","ts":1788974440846}
+{"kind":"driver:stage","stage":"engine","detail":"waves 1, width bound 12, patch input armed","id":"01M23JZ8CE0001ER44DADDPV3C","ts":1788974440846}
+{"kind":"engine:phase","phase":"Setup","id":"01M23JZ8CJ0000GF3AMB1M2FG5","ts":1788974440850}
+{"kind":"engine:log","line":"setup: branch ultra/integration-run-4 at a2135f15cc2982d20d954da672f3cc62c4b67156","id":"01M23JZ8QR0000VDJZK4669J6V","ts":1788974441208}
+{"kind":"engine:phase","phase":"Wave 1","id":"01M23JZ8QS000047D541WXMTBF","ts":1788974441209}
+{"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"80840a87-6789-41f6-8b39-e7bb074c2140","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-4/clones/exam-1","model":"opus","id":"01M23JZ8Y50000PS13DCH8N30D","ts":1788974441413}
+{"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"2acec3db-efad-4d59-9d31-e4c20c5bd3e8","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-4/clones/task-1","model":"opus","id":"01M23JZ8Y700008JS8G9FQF1MQ","ts":1788974441415}
