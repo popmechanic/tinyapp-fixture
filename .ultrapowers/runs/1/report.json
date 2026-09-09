@@ -1,0 +1,181 @@
+{
+  "integrationBranch": "ultra/integration-run-1",
+  "baseSha": "a99a2be2b9d1640af886bfd6d8dbc34e234981de",
+  "waves": [
+    [
+      "1",
+      "5"
+    ],
+    [
+      "2",
+      "3",
+      "4"
+    ],
+    [
+      "6"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)",
+    "1 -> 3 (interface)",
+    "1 -> 4 (interface)",
+    "1 -> 6 (interface)",
+    "2 -> 6 (interface)",
+    "3 -> 6 (interface)",
+    "4 -> 6 (interface)",
+    "5 -> 6 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "d3a04d4603462b41ed32f78f4f8de63a387407d5",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-1/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "unverified: the exam's store legs (e), (f), (g) and (m) construct their store from the sibling-owned `client/src/storeData.ts` (`createTodosStore`, imported as `../../../client/src/storeData` \u2014 authorized explicitly by this task's Context, and present at BASE, so no missing dependency edge). The legs therefore assert against that file's BASE behaviour: `setContent([{}, {}])` empties the two default rows, `setContent` silently drops the unknown `done` cell (leg (g)'s whole premise), and `addRow` on the emptied store returns `'0'`. Task 5 rewrites that same file, adding an optional `seed` argument to `createTodosStore` and rewiring the callbacks. Nothing in THIS diff can settle that those three measured behaviours survive Task 5's edit; this patch touches no file Task 5 owns. What would settle it: Task 5's own M4/leg (d) pins `createTodosStore()` with no argument still returning exactly rows `'1'` and `'2'` and `createTodosStore([{}, {}]).getContent()` being exactly `[{}, {}]`, and the composition/integration run re-executing `bun test packages/tinyapp-exam/test/store-move.test.ts` on the merged tree. Recorded for the operator, not a defect in this submission.; contract.ts: `withContract` validates only that `clock` is a non-empty string (M5), then does `const instant = realDate.parse(clock)` without checking the result. An unparseable clock (e.g. `withContract('not-a-date', fn)`) silently pins `Date.now()` to `NaN` and `new Date().toISOString()` throws `RangeError: Invalid time value` from inside the action, which surfaces as the action's own failure rather than a spec error. No Machine clause requires the check and no leg covers it, so this is advisory: adding `if (Number.isNaN(instant)) throw new Error('contract: clock is required')` (or a distinct message) in packages/tinyapp-exam/src/contract.ts would make the failure legible at the boundary that owns it.; unverified: legs (e), (f), (g) and (m) are graded against `createTodosStore` imported from `../../../client/src/storeData` \u2014 a SIBLING FILES path (task 5's). The import is exactly what this task's Context prescribes, the symbol is pinned at BASE by the task's own BASE facts (`createTodosStore` at `client/src/storeData.ts:14`, blob 63b5107), and this patch does not touch that file, so nothing here is a scope or dependency-edge violation. But the store legs' meaning depends on code this diff cannot settle: if task 5 changes `TABLES_SCHEMA` (e.g. renames `completed`, adds a default, or stops dropping unknown cells) the fixture expectations in leg (g) (`todos/1/done` dropped) and legs (e)/(f) (`addRow` returning row `'0'`, `completed: false` default) change meaning. Re-running `bun test packages/tinyapp-exam/test/store-move.test.ts` on the integrated tree after task 5 lands would settle it.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    },
+    {
+      "task": "5",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "c6956aaf9ea2009034c509150c04e036a74968e8",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-1/patches/task-5.patch",
+      "reviewVerdict": "clean",
+      "notes": "unverified: the Claim's \"the same calls the buttons make\" is graded only by substring grep. Leg (i)/M8 asserts that `client/src/TodoInput.tsx` contains `addTodo(`, `client/src/TodoItem.tsx` contains `setTodoCompleted(` and `deleteTodo(`, and `client/src/index.tsx` contains `readSeed(` (client/test/todos-store.test.ts:271-285, plus the four `Run:` greps). Those assertions survive the call sitting in a branch the UI never reaches, so no exam leg establishes that a click/submit actually mutates the store. Inspection of the diff shows the wiring is in fact correct and live \u2014 TodoInput.tsx's `handleSubmit` calls `addTodo(store, text)` and clears the field only on a defined id, TodoItem.tsx's `handleChange`/`handleDelete` call `setTodoCompleted`/`deleteTodo` and are bound to the checkbox's `onChange` and the Delete `Button`'s `onClick` \u2014 so this is a gap in the exam, not a defect in the code, and the grep legs are what the Proof named. What would settle it: a happy-dom leg (the DOM is already registered in client/test/seeded-store.test.ts) rendering `TodoInput`/`TodoItem` inside the same `Provider`, dispatching a form submit and a checkbox change, and asserting `getRowCount('todos')` and the row's `completed` cell. Actor is `plan` because leg (i) is the Proof's own choice of grep as the exam.; Duplicated type alias: `client/src/storeData.ts` now exports `export type Schemas = [typeof TABLES_SCHEMA, NoValuesSchema]`, but `client/src/Store.tsx:11` keeps its own byte-identical local `type Schemas = [typeof TABLES_SCHEMA, NoValuesSchema];` and still imports `TABLES_SCHEMA` and `NoValuesSchema` only to build it. Two definitions of the same schema tuple can drift; Store.tsx should import the exported one. Nothing observable depends on this \u2014 the exam and every Run/Check are green \u2014 so it is advisory. Fix: in `client/src/Store.tsx`, drop the local alias and the now-unused `TABLES_SCHEMA` / `NoValuesSchema` imports, and add `Schemas` to the existing `import {STORE_ID, createTodosStore, readSeed, type TodoRow, type TodosContent, type TodosStore} from './storeData'` as `type Schemas`.; Duplicated type definition: `client/src/storeData.ts:18` now exports `type Schemas = [typeof TABLES_SCHEMA, NoValuesSchema]`, and `client/src/Store.tsx:19` still declares its own identical local `type Schemas`. The two must now be kept in sync by hand, and Store.tsx already imports from './storeData' three lines below. Import it instead: drop line 19 of Store.tsx and add `type Schemas` to the existing `from './storeData'` import (the `NoValuesSchema` import on line 3 then becomes unused, while `MergeableStore` is still needed for the persister cast). In the same file the re-exports of `useAddRowCallback`, `useSetPartialRowCallback` and `useDelRowCallback` are now dead \u2014 nothing in `client/src` consumes them after the rewiring \u2014 though leaving them is a defensible minimal-diff choice.; unverified: no typecheck was executed anywhere in this run's evidence (the three CHECK commands are a `git diff --quiet`, and two greps; the Proof's `Run:` lines are `bun install` and four greps), and `bun test` strips types rather than checking them \u2014 so the diff's three TypeScript-facing decisions are unproven. (1) `client/src/vite-env.d.ts` declares a bare top-level `interface Window {\u2026}` rather than the `declare global { interface Window \u2026 }` + `export {}` the Context spells out; this is equivalent only because the file has no top-level import/export and so remains a global script \u2014 an undisclosed divergence that happens to be correct, but it silently stops augmenting the global `Window` the moment anything adds a top-level `import`/`export` to that file. (2) the new `as unknown as WebSocket` double-cast at `client/src/Store.tsx:107` is a disclosed divergence with a stated rationale (@types/ws arriving via @happy-dom/global-registrator narrows tinybase's `WebSocketTypes` union), lawful but resting on an unrun compiler. (3) `createTodosStore`'s new explicit `: TodosStore` return annotation over the `setTablesSchema(...).setDefaultContent(...)` chain. What would settle all three: `bun run typecheck` (the client's and the server's `tsc`) on this tree.; The Claim's \"the same calls the buttons make\" half is established only by substring match. Leg (i)/M8 asserts that `client/src/TodoItem.tsx` contains the texts `setTodoCompleted(` and `deleteTodo(` and that `client/src/TodoInput.tsx` contains `addTodo(` \u2014 no leg renders either component or fires its checkbox `onChange` or Delete `onClick`. A `TodoItem.tsx` whose `handleChange` called `deleteTodo` and whose `handleDelete` called `setTodoCompleted` contains both texts and passes every leg, as does one whose handlers are declared but never attached to the JSX. The submission is faithful to the Proof as written, so nothing inside this task's FILES is at fault; strengthening it would need a leg the Proof does not name (the seeded-render harness in `client/test/seeded-store.test.ts` already has happy-dom and could dispatch a click, if a future revision wants the behavioural version).; concern: plan-defect: the plan's instruction to add `@happy-dom/global-registrator` breaks `bun run typecheck` on unmodified BASE sources. happy-dom pulls `@types/ws` into `node_modules/@types`, which tsconfig auto-includes, so tinybase's `WebSocketTypes = WebSocket | WsWebSocket` stops collapsing to `any` and `new ReconnectingWebSocket(...)` is rejected by `createWsSynchronizer` at `client/src/Store.tsx`. I confirmed this by checking out BASE's `client/src/` against the new node_modules \u2014 same error, my code is not the cause. Fixed task-locally with `as unknown as WebSocket` at the call site (in-Files, commented). The alternative fix, a `types` array in `client/tsconfig.json`, was not taken: that file is outside FILES and the byte-identical constraint covers it. Note for the composition task that any later `bun install` in a tree without this cast will fail typecheck.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": false,
+    "output": "not run \u2014 no wave merged"
+  },
+  "integratedRuns": [],
+  "integratedChecks": [],
+  "reviewEconomy": {
+    "reviewerMs": 596557,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0,
+    "pairRounds": 2,
+    "r2MarginalBlocking": 0
+  },
+  "acceptance": {
+    "mode": "suite",
+    "passed": false,
+    "reason": "the committed suite is the verification."
+  },
+  "baseline": {
+    "passed": true,
+    "output": "bun test v1.4.0 (34cbb9a40)\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit\n\ntests/smoke.test.ts:\n(pass) the scaffold's store is green at BASE: schema and default content [8.56ms]\n\n 1 pass\n 0 fail\n 3 expect() calls\nRan 1 test across 1 file. [24.00ms]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "TEST_FAILED",
+      "detail": "candidate suite failed after reconcile attempts: bun test v1.4.0 (34cbb9a40)\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit\n\ntests/smoke.test.ts:\n(pass) the scaffold's store is green at BASE: schema and default content [7.81ms]\n\nclient/test/seeded-store.test.ts:\n\n# Unhandled error between tests\n-------------------------------\nerror: Cannot find module '@happy-dom/global-registrator' from '/home/exedev/target/.claude/ultrapowers/run-run-1/clones/integration/client/test/seeded-store.test.ts'\n-------------------------------\n\n\nclient/test/todos-store.test.ts:\n(pass) leg (a) [M1]: addTodo adds one trimmed, open row and returns its id > on an emptied store the id is exactly \"0\" and the content is exactly the buy-milk snapshot [2.84ms]\n(pass) leg (a) [M1]: addTodo adds one trimmed, open row and returns its id > on the default two-row store the id is a string, the row count becomes 3 and the new row is {text: \"x\", completed: false} [1.05ms]\n(pass) leg (b) [M2]: a blank todo is refused and the store is untouched > addTodo(store, \"\") and addTodo(store, \"   \") each return undefined and leave getContent() deep-equal to before [0.93ms]\n(pass) leg (b) [M2]: a blank todo is refused and the store is untouched > a blank todo on the default store leaves its two rows exactly as they were [0.57ms]\n(pass) leg (c) [M3]: setTodoCompleted ticks and unticks, deleteTodo removes > after addTodo(store, \"a\") on an emptied store, row \"0\" ticks true, then false, then is deleted [1.75ms]\n(pass) leg (d) [M4]: createTodosStore honours its optional seed > with no argument the store carries exactly the scaffold rows \"1\" and \"2\" [0.53ms]\n(pass) leg (d) [M4]: createTodosStore honours its optional seed > createTodosStore([{}, {}]).getContent() is exactly [{}, {}] [0.67ms]\n(pass) leg (d) [M4]: createTodosStore honours its optional seed > createTodosStore(buy-milk snapshot).getContent() is deep-equal to that snapshot [0.73ms]\n(pass) leg (e) [M5]: readSeed reads window.__TINYAPP_SEED__, or nothing at all > a window carrying the seed yields that very array [0.09ms]\n(pass) leg (e) [M5]: readSeed reads window.__TINYAPP_SEED__, or nothing at all > a window carrying no seed yields exactly undefined [0.03ms]\n(pass) leg (e) [M5]: readSeed reads window.__TINYAPP_SEED__, or nothing at all > no window at all yields exactly undefined and throws nothing [0.05ms]\n(pass) leg (h) [M7]: the state-exam JSON files parse to their snapshots > state-exams/seeds/empty.json parses to exactly [{}, {}] [0.10ms]\n(pass) leg (h) [M7]: the state-exam JSON files parse to their snapshots > state-exams/expected/one-open-todo.json parses to exactly the buy-milk snapshot [0.04ms]\n(pass) leg (h) [M7]: the state-exam JSON files parse to their snapshots > state-exams/expected/still-empty.json parses to exactly [{}, {}] [0.02ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/src/TodoInput.tsx contains \"addTodo(\" [0.03ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/src/TodoItem.tsx contains \"setTodoCompleted(\" and \"deleteTodo(\" [0.03ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/src/index.tsx contains \"readSeed(\" [0.02ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/package.json devDependencies carries @happy-dom/global-registrator as a non-empty string [0.05ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > bun.lock records @happy-dom/global-registrator, so `bun install --frozen-lockfile` has a lockfile to be frozen against [0.05ms]\n\npackages/tinyapp-exam/test/store-move.test.ts:\n(pass) leg (a) [M1]: two deep-equal snapshots (two todo rows and one value) diff to exactly [] [0.27ms]\n(pass) leg (b) [M1]: one differing cell is exactly one Difference [0.06ms]\n(pass) leg (c) [M1]: one-sided rows carry null, $values comes last, and rows and cells are ordered by string [0.32ms]\n(pass) leg (d) [M2]: renderDiff writes the header line and one line per difference, absent for null [0.17ms]\n(pass) leg (e) [M3]: a move that reaches the expected state resolves with an empty diff, that content and a finite ms [2.91ms]\n(pass) leg (f) [M3]: a move that lands on the wrong cell resolves with that one difference [1.67ms]\n(pass) leg (g) [M4]: a seed the schema does not round-trip is refused by name, before the action runs [2.40ms]\n(pass) leg (m) [M7]: the move runs twice on fresh stores and refuses an action that answers differently [2.97ms]\n\npackages/tinyapp-exam/test/contract.test.ts:\n(pass) leg (h) [M5]: a missing clock is refused before fn runs, and fn's own error is what rejects [0.39ms]\n(pass) leg (i) [M5]: the clock reads as the spec while fn runs, and is the original again after [0.23ms]\n(pass) leg (j) [M5] [M6]: a fetch is a breach named by url, and the clock and fetch are restored on the rejected path [0.22ms]\n(pass) leg (k) [M5] [M6]: a WebSocket is a breach named by url, and WebSocket and the clock are restored [0.11ms]\n(pass) leg (l) [M6]: after a green fn, fetch and WebSocket are the originals again [0.05ms]\n\n1 tests failed:\n\n 33 pass\n 1 fail\n 1 error\n 83 expect() calls\nRan 34 tests across 5 files. [56.00ms]\nerror: script \"test\" exited with code 1\n",
+      "branches": [
+        "1",
+        "5"
+      ]
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-1/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-1/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 2,
+      "foldCliWallTimeSec": 0.6739999999999999,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 0,
+    "tasks_planned": 6,
+    "complete": false
+  },
+  "missingDeliverables": [
+    {
+      "task": "2",
+      "files": [
+        "packages/tinyapp-exam/src/mutant.ts",
+        "packages/tinyapp-exam/test/mutant.test.ts"
+      ]
+    },
+    {
+      "task": "3",
+      "files": [
+        "bun.lock",
+        "package.json",
+        "packages/tinyapp-exam/src/render-move.ts",
+        "packages/tinyapp-exam/test/render-move.test.ts"
+      ]
+    },
+    {
+      "task": "4",
+      "files": [
+        "packages/tinyapp-exam/src/evidence.ts",
+        "packages/tinyapp-exam/test/evidence.test.ts"
+      ]
+    },
+    {
+      "task": "6",
+      "files": [
+        "bun.lock",
+        "package.json",
+        "packages/tinyapp-exam/package.json",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/state-exam.ts",
+        "packages/tinyapp-exam/test/state-exam.test.ts",
+        "packages/tinyapp-exam/tsconfig.json",
+        "tests/state-exams/buy-milk.test.ts",
+        "tests/state-exams/empty-todo-refused.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": false,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 5: plan-defect: the plan's instruction to add `@happy-dom/global-registrator` breaks `bun run typecheck` on unmodified BASE sources. happy-dom pulls `@types/ws` into `node_modules/@types`, which tsconfig auto-includes, so tinybase's `WebSocketTypes = WebSocket | WsWebSocket` stops collapsing to `any` and `new ReconnectingWebSocket(...)` is rejected by `createWsSynchronizer` at `client/src/Store.tsx`. I confirmed this by checking out BASE's `client/src/` against the new node_modules \u2014 same error, my code is not the cause. Fixed task-locally with `as unknown as WebSocket` at the call site (in-Files, commented). The alternative fix, a `types` array in `client/tsconfig.json`, was not taken: that file is outside FILES and the byte-identical constraint covers it. Note for the composition task that any later `bun install` in a tree without this cast will fail typecheck.",
+    "task 5: examiner: (i) [M8] \u2014 \"the bun install Run: exits 0\" \u2014 The global constraint forbids network use in tests (bun install belongs to the driver's bootstrap only), so the exam does not shell out to `bun install --frozen-lockfile`; that stays the Proof's own Run: line. The exam encodes what it can offline: client/package.json devDependencies['@happy-dom/global-registrator'] is a non-empty string and bun.lock records that package. The four grep Run: lines are encoded in-test as file-content assertions, per M8's \"each a text the file contains\".",
+    "wave 1: reconcile reported FIXED but changed nothing \u2014 not committing",
+    "suite acceptance did not pass (committed test suite failed) \u2014 gate must not Approve"
+  ],
+  "unfinished": [
+    "2: cascade-blocked by wave 1",
+    "3: cascade-blocked by wave 1",
+    "4: cascade-blocked by wave 1",
+    "6: cascade-blocked by wave 1"
+  ],
+  "completenessFindings": [
+    {
+      "severity": "blocking",
+      "detail": "no wave merged \u2014 completeness review skipped (the tree is at BASE)"
+    }
+  ],
+  "blockedWaves": [
+    {
+      "wave": 1,
+      "detail": "candidate suite failed after reconcile attempts: bun test v1.4.0 (34cbb9a40)\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit\n\ntests/smoke.test.ts:\n(pass) the scaffold's store is green at BASE: schema and default content [7.81ms]\n\nclient/test/seeded-store.test.ts:\n\n# Unhandled error between tests\n-------------------------------\nerror: Cannot find module '@happy-dom/global-registrator' from '/home/exedev/target/.claude/ultrapowers/run-run-1/clones/integration/client/test/seeded-store.test.ts'\n-------------------------------\n\n\nclient/test/todos-store.test.ts:\n(pass) leg (a) [M1]: addTodo adds one trimmed, open row and returns its id > on an emptied store the id is exactly \"0\" and the content is exactly the buy-milk snapshot [2.84ms]\n(pass) leg (a) [M1]: addTodo adds one trimmed, open row and returns its id > on the default two-row store the id is a string, the row count becomes 3 and the new row is {text: \"x\", completed: false} [1.05ms]\n(pass) leg (b) [M2]: a blank todo is refused and the store is untouched > addTodo(store, \"\") and addTodo(store, \"   \") each return undefined and leave getContent() deep-equal to before [0.93ms]\n(pass) leg (b) [M2]: a blank todo is refused and the store is untouched > a blank todo on the default store leaves its two rows exactly as they were [0.57ms]\n(pass) leg (c) [M3]: setTodoCompleted ticks and unticks, deleteTodo removes > after addTodo(store, \"a\") on an emptied store, row \"0\" ticks true, then false, then is deleted [1.75ms]\n(pass) leg (d) [M4]: createTodosStore honours its optional seed > with no argument the store carries exactly the scaffold rows \"1\" and \"2\" [0.53ms]\n(pass) leg (d) [M4]: createTodosStore honours its optional seed > createTodosStore([{}, {}]).getContent() is exactly [{}, {}] [0.67ms]\n(pass) leg (d) [M4]: createTodosStore honours its optional seed > createTodosStore(buy-milk snapshot).getContent() is deep-equal to that snapshot [0.73ms]\n(pass) leg (e) [M5]: readSeed reads window.__TINYAPP_SEED__, or nothing at all > a window carrying the seed yields that very array [0.09ms]\n(pass) leg (e) [M5]: readSeed reads window.__TINYAPP_SEED__, or nothing at all > a window carrying no seed yields exactly undefined [0.03ms]\n(pass) leg (e) [M5]: readSeed reads window.__TINYAPP_SEED__, or nothing at all > no window at all yields exactly undefined and throws nothing [0.05ms]\n(pass) leg (h) [M7]: the state-exam JSON files parse to their snapshots > state-exams/seeds/empty.json parses to exactly [{}, {}] [0.10ms]\n(pass) leg (h) [M7]: the state-exam JSON files parse to their snapshots > state-exams/expected/one-open-todo.json parses to exactly the buy-milk snapshot [0.04ms]\n(pass) leg (h) [M7]: the state-exam JSON files parse to their snapshots > state-exams/expected/still-empty.json parses to exactly [{}, {}] [0.02ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/src/TodoInput.tsx contains \"addTodo(\" [0.03ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/src/TodoItem.tsx contains \"setTodoCompleted(\" and \"deleteTodo(\" [0.03ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/src/index.tsx contains \"readSeed(\" [0.02ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > client/package.json devDependencies carries @happy-dom/global-registrator as a non-empty string [0.05ms]\n(pass) leg (i) [M8]: the buttons run the callbacks and the DOM devDependency is declared > bun.lock records @happy-dom/global-registrator, so `bun install --frozen-lockfile` has a lockfile to be frozen against [0.05ms]\n\npackages/tinyapp-exam/test/store-move.test.ts:\n(pass) leg (a) [M1]: two deep-equal snapshots (two todo rows and one value) diff to exactly [] [0.27ms]\n(pass) leg (b) [M1]: one differing cell is exactly one Difference [0.06ms]\n(pass) leg (c) [M1]: one-sided rows carry null, $values comes last, and rows and cells are ordered by string [0.32ms]\n(pass) leg (d) [M2]: renderDiff writes the header line and one line per difference, absent for null [0.17ms]\n(pass) leg (e) [M3]: a move that reaches the expected state resolves with an empty diff, that content and a finite ms [2.91ms]\n(pass) leg (f) [M3]: a move that lands on the wrong cell resolves with that one difference [1.67ms]\n(pass) leg (g) [M4]: a seed the schema does not round-trip is refused by name, before the action runs [2.40ms]\n(pass) leg (m) [M7]: the move runs twice on fresh stores and refuses an action that answers differently [2.97ms]\n\npackages/tinyapp-exam/test/contract.test.ts:\n(pass) leg (h) [M5]: a missing clock is refused before fn runs, and fn's own error is what rejects [0.39ms]\n(pass) leg (i) [M5]: the clock reads as the spec while fn runs, and is the original again after [0.23ms]\n(pass) leg (j) [M5] [M6]: a fetch is a breach named by url, and the clock and fetch are restored on the rejected path [0.22ms]\n(pass) leg (k) [M5] [M6]: a WebSocket is a breach named by url, and WebSocket and the clock are restored [0.11ms]\n(pass) leg (l) [M6]: after a green fn, fetch and WebSocket are the originals again [0.05ms]\n\n1 tests failed:\n\n 33 pass\n 1 fail\n 1 error\n 83 expect() calls\nRan 34 tests across 5 files. [56.00ms]\nerror: script \"test\" exited with code 1\n"
+    }
+  ]
+}

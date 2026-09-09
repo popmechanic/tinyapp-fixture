@@ -40,7 +40,7 @@
     {
       "stage": "base-branch",
       "ok": true,
-      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+      "detail": "detached HEAD → fell back to repo default 'main'"
     }
   ],
   "compile": {
@@ -96,7 +96,7 @@
       },
       {
         "id": "3",
-        "title": "The render move \u2014 bundle, seed, snapshot, view",
+        "title": "The render move — bundle, seed, snapshot, view",
         "disposition": "implementation",
         "heuristic": false,
         "writes": [
@@ -172,7 +172,7 @@
       },
       {
         "id": "6",
-        "title": "`stateExam` \u2014 the three moves composed, the package sealed, the two first-run exams written",
+        "title": "`stateExam` — the three moves composed, the package sealed, the two first-run exams written",
         "disposition": "implementation",
         "heuristic": false,
         "writes": [
@@ -417,7 +417,7 @@
         },
         {
           "id": "3",
-          "title": "The render move \u2014 bundle, seed, snapshot, view",
+          "title": "The render move — bundle, seed, snapshot, view",
           "files": [
             "bun.lock",
             "package.json",
@@ -492,7 +492,7 @@
       [
         {
           "id": "6",
-          "title": "`stateExam` \u2014 the three moves composed, the package sealed, the two first-run exams written",
+          "title": "`stateExam` — the three moves composed, the package sealed, the two first-run exams written",
           "files": [
             "bun.lock",
             "package.json",
@@ -554,8 +554,8 @@
     ],
     "waveLabels": [
       "2 parallel tasks",
-      "packages/tinyapp-exam \u00b7 3 tasks",
-      "`stateExam` \u2014 the three moves composed, the package sea\u2026"
+      "packages/tinyapp-exam · 3 tasks",
+      "`stateExam` — the three moves composed, the package sea…"
     ],
     "mode": "parallel",
     "degrade_reason": null,
@@ -564,7 +564,7 @@
       "mode": "suite",
       "reason": "the committed suite is the verification."
     },
-    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is an injected `fetchImpl` or the\n  contract's blocked one, no test starts a server or a Durable Object, and the renderer URL a test\n  passes is a placeholder that is never dialled. `bun install` is the only network use in the run\n  and happens only in the driver's bootstrap.\n- The app reads from nowhere but its one TinyBase `MergeableStore` (schema `todos: {text: string,\n  completed: boolean}`; the cell is `completed`, not `done`); every `do:` is a store mutation\n  through a callback in `client/src/storeData.ts`, and the seeded page starts neither the\n  SQLite persister nor the `WsSynchronizer`.\n- `getContent()` \u2014 `[tables, values]` \u2014 is the only serialisation the helper compares or writes;\n  `getMergeableContent()` (HLC-stamped) appears nowhere in the helper.\n- The scaffold's generated files not named in a task's Files block are byte-identical to BASE\n  (the first Check); no task adds a dependency outside its own Files block, and `bun.lock` is\n  written by at most one task per wave.\n\n**Acceptance:** suite \u2014 the committed suite is the verification.",
+    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is an injected `fetchImpl` or the\n  contract's blocked one, no test starts a server or a Durable Object, and the renderer URL a test\n  passes is a placeholder that is never dialled. `bun install` is the only network use in the run\n  and happens only in the driver's bootstrap.\n- The app reads from nowhere but its one TinyBase `MergeableStore` (schema `todos: {text: string,\n  completed: boolean}`; the cell is `completed`, not `done`); every `do:` is a store mutation\n  through a callback in `client/src/storeData.ts`, and the seeded page starts neither the\n  SQLite persister nor the `WsSynchronizer`.\n- `getContent()` — `[tables, values]` — is the only serialisation the helper compares or writes;\n  `getMergeableContent()` (HLC-stamped) appears nowhere in the helper.\n- The scaffold's generated files not named in a task's Files block are byte-identical to BASE\n  (the first Check); no task adds a dependency outside its own Files block, and `bun.lock` is\n  written by at most one task per wave.\n\n**Acceptance:** suite — the committed suite is the verification.",
     "constraintChecks": [
       {
         "cmd": "git diff --quiet $ULTRA_BASE -- server/ client/index.html client/vite.config.js client/tsconfig.json client/src/App.tsx client/src/TodoList.tsx client/src/config.ts client/src/sqlite.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/TopBar.tsx tests/smoke.test.ts AGENTS.md",
@@ -587,13 +587,14 @@
   "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-1/args.json",
   "workflowName": "ultrapowers-run",
   "llmDerives": [
-    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
-    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
-    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
-    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries — never a top-level launch key)",
+    "nothing for waves[][].testCmd — the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived — knob or detection — and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd — driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth — it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
   ],
-  "testCmd": "bun run test",
+  "testCmd": "set -o pipefail; { bun run test; } 2>&1 | tee '/home/exedev/target/.claude/ultrapowers/run-run-1/acceptance.log'",
   "testCmdSource": "detected:package-json-bun",
   "bootstrapCmd": "bun install --frozen-lockfile",
-  "bootstrapCmdSource": "detected:bun-lockfile"
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "acceptanceLog": "/home/exedev/target/.claude/ultrapowers/run-run-1/acceptance.log"
 }

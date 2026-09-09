@@ -1,0 +1,60 @@
+{
+  "mode": "gate",
+  "stamp": "run-1",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-1/report.json",
+  "branch": "ultra/integration-run-1",
+  "gateCheck": {
+    "verdict": "BLOCKED",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": false,
+        "detail": "merge-sha guard unavailable \u2014 result lacks waveMerges[last].headSha (budget-exhausted or SKIPPED-only run); inspect and redirect/re-run"
+      },
+      {
+        "name": "head-match",
+        "ok": false,
+        "detail": "skipped \u2014 no recorded merge headSha to compare"
+      },
+      {
+        "name": "git-verified",
+        "ok": false,
+        "detail": "gitVerified is not true \u2014 the completeness critic could not confirm it reviewed the recorded merge HEAD; the review is unverified"
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": false,
+        "detail": "failed/blocked tasks left declared deliverables unproduced: [{\"task\": \"2\", \"files\": [\"packages/tinyapp-exam/src/mutant.ts\", \"packages/tinyapp-exam/test/mutant.test.ts\"]}, {\"task\": \"3\", \"files\": [\"bun.lock\", \"package.json\", \"packages/tinyapp-exam/src/render-move.ts\", \"packages/tinyapp-exam/test/render-move.test.ts\"]}, {\"task\": \"4\", \"files\": [\"packages/tinyapp-exam/src/evidence.ts\", \"packages/tinyapp-exam/test/evidence.test.ts\"]}, {\"task\": \"6\", \"files\": [\"bun.lock\", \"package.json\", \"packages/tinyapp-exam/package.json\", \"packages/tinyapp-exam/src/index.ts\", \"packages/tinyapp-exam/src/state-exam.ts\", \"packages/tinyapp-exam/test/state-exam.test.ts\", \"packages/tinyapp-exam/tsconfig.json\", \"tests/state-exams/buy-milk.test.ts\", \"tests/state-exams/empty-todo-refused.test.ts\"]}]"
+      }
+    ],
+    "acks": [
+      {
+        "type": "coverage",
+        "detail": "green suite but 0/6 tasks merged \u2014 a passing suite over an incomplete merge is a false-green"
+      }
+    ],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 1,
+  "acceptance": {
+    "disposition": "suite",
+    "exit": 0,
+    "output": "{\"sealId\": \"(suite)\", \"status\": \"OK\", \"passed\": true, \"exitCode\": 0, \"output\": \"$ bun run typecheck && bun test\\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit\\nbun test v1.4.0 (34cbb9a40)\\n\\ntests/smoke.test.ts:\\n(pass) the scaffold's store is green at BASE: schema and default content [4.53ms]\\n\\n 1 pass\\n 0 fail\\n 3 expect() calls\\nRan 1 test across 1 file. [11.00ms]\"}\n"
+  },
+  "verdict": "BLOCKED"
+}
