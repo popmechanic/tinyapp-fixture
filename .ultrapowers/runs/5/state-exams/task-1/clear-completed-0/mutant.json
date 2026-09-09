@@ -1,0 +1,18 @@
+{
+  "killed": true,
+  "path": "todos/1/text,todos/1/completed",
+  "edits": [
+    {
+      "table": "todos",
+      "row": "1",
+      "cell": "text",
+      "value": "walk the dog"
+    },
+    {
+      "table": "todos",
+      "row": "1",
+      "cell": "completed",
+      "value": true
+    }
+  ]
+}

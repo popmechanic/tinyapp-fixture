@@ -1,0 +1,42 @@
+{
+  "task": "1",
+  "n": 0,
+  "findings": [],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `clearCompleted(store: TodosStore) -> void` client/src/storeData.ts exports clearCompleted; Produces: `ClearCompleted() -> JSX.Element` client/src/ClearCompleted.tsx exports ClearCompleted"
+    },
+    {
+      "check": "exam-files",
+      "detail": "tests/state-exams/clear-completed.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +6 / −0 across the patch"
+    },
+    {
+      "check": "dependencies",
+      "detail": "no manifest changed"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "client/src/ClearCompleted.tsx": "ts",
+    "client/src/TodoList.tsx": "ts",
+    "client/src/storeData.ts": "ts",
+    "tests/state-exams/clear-completed.test.ts": "ts"
+  },
+  "ms": 7
+}
