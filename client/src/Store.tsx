@@ -29,6 +29,7 @@ const {
   useSetPartialRowCallback,
   useSortedRowIds,
   useStore,
+  useTable,
 } = UiReact as UiReact.WithSchemas<Schemas>;
 
 export {STORE_ID, addTodo, deleteTodo, setTodoCompleted};
@@ -40,6 +41,7 @@ export {
   useSortedRowIds,
   useSetPartialRowCallback,
   useStore,
+  useTable,
 };
 
 export const Store = ({onReady}: {onReady?: () => void}) => {

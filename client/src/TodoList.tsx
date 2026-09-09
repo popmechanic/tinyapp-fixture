@@ -1,6 +1,7 @@
 import './todoList.css';
 import {useSortedRowIds, STORE_ID} from './Store';
 import {TodoItem} from './TodoItem';
+import {ClearCompleted} from './ClearCompleted';
 
 export const TodoList = () => {
   const todoIds = useSortedRowIds(
@@ -13,10 +14,13 @@ export const TodoList = () => {
   );
 
   return (
-    <div id="todoList">
-      {todoIds.map((id) => (
-        <TodoItem key={id} rowId={id} />
-      ))}
-    </div>
+    <>
+      <div id="todoList">
+        {todoIds.map((id) => (
+          <TodoItem key={id} rowId={id} />
+        ))}
+      </div>
+      <ClearCompleted />
+    </>
   );
 };
