@@ -1,0 +1,599 @@
+{
+  "ok": true,
+  "stamp": "run-2",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-2"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "6 task(s) in 3 wave(s); acceptance: suite"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The store move, the diff table and the determinism contract",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/contract.ts",
+          "packages/tinyapp-exam/src/store-move.ts",
+          "packages/tinyapp-exam/src/types.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "`Snapshot` (type, `src/types.ts`)",
+            "`Difference` (type, `src/types.ts`)",
+            "`MutantEdit` (type, `src/types.ts`)",
+            "`View` (type, `src/types.ts`)",
+            "`StateExamSpec` (type, `src/types.ts`)",
+            "`ExamRecord` (type, `src/types.ts`)",
+            "`diffContent(got: Snapshot, wanted: Snapshot) -> Difference[]`",
+            "`renderDiff(differences: Difference[]) -> string`",
+            "`storeMove(spec: StateExamSpec) -> Promise<{content: Snapshot, diff: Difference[], ms: number}>`",
+            "`withContract(clock: string, fn: () => unknown) -> Promise<void>`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The mutant perturbation",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/mutant.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`Snapshot`",
+            "`MutantEdit`"
+          ],
+          "produces": [
+            "`applyMutant(snapshot: Snapshot, edits: MutantEdit[]) -> Snapshot`",
+            "`mutantPath(edits: MutantEdit[]) -> string`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The render move \u2014 bundle, seed, snapshot, view",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "package.json",
+          "packages/tinyapp-exam/src/render-move.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`Snapshot`",
+            "`View`"
+          ],
+          "produces": [
+            "`renderHtml(entryHtml: string, parts: {js: string, css: string, seed: Snapshot}) -> string`",
+            "`assertView(html: string, views: View | View[] | undefined) -> string[]`",
+            "`renderMove(args: {entry: string, content: Snapshot, view?: View | View[], env: Record<string, string | undefined>, fetchImpl?: typeof fetch}) -> Promise<{render: 'ran' | 'skipped', ms: number | null, dom?: string, screenshot?: Uint8Array, failures: string[]}>`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "The evidence writer",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/evidence.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`ExamRecord`"
+          ],
+          "produces": [
+            "`evidenceDir(stem: string, env: Record<string, string | undefined>) -> string`",
+            "`writeEvidence(dir: string, record: ExamRecord) -> string[]`",
+            "`examStem(mainPath: string) -> string`"
+          ]
+        }
+      },
+      {
+        "id": "5",
+        "title": "The fixture honours the seed and exposes its callbacks",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "client/package.json",
+          "client/src/Store.tsx",
+          "client/src/TodoInput.tsx",
+          "client/src/TodoItem.tsx",
+          "client/src/index.tsx",
+          "client/src/storeData.ts",
+          "client/src/vite-env.d.ts",
+          "state-exams/expected/one-open-todo.json",
+          "state-exams/expected/still-empty.json",
+          "state-exams/seeds/empty.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "`addTodo(store: TodosStore, text: string) -> string | undefined`",
+            "`setTodoCompleted(store: TodosStore, id: string, completed: boolean) -> void`",
+            "`deleteTodo(store: TodosStore, id: string) -> void`",
+            "`createTodosStore(seed?: TodosContent) -> TodosStore`",
+            "`readSeed() -> TodosContent | undefined`",
+            "`TodosStore` (type, `client/src/storeData.ts`)"
+          ]
+        }
+      },
+      {
+        "id": "6",
+        "title": "`stateExam` \u2014 the three moves composed, the package sealed, the two first-run exams written",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "package.json",
+          "packages/tinyapp-exam/package.json",
+          "packages/tinyapp-exam/src/index.ts",
+          "packages/tinyapp-exam/src/state-exam.ts",
+          "packages/tinyapp-exam/tsconfig.json",
+          "tests/state-exams/buy-milk.test.ts",
+          "tests/state-exams/empty-todo-refused.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`storeMove(spec: StateExamSpec) -> Promise<{content: Snapshot, diff: Difference[], ms: number}>`",
+            "`diffContent(got: Snapshot, wanted: Snapshot) -> Difference[]`",
+            "`renderDiff(differences: Difference[]) -> string`",
+            "`applyMutant(snapshot: Snapshot, edits: MutantEdit[]) -> Snapshot`",
+            "`mutantPath(edits: MutantEdit[]) -> string`",
+            "`renderMove(args: {entry: string, content: Snapshot, view?: View | View[], env: Record<string, string | undefined>, fetchImpl?: typeof fetch}) -> Promise<{render: 'ran' | 'skipped', ms: number | null, dom?: string, screenshot?: Uint8Array, failures: string[]}>`",
+            "`evidenceDir(stem: string, env: Record<string, string | undefined>) -> string`",
+            "`writeEvidence(dir: string, record: ExamRecord) -> string[]`",
+            "`examStem(mainPath: string) -> string`",
+            "`addTodo(store: TodosStore, text: string) -> string | undefined`",
+            "`createTodosStore(seed?: TodosContent) -> TodosStore`"
+          ],
+          "produces": [
+            "`stateExam(spec: StateExamSpec) -> void`",
+            "`runStateExam(spec: StateExamSpec, opts?: {env?: Record<string, string | undefined>, main?: string, fetchImpl?: typeof fetch}) -> Promise<{ok: boolean, failure: string | null, record: ExamRecord, dir: string}>`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "6",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "6",
+        "why": "interface"
+      },
+      {
+        "from": "3",
+        "to": "6",
+        "why": "interface"
+      },
+      {
+        "from": "4",
+        "to": "6",
+        "why": "interface"
+      },
+      {
+        "from": "5",
+        "to": "6",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "gates": [],
+    "post_merge_runbook": [],
+    "waves": [
+      [
+        "1",
+        "5"
+      ],
+      [
+        "2",
+        "3",
+        "4"
+      ],
+      [
+        "6"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The store move, the diff table and the determinism contract",
+          "files": [
+            "packages/tinyapp-exam/src/contract.ts",
+            "packages/tinyapp-exam/src/store-move.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/contract.test.ts",
+            "packages/tinyapp-exam/test/store-move.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "`Snapshot` (type, `src/types.ts`)",
+              "`Difference` (type, `src/types.ts`)",
+              "`MutantEdit` (type, `src/types.ts`)",
+              "`View` (type, `src/types.ts`)",
+              "`StateExamSpec` (type, `src/types.ts`)",
+              "`ExamRecord` (type, `src/types.ts`)",
+              "`diffContent(got: Snapshot, wanted: Snapshot) -> Difference[]`",
+              "`renderDiff(differences: Difference[]) -> string`",
+              "`storeMove(spec: StateExamSpec) -> Promise<{content: Snapshot, diff: Difference[], ms: number}>`",
+              "`withContract(clock: string, fn: () => unknown) -> Promise<void>`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/contract.ts",
+            "packages/tinyapp-exam/src/store-move.ts",
+            "packages/tinyapp-exam/src/types.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/store-move.test.ts",
+            "packages/tinyapp-exam/test/contract.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/store-move.test.ts packages/tinyapp-exam/test/contract.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/store-move.test.ts",
+            "packages/tinyapp-exam/test/contract.test.ts"
+          ]
+        },
+        {
+          "id": "5",
+          "title": "The fixture honours the seed and exposes its callbacks",
+          "files": [
+            "bun.lock",
+            "client/package.json",
+            "client/src/Store.tsx",
+            "client/src/TodoInput.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/index.tsx",
+            "client/src/storeData.ts",
+            "client/src/vite-env.d.ts",
+            "client/test/seeded-store.test.ts",
+            "client/test/todos-store.test.ts",
+            "state-exams/expected/one-open-todo.json",
+            "state-exams/expected/still-empty.json",
+            "state-exams/seeds/empty.json"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "`addTodo(store: TodosStore, text: string) -> string | undefined`",
+              "`setTodoCompleted(store: TodosStore, id: string, completed: boolean) -> void`",
+              "`deleteTodo(store: TodosStore, id: string) -> void`",
+              "`createTodosStore(seed?: TodosContent) -> TodosStore`",
+              "`readSeed() -> TodosContent | undefined`",
+              "`TodosStore` (type, `client/src/storeData.ts`)"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "bun.lock",
+            "client/package.json",
+            "client/src/Store.tsx",
+            "client/src/TodoInput.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/index.tsx",
+            "client/src/storeData.ts",
+            "client/src/vite-env.d.ts",
+            "state-exams/expected/one-open-todo.json",
+            "state-exams/expected/still-empty.json",
+            "state-exams/seeds/empty.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "client/test/todos-store.test.ts",
+            "client/test/seeded-store.test.ts"
+          ],
+          "testCmd": "bun test client/test/todos-store.test.ts client/test/seeded-store.test.ts",
+          "proofRuns": [
+            "bun install --frozen-lockfile",
+            "grep -q 'addTodo(' client/src/TodoInput.tsx",
+            "grep -q 'setTodoCompleted(' client/src/TodoItem.tsx",
+            "grep -q 'deleteTodo(' client/src/TodoItem.tsx",
+            "grep -q 'readSeed(' client/src/index.tsx"
+          ],
+          "proofGuards": [
+            "client/test/todos-store.test.ts",
+            "client/test/seeded-store.test.ts"
+          ]
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "The mutant perturbation",
+          "files": [
+            "packages/tinyapp-exam/src/mutant.ts",
+            "packages/tinyapp-exam/test/mutant.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`Snapshot`",
+              "`MutantEdit`"
+            ],
+            "produces": [
+              "`applyMutant(snapshot: Snapshot, edits: MutantEdit[]) -> Snapshot`",
+              "`mutantPath(edits: MutantEdit[]) -> string`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/mutant.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/mutant.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/mutant.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/mutant.test.ts"
+          ]
+        },
+        {
+          "id": "3",
+          "title": "The render move \u2014 bundle, seed, snapshot, view",
+          "files": [
+            "bun.lock",
+            "package.json",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`Snapshot`",
+              "`View`"
+            ],
+            "produces": [
+              "`renderHtml(entryHtml: string, parts: {js: string, css: string, seed: Snapshot}) -> string`",
+              "`assertView(html: string, views: View | View[] | undefined) -> string[]`",
+              "`renderMove(args: {entry: string, content: Snapshot, view?: View | View[], env: Record<string, string | undefined>, fetchImpl?: typeof fetch}) -> Promise<{render: 'ran' | 'skipped', ms: number | null, dom?: string, screenshot?: Uint8Array, failures: string[]}>`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "bun.lock",
+            "package.json",
+            "packages/tinyapp-exam/src/render-move.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/render-move.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/render-move.test.ts",
+          "proofRuns": [
+            "bun install --frozen-lockfile"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/render-move.test.ts"
+          ]
+        },
+        {
+          "id": "4",
+          "title": "The evidence writer",
+          "files": [
+            "packages/tinyapp-exam/src/evidence.ts",
+            "packages/tinyapp-exam/test/evidence.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`ExamRecord`"
+            ],
+            "produces": [
+              "`evidenceDir(stem: string, env: Record<string, string | undefined>) -> string`",
+              "`writeEvidence(dir: string, record: ExamRecord) -> string[]`",
+              "`examStem(mainPath: string) -> string`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/evidence.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/evidence.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/evidence.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/evidence.test.ts"
+          ]
+        }
+      ],
+      [
+        {
+          "id": "6",
+          "title": "`stateExam` \u2014 the three moves composed, the package sealed, the two first-run exams written",
+          "files": [
+            "bun.lock",
+            "package.json",
+            "packages/tinyapp-exam/package.json",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/test/state-exam.test.ts",
+            "packages/tinyapp-exam/tsconfig.json",
+            "tests/state-exams/buy-milk.test.ts",
+            "tests/state-exams/empty-todo-refused.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`storeMove(spec: StateExamSpec) -> Promise<{content: Snapshot, diff: Difference[], ms: number}>`",
+              "`diffContent(got: Snapshot, wanted: Snapshot) -> Difference[]`",
+              "`renderDiff(differences: Difference[]) -> string`",
+              "`applyMutant(snapshot: Snapshot, edits: MutantEdit[]) -> Snapshot`",
+              "`mutantPath(edits: MutantEdit[]) -> string`",
+              "`renderMove(args: {entry: string, content: Snapshot, view?: View | View[], env: Record<string, string | undefined>, fetchImpl?: typeof fetch}) -> Promise<{render: 'ran' | 'skipped', ms: number | null, dom?: string, screenshot?: Uint8Array, failures: string[]}>`",
+              "`evidenceDir(stem: string, env: Record<string, string | undefined>) -> string`",
+              "`writeEvidence(dir: string, record: ExamRecord) -> string[]`",
+              "`examStem(mainPath: string) -> string`",
+              "`addTodo(store: TodosStore, text: string) -> string | undefined`",
+              "`createTodosStore(seed?: TodosContent) -> TodosStore`"
+            ],
+            "produces": [
+              "`stateExam(spec: StateExamSpec) -> void`",
+              "`runStateExam(spec: StateExamSpec, opts?: {env?: Record<string, string | undefined>, main?: string, fetchImpl?: typeof fetch}) -> Promise<{ok: boolean, failure: string | null, record: ExamRecord, dir: string}>`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "bun.lock",
+            "package.json",
+            "packages/tinyapp-exam/package.json",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/tsconfig.json",
+            "tests/state-exams/buy-milk.test.ts",
+            "tests/state-exams/empty-todo-refused.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/state-exam.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/state-exam.test.ts",
+          "proofRuns": [
+            "bun install --frozen-lockfile",
+            "bun test tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts",
+            "bunx tsc -p packages/tinyapp-exam --noEmit"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/state-exam.test.ts"
+          ]
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 parallel tasks",
+      "packages/tinyapp-exam \u00b7 3 tasks",
+      "`stateExam` \u2014 the three moves composed, the package sea\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "allHeuristic": false,
+    "acceptance": {
+      "mode": "suite",
+      "reason": "the committed suite is the verification."
+    },
+    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is an injected `fetchImpl` or the\n  contract's blocked one, no test starts a server or a Durable Object, and the renderer URL a test\n  passes is a placeholder that is never dialled. `bun install` is the only network use in the run\n  and happens only in the driver's bootstrap.\n- The app reads from nowhere but its one TinyBase `MergeableStore` (schema `todos: {text: string,\n  completed: boolean}`; the cell is `completed`, not `done`); every `do:` is a store mutation\n  through a callback in `client/src/storeData.ts`, and the seeded page starts neither the\n  SQLite persister nor the `WsSynchronizer`.\n- `getContent()` \u2014 `[tables, values]` \u2014 is the only serialisation the helper compares or writes;\n  `getMergeableContent()` (HLC-stamped) appears nowhere in the helper.\n- The scaffold's generated files not named in a task's Files block are byte-identical to BASE\n  (the first Check); no task adds a dependency outside its own Files block, and `bun.lock` is\n  written by at most one task per wave.\n\n**Acceptance:** suite \u2014 the committed suite is the verification.",
+    "constraintChecks": [
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- server/ client/index.html client/vite.config.js client/tsconfig.json client/src/App.tsx client/src/TodoList.tsx client/src/config.ts client/src/sqlite.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/TopBar.tsx tests/smoke.test.ts AGENTS.md",
+        "minor": false
+      },
+      {
+        "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+        "minor": false
+      },
+      {
+        "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-2/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-2/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-2/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-2/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
