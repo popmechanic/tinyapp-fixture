@@ -1,0 +1,49 @@
+{
+  "task": "3",
+  "n": 0,
+  "findings": [
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `bun.lock` (node-html-parser, boolbase, css-select, dependencies, css-what, domhandler, domutils, nth-check, dom-serializer, domelementtype, entities, dom-serializer/entities, happy-dom/entities)"
+    },
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `package.json` (@types/bun, node-html-parser, typescript)"
+    }
+  ],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `renderHtml(entryHtml: string, parts: {js: string, css: string, seed: Snapshot}) -> string` packages/tinyapp-exam/src/render-move.ts exports renderHtml; Produces: `assertView(html: string, views: View | View[] | undefined) -> string[]` packages/tinyapp-exam/src/render-move.ts exports assertView; Produces: `renderMove(args: {entry: string, content: Snapshot, view?: View | View[], env: Record<string, string | undefined>, fetchImpl?: typeof fetch}) -> Promise<{render: 'ran' | 'skipped', ms: number | null, dom?: string, screenshot?: Uint8Array, failures: string[]}>` packages/tinyapp-exam/src/render-move.ts exports renderMove"
+    },
+    {
+      "check": "exam-files",
+      "detail": "packages/tinyapp-exam/test/render-move.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +14 / −0 across the patch"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "packages/tinyapp-exam/src/render-move.ts": "ts",
+    "packages/tinyapp-exam/test/render-move.test.ts": "ts"
+  },
+  "ms": 2
+}

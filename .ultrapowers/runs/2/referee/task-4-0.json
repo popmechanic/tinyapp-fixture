@@ -1,0 +1,40 @@
+{
+  "task": "4",
+  "n": 0,
+  "findings": [],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `evidenceDir(stem: string, env: Record<string, string | undefined>) -> string` packages/tinyapp-exam/src/evidence.ts exports evidenceDir; Produces: `writeEvidence(dir: string, record: ExamRecord) -> string[]` packages/tinyapp-exam/src/evidence.ts exports writeEvidence; Produces: `examStem(mainPath: string) -> string` packages/tinyapp-exam/src/evidence.ts exports examStem"
+    },
+    {
+      "check": "exam-files",
+      "detail": "packages/tinyapp-exam/test/evidence.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +7 / −0 across the patch"
+    },
+    {
+      "check": "dependencies",
+      "detail": "no manifest changed"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "packages/tinyapp-exam/src/evidence.ts": "ts",
+    "packages/tinyapp-exam/test/evidence.test.ts": "ts"
+  },
+  "ms": 1
+}

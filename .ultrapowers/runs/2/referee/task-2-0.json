@@ -1,0 +1,40 @@
+{
+  "task": "2",
+  "n": 0,
+  "findings": [],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `applyMutant(snapshot: Snapshot, edits: MutantEdit[]) -> Snapshot` packages/tinyapp-exam/src/mutant.ts exports applyMutant; Produces: `mutantPath(edits: MutantEdit[]) -> string` packages/tinyapp-exam/src/mutant.ts exports mutantPath"
+    },
+    {
+      "check": "exam-files",
+      "detail": "packages/tinyapp-exam/test/mutant.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +11 / −0 across the patch"
+    },
+    {
+      "check": "dependencies",
+      "detail": "no manifest changed"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "packages/tinyapp-exam/src/mutant.ts": "ts",
+    "packages/tinyapp-exam/test/mutant.test.ts": "ts"
+  },
+  "ms": 1
+}
