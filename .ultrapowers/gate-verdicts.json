@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "336658d17301eeddda968eea8a724de7fdeafa440615638e0c781f3671b2cd87",
+      "verdict": "pass",
+      "reason": "Every clause is pinned by a leg that would go red on its negation — the M1 sibling pair separates the per-test {timeout} override from the CLI default, the M2 counts (2 on load, still 2 after a no-op mutation, exactly 3 after one real toggle) are the only values consistent with a compare-before-write observer, and M3–M5 are held by literal checks plus Run: exit codes rather than self-reference."
+    }
+  },
+  "tally": {"dispatched": 1, "rejected": 0, "rounds": [{"round": 1, "dispatched": 1, "pass": 1, "fail": 0}]}
+}
