@@ -1,0 +1,34 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "fc3b9d568f19cbba40c1438c940cb508d9f9d9033a8d12a9d708dc52f113bd57",
+      "verdict": "pass",
+      "reason": "Every clause has a leg that falsifies it: (a)-(c) pin the exact post-action contents (including TinyBase dropping the emptied table to [{}, {}]), (d) the seed, (e)-(j) the six grep texts with their exit-1 negatives, and (k) asserts M5 only under the render condition and names the skipped record otherwise; the M1/M3 literals are mutually consistent (row 1 is the sole completed row, so removing it leaves exactly the expected content)."
+    },
+    "2": {
+      "hash": "49b620177e4b745f62f2632dd907e6ed4cc4a7a3c0b1bbfc1fe713801f549b06",
+      "verdict": "pass",
+      "reason": "Legs (a)-(c) compute correctly against the M3 tables (1/2, 0/0, 2/2), the grep/sed legs each fail on the named counter-shapes (leg (i)'s ordered regex, exact-count legs (j) pinning the range to the one Provider body), (o) pins M4's derived-only schema, and (p) asserts M5's expected state plus the render view only under the render-ran condition and names walls.json render: skipped otherwise; the one blemish is leg (l) citing M2 for a Store.tsx fact M2 never pins, surplus rather than a hole."
+    }
+  },
+  "tally": {
+    "dispatched": 6,
+    "rejected": 4,
+    "rounds": {
+      "1": {"dispatched": 2, "rejected": 2, "notes": "task 1: M4 page clause unconditional while asserted only when render ran, greps pinned presence not wiring; task 2: Main-Provider inference unsound if Main moved files"},
+      "2": {"dispatched": 2, "rejected": 1, "notes": "task 1 pass; task 2: <done> of <total> done format unfalsified on the skipped branch"},
+      "3": {"dispatched": 1, "rejected": 1, "notes": "task 2: sed range only showed a Provider line preceding TopBar; Main-inside-Provider unpinned"},
+      "4": {"dispatched": 1, "rejected": 1, "notes": "task 2: M5 said checked where the helper reads data-checked; leg dropped the #doneCount count: 1"},
+      "5": {"dispatched": 1, "rejected": 0, "notes": "task 2 pass"}
+    }
+  },
+  "history": [
+    {"task": "1", "hash": "2c62690e447e5be6236674b8a24c339abf0cfa84a3b9df9f36cd84f7e145e808", "verdict": "fail"},
+    {"task": "2", "hash": "2a3574258ed5f29736fcdf07ff6c1bd22dd02a38a19ed9ceed6ab47fd962a980", "verdict": "fail"},
+    {"task": "1", "hash": "fc3b9d568f19cbba40c1438c940cb508d9f9d9033a8d12a9d708dc52f113bd57", "verdict": "pass"},
+    {"task": "2", "hash": "7943152937d7a6a4e1683a19f90e509e9cabf845e63f5c55dcc2f94cbc84efd1", "verdict": "fail"},
+    {"task": "2", "hash": "b0bf989c48a4b47b30ef3ef5c9fec3a0f94c5d38238fda2a6e0465d38ef9c7f7", "verdict": "fail"},
+    {"task": "2", "hash": "66c2e111186e2a8ae92747b1526f1056101d885e7990478eb5fe86efb658765a", "verdict": "fail"},
+    {"task": "2", "hash": "49b620177e4b745f62f2632dd907e6ed4cc4a7a3c0b1bbfc1fe713801f549b06", "verdict": "pass"}
+  ]
+}
