@@ -1,0 +1,58 @@
+{
+  "task": "6",
+  "n": 0,
+  "findings": [
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `bun.lock` (tinyapp-exam, packages/tinyapp-exam, name, version, dependencies, node-html-parser, tinybase)"
+    },
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `package.json` (typecheck, tinyapp-exam, node-html-parser)"
+    },
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `packages/tinyapp-exam/package.json` (name, version, private, type, main, dependencies, tinybase, node-html-parser)"
+    }
+  ],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `stateExam(spec: StateExamSpec) -> void` packages/tinyapp-exam/src/index.ts exports stateExam; Produces: `runStateExam(spec: StateExamSpec, opts?: {env?: Record<string, string | undefined>, main?: string, fetchImpl?: typeof fetch}) -> Promise<{ok: boolean, failure: string | null, record: ExamRecord, dir: string}>` packages/tinyapp-exam/src/index.ts exports runStateExam"
+    },
+    {
+      "check": "exam-files",
+      "detail": "packages/tinyapp-exam/test/state-exam.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +13 / −0 across the patch"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "packages/tinyapp-exam/src/index.ts": "ts",
+    "packages/tinyapp-exam/src/state-exam.ts": "ts",
+    "packages/tinyapp-exam/test/state-exam.test.ts": "ts",
+    "tests/state-exams/buy-milk.test.ts": "ts",
+    "tests/state-exams/empty-todo-refused.test.ts": "ts"
+  },
+  "ms": 5
+}
