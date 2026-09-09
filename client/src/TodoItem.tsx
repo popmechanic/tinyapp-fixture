@@ -1,35 +1,42 @@
 import './todoItem.css';
 import {
-  useDelRowCallback,
+  deleteTodo,
+  setTodoCompleted,
   useRow,
-  useSetPartialRowCallback,
+  useStore,
   type TodoRow,
+  type TodosStore,
   STORE_ID,
 } from './Store';
 import {Button} from './Button';
 
 export const TodoItem = ({rowId}: {rowId: string}) => {
   const todo = useRow('todos', rowId, STORE_ID) as TodoRow;
-  const setPartialRow = useSetPartialRowCallback(
-    'todos',
-    rowId,
-    (e: React.ChangeEvent<HTMLInputElement>) => ({completed: e.target.checked}),
-    [],
-    STORE_ID,
-  );
-  const delRow = useDelRowCallback('todos', rowId, STORE_ID);
+  const store = useStore(STORE_ID) as TodosStore | undefined;
+
+  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (store) {
+      setTodoCompleted(store, rowId, e.target.checked);
+    }
+  };
+
+  const handleDelete = () => {
+    if (store) {
+      deleteTodo(store, rowId);
+    }
+  };
 
   return (
     <div className={`todoItem${todo.completed ? ' completed' : ''}`}>
       <input
         type="checkbox"
         checked={todo.completed}
-        onChange={setPartialRow}
+        onChange={handleToggle}
         id={`todo-${rowId}`}
       />
       <label htmlFor={`todo-${rowId}`}>{todo.text}</label>
 
-      <Button onClick={delRow}>Delete</Button>
+      <Button onClick={handleDelete}>Delete</Button>
     </div>
   );
 };
