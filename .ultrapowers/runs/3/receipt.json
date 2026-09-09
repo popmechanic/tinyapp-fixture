@@ -1,0 +1,252 @@
+{
+  "ok": true,
+  "stamp": "run-3",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-3"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "2 task(s) in 1 wave(s); acceptance: suite"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Clear completed \u2014 one button, one store callback",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/ClearCompleted.tsx",
+          "client/src/TodoList.tsx",
+          "client/src/storeData.ts",
+          "state-exams/seeds/two-todos-one-done.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "`clearCompleted(store: TodosStore) -> void`",
+            "`ClearCompleted() -> JSX.Element`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The done counter in the top bar, derived from the store",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/App.tsx",
+          "client/src/DoneCount.tsx",
+          "client/src/Store.tsx",
+          "client/src/TopBar.tsx",
+          "client/src/todoCounts.ts",
+          "state-exams/expected/two-todos-one-done.json",
+          "state-exams/seeds/two-open-todos.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "`countTodos(table: Record<string, {text?: string, completed?: boolean}>) -> {done: number, total: number}`",
+            "`DoneCount() -> JSX.Element`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [],
+    "marker_conflicts": [],
+    "gates": [],
+    "post_merge_runbook": [],
+    "waves": [
+      [
+        "1",
+        "2"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "Clear completed \u2014 one button, one store callback",
+          "files": [
+            "client/src/ClearCompleted.tsx",
+            "client/src/TodoList.tsx",
+            "client/src/storeData.ts",
+            "state-exams/seeds/two-todos-one-done.json",
+            "tests/state-exams/clear-completed.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "`clearCompleted(store: TodosStore) -> void`",
+              "`ClearCompleted() -> JSX.Element`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/ClearCompleted.tsx",
+            "client/src/TodoList.tsx",
+            "client/src/storeData.ts",
+            "state-exams/seeds/two-todos-one-done.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/clear-completed.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/clear-completed.test.ts",
+          "proofRuns": [
+            "grep -q 'clearCompleted(' client/src/ClearCompleted.tsx",
+            "grep -q 'id=\"clearCompleted\"' client/src/ClearCompleted.tsx",
+            "grep -q 'Clear completed' client/src/ClearCompleted.tsx",
+            "grep -q 'onClick=' client/src/ClearCompleted.tsx",
+            "grep -q 'useStore(STORE_ID)' client/src/ClearCompleted.tsx",
+            "grep -q '<ClearCompleted />' client/src/TodoList.tsx"
+          ],
+          "proofGuards": [
+            "tests/state-exams/clear-completed.test.ts"
+          ]
+        },
+        {
+          "id": "2",
+          "title": "The done counter in the top bar, derived from the store",
+          "files": [
+            "client/src/App.tsx",
+            "client/src/DoneCount.tsx",
+            "client/src/Store.tsx",
+            "client/src/TopBar.tsx",
+            "client/src/todoCounts.ts",
+            "state-exams/expected/two-todos-one-done.json",
+            "state-exams/seeds/two-open-todos.json",
+            "tests/state-exams/done-count.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "`countTodos(table: Record<string, {text?: string, completed?: boolean}>) -> {done: number, total: number}`",
+              "`DoneCount() -> JSX.Element`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/App.tsx",
+            "client/src/DoneCount.tsx",
+            "client/src/Store.tsx",
+            "client/src/TopBar.tsx",
+            "client/src/todoCounts.ts",
+            "state-exams/expected/two-todos-one-done.json",
+            "state-exams/seeds/two-open-todos.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/done-count.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/done-count.test.ts",
+          "proofRuns": [
+            "grep -q 'countTodos(' client/src/DoneCount.tsx",
+            "grep -q 'id=\"doneCount\"' client/src/DoneCount.tsx",
+            "grep -q 'useTable' client/src/DoneCount.tsx",
+            "grep -qF '{done} of {total} done' client/src/DoneCount.tsx",
+            "sed -n '/<Title/,/<Info/p' client/src/TopBar.tsx | grep -q 'DoneCount'",
+            "sed -n '/<Provider>/,/<\\/Provider>/p' client/src/App.tsx | tr '\\n' ' ' | grep -q '<Provider>.*<TopBar.*<Main.*</Provider>'",
+            "test \"$(grep -c '<Provider>' client/src/App.tsx)\" -eq 1",
+            "test \"$(grep -c '</Provider>' client/src/App.tsx)\" -eq 1",
+            "grep -q 'const Main' client/src/App.tsx",
+            "grep -q 'useTable' client/src/Store.tsx"
+          ],
+          "proofGuards": [
+            "tests/state-exams/done-count.test.ts"
+          ]
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 Stores"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "allHeuristic": false,
+    "acceptance": {
+      "mode": "suite",
+      "reason": "the committed suite is the verification."
+    },
+    "globalConstraints": "- No test reaches the network: every `fetch` a test exercises is the helper's injected\n  `fetchImpl` or the contract's blocked one, no test starts a server or a Durable Object, and the\n  renderer is dialled only by the helper's own render move, from the one `TINYAPP_RENDER_URL`\n  the driver set. `bun install` is the only network use in the run and happens only in the\n  driver's bootstrap.\n- The app reads from nowhere but its one TinyBase `MergeableStore` (schema `todos: {text:\n  string, completed: boolean}`; the cell is `completed`, not `done`); every mutation the UI makes\n  goes through a callback in `client/src/storeData.ts`, and the counter is derived from the\n  `todos` table at render time \u2014 no new table, value, React state or module-level state holds it.\n- The rendered markup the exams read stays the scaffold's: `<div id=\"todoList\">` holding one\n  `<div class=\"todoItem\">` (plus the class `completed` when ticked) per row with\n  `<input type=\"checkbox\" id=\"todo-<id>\">`, a `<label>` carrying the text and a Delete button;\n  `<div id=\"topBar\">` holding `<h1 id=\"topBarTitle\">` and `<div id=\"info\">`.\n- The scaffold's files not named in a task's Files block are byte-identical to BASE (the first\n  Check); no task adds a dependency, and `bun.lock` and both `package.json` files are unwritten.\n\n**Acceptance:** suite \u2014 the committed suite is the verification.",
+    "constraintChecks": [
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- server/ packages/ client/index.html client/vite.config.js client/tsconfig.json client/package.json client/public client/test client/src/TodoInput.tsx client/src/TodoItem.tsx client/src/Button.tsx client/src/Input.tsx client/src/Loading.tsx client/src/Info.tsx client/src/Title.tsx client/src/config.ts client/src/sqlite.tsx client/src/index.tsx client/src/vite-env.d.ts client/src/button.css client/src/todoItem.css client/src/todoList.css client/src/topBar.css client/src/title.css client/src/info.css package.json bun.lock tests/smoke.test.ts tests/state-exams/buy-milk.test.ts tests/state-exams/empty-todo-refused.test.ts state-exams/seeds/empty.json state-exams/expected/one-open-todo.json state-exams/expected/still-empty.json AGENTS.md README.md",
+        "minor": false
+      },
+      {
+        "cmd": "test \"$(grep -rl api.cloudflare.com client/src client/test packages tests state-exams 2>/dev/null | wc -l)\" -eq 0",
+        "minor": false
+      },
+      {
+        "cmd": "test \"$(grep -rlE 'Bun\\.serve\\(|createWsServer|\\.listen\\(' client/test packages tests 2>/dev/null | wc -l)\" -eq 0",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-3/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-3/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-3/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-3/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
