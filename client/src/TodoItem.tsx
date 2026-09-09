@@ -1,0 +1,35 @@
+import './todoItem.css';
+import {
+  useDelRowCallback,
+  useRow,
+  useSetPartialRowCallback,
+  type TodoRow,
+  STORE_ID,
+} from './Store';
+import {Button} from './Button';
+
+export const TodoItem = ({rowId}: {rowId: string}) => {
+  const todo = useRow('todos', rowId, STORE_ID) as TodoRow;
+  const setPartialRow = useSetPartialRowCallback(
+    'todos',
+    rowId,
+    (e: React.ChangeEvent<HTMLInputElement>) => ({completed: e.target.checked}),
+    [],
+    STORE_ID,
+  );
+  const delRow = useDelRowCallback('todos', rowId, STORE_ID);
+
+  return (
+    <div className={`todoItem${todo.completed ? ' completed' : ''}`}>
+      <input
+        type="checkbox"
+        checked={todo.completed}
+        onChange={setPartialRow}
+        id={`todo-${rowId}`}
+      />
+      <label htmlFor={`todo-${rowId}`}>{todo.text}</label>
+
+      <Button onClick={delRow}>Delete</Button>
+    </div>
+  );
+};

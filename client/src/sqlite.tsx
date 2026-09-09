@@ -1,0 +1,19 @@
+import sqlite3InitModule, {
+  type Database,
+  type Sqlite3Static,
+} from '@sqlite.org/sqlite-wasm';
+
+let sqlite3Promise: Promise<Sqlite3Static> | null = null;
+let db: Database | null = null;
+const initSqlite = sqlite3InitModule as () => Promise<Sqlite3Static>;
+
+export const getDb = async () => {
+  if (!sqlite3Promise) {
+    sqlite3Promise = initSqlite();
+  }
+  if (!db) {
+    const sqlite3 = await sqlite3Promise;
+    db = new sqlite3.oo1.DB('file:local?vfs=kvvfs', 'c');
+  }
+  return {sqlite3: await sqlite3Promise, db};
+};
