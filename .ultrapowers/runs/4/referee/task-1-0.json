@@ -1,0 +1,52 @@
+{
+  "task": "1",
+  "n": 0,
+  "findings": [
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `bun.lock` (devDependencies, @happy-dom/global-registrator)"
+    },
+    {
+      "check": "dependencies",
+      "severity": "minor",
+      "actor": "implementer",
+      "detail": "dependency manifest changed: `packages/tinyapp-exam/package.json` (devDependencies, @happy-dom/global-registrator)"
+    }
+  ],
+  "settled": [
+    {
+      "check": "footprint",
+      "detail": "every touched path is in FILES"
+    },
+    {
+      "check": "interface",
+      "detail": "Produces: `STATE_EXAM_TIMEOUT_MS: number` `STATE_EXAM_TIMEOUT_MS` is followed by `:` in the bullet — a field, path or assignment, not an exported symbol; no file was read; Produces: `REFLECT_CHECKED: string` `REFLECT_CHECKED` is followed by `:` in the bullet — a field, path or assignment, not an exported symbol; no file was read"
+    },
+    {
+      "check": "exam-files",
+      "detail": "packages/tinyapp-exam/test/state-exam.test.ts, packages/tinyapp-exam/test/render-move.test.ts exists; exam ran, exit 0"
+    },
+    {
+      "check": "test-count",
+      "detail": "top-level tests +8 / −1 across the patch"
+    },
+    {
+      "check": "secrets",
+      "detail": "no secret-shaped literal added"
+    },
+    {
+      "check": "integrated-suite",
+      "detail": "the run's Acceptance is `suite`; the driver runs the integrated suite on the adopted tree, not this review"
+    }
+  ],
+  "linker": {
+    "packages/tinyapp-exam/src/index.ts": "ts",
+    "packages/tinyapp-exam/src/render-move.ts": "ts",
+    "packages/tinyapp-exam/src/state-exam.ts": "ts",
+    "packages/tinyapp-exam/test/render-move.test.ts": "ts",
+    "packages/tinyapp-exam/test/state-exam.test.ts": "ts"
+  },
+  "ms": 5
+}
