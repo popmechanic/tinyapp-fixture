@@ -40,6 +40,16 @@ export type ExamOutcome = {
 /** The prefix a contract breach's message carries. */
 const BREACH = 'contract breach: ';
 
+/**
+ * The wall one registered exam is given, in milliseconds.
+ *
+ * bun's per-test default is 5000 ms, and a healthy render move — bundling the
+ * app and posting a page of a couple of megabytes to the renderer — costs
+ * seconds, so the default kills the exam on the machines that actually render.
+ * Two minutes is the wall the renderer's own timeouts sit well inside.
+ */
+export const STATE_EXAM_TIMEOUT_MS = 120_000;
+
 /** Reads a snapshot from a path relative to `process.cwd()`. */
 const readSnapshot = (path: string): Snapshot =>
   JSON.parse(readFileSync(resolve(process.cwd(), path), 'utf8')) as Snapshot;
@@ -146,12 +156,20 @@ export const runStateExam = async <S extends ExamStore>(
  *
  * `Bun.main` is the running test file's path even when this module is the one
  * calling for it, so a file's whole exam is the single `stateExam({…})` in it.
+ *
+ * The registration carries `STATE_EXAM_TIMEOUT_MS` explicitly: the per-test
+ * option beats both bun's 5000 ms default and any `--timeout` on the command
+ * line, so an exam that renders is never cut off by a wall meant for unit tests.
  */
 export const stateExam = <S extends ExamStore>(spec: StateExamSpec<S>): void => {
-  test(`state exam: ${examStem(Bun.main)}`, async () => {
-    const outcome = await runStateExam(spec);
-    if (!outcome.ok) {
-      throw new Error(outcome.failure ?? 'state exam failed');
-    }
-  });
+  test(
+    `state exam: ${examStem(Bun.main)}`,
+    async () => {
+      const outcome = await runStateExam(spec);
+      if (!outcome.ok) {
+        throw new Error(outcome.failure ?? 'state exam failed');
+      }
+    },
+    {timeout: STATE_EXAM_TIMEOUT_MS},
+  );
 };

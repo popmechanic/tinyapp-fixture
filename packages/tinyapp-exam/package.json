@@ -7,5 +7,8 @@
   "dependencies": {
     "tinybase": "^9.7.0",
     "node-html-parser": "^9.0.4"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^20.14.0"
   }
 }

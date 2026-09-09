@@ -6,12 +6,12 @@
  * and nothing deeper.
  */
 
-export {runStateExam, stateExam} from './state-exam';
+export {runStateExam, stateExam, STATE_EXAM_TIMEOUT_MS} from './state-exam';
 export type {ExamOptions, ExamOutcome} from './state-exam';
 
 export {withContract} from './contract';
 export {diffContent, renderDiff, storeMove} from './store-move';
-export {assertView, renderHtml, renderMove} from './render-move';
+export {assertView, renderHtml, renderMove, REFLECT_CHECKED} from './render-move';
 export type {RenderResult} from './render-move';
 export {applyMutant, mutantPath} from './mutant';
 export {evidenceDir, examStem, writeEvidence} from './evidence';
