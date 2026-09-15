@@ -118,9 +118,14 @@ test(
     expect(reachability.name).toBe('reachability');
     expect(typeof reachability.run).toBe('function');
 
-    // The fixture's own snapshots: four expected, three seeds.
-    expect(CTX.snapshots.filter(({kind}) => kind === 'expected')).toHaveLength(4);
-    expect(CTX.snapshots.filter(({kind}) => kind === 'seed')).toHaveLength(3);
+    // The fixture's own snapshots, as floors: four expected and three seeds are
+    // what BASE carries, and sibling work adds more of both.
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
+    ).toBeGreaterThanOrEqual(4);
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
+    ).toBeGreaterThanOrEqual(3);
 
     // A rule that fires on a file the fixture already carries is a plan defect,
     // not a finding.
@@ -132,17 +137,54 @@ test(
 // (b) [M2] ---------------------------------------------------------------
 
 /**
- * The line M2 pins, character for character.
+ * The tail every reachability line ends in, with the two things sibling work
+ * moves — the seed count and the callback list — left as capture groups.
  *
- * `theme` is a `values` entry, and a `values` entry can only be written by a
- * callback: no fixture callback writes one, so this state is out of reach of
- * the three seeds whatever the bound.
+ * `theme` is a `values` entry no callback of the fixture writes (`setFilter`
+ * writes `filter`, and only the three names it knows), so this state is out of
+ * reach of the seeds whatever the bound.
  */
-const BAD_LINE =
-  'state-exams/expected/bad.json: state: reached by none of the 3 seeds ' +
-  'within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted ' +
-  '— write the state a callback reaches from a seed, or add the seed it is ' +
-  'reached from';
+const FINDING_TAIL =
+  'reached by none of the (\\d+) seeds within 3 moves of (.+) — write the ' +
+  'state a callback reaches from a seed, or add the seed it is reached from$';
+
+/** The line M2 pins, over the file the finding quotes. */
+const BAD_LINE = new RegExp(
+  '^state-exams/expected/bad\\.json: state: ' + FINDING_TAIL,
+);
+
+/** `a, b, c or d` read back as the list it was written from. */
+const listOf = (text: string): string[] => text.replace(' or ', ', ').split(', ');
+
+/**
+ * One finding line against `pattern`: the two counts it quotes are the
+ * context's own, and the callbacks it names are the context's own, sorted.
+ */
+const expectFindingLine = (
+  line: string,
+  pattern: RegExp,
+  ctx: LintContext,
+): void => {
+  const match = pattern.exec(line);
+  expect(match).not.toBeNull();
+
+  expect(Number(match![1])).toBe(
+    ctx.snapshots.filter(({kind}) => kind === 'seed').length,
+  );
+
+  const named = listOf(match![2]!);
+  expect(named).toEqual([...named].sort());
+  expect(named).toEqual(Object.keys(ctx.callbacks).sort());
+  expect(named).toEqual(
+    expect.arrayContaining([
+      'addTodo',
+      'clearCompleted',
+      'deleteTodo',
+      'setTodoCompleted',
+    ]),
+  );
+  expect(named).toContain('setFilter');
+};
 
 test(
   '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
@@ -163,7 +205,7 @@ test(
     const elapsed = performance.now() - started;
 
     expect(findings).toHaveLength(1);
-    expect(formatFinding(findings[0]!)).toBe(BAD_LINE);
+    expectFindingLine(formatFinding(findings[0]!), BAD_LINE, ctx);
 
     // The full exploration of an unreachable target over the three seeds, at
     // depth 3 and a 2,000-state cap, is what this budget is for.
@@ -254,8 +296,9 @@ test(
  * advance — the CLI's `file` is the path relative to the root, which is why it
  * starts `state-exams/lint-tmp-`.
  */
-const CLI_LINE =
-  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the 3 seeds within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+const CLI_LINE = new RegExp(
+  '^state-exams/lint-tmp-[^/]+/expected/bad\\.json: state: ' + FINDING_TAIL,
+);
 
 test(
   '(e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line',
@@ -283,7 +326,9 @@ test(
       // Contains, never "exactly these lines": the other rules share this
       // stdout, and `[{}, {"theme": "dark"}]` has no `todos` row for them to
       // speak about.
-      expect(run.lines.filter((line) => CLI_LINE.test(line))).toHaveLength(1);
+      const matched = run.lines.filter((line) => CLI_LINE.test(line));
+      expect(matched).toHaveLength(1);
+      expectFindingLine(matched[0]!, CLI_LINE, CTX);
     } finally {
       rmSync(dir, {recursive: true, force: true});
     }

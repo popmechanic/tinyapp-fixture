@@ -2,7 +2,6 @@ import {
   createMergeableStore,
   type Content,
   type MergeableStore,
-  type NoValuesSchema,
   type Row,
 } from 'tinybase/with-schemas';
 
@@ -11,6 +10,14 @@ export const TABLES_SCHEMA = {
     text: {type: 'string', default: ''},
     completed: {type: 'boolean', default: false},
   },
+} as const;
+
+// The chosen filter, and nowhere else. Deliberately no `default`: a default
+// would put `{filter: 'all'}` into a store nobody has filtered, so every
+// snapshot checked in beside the seeds would stop loading to itself. An absent
+// value is how the app says All.
+export const VALUES_SCHEMA = {
+  filter: {type: 'string'},
 } as const;
 
 // What every row of a table must satisfy, whoever wrote the row: the UI, an
@@ -34,7 +41,7 @@ export const INVARIANTS: Invariant[] = [
 
 export type TodoRow = Row<typeof TABLES_SCHEMA, 'todos'>;
 
-export type Schemas = [typeof TABLES_SCHEMA, NoValuesSchema];
+export type Schemas = [typeof TABLES_SCHEMA, typeof VALUES_SCHEMA];
 
 export type TodosStore = MergeableStore<Schemas>;
 
@@ -65,6 +72,7 @@ const exposeStore = (store: TodosStore | undefined): void => {
 export const createTodosStore = (seed?: TodosContent): TodosStore => {
   const store = createMergeableStore()
     .setTablesSchema(TABLES_SCHEMA)
+    .setValuesSchema(VALUES_SCHEMA)
     .setDefaultContent([
       {
         todos: {
@@ -111,6 +119,15 @@ export const clearCompleted = (store: TodosStore): void => {
       }
     });
   });
+};
+
+// The three names the app knows, spelled here once. The schema says `filter`
+// holds a string, so it would take `'bogus'` without complaint — this guard is
+// what refuses it, and an unknown name leaves the store exactly as it was.
+export const setFilter = (store: TodosStore, filter: string): void => {
+  if (filter === 'all' || filter === 'open' || filter === 'done') {
+    store.setValue('filter', filter);
+  }
 };
 
 // A rendered snapshot page hands its starting state over on `window`; outside

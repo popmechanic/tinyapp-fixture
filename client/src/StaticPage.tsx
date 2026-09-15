@@ -5,6 +5,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {
   STORE_ID,
   TABLES_SCHEMA,
+  VALUES_SCHEMA,
   type Schemas,
   type TodosContent,
   type TodosStore,
@@ -41,6 +42,7 @@ export const renderStatic = (content: TodosContent): string =>
     <StaticPage
       store={createMergeableStore()
         .setTablesSchema(TABLES_SCHEMA)
+        .setValuesSchema(VALUES_SCHEMA)
         .setContent(content)}
     />,
   );

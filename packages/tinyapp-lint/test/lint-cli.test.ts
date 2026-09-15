@@ -34,7 +34,13 @@
  * enough for a child `bun` process.
  */
 
-import {mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
+import {
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 
@@ -57,6 +63,25 @@ type SnapshotContent = LintContext['snapshots'][number]['content'];
 /** The parsed content of one of the fixture's own snapshot files. */
 const snapshotFile = (path: string): SnapshotContent =>
   JSON.parse(readFileSync(join(ROOT, path), 'utf8')) as SnapshotContent;
+
+/** Where the fixture's exams live, relative to the root. */
+const EXAM_DIR = 'tests/state-exams';
+
+/**
+ * The exam files of the tree, read off the tree rather than pinned here.
+ *
+ * A state exam is a file that calls `stateExam` at the top level, which is what
+ * keeps `interaction-evidence.test.ts` out: it registers only ordinary tests.
+ * Sibling work adds exams of its own, so a list frozen at one moment's contents
+ * would go red on a file this exam has no quarrel with.
+ */
+const EXAM_FILES: string[] = readdirSync(join(ROOT, EXAM_DIR))
+  .filter((name) => name.endsWith('.test.ts'))
+  .filter((name) =>
+    /^stateExam\(/m.test(readFileSync(join(ROOT, EXAM_DIR, name), 'utf8')),
+  )
+  .sort()
+  .map((name) => `${EXAM_DIR}/${name}`);
 
 /**
  * `bun run lint:state <args>` from the repository root.
@@ -145,8 +170,10 @@ test(
 
     expect(run.code).toBe(0);
 
+    // The counts are the tree's, not this exam's: what M1 pins is that the run
+    // is quiet and says so once.
     const summary =
-      /^lint:state: 0 findings over 7 snapshots and 6 exams in [0-9]+ ms$/;
+      /^lint:state: 0 findings over [0-9]+ snapshots and [0-9]+ exams in [0-9]+ ms$/;
     expect(run.lines.filter((line) => summary.test(line))).toHaveLength(1);
   },
   SPAWN_TIMEOUT_MS,
@@ -164,23 +191,33 @@ test(
     const ctx = await contextOnce();
 
     // Every store export that is a function of arity >= 1 whose name does not
-    // start with `create` or `read` — exactly these four.
-    expect(Object.keys(ctx.callbacks).sort()).toEqual([
-      'addTodo',
-      'clearCompleted',
-      'deleteTodo',
-      'setTodoCompleted',
-    ]);
+    // start with `create` or `read`. A floor, not the whole list: sibling work
+    // adds callbacks of its own, and none of them unmakes these.
+    expect(Object.keys(ctx.callbacks).sort()).toEqual(
+      expect.arrayContaining([
+        'addTodo',
+        'clearCompleted',
+        'deleteTodo',
+        'setTodoCompleted',
+      ]),
+    );
+    expect(Object.keys(ctx.callbacks)).toContain('setFilter');
 
-    const snapshots: {path: string; kind: 'seed' | 'expected'}[] = [
-      {path: 'state-exams/expected/one-open-todo.json', kind: 'expected'},
-      {path: 'state-exams/expected/still-empty.json', kind: 'expected'},
-      {path: 'state-exams/expected/two-todos-first-done.json', kind: 'expected'},
-      {path: 'state-exams/expected/two-todos-one-done.json', kind: 'expected'},
-      {path: 'state-exams/seeds/empty.json', kind: 'seed'},
-      {path: 'state-exams/seeds/two-open-todos.json', kind: 'seed'},
-      {path: 'state-exams/seeds/two-todos-one-done.json', kind: 'seed'},
-    ];
+    // The snapshot list as the tree holds it, sorted the way the loader sorts
+    // it — `expected/` before `seeds/`, each directory's `.json` names in order.
+    const snapshots: {path: string; kind: 'seed' | 'expected'}[] = (
+      [
+        ['state-exams/expected', 'expected'],
+        ['state-exams/seeds', 'seed'],
+      ] as const
+    )
+      .flatMap(([dir, kind]) =>
+        readdirSync(join(ROOT, dir))
+          .filter((name) => name.endsWith('.json'))
+          .map((name) => ({path: `${dir}/${name}`, kind})),
+      )
+      .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+    expect(snapshots.length).toBeGreaterThanOrEqual(7);
     expect(
       ctx.snapshots.map(({path, kind}) => ({path, kind})),
     ).toEqual(snapshots);
@@ -209,17 +246,10 @@ test(
   async () => {
     const ctx = await contextOnce();
 
-    // One per file under `tests/state-exams/` except `interaction-evidence`,
-    // which registers only stubbed tests and calls no `stateExam`.
-    expect(ctx.exams.map(({path}) => path)).toEqual([
-      'tests/state-exams/buy-milk.test.ts',
-      'tests/state-exams/clear-completed.test.ts',
-      'tests/state-exams/click-completes-todo.test.ts',
-      'tests/state-exams/done-count.test.ts',
-      'tests/state-exams/empty-todo-refused.test.ts',
-      'tests/state-exams/enter-submits-todo.test.ts',
-    ]);
-    expect(ctx.exams).toHaveLength(6);
+    // One per file under `tests/state-exams/` that calls `stateExam` — so not
+    // `interaction-evidence`, which registers only stubbed tests.
+    expect(ctx.exams.map(({path}) => path)).toEqual(EXAM_FILES);
+    expect(ctx.exams).toHaveLength(EXAM_FILES.length);
 
     const click = ctx.exams.find(
       ({path}) => path === 'tests/state-exams/click-completes-todo.test.ts',
@@ -324,7 +354,7 @@ test(
     const specs = await captureExams('tests/state-exams');
 
     // The child did the importing, so the specs came back all the same.
-    expect(specs).toHaveLength(6);
+    expect(specs).toHaveLength(EXAM_FILES.length);
 
     expect(examsOfCache()).toEqual(before);
   },
