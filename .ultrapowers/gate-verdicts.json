@@ -1,0 +1,79 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "d86650b882b313e4662d377ea61f39c978e6eae2939b6e81c966b2e6fc0be61d",
+      "verdict": "pass",
+      "reason": "Every clause M1-M7 has a falsifying leg at its layer; the M5 Run captures the lint's own exit code and requires exactly 1 before grepping the pinned line; M6 is examined through the store snapshot plus the rendered view with a mutant that drops the due cell."
+    },
+    "2": {
+      "hash": "54e1d6f6733b9489ccb147913216b242788a848a8d10f717b83db3c1b816f9dd",
+      "verdict": "pass",
+      "reason": "M1 is falsified by leg (a)'s exact count, per-id value and placement checks over the rendered markup, and M2 by leg (b)'s state exam whose action, expected file, view rows and due-absent mutant match the clause at the page layer."
+    },
+    "3": {
+      "hash": "6ecb83a3afdee499008cca4c447f79f6dfa860e9fe77953717d6da4f32a2d1a0",
+      "verdict": "pass",
+      "reason": "M1 is falsified in both directions by legs (a)/(b) on rendered markup under the pinned clock, and M2's state exam names the expected snapshot, absent selectors, counts, the checked checkbox and a mutant that would fail it, all at the page layer."
+    },
+    "4": {
+      "hash": "b1a548bc4b9d51f21cc848222956a1c4beaa686ebd96f3cf7813a69197d39477",
+      "verdict": "pass",
+      "reason": "Leg (a) pins M1's every literal and falsifies each 'exactly' with counts, and the Run line examines M2 at the stylesheet layer with an exit code."
+    }
+  },
+  "tally": {
+    "dispatched": 5,
+    "rejected": 1,
+    "rounds": {
+      "1": {
+        "dispatched": 4,
+        "rejected": 1
+      },
+      "2": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    }
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "1",
+      "hash": "946d07b62a81e0d86d14e029cc5532ea31638f3c0599c9b055ccbd5a3ef2794d",
+      "verdict": "fail",
+      "reason": "M5 pins that lint:state over the bad seed exits 1, but the Run line's grep -q pipe discards the lint's exit status, so a lint that prints the line yet exits 0 passes with the clause false."
+    }
+  ],
+  "authoring": {
+    "minutes": 27,
+    "probes": 0,
+    "routing": {
+      "branch": "width",
+      "lane": "ultrapowers",
+      "T": 4,
+      "width": 2,
+      "risk": false
+    },
+    "questions": [
+      {
+        "question": "Where does the date get set?",
+        "options": [
+          "Per-item date field",
+          "Date on the add form"
+        ],
+        "recommended": "Per-item date field",
+        "picked": "Per-item date field"
+      },
+      {
+        "question": "Execute",
+        "options": [
+          "Ultrapowers",
+          "Subagent-Driven",
+          "Inline"
+        ],
+        "recommended": "Ultrapowers",
+        "picked": "Ultrapowers"
+      }
+    ]
+  }
+}
