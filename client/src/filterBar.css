@@ -1,0 +1,14 @@
+#filterBar {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+/* The pressed look is bound to the same attribute the bar already sets, so the
+   button that reads as active is the button that looks it. `button.css` gives
+   every button `background: #222` and `border: 1px solid #666`; this rule wins
+   on specificity, an id and an attribute against a bare element. */
+#filterBar button[data-active="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+}

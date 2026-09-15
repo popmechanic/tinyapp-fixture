@@ -1,3 +1,4 @@
+import './filterBar.css';
 import {setFilter} from './storeData';
 import {STORE_ID, useStore, useValue, type TodosStore} from './Store';
 import {FILTERS, filterOf} from './todoFilter';
