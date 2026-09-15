@@ -1,0 +1,181 @@
+{
+  "ok": true,
+  "stamp": "run-8",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-8"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "1 task(s) in 1 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Two exams whose action is the interaction \u2014 the checkbox completes the todo, Enter submits the input",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "README.md",
+          "state-exams/expected/two-todos-first-done.json",
+          "tests/state-exams/click-completes-todo.test.ts",
+          "tests/state-exams/enter-submits-todo.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`stateExam(spec: StateExamSpec): void` \u2014 the helper's Bun-test wrapper, exported by `tinyapp-exam` at BASE",
+            "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`"
+          ],
+          "produces": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "Two exams whose action is the interaction \u2014 the checkbox completes the todo, Enter submits the input",
+          "files": [
+            "README.md",
+            "state-exams/expected/two-todos-first-done.json",
+            "tests/state-exams/click-completes-todo.test.ts",
+            "tests/state-exams/enter-submits-todo.test.ts",
+            "tests/state-exams/interaction-evidence.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`stateExam(spec: StateExamSpec): void` \u2014 the helper's Bun-test wrapper, exported by `tinyapp-exam` at BASE",
+              "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`"
+            ],
+            "produces": [
+              "none"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "README.md",
+            "state-exams/expected/two-todos-first-done.json",
+            "tests/state-exams/click-completes-todo.test.ts",
+            "tests/state-exams/enter-submits-todo.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/interaction-evidence.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/interaction-evidence.test.ts",
+          "proofRuns": [
+            "bun test tests/state-exams/click-completes-todo.test.ts",
+            "bun test tests/state-exams/enter-submits-todo.test.ts",
+            "sed -n '/^## State exams/,/^## /p' README.md | tr '\\n' ' ' | grep -q 'click.*type.*key.*Chromium.*TINYAPP_BROWSER.*store diff.*DOM.*screenshot'"
+          ],
+          "proofGuards": [
+            "tests/state-exams/interaction-evidence.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "README.md",
+              "state-exams/expected/two-todos-first-done.json",
+              "tests/state-exams/click-completes-todo.test.ts",
+              "tests/state-exams/enter-submits-todo.test.ts",
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/interaction-evidence.test.ts": "tests/state-exams/interaction-evidence.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`stateExam(spec: StateExamSpec): void` \u2014 the helper's Bun-test wrapper, exported by `tinyapp-exam` at BASE",
+              "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "Two exams whose action is the interaction \u2014 the checkbo\u2026"
+    ],
+    "mode": "sequential",
+    "degrade_reason": "Sequential mode: 1 implementation tasks",
+    "globalConstraints": "- The exam never dials a network: the page is opened from a `data:` URL, every request the page makes is blocked in the browser before it leaves, and the helper's own connection is a loopback WebSocket to a process it spawned.\n- A missing browser binary is a red exam that names the path, never a skip.\n- The evidence keys the engine already reads keep their names: `store-diff.json`, `dom.html`, `screenshot.png`, `mutant.json`, `contract.json`, `walls.json`.\n- `packages/tinyapp-exam` is not edited by this plan; the exams are written against the helper as it is at BASE.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-8/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-8/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-8/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-8/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
