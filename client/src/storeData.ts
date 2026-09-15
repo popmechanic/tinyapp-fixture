@@ -5,10 +5,17 @@ import {
   type Row,
 } from 'tinybase/with-schemas';
 
+import {isIsoDate} from './overdue';
+
 export const TABLES_SCHEMA = {
   todos: {
     text: {type: 'string', default: ''},
     completed: {type: 'boolean', default: false},
+    // No default, deliberately: a cell with one is materialised into the
+    // `getContent()` of every row TinyBase holds, which would write a `due`
+    // into every seed and expected state already checked in. Without one, a
+    // todo that has no date has no `due` cell at all.
+    due: {type: 'string'},
   },
 } as const;
 
@@ -36,6 +43,15 @@ export const INVARIANTS: Invariant[] = [
     predicate: (row) =>
       row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
     message: 'a completed todo has non-empty text',
+  },
+  // Appended, never inserted: the linter's own exam reads the entry above as
+  // `INVARIANTS[0]`. An absent `due` satisfies this one, which is what keeps
+  // every row written before the cell existed a row that still holds.
+  {
+    table: 'todos',
+    predicate: (row) =>
+      row.due === undefined || (typeof row.due === 'string' && isIsoDate(row.due)),
+    message: 'a due date is absent or a valid YYYY-MM-DD',
   },
 ];
 
@@ -105,6 +121,22 @@ export const setTodoCompleted = (
   completed: boolean,
 ): void => {
   store.setPartialRow('todos', id, {completed});
+};
+
+/**
+ * Sets row `id`'s due date, or clears it when `due` is `''`.
+ *
+ * Nothing but a real `YYYY-MM-DD` is ever written: a date that does not parse
+ * is refused outright rather than stored and reported later, so the invariant
+ * above only ever has to speak about a state that arrived some other way — a
+ * hand-written seed, or an expected file.
+ */
+export const setTodoDue = (store: TodosStore, id: string, due: string): void => {
+  if (due === '') {
+    store.delCell('todos', id, 'due');
+  } else if (isIsoDate(due)) {
+    store.setPartialRow('todos', id, {due});
+  }
 };
 
 export const deleteTodo = (store: TodosStore, id: string): void => {

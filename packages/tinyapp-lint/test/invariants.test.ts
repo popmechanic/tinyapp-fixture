@@ -5,9 +5,12 @@
  * One `test` per Proof leg, named for its leg and for the Machine clause it
  * comes from:
  *
- *   (a) [M1] `client/src/storeData.ts` exports `INVARIANTS`: exactly one entry,
- *            `table` `'todos'`, the pinned `message`, and a `predicate` that
- *            returns `false`, `true`, `true` over the three pinned rows;
+ *   (a) [M1] `client/src/storeData.ts` exports `INVARIANTS`, led by the
+ *            completed-text entry: `table` `'todos'`, the pinned `message`, and
+ *            a `predicate` that returns `false`, `true`, `true` over the three
+ *            pinned rows. Beside it, [M5] of the due-date task: the entry found
+ *            by the due-date message, on `todos`, holding of an absent and of a
+ *            valid date and breaking on `''`, `'2025-13-45'` and `'soon'`;
  *   (b) [M2] the default export of `src/rules/invariants.ts` is a `Rule` named
  *            `'invariants'` whose `run` over `await loadContext()` is `[]` —
  *            the fixture's own seven snapshots raise nothing;
@@ -109,8 +112,11 @@ const BAD_SNAPSHOT: SnapshotFile = {
   ],
 };
 
-/** M1's message, the one invariant the fixture declares. */
+/** M1's message, the first invariant the fixture declares. */
 const MESSAGE = 'a completed todo has non-empty text';
+
+/** The due-date invariant's message, which is how its entry is found. */
+const DUE_MESSAGE = 'a due date is absent or a valid YYYY-MM-DD';
 
 /** M3's line, character for character. */
 const BAD_LINE =
@@ -143,11 +149,14 @@ afterAll(() => {
 
 // (a) [M1] ---------------------------------------------------------------
 
-test('(a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicate', async () => {
+test('(a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate', async () => {
   const {INVARIANTS} = await storeModule();
 
   expect(Array.isArray(INVARIANTS)).toBe(true);
-  expect(INVARIANTS).toHaveLength(1);
+  // M1's entry is still the first, and the due-date invariant is appended after
+  // it — this leg's assertions below all read `INVARIANTS[0]`, so what the old
+  // exact count meant is that the completed-text entry leads the list.
+  expect(INVARIANTS.length).toBeGreaterThanOrEqual(2);
 
   const invariant = INVARIANTS[0]!;
   expect(invariant.table).toBe('todos');
@@ -158,6 +167,28 @@ test('(a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicat
   expect(invariant.predicate({text: '', completed: true}, '1')).toBe(false);
   expect(invariant.predicate({text: 'buy milk', completed: true}, '0')).toBe(true);
   expect(invariant.predicate({text: '', completed: false}, '0')).toBe(true);
+});
+
+test('(a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date', async () => {
+  const {INVARIANTS} = await storeModule();
+
+  // Found by message, never by index: two sibling plans append invariants of
+  // their own, and either merge order has to read the same.
+  const due = INVARIANTS.find((entry) => entry.message === DUE_MESSAGE);
+  expect(due).toBeDefined();
+  expect(due!.table).toBe('todos');
+
+  // A row written before the cell existed has no `due` at all, and holds.
+  expect(due!.predicate({text: 'buy milk', completed: false}, '0')).toBe(true);
+  expect(
+    due!.predicate({text: 'buy milk', completed: false, due: '2025-12-31'}, '0'),
+  ).toBe(true);
+
+  for (const bad of ['', '2025-13-45', 'soon']) {
+    expect(
+      due!.predicate({text: 'buy milk', completed: false, due: bad}, '0'),
+    ).toBe(false);
+  }
 });
 
 // (b) [M2] ---------------------------------------------------------------
@@ -173,12 +204,13 @@ test(
     expect(rule.name).toBe('invariants');
 
     const ctx = await contextOnce();
-
-    // What the quiet result is measured over: the fixture's seven snapshots,
-    // with the invariant of M1 live rather than an empty list.
+    // What the quiet result is measured over: every snapshot the fixture
+    // carries — the seven of M2 and whatever a later task added — with the
+    // invariants live rather than an empty list.
     expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
-    expect(ctx.invariants).toHaveLength(1);
+    expect(ctx.invariants.length).toBeGreaterThanOrEqual(2);
     expect(ctx.invariants[0]!.message).toBe(MESSAGE);
+    expect(ctx.invariants.map((entry) => entry.message)).toContain(DUE_MESSAGE);
     expect(ctx.storePath).toBe('client/src/storeData.ts');
 
     expect(await rule.run(ctx)).toEqual([]);

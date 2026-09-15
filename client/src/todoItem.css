@@ -31,3 +31,19 @@
 .todoItem button {
   flex-shrink: 0;
 }
+
+.todoItem input.dueInput {
+  flex-shrink: 0;
+  font: inherit;
+  color: var(--fg);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+
+.todoItem.overdue label {
+  color: var(--accent);
+}
+
+.todoItem.overdue input.dueInput {
+  border-color: var(--accent);
+}

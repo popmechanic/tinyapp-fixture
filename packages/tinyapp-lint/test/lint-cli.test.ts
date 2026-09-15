@@ -7,9 +7,10 @@
  *
  *   (a) [M1] `bun run lint:state`, spawned from the root, exits 0 and its
  *            stdout carries exactly one line matching the summary pattern;
- *   (b) [M2] `loadContext()` with its defaults — callbacks, the seven
- *            snapshots, the schema, the invariants, the clock, the store path;
- *   (c) [M3] that context's six exam specs, and the pinned `click-completes-todo`
+ *   (b) [M2] `loadContext()` with its defaults — callbacks, the snapshots of
+ *            both directories, the schema, the invariants, the clock, the store
+ *            path;
+ *   (c) [M3] that context's exam specs, and the pinned `click-completes-todo`
  *            entry;
  *   (d) [M4] `ctx.render` over `two-todos-first-done.json`'s content;
  *   (e) [M5] `runLint` over a directory of two rule modules, the CLI's
@@ -64,6 +65,36 @@ type SnapshotContent = LintContext['snapshots'][number]['content'];
 const snapshotFile = (path: string): SnapshotContent =>
   JSON.parse(readFileSync(join(ROOT, path), 'utf8')) as SnapshotContent;
 
+/** The four callbacks the store module carried when this exam was written. */
+const CALLBACKS_OF_BASE = [
+  'addTodo',
+  'clearCompleted',
+  'deleteTodo',
+  'setTodoCompleted',
+];
+
+/**
+ * Every snapshot file the loader would read, in the loader's own order.
+ *
+ * Read off the two directories rather than listed here, so a snapshot a later
+ * task or a sibling plan checks in is read by this leg without editing it —
+ * what M2 pins is that the loader reads both directories, tags each file with
+ * its kind and sorts the lot by path, not which seven files existed that day.
+ */
+const snapshotFiles = (): {path: string; kind: 'seed' | 'expected'}[] =>
+  (
+    [
+      ['state-exams/expected', 'expected'],
+      ['state-exams/seeds', 'seed'],
+    ] as const
+  )
+    .flatMap(([dir, kind]) =>
+      readdirSync(join(ROOT, dir))
+        .filter((name) => name.endsWith('.json'))
+        .map((name) => ({path: `${dir}/${name}`, kind})),
+    )
+    .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+
 /** Where the fixture's exams live, relative to the root. */
 const EXAM_DIR = 'tests/state-exams';
 
@@ -82,7 +113,6 @@ const EXAM_FILES: string[] = readdirSync(join(ROOT, EXAM_DIR))
   )
   .sort()
   .map((name) => `${EXAM_DIR}/${name}`);
-
 /**
  * `bun run lint:state <args>` from the repository root.
  *
@@ -169,9 +199,8 @@ test(
     const run = runCli([]);
 
     expect(run.code).toBe(0);
-
-    // The counts are the tree's, not this exam's: what M1 pins is that the run
-    // is quiet and says so once.
+    // The counts are whatever the fixture holds the day this runs — what M1
+    // pins is a clean run reported on one line, not how many files it read.
     const summary =
       /^lint:state: 0 findings over [0-9]+ snapshots and [0-9]+ exams in [0-9]+ ms$/;
     expect(run.lines.filter((line) => summary.test(line))).toHaveLength(1);
@@ -192,31 +221,13 @@ test(
 
     // Every store export that is a function of arity >= 1 whose name does not
     // start with `create` or `read`. A floor, not the whole list: sibling work
-    // adds callbacks of its own, and none of them unmakes these.
+    // adds callbacks of its own — this exam's own `setFilter` and `setTodoDue`
+    // among them — and none of them unmakes these.
     expect(Object.keys(ctx.callbacks).sort()).toEqual(
-      expect.arrayContaining([
-        'addTodo',
-        'clearCompleted',
-        'deleteTodo',
-        'setTodoCompleted',
-      ]),
+      expect.arrayContaining([...CALLBACKS_OF_BASE, 'setFilter', 'setTodoDue']),
     );
-    expect(Object.keys(ctx.callbacks)).toContain('setFilter');
 
-    // The snapshot list as the tree holds it, sorted the way the loader sorts
-    // it — `expected/` before `seeds/`, each directory's `.json` names in order.
-    const snapshots: {path: string; kind: 'seed' | 'expected'}[] = (
-      [
-        ['state-exams/expected', 'expected'],
-        ['state-exams/seeds', 'seed'],
-      ] as const
-    )
-      .flatMap(([dir, kind]) =>
-        readdirSync(join(ROOT, dir))
-          .filter((name) => name.endsWith('.json'))
-          .map((name) => ({path: `${dir}/${name}`, kind})),
-      )
-      .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+    const snapshots = snapshotFiles();
     expect(snapshots.length).toBeGreaterThanOrEqual(7);
     expect(
       ctx.snapshots.map(({path, kind}) => ({path, kind})),
@@ -242,15 +253,19 @@ test(
 // (c) [M3] ---------------------------------------------------------------
 
 test(
-  '(c) [M3] the six exam specs, in path order, and the pinned click entry',
+  '(c) [M3] the exam specs, in path order, and the pinned click entry',
   async () => {
     const ctx = await contextOnce();
 
-    // One per file under `tests/state-exams/` that calls `stateExam` — so not
-    // `interaction-evidence`, which registers only stubbed tests.
+    // One per file under `tests/state-exams/` that calls `stateExam` at the top
+    // level, in path order — so not `interaction-evidence`, which registers
+    // only stubbed tests and names `stateExam` in prose alone.
     expect(ctx.exams.map(({path}) => path)).toEqual(EXAM_FILES);
     expect(ctx.exams).toHaveLength(EXAM_FILES.length);
 
+    // The two the list is pinned on either way.
+    expect(EXAM_FILES).toContain('tests/state-exams/click-completes-todo.test.ts');
+    expect(EXAM_FILES).not.toContain('tests/state-exams/interaction-evidence.test.ts');
     const click = ctx.exams.find(
       ({path}) => path === 'tests/state-exams/click-completes-todo.test.ts',
     );
@@ -355,7 +370,6 @@ test(
 
     // The child did the importing, so the specs came back all the same.
     expect(specs).toHaveLength(EXAM_FILES.length);
-
     expect(examsOfCache()).toEqual(before);
   },
   SPAWN_TIMEOUT_MS,
