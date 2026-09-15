@@ -1,0 +1,79 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "ad96fd87c16559cdae899bb3a149d953fd340bd39c3a6e91d978781aac341630",
+      "verdict": "pass",
+      "reason": "Legs (a) and (e) spawn bun run lint:state itself for both halves of the sentence, every pinned count and line composes (7 snapshots, 6 exams, the a.json line), and M6's negation names the absent require.cache key."
+    },
+    "2": {
+      "hash": "655492ea984642229f638c0f1b79374bac1cec6d2ee905f748c6200b932327b2",
+      "verdict": "pass",
+      "reason": "The three predicate rows, the exact M3 line and the M5 regex agree, and leg (e) spawns bun run lint:state with exit 1 and the finding line on stdout."
+    },
+    "3": {
+      "hash": "fe7b0adbdc89afa7adc5e5eff8823c05d088e0c3b5ad1950667350d3c87ab492",
+      "verdict": "pass",
+      "reason": "M2, M4 and M5 share one diagnostic template, M3 carries both negative rows, and leg (e) runs bun run lint:state over the ref-store fixture with exit 1 and the regex."
+    },
+    "4": {
+      "hash": "069fa0db40d009734c9a0286a5008f5133fb8dc39ac71c440b31d23ecf5f9c8b",
+      "verdict": "pass",
+      "reason": "1767225600000 is 2026-01-01T00:00:00Z, the M2 line and M5 regex agree on 3 seeds, 3 moves and the four callbacks, M1's empty result is guarded by the four-expected count, and M5 spawns bun run lint:state."
+    },
+    "5": {
+      "hash": "4b9ed147b4d8fe5c1a44a04864380c06c20401d6c3f3a4f49421cb82086e48e4",
+      "verdict": "pass",
+      "reason": "checked names #todo-1 and unchecked #todo-0 on the same snapshot, count 1 vs 2 falsifies M3, M1's six exams with views guard the empty result, and M6 spawns bun run lint:state."
+    }
+  },
+  "tally": {
+    "dispatched": 15,
+    "rejected": 6,
+    "rounds": 4,
+    "per_round": {
+      "1": {
+        "dispatched": 5,
+        "rejected": 2
+      },
+      "2": {
+        "dispatched": 4,
+        "rejected": 3
+      },
+      "3": {
+        "dispatched": 5,
+        "rejected": 1
+      },
+      "4": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    }
+  },
+  "history": {
+    "1": [
+      "pass",
+      "pass"
+    ],
+    "2": [
+      "fail",
+      "fail",
+      "pass"
+    ],
+    "3": [
+      "fail",
+      "pass",
+      "pass"
+    ],
+    "4": [
+      "pass",
+      "fail",
+      "fail",
+      "pass"
+    ],
+    "5": [
+      "pass",
+      "fail",
+      "pass"
+    ]
+  }
+}
