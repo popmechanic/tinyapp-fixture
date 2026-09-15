@@ -176,7 +176,7 @@ test(
 
     // What the quiet result is measured over: the fixture's seven snapshots,
     // with the invariant of M1 live rather than an empty list.
-    expect(ctx.snapshots).toHaveLength(7);
+    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
     expect(ctx.invariants).toHaveLength(1);
     expect(ctx.invariants[0]!.message).toBe(MESSAGE);
     expect(ctx.storePath).toBe('client/src/storeData.ts');

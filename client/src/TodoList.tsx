@@ -1,7 +1,9 @@
 import './todoList.css';
-import {useSortedRowIds, STORE_ID} from './Store';
+import {useSortedRowIds, useTable, useValue, STORE_ID} from './Store';
 import {TodoItem} from './TodoItem';
 import {ClearCompleted} from './ClearCompleted';
+import {FilterBar} from './FilterBar';
+import {admits, filterOf} from './todoFilter';
 
 export const TodoList = () => {
   const todoIds = useSortedRowIds(
@@ -12,11 +14,20 @@ export const TodoList = () => {
     undefined,
     STORE_ID,
   );
+  const table = useTable('todos', STORE_ID);
+  const filter = filterOf(useValue('filter', STORE_ID));
+  // The filter hides rows from the list and from nothing else: the counter in
+  // the top bar goes on reading the whole table.
+  const shown = todoIds.filter((id) => admits(filter, table[id]?.completed === true));
 
   return (
     <>
+      {/* Mounted once, here, because both `App` and `StaticPage` render
+          `TodoList` — so the live page and the linter's static render carry
+          the bar by this one line. */}
+      <FilterBar />
       <div id="todoList">
-        {todoIds.map((id) => (
+        {shown.map((id) => (
           <TodoItem key={id} rowId={id} />
         ))}
       </div>
