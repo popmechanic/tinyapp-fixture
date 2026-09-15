@@ -41,6 +41,15 @@
         "@happy-dom/global-registrator": "^20.14.0",
       },
     },
+    "packages/tinyapp-lint": {
+      "name": "tinyapp-lint",
+      "version": "0.1.0",
+      "dependencies": {
+        "node-html-parser": "^9.0.4",
+        "tinyapp-exam": "workspace:*",
+        "tinybase": "^9.7.0",
+      },
+    },
     "server": {
       "name": "tinyapp-fixture-server",
       "version": "1.0.0",
@@ -354,6 +363,8 @@
     "tinyapp-fixture-client": ["tinyapp-fixture-client@workspace:client"],
 
     "tinyapp-fixture-server": ["tinyapp-fixture-server@workspace:server"],
+
+    "tinyapp-lint": ["tinyapp-lint@workspace:packages/tinyapp-lint"],
 
     "tinybase": ["tinybase@9.7.0", "", { "peerDependencies": { "@automerge/automerge-repo": "^2.5.6", "@capacitor-community/sqlite": "^8.1.1", "@cloudflare/workers-types": "^5.20260902.1", "@electric-sql/pglite": "^0.5.8", "@libsql/client": "^0.17.4", "@powersync/common": "^2.2.0", "@sinclair/typebox": "^0.34.52", "@sqlite.org/sqlite-wasm": "^3.53.0-build1", "@supabase/supabase-js": "^2.114.0", "@vlcn.io/crsqlite-wasm": "^0.16.0", "arktype": "^2.2.3", "better-sqlite3": "^13.0.3", "bun": "^1.4.0", "effect": "^3.22.1", "electric-sql": "^0.12.1", "expo": "^57.0.19", "expo-sqlite": "^57.0.2", "partykit": "^0.0.115", "partysocket": "^1.3.0", "pg": "^8.23.0", "postgres": "^3.4.9", "react": "^19.2.8", "react-dom": "^19.2.8", "react-native-mmkv": "^4.3.2", "react-native-sqlite-storage": "^6.0.1", "solid-js": "^1.9.15", "sqlite3": "^6.0.1", "svelte": "^5.57.0", "valibot": "^1.4.2", "ws": "^8.21.3", "yjs": "^13.6.32", "zod": "^4.5.4" }, "optionalPeers": ["@automerge/automerge-repo", "@capacitor-community/sqlite", "@cloudflare/workers-types", "@electric-sql/pglite", "@libsql/client", "@powersync/common", "@sinclair/typebox", "@sqlite.org/sqlite-wasm", "@supabase/supabase-js", "@vlcn.io/crsqlite-wasm", "arktype", "better-sqlite3", "bun", "effect", "electric-sql", "expo", "expo-sqlite", "partykit", "partysocket", "pg", "postgres", "react", "react-dom", "react-native-mmkv", "react-native-sqlite-storage", "solid-js", "sqlite3", "svelte", "valibot", "ws", "yjs", "zod"] }, "sha512-VPe9aVXwIVaE0BkEOjJSr8ELKqnkQHNh6T2yxkYSJMHrMUxmn3qP+0P+2q7ThmYqhNpYSxRQs6k2p8QEyILp7A=="],
 
