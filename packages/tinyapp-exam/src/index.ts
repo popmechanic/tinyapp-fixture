@@ -9,6 +9,9 @@
 export {runStateExam, stateExam, STATE_EXAM_TIMEOUT_MS} from './state-exam';
 export type {ExamOptions, ExamOutcome} from './state-exam';
 
+export {launchBrowser} from './browser';
+export type {Action, Browser, Page} from './browser';
+
 export {withContract} from './contract';
 export {diffContent, renderDiff, storeMove} from './store-move';
 export {assertView, renderHtml, renderMove, REFLECT_CHECKED} from './render-move';
