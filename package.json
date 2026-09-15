@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "workspaces": ["client", "server", "packages/*"],
   "scripts": {
-    "typecheck": "bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit",
+    "lint:state": "bun packages/tinyapp-lint/src/cli.ts",
+    "typecheck": "bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit",
     "test": "bun run typecheck && bun test"
   },
   "devDependencies": {
