@@ -1,0 +1,322 @@
+{
+  "ok": true,
+  "stamp": "run-14",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-14"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "2 task(s) in 2 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The trash table \u2014 Delete moves the whole row there, Undo moves it back",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/storeData.ts",
+          "client/test/todos-store.test.ts",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/second-delete-replaces-trash.json",
+          "state-exams/expected/two-open-todos-first-trashed.json",
+          "state-exams/expected/two-open-todos-restored.json",
+          "tests/smoke.test.ts",
+          "tests/state-exams/done-count.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`deleteTodo(store: TodosStore, id: string): void`",
+            "`undoDelete(store: TodosStore): void`",
+            "`TABLES_SCHEMA`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The Undo button \u2014 shown only while a deleted todo waits, gone once pressed",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/TodoList.tsx",
+          "client/src/UndoDelete.tsx"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`undoDelete(store: TodosStore): void`"
+          ],
+          "produces": [
+            "`UndoDelete`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ],
+      [
+        "2"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The trash table \u2014 Delete moves the whole row there, Undo moves it back",
+          "files": [
+            "client/src/storeData.ts",
+            "client/test/todos-store.test.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/second-delete-replaces-trash.json",
+            "state-exams/expected/two-open-todos-first-trashed.json",
+            "state-exams/expected/two-open-todos-restored.json",
+            "tests/smoke.test.ts",
+            "tests/state-exams/delete-to-trash.test.ts",
+            "tests/state-exams/done-count.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`deleteTodo(store: TodosStore, id: string): void`",
+              "`undoDelete(store: TodosStore): void`",
+              "`TABLES_SCHEMA`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/storeData.ts",
+            "client/test/todos-store.test.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/second-delete-replaces-trash.json",
+            "state-exams/expected/two-open-todos-first-trashed.json",
+            "state-exams/expected/two-open-todos-restored.json",
+            "tests/smoke.test.ts",
+            "tests/state-exams/done-count.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/delete-to-trash.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/delete-to-trash.test.ts",
+          "proofRuns": [
+            "bun test packages/tinyapp-lint",
+            "test \"$(grep -c 'deleteTodo or setTodoCompleted' packages/tinyapp-lint/test/reachability.test.ts)\" -eq 0",
+            "bun test tests/smoke.test.ts",
+            "bun test tests/state-exams/done-count.test.ts",
+            "bun test client/test/todos-store.test.ts",
+            "grep -q 'toContain(\"todos\")' tests/smoke.test.ts",
+            "grep -q \"toContain('todos')\" tests/state-exams/done-count.test.ts",
+            "grep -q \"getContent()\\[0\\].todos).toBeUndefined()\" client/test/todos-store.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/delete-to-trash.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/storeData.ts",
+              "client/test/todos-store.test.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/second-delete-replaces-trash.json",
+              "state-exams/expected/two-open-todos-first-trashed.json",
+              "state-exams/expected/two-open-todos-restored.json",
+              "tests/smoke.test.ts",
+              "tests/state-exams/delete-to-trash.test.ts",
+              "tests/state-exams/done-count.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/delete-to-trash.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/delete-to-trash.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/delete-to-trash.test.ts": "tests/state-exams/delete-to-trash.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/delete-to-trash.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`deleteTodo(store: TodosStore, id: string): void`",
+              "`undoDelete(store: TodosStore): void`",
+              "`TABLES_SCHEMA`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "The Undo button \u2014 shown only while a deleted todo waits, gone once pressed",
+          "files": [
+            "client/src/TodoList.tsx",
+            "client/src/UndoDelete.tsx",
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`undoDelete(store: TodosStore): void`"
+            ],
+            "produces": [
+              "`UndoDelete`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/TodoList.tsx",
+            "client/src/UndoDelete.tsx"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/undo-delete.test.ts",
+          "proofRuns": [
+            "grep -q 'export const UndoDelete' client/src/UndoDelete.tsx",
+            "grep -q 'undoDelete(' client/src/UndoDelete.tsx",
+            "grep -q 'useStore(STORE_ID)' client/src/UndoDelete.tsx",
+            "grep -q \"useTable('trash'\" client/src/UndoDelete.tsx",
+            "grep -q '<UndoDelete />' client/src/TodoList.tsx"
+          ],
+          "proofGuards": [
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/TodoList.tsx",
+              "client/src/UndoDelete.tsx",
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/undo-delete.test.ts": "tests/state-exams/undo-delete.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`UndoDelete`"
+            ],
+            "consumes": [
+              "`undoDelete(store: TodosStore): void`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The trash table \u2014 Delete moves the whole row there, Und\u2026",
+      "The Undo button \u2014 shown only while a deleted todo waits\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- Nothing this plan asserts pins the exact key set of `TABLES_SCHEMA`, of a todos row, or of the store's values: two sibling runs on the same base add a cell to `todos` and a values schema concurrently, and the fold at publish must leave both green. A test that lists every table, every cell of a row, or every value is a finding.\n- A deleted todo is never lost between the two tables: `deleteTodo` writes `trash` and `todos` inside one `store.transaction`, and so does `undoDelete`, so no listener ever sees the row in neither table or in both.\n- The trash row is the todos row copied whole, whatever cells the schema holds \u2014 `getRow` out, `setRow` in \u2014 never a hand-picked subset of cells.\n- No exam and no source names a `due` cell.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-14/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-14/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-14/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-14/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
