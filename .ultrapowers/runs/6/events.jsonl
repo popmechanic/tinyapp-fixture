@@ -1,0 +1,13 @@
+{"kind":"run:open","runId":"run-6","base":"","source":"fleet/run-main.mjs","id":"01M2HSM6XQ0000PFX34ECCE56Q","ts":1789451180983}
+{"kind":"driver:stage","stage":"kata","detail":"record /home/exedev/plans/run-6.kata.json → https://kata.int.exe.xyz","id":"01M2HSM6XS0000KRS329XPBP7T","ts":1789451180985}
+{"kind":"driver:stage","stage":"tiers","detail":"4 null tier slot(s) stamped mostCapable (uniform driver fill; per-task tier is the intent document's slot, #243)","id":"01M2HSM6XT00008V912EA66P3H","ts":1789451180986}
+{"kind":"driver:stage","stage":"provision","detail":"BASE 1f8e0a65e1c7c960d61c87d84d9b75ec2bf2a7c1; 4 task clone(s) + integration","id":"01M2HSM7R50000TQM0A7MR2JBY","ts":1789451181829}
+{"kind":"driver:auth","authMethod":"oauth_token","apiKeySource":null,"subscriptionType":null,"id":"01M2HSM8810000WA0GQPBGH1B7","ts":1789451182337}
+{"kind":"driver:stage","stage":"engine","detail":"waves 2/1/1, width bound 2, patch input armed","id":"01M2HSM8810001G46HG1N02WGW","ts":1789451182337}
+{"kind":"engine:phase","phase":"Setup","id":"01M2HSM8880000HCQ7SESFMNW4","ts":1789451182344}
+{"kind":"engine:log","line":"setup: branch ultra/integration-run-6 at 1f8e0a65e1c7c960d61c87d84d9b75ec2bf2a7c1","id":"01M2HSM9CK0000NGGK6EFWFBVT","ts":1789451183507}
+{"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"a96a8bec-f90c-42ad-8673-4f0d04d3e312","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-6/clones/exam-1","model":"opus","id":"01M2HSMA630000QKXJSFNNM3J4","ts":1789451184323}
+{"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"668a1528-5f18-4f07-a5a4-2a57e67616b9","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-6/clones/task-1","model":"opus","id":"01M2HSMA670000WJGN99SPWJN0","ts":1789451184327}
+{"kind":"worker:start","label":"exam:3","role":"examiner","sessionId":"a5151a4c-e18c-4b2e-a210-62d09887a1e8","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-6/clones/exam-3","model":"opus","id":"01M2HSMA6J0000KWEA1F19HAY5","ts":1789451184338}
+{"kind":"worker:start","label":"impl:3","role":"implementer","sessionId":"60725c60-1882-4fcc-b002-3ffcfa63aef6","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-6/clones/task-3","model":"opus","id":"01M2HSMA6K00009NNMXCHD99PS","ts":1789451184339}
+{"kind":"engine:log","line":"baseline: green on 1f8e0a65e1c7c960d61c87d84d9b75ec2bf2a7c1","id":"01M2HSMEYB0000AB3NFQ75MW36","ts":1789451189195}

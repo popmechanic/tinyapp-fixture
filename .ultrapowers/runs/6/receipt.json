@@ -1,0 +1,512 @@
+{
+  "ok": true,
+  "stamp": "run-6",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-6"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "4 task(s) in 3 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "A CDP driver for the sandbox's Chromium \u2014 launch, seed a page, act, read, snapshot",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/browser.ts",
+          "packages/tinyapp-exam/src/index.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`launchBrowser(opts?: {binary?: string; env?: Record<string, string | undefined>}) => Promise<Browser>`",
+            "`Browser.open(opts: {html: string; clock: string}) => Promise<Page>`",
+            "`Page.act(action: Action) => Promise<void>` \u2014 `Action = {click: string} | {type: [string, string]} | {key: [string, string]}`",
+            "`Page.evaluate(expression: string) => Promise<unknown>`",
+            "`Page.snapshot() => Promise<{dom: string; screenshot: Uint8Array}>`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The exam's action may be an interaction, and every move reads from the one page it opened",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/render-move.ts",
+          "packages/tinyapp-exam/src/state-exam.ts",
+          "packages/tinyapp-exam/src/store-move.ts",
+          "packages/tinyapp-exam/src/types.ts",
+          "packages/tinyapp-exam/test/render-move.test.ts",
+          "packages/tinyapp-exam/test/state-exam.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`launchBrowser(opts?: {binary?: string; env?: Record<string, string | undefined>}) => Promise<Browser>`",
+            "`Browser.open(opts: {html: string; clock: string}) => Promise<Page>`",
+            "`Page.act(action: Action) => Promise<void>`",
+            "`Page.evaluate(expression: string) => Promise<unknown>`",
+            "`Page.snapshot() => Promise<{dom: string; screenshot: Uint8Array}>`"
+          ],
+          "produces": [
+            "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`",
+            "`walls.action_ms: number | null` and `walls.browser: 'ran' | 'skipped'` in `walls.json`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "A seeded fixture page exposes its store to the exam",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "AGENTS.md",
+          "client/src/Store.tsx",
+          "client/src/storeData.ts",
+          "client/test/seeded-store.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`window.__TINYAPP_STORE__` \u2014 the seeded page's `TodosStore`, with `getContent(): [tables, values]`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "Two exams whose action is the interaction \u2014 the checkbox completes the todo, Enter submits the input",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "README.md",
+          "state-exams/expected/one-open-todo-typed.json",
+          "tests/state-exams/click-completes-todo.test.ts",
+          "tests/state-exams/enter-submits-todo.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`",
+            "`window.__TINYAPP_STORE__` \u2014 the seeded page's `TodosStore`, with `getContent(): [tables, values]`"
+          ],
+          "produces": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "3",
+        "to": "4",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "2"
+      ],
+      [
+        "4"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "A CDP driver for the sandbox's Chromium \u2014 launch, seed a page, act, read, snapshot",
+          "files": [
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/test/browser.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`launchBrowser(opts?: {binary?: string; env?: Record<string, string | undefined>}) => Promise<Browser>`",
+              "`Browser.open(opts: {html: string; clock: string}) => Promise<Page>`",
+              "`Page.act(action: Action) => Promise<void>` \u2014 `Action = {click: string} | {type: [string, string]} | {key: [string, string]}`",
+              "`Page.evaluate(expression: string) => Promise<unknown>`",
+              "`Page.snapshot() => Promise<{dom: string; screenshot: Uint8Array}>`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/index.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/browser.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/browser.test.ts",
+          "proofRuns": [
+            "bun test packages/tinyapp-exam/test/browser.test.ts"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/browser.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/test/browser.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-exam/test/browser.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-exam/test/browser.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-exam/test/browser.test.ts": "packages/tinyapp-exam/test/browser.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-exam/test/browser.test.ts"
+            ],
+            "siblingOwned": [
+              "AGENTS.md",
+              "client/src/Store.tsx",
+              "client/src/storeData.ts",
+              "client/test/seeded-store-global.test.ts",
+              "client/test/seeded-store.test.ts"
+            ],
+            "produces": [
+              "`launchBrowser(opts?: {binary?: string; env?: Record<string, string | undefined>}) => Promise<Browser>`",
+              "`Browser.open(opts: {html: string; clock: string}) => Promise<Page>`",
+              "`Page.act(action: Action) => Promise<void>` \u2014 `Action = {click: string} | {type: [string, string]} | {key: [string, string]}`",
+              "`Page.evaluate(expression: string) => Promise<unknown>`",
+              "`Page.snapshot() => Promise<{dom: string; screenshot: Uint8Array}>`"
+            ],
+            "consumes": []
+          }
+        },
+        {
+          "id": "3",
+          "title": "A seeded fixture page exposes its store to the exam",
+          "files": [
+            "AGENTS.md",
+            "client/src/Store.tsx",
+            "client/src/storeData.ts",
+            "client/test/seeded-store-global.test.ts",
+            "client/test/seeded-store.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`window.__TINYAPP_STORE__` \u2014 the seeded page's `TodosStore`, with `getContent(): [tables, values]`"
+            ]
+          },
+          "tier": null,
+          "review": "lean",
+          "writes": [
+            "AGENTS.md",
+            "client/src/Store.tsx",
+            "client/src/storeData.ts",
+            "client/test/seeded-store.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "client/test/seeded-store-global.test.ts"
+          ],
+          "testCmd": "bun test client/test/seeded-store-global.test.ts",
+          "proofRuns": [
+            "bun test client/test/seeded-store.test.ts",
+            "sed -n '/^## Key Files/,/^## Working Method/p' AGENTS.md | tr '\\n' ' ' | grep -q '__TINYAPP_STORE__.*normal page'"
+          ],
+          "proofGuards": [
+            "client/test/seeded-store-global.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "AGENTS.md",
+              "client/src/Store.tsx",
+              "client/src/storeData.ts",
+              "client/test/seeded-store-global.test.ts",
+              "client/test/seeded-store.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "client/test/seeded-store-global.test.ts"
+            ],
+            "proofTests": [
+              "client/test/seeded-store-global.test.ts"
+            ],
+            "landing": {
+              "client/test/seeded-store-global.test.ts": "client/test/seeded-store-global.test.ts"
+            },
+            "driverOwned": [
+              "client/test/seeded-store-global.test.ts"
+            ],
+            "siblingOwned": [
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/test/browser.test.ts"
+            ],
+            "produces": [
+              "`window.__TINYAPP_STORE__` \u2014 the seeded page's `TodosStore`, with `getContent(): [tables, values]`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "The exam's action may be an interaction, and every move reads from the one page it opened",
+          "files": [
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/src/store-move.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/browser-exam.test.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts",
+            "packages/tinyapp-exam/test/state-exam.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`launchBrowser(opts?: {binary?: string; env?: Record<string, string | undefined>}) => Promise<Browser>`",
+              "`Browser.open(opts: {html: string; clock: string}) => Promise<Page>`",
+              "`Page.act(action: Action) => Promise<void>`",
+              "`Page.evaluate(expression: string) => Promise<unknown>`",
+              "`Page.snapshot() => Promise<{dom: string; screenshot: Uint8Array}>`"
+            ],
+            "produces": [
+              "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`",
+              "`walls.action_ms: number | null` and `walls.browser: 'ran' | 'skipped'` in `walls.json`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/src/store-move.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts",
+            "packages/tinyapp-exam/test/state-exam.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/browser-exam.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/browser-exam.test.ts",
+          "proofRuns": [
+            "bun test packages/tinyapp-exam/test/render-move.test.ts packages/tinyapp-exam/test/state-exam.test.ts",
+            "test \"$(grep -rc 'TINYAPP_RENDER_URL' packages/tinyapp-exam/src | awk -F: '{s+=$2} END {print s}')\" = 0",
+            "test \"$(grep -c -e 'TINYAPP_RENDER_URL' -e 'fetchImpl' packages/tinyapp-exam/test/render-move.test.ts packages/tinyapp-exam/test/state-exam.test.ts | awk -F: '{s+=$2} END {print s}')\" = 0"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/browser-exam.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-exam/src/render-move.ts",
+              "packages/tinyapp-exam/src/state-exam.ts",
+              "packages/tinyapp-exam/src/store-move.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/browser-exam.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "packages/tinyapp-exam/test/state-exam.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-exam/test/browser-exam.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-exam/test/browser-exam.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-exam/test/browser-exam.test.ts": "packages/tinyapp-exam/test/browser-exam.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-exam/test/browser-exam.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`",
+              "`walls.action_ms: number | null` and `walls.browser: 'ran' | 'skipped'` in `walls.json`"
+            ],
+            "consumes": [
+              "`launchBrowser(opts?: {binary?: string; env?: Record<string, string | undefined>}) => Promise<Browser>`",
+              "`Browser.open(opts: {html: string; clock: string}) => Promise<Page>`",
+              "`Page.act(action: Action) => Promise<void>`",
+              "`Page.evaluate(expression: string) => Promise<unknown>`",
+              "`Page.snapshot() => Promise<{dom: string; screenshot: Uint8Array}>`"
+            ]
+          }
+        }
+      ],
+      [
+        {
+          "id": "4",
+          "title": "Two exams whose action is the interaction \u2014 the checkbox completes the todo, Enter submits the input",
+          "files": [
+            "README.md",
+            "state-exams/expected/one-open-todo-typed.json",
+            "tests/state-exams/click-completes-todo.test.ts",
+            "tests/state-exams/enter-submits-todo.test.ts",
+            "tests/state-exams/interaction-evidence.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`",
+              "`window.__TINYAPP_STORE__` \u2014 the seeded page's `TodosStore`, with `getContent(): [tables, values]`"
+            ],
+            "produces": [
+              "none"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "README.md",
+            "state-exams/expected/one-open-todo-typed.json",
+            "tests/state-exams/click-completes-todo.test.ts",
+            "tests/state-exams/enter-submits-todo.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/interaction-evidence.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/interaction-evidence.test.ts",
+          "proofRuns": [
+            "bun test tests/state-exams/click-completes-todo.test.ts tests/state-exams/enter-submits-todo.test.ts",
+            "sed -n '/^## State exams/,/^## /p' README.md | tr '\\n' ' ' | grep -q 'click.*type.*key.*Chromium.*TINYAPP_BROWSER.*store diff.*DOM.*screenshot'"
+          ],
+          "proofGuards": [
+            "tests/state-exams/interaction-evidence.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "README.md",
+              "state-exams/expected/one-open-todo-typed.json",
+              "tests/state-exams/click-completes-todo.test.ts",
+              "tests/state-exams/enter-submits-todo.test.ts",
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/interaction-evidence.test.ts": "tests/state-exams/interaction-evidence.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/interaction-evidence.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`StateExamSpec.action: ((store: S) => void | Promise<void>) | Action | Action[]`",
+              "`window.__TINYAPP_STORE__` \u2014 the seeded page's `TodosStore`, with `getContent(): [tables, values]`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 Pages",
+      "The exam's action may be an interaction, and every move\u2026",
+      "Two exams whose action is the interaction \u2014 the checkbo\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The exam never dials a network: the page is opened from a `data:` URL, every request the page makes is blocked in the browser before it leaves, and the helper's own connection is a loopback WebSocket to a process it spawned.\n- A missing browser binary is a red exam that names the path, never a skip: with no browser there is no proof, on the fleet the binary is on the image, and on a laptop `TINYAPP_BROWSER` names one.\n- The determinism contract holds in the browser as it does in the store: the page's clock is pinned to the exam's `clock` before the app runs, the store move runs twice on two fresh pages and must agree byte for byte, and the mutant must still kill.\n- The evidence keys the engine already reads keep their names: `store-diff.json`, `dom.html`, `screenshot.png`, `mutant.json`, `contract.json`, `walls.json`; `walls.json` may gain keys and loses none.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-6/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-6/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-6/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-6/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
