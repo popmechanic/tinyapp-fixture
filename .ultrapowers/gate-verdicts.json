@@ -1,0 +1,51 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "27ef06e4ea632dfc2cc58a51b7b17cc9f33b4c4fc159378713b19c2ebfdd2d0d",
+      "verdict": "pass",
+      "reason": "Leg (a) asserts M1 per name with the values half {filter: name} and tables unchanged, (b)/(c) falsify M2 on both the fresh and the post-'open' store with 'bogus' and 'Open', (d)/(e) pin M3's schema and the seven BASE snapshot files via git diff --quiet, (f) is a stateExam whose mutant flips the checked row 1 and so is killed, and (g)–(l) each cite the Run line that greps the M5 literal (setFilter present, the frozen list and toHaveLength(7|6|4|3) absent, the floor regex present) with bun test exit 0 confirming the computed lists — the sentence follows at the operator layer."
+    },
+    "2": {
+      "hash": "9ac4874a2fe6497df9d5f7ac081645d4eb0064ede6920bda31a7ef32aa9adc1d",
+      "verdict": "pass",
+      "reason": "M1's six rows and M2's six values each have one falsifying leg (a–f, g–l), M3's ordered list has leg m, the admits domain is closed by M3's three filters so 'nothing else' is exhausted by the enumeration, and the operator sentence's four parts map directly onto M1/M2 at the same function layer."
+    },
+    "3": {
+      "hash": "95dc2c7e79b7da3d8d66c06119832f4df6c66a2b6b0457609b968a48a11a422b",
+      "verdict": "pass",
+      "reason": "Every clause M1–M8 has a leg that would falsify it (the mutant unticks row 1 against an expected file where it is done, each view leg pins count/text/attr per enumerated selector, M7 checks both new files pairwise, and the three Run: lines plus the four-exam bun test over a tree holding a seventh exam and ninth snapshot would break any surviving literal list or '7 snapshots and 6 exams' regex), and the literals compute consistently from the seed — so the operator's sentence is entailed at the page layer."
+    },
+    "4": {
+      "hash": "87807062cce316b22304d1b11c1ad0842ecc4caf0f3eabb4645ea99375352318",
+      "verdict": "pass",
+      "reason": "Each clause M1–M6 has a leg that would fail on its falsification (the mutant ticking row 0, the count/text views, the four M4 views covering all three buttons with data-active pinned, the three fixed-string/range Run lines for the import and the non-empty #filterBar button[data-active=\"true\"] rule, and the two linter exams exiting 0 over the tree with the new exam in their computed list), and the literals check out against the seed — two todos, one done, so 1 of 2 done, one .todoItem, one .todoItem.completed, three bar buttons."
+    }
+  },
+  "tally": {"dispatched": 15, "rejected": 8, "rounds": {"1": {"dispatched": 3, "rejected": 3}, "2": {"dispatched": 3, "rejected": 1}, "3": {"dispatched": 2, "rejected": 1}, "4": {"dispatched": 1, "rejected": 1}, "5": {"dispatched": 1, "rejected": 0}, "6": {"dispatched": 3, "rejected": 2}, "7": {"dispatched": 2, "rejected": 0}}, "note": "Task 4 was added after round 2 on reader 3's finding that nothing clicked #filter-done; round 6 re-read tasks 1, 3 and 4 after the linter's own exams were moved from re-pinned literals to tree-computed lists (a sibling plan loosens the same four files); rounds 3-7 are per-task re-dispatches as edits landed."},
+  "authoring": {
+    "minutes": 37,
+    "probes": 0,
+    "routing": {"branch": "width", "lane": "ultrapowers"},
+    "questions": [
+      {"question": "Where does the chosen filter live?", "options": ["In the store's values", "In React state"], "recommended": "In the store's values", "picked": "In the store's values"},
+      {"question": "Execute", "options": ["Ultrapowers", "Subagent-Driven", "Inline"], "recommended": "Ultrapowers", "picked": "Ultrapowers"}
+    ]
+  },
+  "history": [
+    {"round": 1, "task": "1", "hash": "08e482428a0b061563776b55da723284bb5d243e556c80471e54bd5973603ae3", "verdict": "fail", "reason": "M5 pins the ordinals 'fifth callback' and 'set-filter as the seventh exam', but leg (g) is only the bun-test Run line exiting 0, which a pinned list placing setFilter fourth or set-filter sixth would also satisfy."},
+    {"round": 1, "task": "2", "hash": "9253762580b5d9659a6697d2d24b95755bba02b8c437a9755179361c480c08e8", "verdict": "fail", "reason": "M3 asserts both the array and that this is 'the order the bar renders its buttons in', but leg (m) only checks the array; the UI-layer 'shows' in the operator sentence is connected to admits by no leg."},
+    {"round": 1, "task": "3", "hash": "8d97f44d11c1c54ffaad0aeb2e9c1fb1bb85baafd297bebf22b3905b98185851", "verdict": "fail", "reason": "The operator sentence claims pressing Done filters to the done todos, but no Machine clause or leg ever clicks #filter-done — a Done button with no click handler passes every leg."},
+    {"round": 2, "task": "1", "hash": "a050cd9934973871cc9521ecd0339d6412ceca40678caf670fcb7e04dbb48eba", "verdict": "pass", "reason": "as recorded in tasks"},
+    {"round": 2, "task": "2", "hash": "9ac4874a2fe6497df9d5f7ac081645d4eb0064ede6920bda31a7ef32aa9adc1d", "verdict": "pass", "reason": "as recorded in tasks"},
+    {"round": 2, "task": "3", "hash": "c419055849a308ff0a138da365d397620361e5688050558f1068afe54800f61f", "verdict": "fail", "reason": "M9's conclusion that pressing #filter-done records 'done' is never measured: legs (j)–(l) are grep line counts blind to how each button's id is bound to the name passed to setFilter; the Done half of the sentence needs a click leg of its own."},
+    {"round": 3, "task": "3", "hash": "33b098c34420941562159c6a84f868914f901c17e5838a9d9e02a1f658ffe2c6", "verdict": "pass", "reason": "as recorded in tasks"},
+    {"round": 3, "task": "4", "hash": "171aba2cf7db1db9cde6d3140d0a94282713288767f97b7750014ccb943573a5", "verdict": "fail", "reason": "Leg (f) checks only the substring button[data-active=\"true\"] while M5 pins the selector #filterBar button[data-active=\"true\"], so an unscoped rule or a comment passes the leg without satisfying the clause."},
+    {"round": 4, "task": "4", "hash": "91be31cad88e2b1885022d527d8c35d8a44897bb0ea4d86f290094bfa1989335", "verdict": "fail", "reason": "No clause or leg establishes that #filter-done sits inside an element with id filterBar, and the fixed-string grep is satisfied by an empty rule body."},
+    {"round": 5, "task": "4", "hash": "b10dbbcec94493b20a82299b4169bca63fb659100dfbe698b83e2b5e16b41bfd", "verdict": "pass", "reason": "superseded by round 6 after the lint-exam edits moved out of this task"},
+    {"round": 6, "task": "1", "hash": "3153445bd0f9f06dddb0e0ed0804fa2a91c6f739d70c330a15b6b274d51c23d5", "verdict": "fail", "reason": "M5's negation (no exact toHaveLength count survives) had no leg that would fail on a surviving toHaveLength(7|6|4|3)."},
+    {"round": 6, "task": "3", "hash": "285d9b5db0a761b8ed371e4eb16a390b618a97d10a4c640c4dbca2642b901487", "verdict": "fail", "reason": "M8 relied on lint-cli.test.ts computing its exam list, which BASE pins literally and no clause or leg of this task established."},
+    {"round": 6, "task": "4", "hash": "87807062cce316b22304d1b11c1ad0842ecc4caf0f3eabb4645ea99375352318", "verdict": "pass", "reason": "as recorded in tasks"},
+    {"round": 7, "task": "1", "hash": "27ef06e4ea632dfc2cc58a51b7b17cc9f33b4c4fc159378713b19c2ebfdd2d0d", "verdict": "pass", "reason": "as recorded in tasks"},
+    {"round": 7, "task": "3", "hash": "95dc2c7e79b7da3d8d66c06119832f4df6c66a2b6b0457609b968a48a11a422b", "verdict": "pass", "reason": "as recorded in tasks"}
+  ]
+}
