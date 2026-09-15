@@ -1,0 +1,510 @@
+{
+  "ok": true,
+  "stamp": "run-12",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-12"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "4 task(s) in 3 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The due cell \u2014 schema, callback, invariant, and the pins they move",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/Store.tsx",
+          "client/src/overdue.ts",
+          "client/src/storeData.ts",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/two-todos-second-due.json",
+          "tests/state-exams/done-count.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`setTodoDue(store: TodosStore, id: string, due: string): void`",
+            "`isIsoDate(value: string): boolean`",
+            "`isOverdue(row: {completed?: boolean; due?: string}, now: Date): boolean`",
+            "`dateOf(now: Date): string`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The date field on each row",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/DueInput.tsx",
+          "client/src/TodoItem.tsx",
+          "client/src/todoItem.css"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`setTodoDue(store: TodosStore, id: string, due: string): void`",
+            "`isIsoDate(value: string): boolean`"
+          ],
+          "produces": [
+            "`DueInput({rowId, due}: {rowId: string; due: string})`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The overdue mark on a row",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/TodoItem.tsx",
+          "state-exams/expected/two-todos-first-past-due-done.json",
+          "state-exams/seeds/two-open-todos-first-past-due.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`isOverdue(row: {completed?: boolean; due?: string}, now: Date): boolean`"
+          ],
+          "produces": [
+            "`data-overdue`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "A date typed into a row shows it overdue",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/todoItem.css",
+          "state-exams/expected/two-todos-first-due.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`DueInput({rowId, due}: {rowId: string; due: string})`",
+            "`data-overdue`"
+          ],
+          "produces": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "3",
+        "to": "4",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ],
+      [
+        "2",
+        "3"
+      ],
+      [
+        "4"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The due cell \u2014 schema, callback, invariant, and the pins they move",
+          "files": [
+            "client/src/Store.tsx",
+            "client/src/overdue.ts",
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-due.json",
+            "tests/state-exams/done-count.test.ts",
+            "tests/state-exams/set-todo-due.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`setTodoDue(store: TodosStore, id: string, due: string): void`",
+              "`isIsoDate(value: string): boolean`",
+              "`isOverdue(row: {completed?: boolean; due?: string}, now: Date): boolean`",
+              "`dateOf(now: Date): string`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/Store.tsx",
+            "client/src/overdue.ts",
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-due.json",
+            "tests/state-exams/done-count.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/set-todo-due.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/set-todo-due.test.ts",
+          "proofRuns": [
+            "d=$(mktemp -d state-exams/lint-tmp-XXXXXX); mkdir \"$d/seeds\"; printf '%s' '[{\"todos\":{\"0\":{\"text\":\"a\",\"completed\":false,\"due\":\"2025-13-45\"}}},{}]' > \"$d/seeds/bad.json\"; out=$(bun run lint:state --seeds \"$d/seeds\" --expected \"$d/none\" --exams \"$d/none\" 2>&1); code=$?; rm -rf \"$d\"; test \"$code\" -eq 1 && printf '%s\\n' \"$out\" | grep -q 'todos/0: breaks the invariant \"a due date is absent or a valid YYYY-MM-DD\"'",
+            "bun test tests/state-exams/done-count.test.ts",
+            "bun test packages/tinyapp-lint"
+          ],
+          "proofGuards": [
+            "tests/state-exams/set-todo-due.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/Store.tsx",
+              "client/src/overdue.ts",
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/two-todos-second-due.json",
+              "tests/state-exams/done-count.test.ts",
+              "tests/state-exams/set-todo-due.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/set-todo-due.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/set-todo-due.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/set-todo-due.test.ts": "tests/state-exams/set-todo-due.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/set-todo-due.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`setTodoDue(store: TodosStore, id: string, due: string): void`",
+              "`isIsoDate(value: string): boolean`",
+              "`isOverdue(row: {completed?: boolean; due?: string}, now: Date): boolean`",
+              "`dateOf(now: Date): string`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "The date field on each row",
+          "files": [
+            "client/src/DueInput.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/todoItem.css",
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`setTodoDue(store: TodosStore, id: string, due: string): void`",
+              "`isIsoDate(value: string): boolean`"
+            ],
+            "produces": [
+              "`DueInput({rowId, due}: {rowId: string; due: string})`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/DueInput.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/todoItem.css"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/type-due-date.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/DueInput.tsx",
+              "client/src/TodoItem.tsx",
+              "client/src/todoItem.css",
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/type-due-date.test.ts": "tests/state-exams/type-due-date.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/TodoItem.tsx",
+              "state-exams/expected/two-todos-first-past-due-done.json",
+              "state-exams/seeds/two-open-todos-first-past-due.json",
+              "tests/state-exams/completed-past-due-not-overdue.test.ts"
+            ],
+            "produces": [
+              "`DueInput({rowId, due}: {rowId: string; due: string})`"
+            ],
+            "consumes": [
+              "`setTodoDue(store: TodosStore, id: string, due: string): void`",
+              "`isIsoDate(value: string): boolean`"
+            ]
+          }
+        },
+        {
+          "id": "3",
+          "title": "The overdue mark on a row",
+          "files": [
+            "client/src/TodoItem.tsx",
+            "state-exams/expected/two-todos-first-past-due-done.json",
+            "state-exams/seeds/two-open-todos-first-past-due.json",
+            "tests/state-exams/completed-past-due-not-overdue.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`isOverdue(row: {completed?: boolean; due?: string}, now: Date): boolean`"
+            ],
+            "produces": [
+              "`data-overdue`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/TodoItem.tsx",
+            "state-exams/expected/two-todos-first-past-due-done.json",
+            "state-exams/seeds/two-open-todos-first-past-due.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/completed-past-due-not-overdue.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/completed-past-due-not-overdue.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "tests/state-exams/completed-past-due-not-overdue.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/TodoItem.tsx",
+              "state-exams/expected/two-todos-first-past-due-done.json",
+              "state-exams/seeds/two-open-todos-first-past-due.json",
+              "tests/state-exams/completed-past-due-not-overdue.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/completed-past-due-not-overdue.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/completed-past-due-not-overdue.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/completed-past-due-not-overdue.test.ts": "tests/state-exams/completed-past-due-not-overdue.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/completed-past-due-not-overdue.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/DueInput.tsx",
+              "client/src/TodoItem.tsx",
+              "client/src/todoItem.css",
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "produces": [
+              "`data-overdue`"
+            ],
+            "consumes": [
+              "`isOverdue(row: {completed?: boolean; due?: string}, now: Date): boolean`"
+            ]
+          }
+        }
+      ],
+      [
+        {
+          "id": "4",
+          "title": "A date typed into a row shows it overdue",
+          "files": [
+            "client/src/todoItem.css",
+            "state-exams/expected/two-todos-first-due.json",
+            "tests/state-exams/due-date-marks-overdue.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`DueInput({rowId, due}: {rowId: string; due: string})`",
+              "`data-overdue`"
+            ],
+            "produces": [
+              "none"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/todoItem.css",
+            "state-exams/expected/two-todos-first-due.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/due-date-marks-overdue.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/due-date-marks-overdue.test.ts",
+          "proofRuns": [
+            "sed -n '/^\\.todoItem\\.overdue label/,/}/p' client/src/todoItem.css | grep -q 'color'"
+          ],
+          "proofGuards": [
+            "tests/state-exams/due-date-marks-overdue.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/todoItem.css",
+              "state-exams/expected/two-todos-first-due.json",
+              "tests/state-exams/due-date-marks-overdue.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/due-date-marks-overdue.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/due-date-marks-overdue.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/due-date-marks-overdue.test.ts": "tests/state-exams/due-date-marks-overdue.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/due-date-marks-overdue.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`DueInput({rowId, due}: {rowId: string; due: string})`",
+              "`data-overdue`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The due cell \u2014 schema, callback, invariant, and the pin\u2026",
+      "2 Rows",
+      "A date typed into a row shows it overdue"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The `due` cell has no schema default: a todo with no date has no `due` cell, `setTodoDue(store, id, '')` removes the cell, and `''` is never stored. Measured at BASE (tinybase 9.7.0, 2026-09-15): a cell with `default: ''` is materialised into `getContent()` of every seeded row, which rewrote the five snapshot files that hold rows and reddened 20 files of pins (three fixture exams, two `client/test` files, four `packages/tinyapp-lint/test` files, three `packages/tinyapp-exam/test` files, and the snapshots); the same cell with no default leaves `getContent()` of every existing seed byte-identical and reddens only the count, list and cell-name pins the tasks below own. A sibling plan's expected file whose rows carry only `text` and `completed` therefore still round-trips.\n- A stored `due` is a `YYYY-MM-DD` that is a real UTC calendar date; nothing else is ever written, and the `INVARIANTS` entry for it is what lets `lint:state` reject a bad seed.\n- Every dated seed or expected row in this plan is dated before `2026-01-01` (the clock every exam pins). A page's `new Date()` is the exam's pinned clock, but the linter's static render (`packages/tinyapp-lint/src/context.ts` calls `renderStatic` outside `withContract`) runs under the wall clock \u2014 so a view asserting `data-overdue=\"true\"` rests on a date that is past under both clocks, and a `data-overdue=\"false\"` view rests on a completed row or a row with no date, never on a future date.\n- No exam or test pins the exact key set of a sibling plan's surface: a pin of `TABLES_SCHEMA.todos`'s cells names `completed`, `due` and `text`; nothing here pins the tables of `TABLES_SCHEMA`, the values schema, the callback list, the invariant list, or a count of snapshot or exam files as an exact number \u2014 lists are matched by containment, counts are read off the directories or bounded from below, since two sibling runs add a callback, a values schema, a table and snapshots concurrently.\n- `packages/tinyapp-exam/src` and `packages/tinyapp-lint/src` are byte-identical to BASE; the tests under `packages/tinyapp-lint/test` change only where a count, a list or a message the new callback and snapshots move is pinned, and nothing under `packages/tinyapp-exam/test` changes.\n- A state exam whose action is an interaction imports `createTodosStore` from `client/src/storeData` and names `store: () => createTodosStore()` exactly as `tests/state-exams/click-completes-todo.test.ts` does: measured 2026-09-15, an interaction exam file that imports nothing from `client/src` fails under `bun test` with `Bundle failed` before it opens a page, and the same spec with that import passes.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam/src packages/tinyapp-lint/src",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-12/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-12/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
