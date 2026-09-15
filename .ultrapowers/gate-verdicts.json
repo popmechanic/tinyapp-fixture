@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "1": {"hash": "8daae3776bfe81f05abf2d79eb79fa36a04051f55bdf337e7c77815f3e0d9253", "verdict": "pass", "reason": "Unchanged from the click plan's task 3 (same Claim and Proof, hash identical): M1 by comparing the global's getContent to the seed and to the app store after a mutation; M2 by undefined with the seed absent; M3 by the kept BASE run plus WebSocket and getDb counts with an unseeded positive control; M4 by a section-scoped ordered grep."},
+    "2": {"hash": "2bf72fea9dfba2241e51b741a332cf089c10448e5fa10c7c119f633001b26bb6", "verdict": "pass", "reason": "M1's action recording and seed/no-src html checks plus the nondeterminism split; M2's exactly-two open and one snapshot counts and the zero-count grep; M3's skipped/tmpdir pair; M4's per-spec walls and contract values; M5's rejected-binary reds with six files and the surviving kill; M6's Run lines; M7's real-browser data-URL length under the ceiling the minified bundle meets, and the unminified negative rejecting within 15 s."},
+    "3": {"hash": "74de6ca350aa4ca54c685e180f37ca19f8288ad58a8847707aa2aea6d6fd395b", "verdict": "pass", "reason": "Unchanged from the click plan's task 4 (hash identical): M1/M2 by the exams passing plus text reads of their literals and the expected file's single row; M3 by the child-process evidence with pinned contents and the swapped-expected negative; M4 by a section-scoped ordered grep."}
+  },
+  "tally": {"dispatched": 1, "rejected": 0, "carried": {"1": "click plan task 3, round 2", "3": "click plan task 4, round 2"}},
+  "history": [{"round": 1, "task": "2", "verdict": "pass"}]
+}
