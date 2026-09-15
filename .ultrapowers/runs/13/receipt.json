@@ -1,0 +1,520 @@
+{
+  "ok": true,
+  "stamp": "run-13",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-13"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "4 task(s) in 3 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The filter lives in the store's values \u2014 a values schema and `setFilter`",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/StaticPage.tsx",
+          "client/src/storeData.ts",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`setFilter(store: TodosStore, filter: string): void`",
+            "`VALUES_SCHEMA`",
+            "`Schemas`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "Which rows a filter admits \u2014 a pure predicate over one row",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/todoFilter.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`admits(filter: Filter, completed: boolean): boolean`",
+            "`filterOf(value: unknown): Filter`",
+            "`FILTERS`",
+            "`Filter`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The filter bar above the list \u2014 three buttons, the list shows what the filter admits, the counter counts everything",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/FilterBar.tsx",
+          "client/src/Store.tsx",
+          "client/src/TodoList.tsx",
+          "state-exams/expected/two-todos-one-done-filter-done.json",
+          "state-exams/expected/two-todos-one-done-filter-open.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`setFilter(store: TodosStore, filter: string): void`",
+            "`admits(filter: Filter, completed: boolean): boolean`",
+            "`filterOf(value: unknown): Filter`",
+            "`FILTERS`"
+          ],
+          "produces": [
+            "`FilterBar`",
+            "`useValue`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "Pressing Done \u2014 the click that leaves only the done todos, and the pressed look",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/FilterBar.tsx",
+          "client/src/filterBar.css"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`FilterBar`"
+          ],
+          "produces": [
+            "nothing"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "3",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "4",
+        "why": "proof-run"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1",
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "4"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The filter lives in the store's values \u2014 a values schema and `setFilter`",
+          "files": [
+            "client/src/StaticPage.tsx",
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "tests/state-exams/set-filter.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`setFilter(store: TodosStore, filter: string): void`",
+              "`VALUES_SCHEMA`",
+              "`Schemas`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/StaticPage.tsx",
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/set-filter.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/set-filter.test.ts",
+          "proofRuns": [
+            "git diff --quiet $ULTRA_BASE -- state-exams/seeds state-exams/expected/one-open-todo.json state-exams/expected/still-empty.json state-exams/expected/two-todos-first-done.json state-exams/expected/two-todos-one-done.json",
+            "grep -q \"toContain('setFilter')\" packages/tinyapp-lint/test/lint-cli.test.ts",
+            "grep -q \"toContain('setFilter')\" packages/tinyapp-lint/test/reachability.test.ts",
+            "test \"$(cat packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts | grep -c 'deleteTodo or setTodoCompleted')\" -eq 0",
+            "grep -qF '[0-9]+ snapshots and [0-9]+ exams' packages/tinyapp-lint/test/lint-cli.test.ts",
+            "test \"$(cat packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts | grep -cE 'toHaveLength\\((7|6|4|3)\\)')\" -eq 0",
+            "bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/set-filter.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/StaticPage.tsx",
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/state-exams/set-filter.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/set-filter.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/set-filter.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/set-filter.test.ts": "tests/state-exams/set-filter.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/set-filter.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/todoFilter.ts",
+              "tests/todo-filter.test.ts"
+            ],
+            "produces": [
+              "`setFilter(store: TodosStore, filter: string): void`",
+              "`VALUES_SCHEMA`",
+              "`Schemas`"
+            ],
+            "consumes": []
+          }
+        },
+        {
+          "id": "2",
+          "title": "Which rows a filter admits \u2014 a pure predicate over one row",
+          "files": [
+            "client/src/todoFilter.ts",
+            "tests/todo-filter.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`admits(filter: Filter, completed: boolean): boolean`",
+              "`filterOf(value: unknown): Filter`",
+              "`FILTERS`",
+              "`Filter`"
+            ]
+          },
+          "tier": null,
+          "review": "lean",
+          "writes": [
+            "client/src/todoFilter.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/todo-filter.test.ts"
+          ],
+          "testCmd": "bun test tests/todo-filter.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "tests/todo-filter.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/todoFilter.ts",
+              "tests/todo-filter.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/todo-filter.test.ts"
+            ],
+            "proofTests": [
+              "tests/todo-filter.test.ts"
+            ],
+            "landing": {
+              "tests/todo-filter.test.ts": "tests/todo-filter.test.ts"
+            },
+            "driverOwned": [
+              "tests/todo-filter.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/StaticPage.tsx",
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/state-exams/set-filter.test.ts"
+            ],
+            "produces": [
+              "`admits(filter: Filter, completed: boolean): boolean`",
+              "`filterOf(value: unknown): Filter`",
+              "`FILTERS`",
+              "`Filter`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "3",
+          "title": "The filter bar above the list \u2014 three buttons, the list shows what the filter admits, the counter counts everything",
+          "files": [
+            "client/src/FilterBar.tsx",
+            "client/src/Store.tsx",
+            "client/src/TodoList.tsx",
+            "state-exams/expected/two-todos-one-done-filter-done.json",
+            "state-exams/expected/two-todos-one-done-filter-open.json",
+            "tests/state-exams/filter-bar.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`setFilter(store: TodosStore, filter: string): void`",
+              "`admits(filter: Filter, completed: boolean): boolean`",
+              "`filterOf(value: unknown): Filter`",
+              "`FILTERS`"
+            ],
+            "produces": [
+              "`FilterBar`",
+              "`useValue`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/FilterBar.tsx",
+            "client/src/Store.tsx",
+            "client/src/TodoList.tsx",
+            "state-exams/expected/two-todos-one-done-filter-done.json",
+            "state-exams/expected/two-todos-one-done-filter-open.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/filter-bar.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/filter-bar.test.ts",
+          "proofRuns": [
+            "grep -q 'const EXAM_FILES' packages/tinyapp-lint/test/lint-cli.test.ts",
+            "grep -qF '[0-9]+ snapshots and [0-9]+ exams' packages/tinyapp-lint/test/lint-cli.test.ts",
+            "bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/filter-bar.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/FilterBar.tsx",
+              "client/src/Store.tsx",
+              "client/src/TodoList.tsx",
+              "state-exams/expected/two-todos-one-done-filter-done.json",
+              "state-exams/expected/two-todos-one-done-filter-open.json",
+              "tests/state-exams/filter-bar.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/filter-bar.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/filter-bar.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/filter-bar.test.ts": "tests/state-exams/filter-bar.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/filter-bar.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`FilterBar`",
+              "`useValue`"
+            ],
+            "consumes": [
+              "`setFilter(store: TodosStore, filter: string): void`",
+              "`admits(filter: Filter, completed: boolean): boolean`",
+              "`filterOf(value: unknown): Filter`",
+              "`FILTERS`"
+            ]
+          }
+        }
+      ],
+      [
+        {
+          "id": "4",
+          "title": "Pressing Done \u2014 the click that leaves only the done todos, and the pressed look",
+          "files": [
+            "client/src/FilterBar.tsx",
+            "client/src/filterBar.css",
+            "tests/state-exams/filter-done.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`FilterBar`"
+            ],
+            "produces": [
+              "nothing"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/FilterBar.tsx",
+            "client/src/filterBar.css"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/filter-done.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/filter-done.test.ts",
+          "proofRuns": [
+            "grep -q \"import './filterBar.css';\" client/src/FilterBar.tsx",
+            "grep -qF '#filterBar button[data-active=\"true\"] {' client/src/filterBar.css",
+            "sed -n '/#filterBar button\\[data-active=\"true\"\\] {/,/}/p' client/src/filterBar.css | grep -q 'background: var(--accent)'",
+            "bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/filter-done.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/FilterBar.tsx",
+              "client/src/filterBar.css",
+              "tests/state-exams/filter-done.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/filter-done.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/filter-done.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/filter-done.test.ts": "tests/state-exams/filter-done.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/filter-done.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`FilterBar`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 Filters",
+      "The filter bar above the list \u2014 three buttons, the list\u2026",
+      "Pressing Done \u2014 the click that leaves only the done tod\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The chosen filter lives in the store's values under the id `filter` and nowhere else \u2014 never in React state, never in a URL, never in a second store.\n- The values schema entry `filter` is `{type: 'string'}` with no `default`, so `getContent()` of a store that was never filtered carries an empty values half and every snapshot file that existed at BASE loads to itself. A `default` on that entry is a finding.\n- Nothing this plan asserts pins the exact key set of `TABLES_SCHEMA`, of a todos row, or of the store's tables: two sibling runs on the same base add a cell to `todos` and a `trash` table concurrently, and the fold at publish must leave all three green. A test that lists every table or every cell of a row is a finding. `TABLES_SCHEMA` and `INVARIANTS` are not edited by this plan.\n- `#doneCount` is derived from every row of `todos` whatever the filter holds \u2014 `countTodos` and `DoneCount` are not edited by this plan.\n- No exam file bundles the page twice: at most one `stateExam` that names an `entry` per exam file, and any further check in that file is an ordinary `bun:test` block, because a second `Bun.build` in one `bun test` process fails with `Bundle failed` (measured on Bun 1.3.0; recorded on the fleet in `tests/state-exams/interaction-evidence.test.ts`'s header).\n- The static page `renderStatic` paints for the linter and the live page paint the same markup for the same state: the bar is mounted once, in `TodoList`, which both pages render.\n- The linter's own exams under `packages/tinyapp-lint/test/` read their expectations from the tree \u2014 the snapshot list, the exam list and the callback list computed from the directories and the store module, counts as floors \u2014 and carry no exact count of snapshots, exams or seeds and no frozen callback list. Two sibling runs on the same base add a callback and snapshots of their own, and a literal re-pinned here to a new number is a same-line conflict with theirs at publish; a re-pinned literal is a finding.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-13/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-13/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-13/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-13/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
