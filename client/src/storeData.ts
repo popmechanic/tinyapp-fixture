@@ -13,6 +13,25 @@ export const TABLES_SCHEMA = {
   },
 } as const;
 
+// What every row of a table must satisfy, whoever wrote the row: the UI, an
+// exam's seed, or an expected state checked in beside it. The schema says what
+// a cell is; an invariant says what a row means, and carries the sentence to
+// say when a row stops meaning it.
+export type Invariant = {
+  table: keyof typeof TABLES_SCHEMA;
+  predicate: (row: Record<string, string | number | boolean>, rowId: string) => boolean;
+  message: string;
+};
+
+export const INVARIANTS: Invariant[] = [
+  {
+    table: 'todos',
+    predicate: (row) =>
+      row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
+    message: 'a completed todo has non-empty text',
+  },
+];
+
 export type TodoRow = Row<typeof TABLES_SCHEMA, 'todos'>;
 
 export type Schemas = [typeof TABLES_SCHEMA, NoValuesSchema];
