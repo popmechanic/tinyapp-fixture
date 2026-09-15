@@ -1,0 +1,656 @@
+{
+  "ok": true,
+  "stamp": "run-9",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-9"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "5 task(s) in 2 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The package, its loaders, the static page and the `lint:state` script",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "client/src/StaticPage.tsx",
+          "package.json",
+          "packages/tinyapp-lint/package.json",
+          "packages/tinyapp-lint/src/capture-plugin.ts",
+          "packages/tinyapp-lint/src/capture.ts",
+          "packages/tinyapp-lint/src/cli.ts",
+          "packages/tinyapp-lint/src/context.ts",
+          "packages/tinyapp-lint/src/lint.ts",
+          "packages/tinyapp-lint/src/types.ts",
+          "packages/tinyapp-lint/tsconfig.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`TABLES_SCHEMA` (`client/src/storeData.ts`, BASE)",
+            "`assertView` (`tinyapp-exam`, BASE)"
+          ],
+          "produces": [
+            "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+            "`captureExams(dir: string) -> Promise<ExamSpec[]>`",
+            "`runLint(ctx: LintContext, opts?: {rulesDir?: string}) -> Promise<{lines: string[]; count: number}>`",
+            "`formatFinding(f: Finding) -> string`",
+            "`renderStatic(content: TodosContent) -> string`",
+            "`LintContext`",
+            "`Finding`",
+            "`Rule`",
+            "`ExamSpec`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The invariants rule \u2014 a completed todo has non-empty text",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/storeData.ts",
+          "packages/tinyapp-lint/src/rules/invariants.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+            "`formatFinding(f: Finding) -> string`",
+            "`LintContext`",
+            "`Finding`",
+            "`Rule`"
+          ],
+          "produces": [
+            "`INVARIANTS: Invariant[]`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The referential-integrity rule \u2014 a cell marked `ref` names a row that exists",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-lint/src/rules/references.ts",
+          "packages/tinyapp-lint/test/fixtures/ref-store.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+            "`formatFinding(f: Finding) -> string`",
+            "`LintContext`",
+            "`Finding`",
+            "`Rule`"
+          ],
+          "produces": [
+            "`none`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "The reachability rule \u2014 every expected state is some seed plus a few of the app's own moves",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-lint/src/rules/reachability.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+            "`formatFinding(f: Finding) -> string`",
+            "`LintContext`",
+            "`Finding`",
+            "`Rule`",
+            "`withContract(clock: string, fn: () => unknown) -> Promise<void>` (`tinyapp-exam`, BASE)"
+          ],
+          "produces": [
+            "`none`"
+          ]
+        }
+      },
+      {
+        "id": "5",
+        "title": "The view-satisfiability rule \u2014 every view an exam asserts holds over the state it names",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-lint/src/rules/views.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+            "`formatFinding(f: Finding) -> string`",
+            "`LintContext`",
+            "`Finding`",
+            "`Rule`",
+            "`ExamSpec`",
+            "`assertView(html: string, views: View | View[] | undefined) -> string[]` (`tinyapp-exam`, BASE)"
+          ],
+          "produces": [
+            "`none`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "5",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ],
+      [
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The package, its loaders, the static page and the `lint:state` script",
+          "files": [
+            "bun.lock",
+            "client/src/StaticPage.tsx",
+            "package.json",
+            "packages/tinyapp-lint/package.json",
+            "packages/tinyapp-lint/src/capture-plugin.ts",
+            "packages/tinyapp-lint/src/capture.ts",
+            "packages/tinyapp-lint/src/cli.ts",
+            "packages/tinyapp-lint/src/context.ts",
+            "packages/tinyapp-lint/src/lint.ts",
+            "packages/tinyapp-lint/src/types.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/tsconfig.json"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`TABLES_SCHEMA` (`client/src/storeData.ts`, BASE)",
+              "`assertView` (`tinyapp-exam`, BASE)"
+            ],
+            "produces": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`captureExams(dir: string) -> Promise<ExamSpec[]>`",
+              "`runLint(ctx: LintContext, opts?: {rulesDir?: string}) -> Promise<{lines: string[]; count: number}>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`renderStatic(content: TodosContent) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`",
+              "`ExamSpec`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "bun.lock",
+            "client/src/StaticPage.tsx",
+            "package.json",
+            "packages/tinyapp-lint/package.json",
+            "packages/tinyapp-lint/src/capture-plugin.ts",
+            "packages/tinyapp-lint/src/capture.ts",
+            "packages/tinyapp-lint/src/cli.ts",
+            "packages/tinyapp-lint/src/context.ts",
+            "packages/tinyapp-lint/src/lint.ts",
+            "packages/tinyapp-lint/src/types.ts",
+            "packages/tinyapp-lint/tsconfig.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-lint/test/lint-cli.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-lint/test/lint-cli.test.ts",
+          "proofRuns": [
+            "bun run lint:state"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-lint/test/lint-cli.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "bun.lock",
+              "client/src/StaticPage.tsx",
+              "package.json",
+              "packages/tinyapp-lint/package.json",
+              "packages/tinyapp-lint/src/capture-plugin.ts",
+              "packages/tinyapp-lint/src/capture.ts",
+              "packages/tinyapp-lint/src/cli.ts",
+              "packages/tinyapp-lint/src/context.ts",
+              "packages/tinyapp-lint/src/lint.ts",
+              "packages/tinyapp-lint/src/types.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/tsconfig.json"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-lint/test/lint-cli.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-lint/test/lint-cli.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-lint/test/lint-cli.test.ts": "packages/tinyapp-lint/test/lint-cli.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-lint/test/lint-cli.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`captureExams(dir: string) -> Promise<ExamSpec[]>`",
+              "`runLint(ctx: LintContext, opts?: {rulesDir?: string}) -> Promise<{lines: string[]; count: number}>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`renderStatic(content: TodosContent) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`",
+              "`ExamSpec`"
+            ],
+            "consumes": [
+              "`TABLES_SCHEMA` (`client/src/storeData.ts`, BASE)",
+              "`assertView` (`tinyapp-exam`, BASE)"
+            ]
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "The invariants rule \u2014 a completed todo has non-empty text",
+          "files": [
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/src/rules/invariants.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`"
+            ],
+            "produces": [
+              "`INVARIANTS: Invariant[]`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/src/rules/invariants.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-lint/test/invariants.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-lint/test/invariants.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-lint/test/invariants.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/src/rules/invariants.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-lint/test/invariants.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-lint/test/invariants.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-lint/test/invariants.test.ts": "packages/tinyapp-lint/test/invariants.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-lint/test/invariants.test.ts"
+            ],
+            "siblingOwned": [
+              "packages/tinyapp-lint/src/rules/reachability.ts",
+              "packages/tinyapp-lint/src/rules/references.ts",
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/fixtures/ref-store.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/references.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "produces": [
+              "`INVARIANTS: Invariant[]`"
+            ],
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`"
+            ]
+          }
+        },
+        {
+          "id": "3",
+          "title": "The referential-integrity rule \u2014 a cell marked `ref` names a row that exists",
+          "files": [
+            "packages/tinyapp-lint/src/rules/references.ts",
+            "packages/tinyapp-lint/test/fixtures/ref-store.ts",
+            "packages/tinyapp-lint/test/references.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`"
+            ],
+            "produces": [
+              "`none`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-lint/src/rules/references.ts",
+            "packages/tinyapp-lint/test/fixtures/ref-store.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-lint/test/references.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-lint/test/references.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-lint/test/references.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-lint/src/rules/references.ts",
+              "packages/tinyapp-lint/test/fixtures/ref-store.ts",
+              "packages/tinyapp-lint/test/references.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-lint/test/references.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-lint/test/references.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-lint/test/references.test.ts": "packages/tinyapp-lint/test/references.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-lint/test/references.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/src/rules/invariants.ts",
+              "packages/tinyapp-lint/src/rules/reachability.ts",
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "produces": [],
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`"
+            ]
+          }
+        },
+        {
+          "id": "4",
+          "title": "The reachability rule \u2014 every expected state is some seed plus a few of the app's own moves",
+          "files": [
+            "packages/tinyapp-lint/src/rules/reachability.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`",
+              "`withContract(clock: string, fn: () => unknown) -> Promise<void>` (`tinyapp-exam`, BASE)"
+            ],
+            "produces": [
+              "`none`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-lint/src/rules/reachability.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-lint/test/reachability.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-lint/test/reachability.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-lint/test/reachability.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-lint/src/rules/reachability.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-lint/test/reachability.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-lint/test/reachability.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-lint/test/reachability.test.ts": "packages/tinyapp-lint/test/reachability.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-lint/test/reachability.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/src/rules/invariants.ts",
+              "packages/tinyapp-lint/src/rules/references.ts",
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/fixtures/ref-store.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/references.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "produces": [],
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`",
+              "`withContract(clock: string, fn: () => unknown) -> Promise<void>` (`tinyapp-exam`, BASE)"
+            ]
+          }
+        },
+        {
+          "id": "5",
+          "title": "The view-satisfiability rule \u2014 every view an exam asserts holds over the state it names",
+          "files": [
+            "packages/tinyapp-lint/src/rules/views.ts",
+            "packages/tinyapp-lint/test/views.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`",
+              "`ExamSpec`",
+              "`assertView(html: string, views: View | View[] | undefined) -> string[]` (`tinyapp-exam`, BASE)"
+            ],
+            "produces": [
+              "`none`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-lint/src/rules/views.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-lint/test/views.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-lint/test/views.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "packages/tinyapp-lint/test/views.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-lint/test/views.test.ts": "packages/tinyapp-lint/test/views.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-lint/test/views.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/src/rules/invariants.ts",
+              "packages/tinyapp-lint/src/rules/reachability.ts",
+              "packages/tinyapp-lint/src/rules/references.ts",
+              "packages/tinyapp-lint/test/fixtures/ref-store.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/references.test.ts"
+            ],
+            "produces": [],
+            "consumes": [
+              "`loadContext(opts?: Partial<LoadOptions>) -> Promise<LintContext>`",
+              "`formatFinding(f: Finding) -> string`",
+              "`LintContext`",
+              "`Finding`",
+              "`Rule`",
+              "`ExamSpec`",
+              "`assertView(html: string, views: View | View[] | undefined) -> string[]` (`tinyapp-exam`, BASE)"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The package, its loaders, the static page and the `lint\u2026",
+      "4 Rules"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- `bun run lint:state` on the fixture's own seeds, expected states and exams reports zero findings: a rule that fires on a file the fixture already carries is a plan defect, not a finding.\n- The linter opens no browser and dials no network: a state is rendered with `react-dom/server` over the app's own components, and an exam's spec is read without running the exam.\n- Every finding is exactly one line, `<file>: <subject>: <what is wrong> \u2014 <the fix>`, written in the app's vocabulary \u2014 table, row and cell ids, the invariant's own message, the exam's own selector \u2014 and every fix is concrete.\n- `packages/tinyapp-exam`, the snapshots under `state-exams/` and the exams under `tests/state-exams/` are not edited by this plan.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-9/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-9/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-9/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-9/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
