@@ -94,3 +94,14 @@
 {"kind":"worker:end","label":"review:4:1","role":"reviewer","sessionId":"90101309-597c-4796-97ea-b507847e20fd","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":5312,"output":13341,"cacheRead":180381,"cacheCreation":53789,"costUsd":0.9881655,"models":["claude-opus-5"]},"id":"01M2J8HVX00000XX2T2E8MQXWT","ts":1789466832800}
 {"kind":"transcript:slice","label":"review:4:1","sessionId":"90101309-597c-4796-97ea-b507847e20fd","bytes":8364,"id":"01M2J8HVX40000TWMD5ETDY2XZ","ts":1789466832804}
 {"kind":"engine:phase","phase":"Wave 5","id":"01M2J8HVX700002THEW8KQEJK4","ts":1789466832807}
+{"kind":"driver:wave-adopted","wave":5,"tasks":["4"],"headSha":"b8404196076d0c8bf737d144d94ad901496965ed","id":"01M2J8JRAP0000Z6TWF4QRDJ33","ts":1789466861910}
+{"kind":"driver:integrated-clean","wave":5,"removed":0,"id":"01M2J8JRBC0000F48WPW15WXPM","ts":1789466861932}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":5,"id":"01M2J8JVM400007G2XZR1YK9ZW","ts":1789466865284}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2J8JVQ80000VRR11V1YJN4W","ts":1789466865384}
+{"kind":"driver:stage","stage":"finalize","id":"01M2J8JVRS0000KHA04ZMNGRXN","ts":1789466865433}
+{"kind":"driver:stage","stage":"gate","id":"01M2J8JVTC0000SA8G3P1PWXGW","ts":1789466865484}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2J8JVX90000C52V5ZPSNJVH","ts":1789466865577}
+{"kind":"driver:stage","stage":"approve","id":"01M2J8JVX90001VMV5BJ6C6CGW","ts":1789466865577}
+{"kind":"driver:approved","stamp":"run-9","integrationBranch":"ultra/integration-run-9","id":"01M2J8JVYF0000EKE498DFC2YG","ts":1789466865615}
+{"kind":"run:open","runId":"run-9","base":"c2a75c6a6612fbbbb77c307516d9f35b9366ff26","source":"fleet/publish-fold.mjs","id":"01M2J8JWPQ000049673QCA2WJE","ts":1789466866391}
+{"kind":"driver:publish-fold","run":"9","attempt":"1","base":"c2a75c6a6612fbbbb77c307516d9f35b9366ff26","tip":"c2a75c6a6612fbbbb77c307516d9f35b9366ff26","candidate":"b8404196076d0c8bf737d144d94ad901496965ed","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2J8JX3Z000049RAAYRC393Q","ts":1789466866815}
