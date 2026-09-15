@@ -1,0 +1,35 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/state-exams/set-todo-due.test.ts:
+(pass) leg (a) [M1] TABLES_SCHEMA.todos.due is exactly {type: `string`} with no default key [0.07ms]
+(pass) leg (a) [M1] createTodosStore over a seed with no due cell round-trips to exactly that seed [8.30ms]
+(pass) leg (b) [M2] setTodoDue sets a valid date on the row it names, returning undefined [2.33ms]
+(pass) leg (b) [M2] setTodoDue with the empty string removes the cell, so the row has no due key [1.43ms]
+(pass) leg (b) [M2] setTodoDue with "2025-13-45" leaves the content deep-equal to what it was, returning undefined [1.13ms]
+(pass) leg (b) [M2] setTodoDue with "soon" leaves the content deep-equal to what it was, returning undefined [2.97ms]
+(pass) leg (c) [M3] isIsoDate("2025-12-31") is true [0.16ms]
+(pass) leg (c) [M3] isIsoDate("2024-02-29") is true [0.02ms]
+(pass) leg (c) [M3] isIsoDate("") is false [0.01ms]
+(pass) leg (c) [M3] isIsoDate("2025-13-45") is false [0.01ms]
+(pass) leg (c) [M3] isIsoDate("2025-02-30") is false [0.01ms]
+(pass) leg (c) [M3] isIsoDate("2025-1-5") is false
+(pass) leg (c) [M3] isIsoDate("soon") is false
+(pass) leg (d) [M4] isOverdue({"completed":false,"due":"2025-12-31"}, 2026-01-01T00:00:00Z) is true [0.09ms]
+(pass) leg (d) [M4] isOverdue({"completed":true,"due":"2025-12-31"}, 2026-01-01T00:00:00Z) is false [0.01ms]
+(pass) leg (d) [M4] isOverdue({"completed":false,"due":""}, 2026-01-01T00:00:00Z) is false
+(pass) leg (d) [M4] isOverdue({"completed":false}, 2026-01-01T00:00:00Z) is false
+(pass) leg (d) [M4] isOverdue({"completed":false,"due":"2026-01-01"}, 2026-01-01T00:00:00Z) is false
+(pass) leg (d) [M4] isOverdue({"completed":false,"due":"2026-06-01"}, 2026-01-01T00:00:00Z) is false
+(pass) [Produces] dateOf(now) is the instant`s UTC calendar date [0.08ms]
+(pass) leg (e) [M5] INVARIANTS holds a todos entry with the pinned message and predicate [0.14ms]
+(pass) leg (e) [M5] the lint Run line — one seed with a bad due date exits 1 and prints the pinned finding [62.42ms]
+(pass) leg (f) [M6] state-exams/expected/two-todos-second-due.json parses to exactly the M6 literal [0.09ms]
+(pass) leg (g) [M7] the Run line `bun test tests/state-exams/done-count.test.ts` exits 0 [723.42ms]
+(pass) leg (g) [M7] the Run line `bun test packages/tinyapp-lint` exits 0 [19751.15ms]
+(pass) leg (g) [M7] done-count.test.ts pins the sorted todos cells as completed, due and text [0.21ms]
+(pass) state exam: set-todo-due [675.89ms]
+
+ 27 pass
+ 0 fail
+ 47 expect() calls
+Ran 27 tests across 1 file. [21.26s]

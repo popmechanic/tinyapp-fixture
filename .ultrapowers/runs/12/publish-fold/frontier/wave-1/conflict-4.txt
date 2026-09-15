@@ -1,0 +1,325 @@
+/**
+ * The exam for Task 5 — "The view-satisfiability rule: every view an exam
+ * asserts holds over the state it names".
+ *
+ * One `test` per Proof leg, named for its leg and for the Machine clause it
+ * comes from:
+ *
+ *   (a) [M1] the module's default export is the `views` rule, `loadContext()`
+ *            carries six exams each with a defined `view` and an `expected`
+ *            that is a snapshot's `path`, and `run` over it finds nothing;
+ *   (b) [M2] the run-7 spec — the bare selector with `checked: true` over
+ *            `two-todos-one-done.json` — is one finding, pinned character for
+ *            character;
+ *   (c) [M3] the `count: 1` spec over the same state is one pinned finding;
+ *   (d) [M4] the corrected selector over `two-todos-first-done.json` is
+ *            nothing, and the bare selector with `unchecked: true` over
+ *            `two-todos-one-done.json` names `#todo-0`;
+ *   (e) [M5] a `view` of `undefined` asserts nothing, and an `expected` no
+ *            snapshot carries is one pinned finding and nothing further;
+ *   (f) [M6] the CLI, spawned from the root over one seeded exam directory,
+ *            exits 1 and prints that same line for a file under the root.
+ *
+ * Readings this file makes, written down because the task leaves them open:
+ *
+ *   - M3, M4 and M5 name a spec's `path`, `expected` and `view` and leave its
+ *     `seed` and `action` open. Each carries the fixture's own
+ *     `two-open-todos.json` seed and an empty `action`: the task's Context says
+ *     the action of a spec is carried and not read by this rule.
+ *   - M5's second spec is given a `view` that would breach over a state that
+ *     existed, so that "exactly one finding" is a live check of the Context's
+ *     "nothing further for that exam" rather than a check a spec with no view
+ *     at all would pass.
+ *   - M4's second leg pins `fix`, which is what the Machine asks. Its `file`,
+ *     `subject` and `problem` are asserted too, exactly as the Context spells
+ *     them — `file` the exam's path, `subject` `view <selector> over <expected
+ *     path>`, `problem` the breach text after the `view <selector>: ` prefix —
+ *     which is the same shape M2 and M3 pin as whole lines.
+ *   - The rule module is read with `await import('../src/rules/views')` inside
+ *     each leg rather than with a static import at the top, so an absent rule
+ *     reads as one failing leg at a time rather than as a file that would not
+ *     load.
+ *
+ * Every leg loads a context, which spawns the capture child, and (f) spawns the
+ * CLI on top of that: Bun's default per-test 5 s is not enough, so each carries
+ * the 60 s the task asks for.
+ */
+
+import {existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync} from 'node:fs';
+import {join, resolve} from 'node:path';
+
+import {expect, test} from 'bun:test';
+
+import {loadContext} from '../src/context';
+import {formatFinding} from '../src/lint';
+import type {ExamSpec, Finding, LintContext, Rule} from '../src/types';
+
+/** This file sits three directories below the repository root. */
+const ROOT = resolve(import.meta.dir, '..', '..', '..');
+
+/** A child `bun` process needs more than Bun's default per-test 5 s. */
+const SPAWN_TIMEOUT_MS = 60_000;
+
+/** The rule under exam: `packages/tinyapp-lint/src/rules/views.ts`'s default. */
+const ruleOnce = async (): Promise<Rule> =>
+  ((await import('../src/rules/views')) as {default: Rule}).default;
+
+/** The context of M1, loaded once and shared by every leg. */
+let contextPromise: Promise<LintContext> | undefined;
+const contextOnce = (): Promise<LintContext> => (contextPromise ??= loadContext());
+
+/** The M2–M5 contexts: the fixture's own, with `exams` replaced. */
+const contextOver = async (...exams: ExamSpec[]): Promise<LintContext> => ({
+  ...(await contextOnce()),
+  exams,
+});
+
+/** `rule.run` over a context carrying exactly `exams`. */
+const findingsOver = async (...exams: ExamSpec[]): Promise<Finding[]> => {
+  const rule = await ruleOnce();
+  return [...(await rule.run(await contextOver(...exams)))];
+};
+
+/** The one spec run-7 parked on: the bare selector, asserted `checked`. */
+const RUN_7: ExamSpec = {
+  path: 'tests/state-exams/run-7.test.ts',
+  seed: 'state-exams/seeds/two-open-todos.json',
+  expected: 'state-exams/expected/two-todos-one-done.json',
+  view: [
+    {selector: '.todoItem input[type=checkbox]', checked: true},
+    {selector: '.todoItem', count: 2},
+  ],
+  action: [{click: '.todoItem input[type=checkbox]'}],
+};
+
+/** The line M2 and M6 both pin, character for character. */
+const RUN_7_LINE =
+  'tests/state-exams/run-7.test.ts: ' +
+  'view .todoItem input[type=checkbox] over state-exams/expected/two-todos-one-done.json: ' +
+  'a match is not checked — name the narrower selector: #todo-1';
+
+/** The `seed` and `action` M3–M5 leave open. See this file's header. */
+const CARRIED = {
+  seed: 'state-exams/seeds/two-open-todos.json',
+  action: [] as ExamSpec['action'],
+};
+
+// (a) [M1] ---------------------------------------------------------------
+
+test(
+  '(a) [M1] the `views` rule finds nothing over the fixture`s own six exams',
+  async () => {
+    // The defaults `loadContext` reads are relative to `process.cwd()`, and the
+    // Proof runs this exam from the repository root.
+    expect(resolve(process.cwd())).toBe(ROOT);
+
+    const rule = await ruleOnce();
+    expect(rule.name).toBe('views');
+
+    const ctx = await contextOnce();
+<<<<<<< begin added run-12
+    // At least the six of M1: a later task's state exam is one more file under
+    // `tests/state-exams/`, and what this leg means is that every exam there
+    // is — six or more — asserts a view over a state that exists.
+    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
+======= begin added frontier
+    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
+======= begin added both
+
+>>>>>>> end conflict
+    // Every one of the six asserts a view, and names a state that is there.
+    const paths = ctx.snapshots.map(({path}) => path);
+    expect(
+      ctx.exams
+        .filter(({view}) => view === undefined)
+        .map(({path}) => path),
+    ).toEqual([]);
+    expect(
+      ctx.exams
+        .filter(({expected}) => !paths.includes(expected))
+        .map(({path, expected}) => `${path} -> ${expected}`),
+    ).toEqual([]);
+
+    expect(await rule.run(ctx)).toEqual([]);
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (b) [M2] ---------------------------------------------------------------
+
+test(
+  '(b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1`',
+  async () => {
+    const findings = await findingsOver(RUN_7);
+
+    expect(findings).toHaveLength(1);
+    expect(formatFinding(findings[0]!)).toBe(RUN_7_LINE);
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (c) [M3] ---------------------------------------------------------------
+
+test(
+  '(c) [M3] the `count: 1` spec is one finding reading `found 2`',
+  async () => {
+    const findings = await findingsOver({
+      ...CARRIED,
+      path: 'tests/state-exams/count.test.ts',
+      expected: 'state-exams/expected/two-todos-one-done.json',
+      view: {selector: '.todoItem', count: 1},
+    });
+
+    expect(findings).toHaveLength(1);
+    expect(formatFinding(findings[0]!)).toBe(
+      'tests/state-exams/count.test.ts: ' +
+        'view .todoItem over state-exams/expected/two-todos-one-done.json: ' +
+        'expected 1 matches, found 2 — expect count 2, or name a narrower selector',
+    );
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (d) [M4] ---------------------------------------------------------------
+
+test(
+  '(d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0`',
+  async () => {
+    // The view `click-completes-todo` actually writes, over the state it names.
+    expect(
+      await findingsOver({
+        ...CARRIED,
+        path: 'tests/state-exams/corrected.test.ts',
+        expected: 'state-exams/expected/two-todos-first-done.json',
+        view: {selector: '.todoItem.completed input[type=checkbox]', checked: true},
+      }),
+    ).toEqual([]);
+
+    // The mirror breach: every match must read `data-checked="false"`, and
+    // `#todo-0` is the one that does.
+    const findings = await findingsOver({
+      ...CARRIED,
+      path: 'tests/state-exams/unchecked.test.ts',
+      expected: 'state-exams/expected/two-todos-one-done.json',
+      view: {selector: '.todoItem input[type=checkbox]', unchecked: true},
+    });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]!.fix).toBe('name the narrower selector: #todo-0');
+
+    // The rest of that finding, as the task's Context spells a finding out.
+    expect(findings[0]).toEqual({
+      file: 'tests/state-exams/unchecked.test.ts',
+      subject:
+        'view .todoItem input[type=checkbox] over state-exams/expected/two-todos-one-done.json',
+      problem: 'a match is not unchecked',
+      fix: 'name the narrower selector: #todo-0',
+    });
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (e) [M5] ---------------------------------------------------------------
+
+test(
+  '(e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding',
+  async () => {
+    expect(
+      await findingsOver({
+        ...CARRIED,
+        path: 'tests/state-exams/silent.test.ts',
+        expected: 'state-exams/expected/two-todos-one-done.json',
+        view: undefined,
+      }),
+    ).toEqual([]);
+
+    // The view here is run-7's, which breaches over any state this exam could
+    // render: the missing snapshot is the only finding all the same, which is
+    // the Context's "and nothing further for that exam".
+    const findings = await findingsOver({
+      ...CARRIED,
+      path: 'tests/state-exams/lost.test.ts',
+      expected: 'state-exams/expected/missing.json',
+      view: {selector: '.todoItem input[type=checkbox]', checked: true},
+    });
+
+    expect(findings).toHaveLength(1);
+    expect(formatFinding(findings[0]!)).toBe(
+      'tests/state-exams/lost.test.ts: ' +
+        'expected state-exams/expected/missing.json: ' +
+        'no such snapshot — name a file under state-exams/expected/',
+    );
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (f) [M6] ---------------------------------------------------------------
+
+/**
+ * The exam file M6 seeds: run-7's spec, as a state exam file.
+ *
+ * It imports nothing but `tinyapp-exam` — resolved through the root
+ * `node_modules`, and rewritten by the capture anyway — and names no `store`,
+ * since the capture's stub records whatever object it is handed.
+ */
+const RUN_7_EXAM_FILE = `import {stateExam} from 'tinyapp-exam';
+
+stateExam({
+  clock: '2026-01-01T00:00:00Z',
+  entry: 'client/index.html',
+  seed: '${RUN_7.seed}',
+  action: [{click: '.todoItem input[type=checkbox]'}],
+  expected: '${RUN_7.expected}',
+  view: [
+    {selector: '.todoItem input[type=checkbox]', checked: true},
+    {selector: '.todoItem', count: 2},
+  ],
+  mutant: [],
+});
+`;
+
+/** The line M6 pins, for a file whose path the CLI writes against the root. */
+const RUN_7_CLI_LINE =
+  /^state-exams\/lint-tmp-[^/]+\/exams\/run-7\.test\.ts: view \.todoItem input\[type=checkbox\] over state-exams\/expected\/two-todos-one-done\.json: a match is not checked — name the narrower selector: #todo-1$/;
+
+test(
+  '(f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line',
+  () => {
+    // Beside the fixture's own seeds and expected states, which this run still
+    // reads: `two-todos-one-done.json` has to be among the snapshots.
+    const dir = mkdtempSync(join(ROOT, 'state-exams', 'lint-tmp-'));
+    let code: number;
+    let lines: string[];
+    try {
+      const exams = join(dir, 'exams');
+      mkdirSync(exams);
+      writeFileSync(join(exams, 'run-7.test.ts'), RUN_7_EXAM_FILE);
+
+      const child = Bun.spawnSync(
+        ['bun', 'run', 'lint:state', '--', '--exams', exams],
+        {cwd: ROOT, stdout: 'pipe', stderr: 'pipe'},
+      );
+      code = child.exitCode;
+      if (code !== 1) {
+        console.error(child.stderr.toString());
+      }
+      lines = child.stdout
+        .toString()
+        .split('\n')
+        .map((line) => line.replace(/\r$/, ''));
+    } finally {
+      rmSync(dir, {recursive: true, force: true});
+    }
+
+    expect(code).toBe(1);
+
+    // Contains a matching line, never "exactly these lines": the fixture's own
+    // six exams are not read on this run, but another rule may still have
+    // something of its own to say about the seeded one.
+    expect(lines.filter((line) => RUN_7_CLI_LINE.test(line))).toHaveLength(1);
+
+    // The `finally` above is what leaves the fixture as it found it.
+    expect(existsSync(dir)).toBe(false);
+  },
+  SPAWN_TIMEOUT_MS,
+);

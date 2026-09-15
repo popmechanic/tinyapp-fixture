@@ -1,0 +1,1 @@
+Both sides (run-12 and frontier) converge on the identical assertion `expect(ctx.exams.length).toBeGreaterThanOrEqual(6);` — the only difference is run-12's added explanatory comment. Kept the comment plus the shared line; no conflict in substance.

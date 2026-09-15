@@ -1,0 +1,4 @@
+      // speak about.
+      const matched = run.lines.filter((line) => CLI_LINE.test(line));
+      expect(matched).toHaveLength(1);
+      expectFindingLine(matched[0]!, CLI_LINE, CTX);

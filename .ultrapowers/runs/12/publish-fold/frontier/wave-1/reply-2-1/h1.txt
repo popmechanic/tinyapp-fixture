@@ -1,0 +1,49 @@
+
+/** The four callbacks the store module carried when this exam was written. */
+const CALLBACKS_OF_BASE = [
+  'addTodo',
+  'clearCompleted',
+  'deleteTodo',
+  'setTodoCompleted',
+];
+
+/**
+ * Every snapshot file the loader would read, in the loader's own order.
+ *
+ * Read off the two directories rather than listed here, so a snapshot a later
+ * task or a sibling plan checks in is read by this leg without editing it —
+ * what M2 pins is that the loader reads both directories, tags each file with
+ * its kind and sorts the lot by path, not which seven files existed that day.
+ */
+const snapshotFiles = (): {path: string; kind: 'seed' | 'expected'}[] =>
+  (
+    [
+      ['state-exams/expected', 'expected'],
+      ['state-exams/seeds', 'seed'],
+    ] as const
+  )
+    .flatMap(([dir, kind]) =>
+      readdirSync(join(ROOT, dir))
+        .filter((name) => name.endsWith('.json'))
+        .map((name) => ({path: `${dir}/${name}`, kind})),
+    )
+    .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+
+/** Where the fixture's exams live, relative to the root. */
+const EXAM_DIR = 'tests/state-exams';
+
+/**
+ * The exam files of the tree, read off the tree rather than pinned here.
+ *
+ * A state exam is a file that calls `stateExam` at the top level, which is what
+ * keeps `interaction-evidence.test.ts` out: it registers only ordinary tests.
+ * Sibling work adds exams of its own, so a list frozen at one moment's contents
+ * would go red on a file this exam has no quarrel with.
+ */
+const EXAM_FILES: string[] = readdirSync(join(ROOT, EXAM_DIR))
+  .filter((name) => name.endsWith('.test.ts'))
+  .filter((name) =>
+    /^stateExam\(/m.test(readFileSync(join(ROOT, EXAM_DIR, name), 'utf8')),
+  )
+  .sort()
+  .map((name) => `${EXAM_DIR}/${name}`);

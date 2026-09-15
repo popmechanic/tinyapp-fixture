@@ -1,0 +1,1 @@
+    expectFindingLine(formatFinding(findings[0]!), BAD_LINE, ctx);

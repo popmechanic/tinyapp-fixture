@@ -1,0 +1,42 @@
+[
+  {
+    "i": 1,
+    "path": "packages/tinyapp-lint/test/invariants.test.ts",
+    "kind": "lines",
+    "dispatchable": true,
+    "reason": "",
+    "epoch": 2,
+    "hunksFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/publish-fold/frontier/wave-1/conflict-1.hunks.txt",
+    "hunkCount": 1
+  },
+  {
+    "i": 2,
+    "path": "packages/tinyapp-lint/test/lint-cli.test.ts",
+    "kind": "lines",
+    "dispatchable": true,
+    "reason": "",
+    "epoch": 2,
+    "hunksFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/publish-fold/frontier/wave-1/conflict-2.hunks.txt",
+    "hunkCount": 5
+  },
+  {
+    "i": 3,
+    "path": "packages/tinyapp-lint/test/reachability.test.ts",
+    "kind": "lines",
+    "dispatchable": true,
+    "reason": "",
+    "epoch": 2,
+    "hunksFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/publish-fold/frontier/wave-1/conflict-3.hunks.txt",
+    "hunkCount": 5
+  },
+  {
+    "i": 4,
+    "path": "packages/tinyapp-lint/test/views.test.ts",
+    "kind": "lines",
+    "dispatchable": true,
+    "reason": "",
+    "epoch": 2,
+    "hunksFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/publish-fold/frontier/wave-1/conflict-4.hunks.txt",
+    "hunkCount": 1
+  }
+]

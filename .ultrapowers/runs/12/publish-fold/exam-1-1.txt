@@ -1,0 +1,16 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/state-exams/filter-bar.test.ts:
+(pass) leg (e) [M5] renderStatic over two-todos-one-done-filter-done.json paints one done row, `1 of 2 done`, and Done active [14.80ms]
+(pass) leg (f) [M6] renderStatic over the seed paints both rows, `1 of 2 done`, All active, and three buttons in #filterBar [4.18ms]
+(pass) leg (g) [M7] state-exams/expected/two-todos-one-done-filter-open.json is the seed's tables half beside exactly {"filter":"open"} [0.06ms]
+(pass) leg (g) [M7] state-exams/expected/two-todos-one-done-filter-done.json is the seed's tables half beside exactly {"filter":"done"} [0.01ms]
+(pass) leg (h) [M8] the Run line `grep -q 'const EXAM_FILES' packages/tinyapp-lint/test/lint-cli.test.ts` exits 0 [5.52ms]
+(pass) leg (i) [M8] the Run line `grep -qF '[0-9]+ snapshots and [0-9]+ exams' packages/tinyapp-lint/test/lint-cli.test.ts` exits 0 [2.32ms]
+(pass) leg (j) [M8] `bun test` over the linter`s four exams exits 0 over this tree [19136.12ms]
+(pass) state exam: filter-bar [1271.49ms]
+
+ 8 pass
+ 0 fail
+ 9 expect() calls
+Ran 8 tests across 1 file. [20.49s]

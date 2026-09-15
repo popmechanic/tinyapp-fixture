@@ -1,0 +1,7 @@
+ * The line M5 pins, over a directory whose name the exam does not know in
+ * advance — the CLI's `file` is the path relative to the root, which is why it
+ * starts `state-exams/lint-tmp-`.
+ */
+const CLI_LINE = new RegExp(
+  '^state-exams/lint-tmp-[^/]+/expected/bad\\.json: state: ' + FINDING_TAIL,
+);

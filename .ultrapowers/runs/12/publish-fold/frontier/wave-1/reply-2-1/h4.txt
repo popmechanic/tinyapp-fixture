@@ -1,0 +1,10 @@
+
+    // One per file under `tests/state-exams/` that calls `stateExam` at the top
+    // level, in path order — so not `interaction-evidence`, which registers
+    // only stubbed tests and names `stateExam` in prose alone.
+    expect(ctx.exams.map(({path}) => path)).toEqual(EXAM_FILES);
+    expect(ctx.exams).toHaveLength(EXAM_FILES.length);
+
+    // The two the list is pinned on either way.
+    expect(EXAM_FILES).toContain('tests/state-exams/click-completes-todo.test.ts');
+    expect(EXAM_FILES).not.toContain('tests/state-exams/interaction-evidence.test.ts');

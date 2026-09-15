@@ -1,0 +1,362 @@
+/**
+ * The exam for Task 2 — "The invariants rule — a completed todo has non-empty
+ * text".
+ *
+ * One `test` per Proof leg, named for its leg and for the Machine clause it
+ * comes from:
+ *
+ *   (a) [M1] `client/src/storeData.ts` exports `INVARIANTS`, led by the
+ *            completed-text entry: `table` `'todos'`, the pinned `message`, and
+ *            a `predicate` that returns `false`, `true`, `true` over the three
+ *            pinned rows. Beside it, [M5] of the due-date task: the entry found
+ *            by the due-date message, on `todos`, holding of an absent and of a
+ *            valid date and breaking on `''`, `'2025-13-45'` and `'soon'`;
+ *   (b) [M2] the default export of `src/rules/invariants.ts` is a `Rule` named
+ *            `'invariants'` whose `run` over `await loadContext()` is `[]` —
+ *            the fixture's own seven snapshots raise nothing;
+ *   (c) [M3] over the hand-built context carrying the `bad.json` snapshot and
+ *            `INVARIANTS`, `run` is exactly one finding, and `formatFinding` of
+ *            it is the pinned line character for character;
+ *   (d) [M4] `[{}, {}]` with `INVARIANTS` is `[]`, and the `bad.json` context
+ *            with a throwing invariant appended reports that invariant against
+ *            `todos/0` and against `todos/1`;
+ *   (e) [M5] `bun run lint:state -- --expected … --exams …`, spawned from the
+ *            root over one seeded violation, exits 1 and prints a line matching
+ *            the pinned pattern; the temp directory is gone afterwards.
+ *
+ * Three readings this file makes, written down because the task leaves them
+ * open:
+ *
+ *   - Both `client/src/storeData.ts` and `../src/rules/invariants.ts` are
+ *     reached with a computed-specifier `import()` rather than a static import.
+ *     For the store module that is the precedent `test/lint-cli.test.ts` set: a
+ *     static import pulls `client/src` into this package's own tsconfig project
+ *     (`include: ["src", "test"]`), where `window.__TINYAPP_SEED__` has no
+ *     declaration. For the rule module it is what keeps each leg's failure its
+ *     own — a static import of a module that does not exist yet fails the whole
+ *     file at load, so legs (a) and (e) would report the missing module rather
+ *     than the missing `INVARIANTS` and the missing CLI line.
+ *   - M4's ordering is not stated in the clause but is stated in the task's
+ *     Context — "findings in snapshot order, then invariant order, then row-id
+ *     order" — so leg (d) asserts the subjects and problems the leg names *and*
+ *     the whole ordered list of three lines that ordering determines.
+ *   - M5's assertion is `contains a matching line`, never `exactly these lines`:
+ *     the sibling rules of tasks 3–5 run under the same CLI and may add their
+ *     own. The `bad.json` state is reachable from the fixture's own seeds
+ *     (`addTodo(store, 'buy milk')` then `setTodoCompleted(store, '1', true)`
+ *     from `empty.json`), and the seeds are left at their defaults, so nothing
+ *     here depends on which siblings are folded in.
+ *
+ * `loadContext()` spawns the capture child, so it is loaded once and shared by
+ * legs (b)–(d); those legs and (e) carry a 60 s timeout, since Bun's default
+ * per-test 5 s is not enough for a child `bun` process.
+ */
+
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import {join, resolve} from 'node:path';
+
+import {afterAll, expect, test} from 'bun:test';
+
+import {loadContext} from '../src/context';
+import {formatFinding} from '../src/lint';
+import type {
+  Finding,
+  Invariant,
+  LintContext,
+  Rule,
+  SnapshotFile,
+} from '../src/types';
+
+/** This file sits three directories below the repository root. */
+const ROOT = resolve(import.meta.dir, '..', '..', '..');
+
+/** A child `bun` process needs more than Bun's default per-test 5 s. */
+const SPAWN_TIMEOUT_MS = 60_000;
+
+/** The store module M1 declares `INVARIANTS` in. See this file's header. */
+const storeModule = async (): Promise<{INVARIANTS: Invariant[]}> =>
+  (await import(resolve(ROOT, 'client/src/storeData.ts'))) as {
+    INVARIANTS: Invariant[];
+  };
+
+/** The `Rule` M2 pins as the default export of the rule module. */
+const invariantsRule = async (): Promise<Rule> =>
+  (
+    (await import(
+      resolve(import.meta.dir, '..', 'src', 'rules', 'invariants.ts')
+    )) as {default: Rule}
+  ).default;
+
+/** The context of M2, loaded once and shared by legs (b)–(d). */
+let contextPromise: Promise<LintContext> | undefined;
+const contextOnce = (): Promise<LintContext> => (contextPromise ??= loadContext());
+
+/** M3's snapshot: `todos/0` holds, `todos/1` is a completed todo with no text. */
+const BAD_SNAPSHOT: SnapshotFile = {
+  path: 'state-exams/expected/bad.json',
+  kind: 'expected',
+  content: [
+    {
+      todos: {
+        '0': {text: 'buy milk', completed: false},
+        '1': {text: '', completed: true},
+      },
+    },
+    {},
+  ],
+};
+
+/** M1's message, the first invariant the fixture declares. */
+const MESSAGE = 'a completed todo has non-empty text';
+
+/** The due-date invariant's message, which is how its entry is found. */
+const DUE_MESSAGE = 'a due date is absent or a valid YYYY-MM-DD';
+
+/** M3's line, character for character. */
+const BAD_LINE =
+  'state-exams/expected/bad.json: todos/1: breaks the invariant ' +
+  '"a completed todo has non-empty text" — change todos/1 so the invariant ' +
+  'holds, or change INVARIANTS in client/src/storeData.ts';
+
+/**
+ * One finding's line over `BAD_SNAPSHOT`, in the shape the task's Context
+ * spells out. Leg (c) checks this template against `BAD_LINE`, so M4's lines
+ * are composed by something the pinned literal has already graded.
+ */
+const lineFor = (subject: string, message: string): string =>
+  `state-exams/expected/bad.json: ${subject}: breaks the invariant ` +
+  `"${message}" — change ${subject} so the invariant holds, or change ` +
+  `INVARIANTS in client/src/storeData.ts`;
+
+/** M5's pinned pattern, over a path relative to the repository root. */
+const CLI_LINE =
+  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: todos\/1: breaks the invariant "a completed todo has non-empty text" — change todos\/1 so the invariant holds, or change INVARIANTS in client\/src\/storeData\.ts$/;
+
+/** Every temp directory leg (e) made, so a thrown assertion still cleans up. */
+const tempDirs: string[] = [];
+
+afterAll(() => {
+  for (const dir of tempDirs) {
+    rmSync(dir, {recursive: true, force: true});
+  }
+});
+
+// (a) [M1] ---------------------------------------------------------------
+
+test('(a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate', async () => {
+  const {INVARIANTS} = await storeModule();
+
+  expect(Array.isArray(INVARIANTS)).toBe(true);
+  // M1's entry is still the first, and the due-date invariant is appended after
+  // it — this leg's assertions below all read `INVARIANTS[0]`, so what the old
+  // exact count meant is that the completed-text entry leads the list.
+  expect(INVARIANTS.length).toBeGreaterThanOrEqual(2);
+
+  const invariant = INVARIANTS[0]!;
+  expect(invariant.table).toBe('todos');
+  expect(invariant.message).toBe(MESSAGE);
+
+  // A completed todo with no text breaks it; a completed todo with text and an
+  // open todo with no text both hold.
+  expect(invariant.predicate({text: '', completed: true}, '1')).toBe(false);
+  expect(invariant.predicate({text: 'buy milk', completed: true}, '0')).toBe(true);
+  expect(invariant.predicate({text: '', completed: false}, '0')).toBe(true);
+});
+
+test('(a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date', async () => {
+  const {INVARIANTS} = await storeModule();
+
+  // Found by message, never by index: two sibling plans append invariants of
+  // their own, and either merge order has to read the same.
+  const due = INVARIANTS.find((entry) => entry.message === DUE_MESSAGE);
+  expect(due).toBeDefined();
+  expect(due!.table).toBe('todos');
+
+  // A row written before the cell existed has no `due` at all, and holds.
+  expect(due!.predicate({text: 'buy milk', completed: false}, '0')).toBe(true);
+  expect(
+    due!.predicate({text: 'buy milk', completed: false, due: '2025-12-31'}, '0'),
+  ).toBe(true);
+
+  for (const bad of ['', '2025-13-45', 'soon']) {
+    expect(
+      due!.predicate({text: 'buy milk', completed: false, due: bad}, '0'),
+    ).toBe(false);
+  }
+});
+
+// (b) [M2] ---------------------------------------------------------------
+
+test(
+  '(b) [M2] the rule is named `invariants` and is quiet over the fixture',
+  async () => {
+    // `loadContext`'s defaults are relative to `process.cwd()`, and the Proof
+    // runs this exam from the repository root.
+    expect(resolve(process.cwd())).toBe(ROOT);
+
+    const rule = await invariantsRule();
+    expect(rule.name).toBe('invariants');
+
+    const ctx = await contextOnce();
+<<<<<<< begin added both
+
+======= begin added run-12
+    // What the quiet result is measured over: every snapshot the fixture
+    // carries — the seven of M2 and whatever a later task added — with the
+    // invariants live rather than an empty list.
+    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
+    expect(ctx.invariants.length).toBeGreaterThanOrEqual(2);
+======= begin deleted run-12
+    // What the quiet result is measured over: the fixture's seven snapshots,
+    // with the invariant of M1 live rather than an empty list.
+======= begin added frontier
+    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
+======= begin deleted run-12
+    expect(ctx.invariants).toHaveLength(1);
+>>>>>>> end conflict
+    expect(ctx.invariants[0]!.message).toBe(MESSAGE);
+    expect(ctx.invariants.map((entry) => entry.message)).toContain(DUE_MESSAGE);
+    expect(ctx.storePath).toBe('client/src/storeData.ts');
+
+    expect(await rule.run(ctx)).toEqual([]);
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (c) [M3] ---------------------------------------------------------------
+
+test(
+  '(c) [M3] the bad snapshot is exactly one finding, formatted character for character',
+  async () => {
+    const rule = await invariantsRule();
+    const {INVARIANTS} = await storeModule();
+
+    const ctx: LintContext = {
+      ...(await contextOnce()),
+      snapshots: [BAD_SNAPSHOT],
+      invariants: INVARIANTS,
+    };
+
+    const findings = await rule.run(ctx);
+    expect(findings).toHaveLength(1);
+    expect(formatFinding(findings[0]!)).toBe(BAD_LINE);
+
+    // The four fields the task's Context names, behind that one line.
+    const expected: Finding = {
+      file: 'state-exams/expected/bad.json',
+      subject: 'todos/1',
+      problem: 'breaks the invariant "a completed todo has non-empty text"',
+      fix: 'change todos/1 so the invariant holds, or change INVARIANTS in client/src/storeData.ts',
+    };
+    expect(findings[0]).toEqual(expected);
+
+    // The template leg (d) composes with, graded against the pinned literal.
+    expect(lineFor('todos/1', MESSAGE)).toBe(BAD_LINE);
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (d) [M4] ---------------------------------------------------------------
+
+test(
+  '(d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row',
+  async () => {
+    const rule = await invariantsRule();
+    const {INVARIANTS} = await storeModule();
+    const base = await contextOnce();
+
+    // A snapshot without the invariant's table has no rows and yields nothing.
+    const empty: LintContext = {
+      ...base,
+      snapshots: [{...BAD_SNAPSHOT, content: [{}, {}]}],
+      invariants: INVARIANTS,
+    };
+    expect(await rule.run(empty)).toEqual([]);
+
+    const thrower: Invariant = {
+      table: 'todos',
+      predicate: () => {
+        throw new Error('boom');
+      },
+      message: 'never throws',
+    };
+    const ctx: LintContext = {
+      ...base,
+      snapshots: [BAD_SNAPSHOT],
+      invariants: [...INVARIANTS, thrower],
+    };
+
+    const findings = await rule.run(ctx);
+
+    // A predicate that throws is a finding against every row of its table.
+    const thrown = findings.filter(
+      (f) => f.problem === 'breaks the invariant "never throws"',
+    );
+    expect(thrown.map((f) => f.subject)).toEqual(['todos/0', 'todos/1']);
+
+    // Snapshot order, then invariant order, then row-id order.
+    expect(findings.map(formatFinding)).toEqual([
+      BAD_LINE,
+      lineFor('todos/0', 'never throws'),
+      lineFor('todos/1', 'never throws'),
+    ]);
+  },
+  SPAWN_TIMEOUT_MS,
+);
+
+// (e) [M5] ---------------------------------------------------------------
+
+test(
+  '(e) [M5] the CLI over one seeded violation exits 1 and names the row',
+  () => {
+    const dir = mkdtempSync(join(ROOT, 'state-exams', 'lint-tmp-'));
+    tempDirs.push(dir);
+
+    try {
+      mkdirSync(join(dir, 'expected'));
+      // Empty: the seeds stay the fixture's, and this run reads no exam.
+      mkdirSync(join(dir, 'exams'));
+      writeFileSync(
+        join(dir, 'expected', 'bad.json'),
+        `${JSON.stringify(BAD_SNAPSHOT.content)}\n`,
+      );
+
+      const child = Bun.spawnSync(
+        [
+          'bun',
+          'run',
+          'lint:state',
+          '--',
+          '--expected',
+          join(dir, 'expected'),
+          '--exams',
+          join(dir, 'exams'),
+        ],
+        {cwd: ROOT, stdout: 'pipe', stderr: 'pipe'},
+      );
+
+      // A wrong exit code reads as whatever the CLI said, not as a bare number.
+      if (child.exitCode !== 1) {
+        console.error(child.stderr.toString());
+      }
+      expect(child.exitCode).toBe(1);
+
+      const lines = child.stdout
+        .toString()
+        .split('\n')
+        .map((line) => line.replace(/\r$/, ''));
+      expect(lines.filter((line) => CLI_LINE.test(line))).toHaveLength(1);
+    } finally {
+      rmSync(dir, {recursive: true, force: true});
+    }
+
+    expect(existsSync(dir)).toBe(false);
+  },
+  SPAWN_TIMEOUT_MS,
+);

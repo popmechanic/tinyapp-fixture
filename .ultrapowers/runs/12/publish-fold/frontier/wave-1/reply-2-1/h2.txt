@@ -1,0 +1,2 @@
+    // The counts are whatever the fixture holds the day this runs — what M1
+    // pins is a clean run reported on one line, not how many files it read.

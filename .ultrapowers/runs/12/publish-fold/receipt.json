@@ -1,0 +1,35 @@
+{
+  "engineHead": "35ba34dda7e3d087f7e4fe223623b27b581c64ce",
+  "attempts": {
+    "1": {
+      "tip": "9f8fb08f9325c4176e6c8d8a37df30e66b73dadc",
+      "candidate": "03af6f7b7ccc4d5792ef37003a34b63ccf005e22",
+      "disposition": "suite red",
+      "reason": "tests/state-exams/set-filter.test.ts red on client/src/storeData.ts",
+      "pathsJoined": 6,
+      "resolversDispatched": 4,
+      "suite": "none",
+      "checks": [
+        {
+          "check": "exam",
+          "exam": "tests/state-exams/filter-bar.test.ts",
+          "path": "client/src/Store.tsx",
+          "result": "pass"
+        },
+        {
+          "check": "exam",
+          "exam": "tests/state-exams/set-todo-due.test.ts",
+          "path": "client/src/Store.tsx",
+          "result": "pass"
+        },
+        {
+          "check": "exam",
+          "exam": "tests/state-exams/set-filter.test.ts",
+          "path": "client/src/storeData.ts",
+          "result": "fail"
+        }
+      ],
+      "checkRetries": 0
+    }
+  }
+}

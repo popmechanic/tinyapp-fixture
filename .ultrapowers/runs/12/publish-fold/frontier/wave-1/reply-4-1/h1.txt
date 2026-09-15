@@ -1,0 +1,4 @@
+    // At least the six of M1: a later task's state exam is one more file under
+    // `tests/state-exams/`, and what this leg means is that every exam there
+    // is — six or more — asserts a view over a state that exists.
+    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);

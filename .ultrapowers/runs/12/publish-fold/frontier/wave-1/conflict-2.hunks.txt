@@ -1,0 +1,471 @@
+HUNK h1 lines 67-139
+--- context (read-only)
+   *   - `TABLES_SCHEMA` is read with a computed-specifier `import()` rather than a
+   *     static one. A static import would pull `client/src` into this package's
+   *     own tsconfig project (`include: ["src", "test"]`), where
+   *     `window.__TINYAPP_SEED__` has no declaration — the same module at
+   *     runtime, and no new work for the `typecheck` script this task extends.
+   *
+   * The three spawning tests, and the two that load a context (which spawns the
+   * capture child), carry a 60 s timeout: Bun's default per-test 5 s is not
+   * enough for a child `bun` process.
+   */
+  
+  import {
+    mkdtempSync,
+    readFileSync,
+    readdirSync,
+    rmSync,
+    writeFileSync,
+  } from 'node:fs';
+  import {tmpdir} from 'node:os';
+  import {join, resolve} from 'node:path';
+  
+  import {afterAll, expect, test} from 'bun:test';
+  import {parse} from 'node-html-parser';
+  
+  import {loadContext} from '../src/context';
+  import {formatFinding, runLint} from '../src/lint';
+  import type {ExamSpec, Finding, LintContext} from '../src/types';
+  
+  /** This file sits three directories below the repository root. */
+  const ROOT = resolve(import.meta.dir, '..', '..', '..');
+  
+  /** A child `bun` process needs more than Bun's default per-test 5 s. */
+  const SPAWN_TIMEOUT_MS = 60_000;
+  
+  /** The `[tables, values]` pair a snapshot file parses to. */
+  type SnapshotContent = LintContext['snapshots'][number]['content'];
+  
+  /** The parsed content of one of the fixture's own snapshot files. */
+  const snapshotFile = (path: string): SnapshotContent =>
+    JSON.parse(readFileSync(join(ROOT, path), 'utf8')) as SnapshotContent;
+--- conflict
+<<<<<<< begin added both
+
+======= begin added run-12
+/** The four callbacks the store module carried when this exam was written. */
+const CALLBACKS_OF_BASE = [
+  'addTodo',
+  'clearCompleted',
+  'deleteTodo',
+  'setTodoCompleted',
+];
+
+/**
+ * Every snapshot file the loader would read, in the loader's own order.
+ *
+ * Read off the two directories rather than listed here, so a snapshot a later
+ * task or a sibling plan checks in is read by this leg without editing it —
+ * what M2 pins is that the loader reads both directories, tags each file with
+ * its kind and sorts the lot by path, not which seven files existed that day.
+ */
+const snapshotFiles = (): {path: string; kind: 'seed' | 'expected'}[] =>
+  (
+    [
+      ['state-exams/expected', 'expected'],
+      ['state-exams/seeds', 'seed'],
+    ] as const
+  )
+    .flatMap(([dir, kind]) =>
+      readdirSync(join(ROOT, dir))
+        .filter((name) => name.endsWith('.json'))
+        .map((name) => ({path: `${dir}/${name}`, kind})),
+    )
+    .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+
+/**
+ * Every state exam file the capture would read, sorted by path.
+ *
+ * A file counts when it calls `stateExam(` at the top level — which is why
+ * `interaction-evidence.test.ts`, whose only `stateExam` is in prose, stays
+ * out. Read off the directory for the same reason `snapshotFiles` is: the
+ * fixture gains exams, and M3 is about which files the capture picks up.
+ */
+const examFiles = (): string[] =>
+  readdirSync(join(ROOT, 'tests/state-exams'))
+    .filter((name) => name.endsWith('.test.ts'))
+    .filter((name) =>
+      /^stateExam\(/m.test(
+        readFileSync(join(ROOT, 'tests/state-exams', name), 'utf8'),
+      ),
+    )
+    .map((name) => `tests/state-exams/${name}`)
+    .sort();
+======= begin added frontier
+/** Where the fixture's exams live, relative to the root. */
+const EXAM_DIR = 'tests/state-exams';
+
+/**
+ * The exam files of the tree, read off the tree rather than pinned here.
+ *
+ * A state exam is a file that calls `stateExam` at the top level, which is what
+ * keeps `interaction-evidence.test.ts` out: it registers only ordinary tests.
+ * Sibling work adds exams of its own, so a list frozen at one moment's contents
+ * would go red on a file this exam has no quarrel with.
+ */
+const EXAM_FILES: string[] = readdirSync(join(ROOT, EXAM_DIR))
+  .filter((name) => name.endsWith('.test.ts'))
+  .filter((name) =>
+    /^stateExam\(/m.test(readFileSync(join(ROOT, EXAM_DIR, name), 'utf8')),
+  )
+  .sort()
+  .map((name) => `${EXAM_DIR}/${name}`);
+======= begin added both
+
+>>>>>>> end conflict
+--- context (read-only)
+  /**
+   * `bun run lint:state <args>` from the repository root.
+   *
+   * A non-zero exit puts the child's stderr on this process's, so a red leg reads
+   * as whatever the CLI said rather than as a bare exit code.
+   */
+  const runCli = (args: string[]): {code: number; lines: string[]} => {
+    const child = Bun.spawnSync(['bun', 'run', 'lint:state', ...args], {
+      cwd: ROOT,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    });
+    const code = child.exitCode;
+    if (code !== 0) {
+      console.error(child.stderr.toString());
+    }
+    return {
+      code,
+      lines: child.stdout
+        .toString()
+        .split('\n')
+        .map((line) => line.replace(/\r$/, '')),
+    };
+  };
+  
+  /** The context of M2, loaded once and shared by legs (b)–(e). */
+  let contextPromise: Promise<LintContext> | undefined;
+  const contextOnce = (): Promise<LintContext> =>
+    (contextPromise ??= loadContext());
+  
+  /**
+   * `captureExams`, from whichever of the package's two capture modules exports
+   * it. See this file's header: the task pins its behaviour, not its home.
+   */
+  const captureExamsOf = async (): Promise<(dir: string) => Promise<ExamSpec[]>> => {
+    const context = (await import('../src/context')) as unknown as Record<
+      string,
+      unknown
+    >;
+    if (typeof context.captureExams === 'function') {
+
+HUNK h2 lines 226-234
+--- context (read-only)
+    return capture.captureExams as (dir: string) => Promise<ExamSpec[]>;
+  };
+  
+  /** The rule directory of M5, removed once the legs that read it are done. */
+  const rulesDir = mkdtempSync(join(tmpdir(), 'tinyapp-lint-rules-'));
+  
+  afterAll(() => {
+    rmSync(rulesDir, {recursive: true, force: true});
+  });
+  
+  /** The one finding M5's second rule module reports. */
+  const FINDING: Finding = {
+    file: 'a.json',
+    subject: 'todos/1',
+    problem: 'p',
+    fix: 'f',
+  };
+  
+  /** That finding as one line: `<file>: <subject>: <problem> — <fix>`. */
+  const FINDING_LINE = 'a.json: todos/1: p — f';
+  
+  writeFileSync(
+    join(rulesDir, 'a-quiet.ts'),
+    "export default {name: 'a-quiet', run: () => []};\n",
+  );
+  writeFileSync(
+    join(rulesDir, 'b-loud.ts'),
+    "export default {name: 'b-loud', run: () => [" +
+      JSON.stringify(FINDING) +
+      ']};\n',
+  );
+  
+  // (a) [M1] ---------------------------------------------------------------
+  
+  test(
+    '(a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line',
+    () => {
+      const run = runCli([]);
+  
+      expect(run.code).toBe(0);
+--- conflict
+<<<<<<< begin added both
+
+======= begin added frontier
+    // The counts are the tree's, not this exam's: what M1 pins is that the run
+    // is quiet and says so once.
+======= begin added run-12
+    // The counts are whatever the fixture holds the day this runs — what M1
+    // pins is a clean run reported on one line, not how many files it read.
+>>>>>>> end conflict
+--- context (read-only)
+      const summary =
+        /^lint:state: 0 findings over [0-9]+ snapshots and [0-9]+ exams in [0-9]+ ms$/;
+      expect(run.lines.filter((line) => summary.test(line))).toHaveLength(1);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (b) [M2] ---------------------------------------------------------------
+  
+  test(
+    '(b) [M2] `loadContext()` resolves to the pinned context',
+    async () => {
+      // M2's defaults are relative to `process.cwd()`, and the Proof runs this
+      // exam from the repository root.
+      expect(resolve(process.cwd())).toBe(ROOT);
+  
+      const ctx = await contextOnce();
+  
+      // Every store export that is a function of arity >= 1 whose name does not
+
+HUNK h3 lines 254-292
+--- context (read-only)
+      const summary =
+        /^lint:state: 0 findings over [0-9]+ snapshots and [0-9]+ exams in [0-9]+ ms$/;
+      expect(run.lines.filter((line) => summary.test(line))).toHaveLength(1);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (b) [M2] ---------------------------------------------------------------
+  
+  test(
+    '(b) [M2] `loadContext()` resolves to the pinned context',
+    async () => {
+      // M2's defaults are relative to `process.cwd()`, and the Proof runs this
+      // exam from the repository root.
+      expect(resolve(process.cwd())).toBe(ROOT);
+  
+      const ctx = await contextOnce();
+  
+      // Every store export that is a function of arity >= 1 whose name does not
+--- conflict
+<<<<<<< begin added frontier
+    // start with `create` or `read`. A floor, not the whole list: sibling work
+    // adds callbacks of its own, and none of them unmakes these.
+    expect(Object.keys(ctx.callbacks).sort()).toEqual(
+      expect.arrayContaining([
+        'addTodo',
+        'clearCompleted',
+        'deleteTodo',
+        'setTodoCompleted',
+      ]),
+    );
+    expect(Object.keys(ctx.callbacks)).toContain('setFilter');
+
+    // The snapshot list as the tree holds it, sorted the way the loader sorts
+    // it — `expected/` before `seeds/`, each directory's `.json` names in order.
+    const snapshots: {path: string; kind: 'seed' | 'expected'}[] = (
+      [
+        ['state-exams/expected', 'expected'],
+        ['state-exams/seeds', 'seed'],
+      ] as const
+    )
+      .flatMap(([dir, kind]) =>
+        readdirSync(join(ROOT, dir))
+          .filter((name) => name.endsWith('.json'))
+          .map((name) => ({path: `${dir}/${name}`, kind})),
+      )
+      .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+    expect(snapshots.length).toBeGreaterThanOrEqual(7);
+======= begin added run-12
+    // start with `create` or `read`: the four this exam was written over, and
+    // `setTodoDue` beside them. Containment, not an exact list — a sibling
+    // plan's callback sorts anywhere among these.
+    expect(Object.keys(ctx.callbacks).sort()).toEqual(
+      expect.arrayContaining([...CALLBACKS_OF_BASE, 'setTodoDue']),
+    );
+
+    const snapshots = snapshotFiles();
+    expect(snapshots.length).toBeGreaterThanOrEqual(7);
+>>>>>>> end conflict
+--- context (read-only)
+      expect(
+        ctx.snapshots.map(({path, kind}) => ({path, kind})),
+      ).toEqual(snapshots);
+  
+      // Each `content` is the file's own parsed JSON, loaded through the schema.
+      snapshots.forEach(({path}, index) => {
+        expect(ctx.snapshots[index]!.content).toEqual(snapshotFile(path));
+      });
+  
+      const {TABLES_SCHEMA} = (await import(
+        resolve(ROOT, 'client/src/storeData.ts')
+      )) as {TABLES_SCHEMA: LintContext['schema']};
+      expect(ctx.schema).toEqual(TABLES_SCHEMA);
+  
+      expect(Array.isArray(ctx.invariants)).toBe(true);
+      expect(ctx.clock).toBe('2026-01-01T00:00:00Z');
+      expect(ctx.storePath).toBe('client/src/storeData.ts');
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (c) [M3] ---------------------------------------------------------------
+  
+  test(
+    '(c) [M3] the exam specs, in path order, and the pinned click entry',
+    async () => {
+      const ctx = await contextOnce();
+
+HUNK h4 lines 320-341
+--- context (read-only)
+      expect(
+        ctx.snapshots.map(({path, kind}) => ({path, kind})),
+      ).toEqual(snapshots);
+  
+      // Each `content` is the file's own parsed JSON, loaded through the schema.
+      snapshots.forEach(({path}, index) => {
+        expect(ctx.snapshots[index]!.content).toEqual(snapshotFile(path));
+      });
+  
+      const {TABLES_SCHEMA} = (await import(
+        resolve(ROOT, 'client/src/storeData.ts')
+      )) as {TABLES_SCHEMA: LintContext['schema']};
+      expect(ctx.schema).toEqual(TABLES_SCHEMA);
+  
+      expect(Array.isArray(ctx.invariants)).toBe(true);
+      expect(ctx.clock).toBe('2026-01-01T00:00:00Z');
+      expect(ctx.storePath).toBe('client/src/storeData.ts');
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (c) [M3] ---------------------------------------------------------------
+  
+  test(
+    '(c) [M3] the exam specs, in path order, and the pinned click entry',
+    async () => {
+      const ctx = await contextOnce();
+--- conflict
+<<<<<<< begin added both
+
+======= begin added run-12
+    // One per file under `tests/state-exams/` that calls `stateExam` at the top
+    // level, in path order.
+    const files = examFiles();
+    expect(ctx.exams.map(({path}) => path)).toEqual(files);
+    expect(ctx.exams).toHaveLength(files.length);
+
+    // The two the list is pinned on either way: `click-completes-todo` calls
+    // `stateExam`, and `interaction-evidence` registers only stubbed tests and
+    // names `stateExam` in prose alone.
+    expect(files).toContain('tests/state-exams/click-completes-todo.test.ts');
+    expect(files).not.toContain('tests/state-exams/interaction-evidence.test.ts');
+======= begin added frontier
+    // One per file under `tests/state-exams/` that calls `stateExam` — so not
+    // `interaction-evidence`, which registers only stubbed tests.
+    expect(ctx.exams.map(({path}) => path)).toEqual(EXAM_FILES);
+    expect(ctx.exams).toHaveLength(EXAM_FILES.length);
+======= begin added both
+
+>>>>>>> end conflict
+--- context (read-only)
+      const click = ctx.exams.find(
+        ({path}) => path === 'tests/state-exams/click-completes-todo.test.ts',
+      );
+      expect(click).toBeDefined();
+      expect(click!.seed).toBe('state-exams/seeds/two-open-todos.json');
+      expect(click!.expected).toBe(
+        'state-exams/expected/two-todos-first-done.json',
+      );
+      expect(click!.view).toEqual([
+        {selector: '.todoItem.completed input[type=checkbox]', checked: true},
+        {selector: '.todoItem', count: 2},
+      ]);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (d) [M4] ---------------------------------------------------------------
+  
+  test(
+    '(d) [M4] `ctx.render` reflects `checked` and paints the two rows',
+    async () => {
+      const ctx = await contextOnce();
+      const content = snapshotFile(
+        'state-exams/expected/two-todos-first-done.json',
+      );
+  
+      const html = ctx.render(content);
+      const doc = parse(html);
+  
+      const todo0 = doc.querySelector('#todo-0');
+      expect(todo0).not.toBeNull();
+      expect(todo0!.getAttribute('data-checked')).toBe('true');
+  
+      const todo1 = doc.querySelector('#todo-1');
+      expect(todo1).not.toBeNull();
+      expect(todo1!.getAttribute('data-checked')).toBe('false');
+  
+      // Every `input`, not merely the two checkboxes — that is what makes this
+      // markup read to `assertView` the way a rendered page's does.
+      const inputs = doc.querySelectorAll('input');
+
+HUNK h5 lines 445-451
+--- context (read-only)
+      expect(await runLint(ctx, {rulesDir})).toEqual({
+        lines: [FINDING_LINE],
+        count: 1,
+      });
+  
+      // The same line, built by the formatter the rules are graded through.
+      expect(formatFinding(FINDING)).toBe(FINDING_LINE);
+  
+      const run = runCli(['--', '--rules', rulesDir]);
+      expect(run.code).toBe(1);
+      expect(run.lines).toContain(FINDING_LINE);
+  
+      // An absent rules directory is an empty list, not an error.
+      expect(
+        await runLint(ctx, {rulesDir: join(rulesDir, 'no-such-directory')}),
+      ).toEqual({lines: [], count: 0});
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (f) [M6] ---------------------------------------------------------------
+  
+  test(
+    '(f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache`',
+    async () => {
+      const captureExams = await captureExamsOf();
+  
+      // What `captureExams` adds, not what the process already holds: under a
+      // whole-suite `bun test` the runner loads `tests/state-exams/*` itself, so
+      // the registry carries them before this leg runs. The claim is that the
+      // call below leaves it exactly as it found it.
+      const examsOfCache = (): string[] =>
+        Object.keys(require.cache)
+          .filter((key) => key.includes('tests/state-exams/'))
+          .sort();
+      const before = examsOfCache();
+  
+      const specs = await captureExams('tests/state-exams');
+  
+      // The child did the importing, so the specs came back all the same.
+--- conflict
+<<<<<<< begin added frontier
+    expect(specs).toHaveLength(EXAM_FILES.length);
+======= begin added run-12
+    expect(specs).toHaveLength(examFiles().length);
+======= begin added both
+
+>>>>>>> end conflict
+--- context (read-only)
+      expect(examsOfCache()).toEqual(before);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  

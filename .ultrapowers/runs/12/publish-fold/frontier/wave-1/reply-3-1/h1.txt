@@ -1,0 +1,9 @@
+
+    // The fixture's own snapshots, as floors: four expected and three seeds are
+    // what BASE carries, and sibling work adds more of both.
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
+    ).toBeGreaterThanOrEqual(4);
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
+    ).toBeGreaterThanOrEqual(3);

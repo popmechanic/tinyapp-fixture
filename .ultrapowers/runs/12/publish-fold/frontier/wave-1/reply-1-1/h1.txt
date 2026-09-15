@@ -1,0 +1,5 @@
+    // What the quiet result is measured over: every snapshot the fixture
+    // carries — the seven of M2 and whatever a later task added — with the
+    // invariants live rather than an empty list.
+    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
+    expect(ctx.invariants.length).toBeGreaterThanOrEqual(2);

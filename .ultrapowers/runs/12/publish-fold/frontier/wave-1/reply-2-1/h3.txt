@@ -1,0 +1,9 @@
+    // start with `create` or `read`. A floor, not the whole list: sibling work
+    // adds callbacks of its own — this exam's own `setFilter` and `setTodoDue`
+    // among them — and none of them unmakes these.
+    expect(Object.keys(ctx.callbacks).sort()).toEqual(
+      expect.arrayContaining([...CALLBACKS_OF_BASE, 'setFilter', 'setTodoDue']),
+    );
+
+    const snapshots = snapshotFiles();
+    expect(snapshots.length).toBeGreaterThanOrEqual(7);

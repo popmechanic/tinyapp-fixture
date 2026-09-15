@@ -1,0 +1,37 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/state-exams/set-filter.test.ts:
+(pass) leg (a) [M1] setFilter(store, 'all') leaves the values half exactly {filter: 'all'} and the tables half untouched [14.82ms]
+(pass) leg (a) [M1] setFilter(store, 'open') leaves the values half exactly {filter: 'open'} and the tables half untouched [2.61ms]
+(pass) leg (a) [M1] setFilter(store, 'done') leaves the values half exactly {filter: 'done'} and the tables half untouched [1.92ms]
+(pass) leg (b) [M2] on the fresh seed, 'bogus' and 'Open' each leave the content deep-equal to the snapshot before the call [1.89ms]
+(pass) leg (c) [M2] after setFilter(store, 'open'), 'bogus' leaves the content deep-equal and the filter still 'open' [0.92ms]
+(pass) leg (d) [M3] VALUES_SCHEMA.filter is exactly {type: "string"} with no default, and a fresh store has no filter [1.02ms]
+(pass) leg (e) [M3] the seven snapshot files that exist at BASE are byte-identical to BASE and load to themselves [4.45ms]
+
+
+190 | test("leg (g) [M5] the Run line `grep -q \"toContain('setFilter')\" packages/tinyapp-lint/test/lint-cli.test.ts` exits 0", () => {
+191 |   expect(
+192 |     runLine(
+193 |       `grep -q "toContain('setFilter')" packages/tinyapp-lint/test/lint-cli.test.ts`,
+194 |     ),
+195 |   ).toBe(0);
+          ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: 1
+
+      at <anonymous> (/home/exedev/target/.claude/ultrapowers/run-run-12/clones/integration/tests/state-exams/set-filter.test.ts:195:5)
+(fail) leg (g) [M5] the Run line `grep -q "toContain('setFilter')" packages/tinyapp-lint/test/lint-cli.test.ts` exits 0 [8.51ms]
+(pass) leg (h) [M5] the Run line `grep -q "toContain('setFilter')" packages/tinyapp-lint/test/reachability.test.ts` exits 0 [2.67ms]
+(pass) leg (i) [M5] the frozen list text occurs zero times across the linter`s four exams [3.51ms]
+(pass) leg (j) [M5] the Run line `grep -qF '[0-9]+ snapshots and [0-9]+ exams' packages/tinyapp-lint/test/lint-cli.test.ts` exits 0 [2.43ms]
+(pass) leg (k) [M5] toHaveLength(7), (6), (4) and (3) occur zero times across the linter`s four exams [3.60ms]
+(pass) leg (l) [M5] `bun test` over the linter`s four exams exits 0 [19502.69ms]
+(pass) state exam: set-filter [708.27ms]
+
+ 13 pass
+ 1 fail
+ 42 expect() calls
+Ran 14 tests across 1 file. [20.30s]

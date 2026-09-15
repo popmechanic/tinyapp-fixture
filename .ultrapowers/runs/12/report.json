@@ -1,0 +1,318 @@
+{
+  "integrationBranch": "ultra/integration-run-12",
+  "baseSha": "f24d4059a76fa6c58a38a26ca2b60d4cd59fe336",
+  "waves": [
+    [
+      "1"
+    ],
+    [
+      "2",
+      "3"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)",
+    "1 -> 3 (interface)",
+    "2 -> 4 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "933b047542e41fe9b70ca7125ced54ec179fd340",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-12/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "unverified: `tests/state-exams/set-todo-due.test.ts` leg (a)'s round-trip pin deep-equals the whole `getContent()` result, including the values half \u2014 `expect(content).toEqual([{todos: {'0': {text: 'buy milk', completed: false}}}, {}])` (patch lines 795-798). That is exactly what M1 spells (\"is exactly that seed\"), so the implementer had no latitude here, and every leg is green in EXAM EVIDENCE; but the fourth Global Constraint says nothing in this plan pins a sibling plan's surface, naming the values schema explicitly, and a concurrent sibling run that adds a values schema with defaults would materialise cells into `content[1]` and redden this one assertion. Nothing in this diff can settle it \u2014 the sibling schema does not exist at BASE. What would settle it: re-running this exam on a tree that also carries the sibling plan's values schema; if it must be made merge-proof, asserting `content[0]` and the row's key set (the two things M1 is actually about) instead of the two-element literal. Recorded rather than fixed, since the pin as written is what the task's Machine clause requires.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789515513296,
+      "stateExams": [
+        {
+          "exam": "done-count",
+          "store_ms": 14.001313999999994,
+          "render_ms": 510.00311899999997,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "set-todo-due",
+          "store_ms": 2.6242810000003374,
+          "render_ms": 498.60533899999973,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "b475eb428c01d2dcd6241d7145a8a2a4cf6ad4ee",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-12/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789515847614,
+      "stateExams": [
+        {
+          "exam": "type-due-date",
+          "store_ms": 559.898984,
+          "render_ms": 181.57899700000007,
+          "render": "ran",
+          "action_ms": 75.14594900000003,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "f6f86145efca7afeaffbaa4b9c2eef196747b9fd",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-12/patches/task-3.patch",
+      "reviewVerdict": "clean",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789515907920,
+      "stateExams": [
+        {
+          "exam": "completed-past-due-not-overdue",
+          "store_ms": 617.6195309999999,
+          "render_ms": 191.66772300000002,
+          "render": "ran",
+          "action_ms": 93.61947900000007,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "4",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "57aee7f77d4e22832908832626a489edcd3b23a9",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-12/patches/task-4.patch",
+      "reviewVerdict": "clean",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 1,
+      "examEdited": [],
+      "landedAt": 1789516339390,
+      "stateExams": [
+        {
+          "exam": "due-date-marks-overdue",
+          "store_ms": 572.561846,
+          "render_ms": 135.87254300000006,
+          "render": "ran",
+          "action_ms": 85.73575999999997,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "and an entry is the same red [2.36ms]\n(pass) leg (e) [M5]: the mutant move is unchanged \u2014 a green click spec still kills its mutant [0.24ms]\n(pass) leg (f) [M6]: the two re-aimed test files pass, and neither names the endpoint or its stub [2774.26ms]\n(pass) leg (g) [M1] [M7]: a click on the fixture completes the todo, read through the page store, under the ceiling [1066.44ms]\n(pass) leg (g) [M7]: forced unminified, the url is over the ceiling and the exam says so rather than hanging [140.38ms]\n(pass) leg (g) [M7]: `open` refuses a data: url over the ceiling within 15 s, naming it [90.24ms]\n\npackages/tinyapp-lint/test/references.test.ts:\n(pass) (a) [M1] the rule is named `references` and says nothing about the fixture [69.34ms]\n(pass) (b) [M2] the dangling `owner` is one finding, formatted exactly as pinned [0.23ms]\n(pass) (c) [M3] a resolvable reference, and a row without the cell, are both silent [0.09ms]\n(pass) (d) [M4] a snapshot without the referenced table names the missing row [0.07ms]\n(pass) (e) [M5] the fixture store module, and `lint:state` over one seeded violation [53.78ms]\n\npackages/tinyapp-lint/test/reachability.test.ts:\n(pass) (a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached [1491.21ms]\n(pass) (b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms [2039.84ms]\n(pass) (c) [M3] a state equal to a seed is reached in zero moves [0.15ms]\n(pass) (d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract [1.06ms]\n$ bun packages/tinyapp-lint/src/cli.ts --expected \"/home/exedev/target/.claude/ultrapowers/run-run-12/clones/integration/state-exams/lint-tmp-yXZqE2/expected\" --exams \"/home/exedev/target/.claude/ultrapowers/run-run-12/clones/integration/state-exams/lint-tmp-yXZqE2/exams\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [2328.63ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1916.81ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [87.69ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.44ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [3.91ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-Cde9mB\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [132.75ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [58.00ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.43ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.38ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [51.97ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.40ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.51ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [92.56ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [74.64ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [1.58ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.13ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [3.84ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1615.85ms]\n\n 236 pass\n 0 fail\n 993 expect() calls\nRan 236 tests across 28 files. [45.08s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 8 snapshots and 7 exams in 877 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam/src packages/tinyapp-lint/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 10 snapshots and 9 exams in 1560 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam/src packages/tinyapp-lint/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 11 snapshots and 10 exams in 1704 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam/src packages/tinyapp-lint/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 350946,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": ") (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [1415.14ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [524.39ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [31.15ms]\n(pass) (c) [M3] the six exam specs, in path order, and the pinned click entry [0.15ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [9.07ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-6YTh2L\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [92.32ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [34.08ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicate [0.21ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [27.23ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.24ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.28ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [128.80ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [38.42ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.65ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.88ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [3.67ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.23ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [509.83ms]\n\n 185 pass\n 0 fail\n 876 expect() calls\nRan 185 tests across 24 files. [24.16s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "8d57a2301ff483ce9ec9cb4f3e56145fac082910",
+      "branches": [
+        "1"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "57b7561022e1914701d7cd4120478c8550208520",
+      "branches": [
+        "2",
+        "3"
+      ],
+      "joined": [
+        "client/src/TodoItem.tsx"
+      ]
+    },
+    {
+      "wave": 3,
+      "status": "MERGED",
+      "headSha": "35ba34dda7e3d087f7e4fe223623b27b581c64ce",
+      "branches": [
+        "4"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.7599999999999999,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 4,
+      "foldCliWallTimeSec": 0.7020000000000001,
+      "autoResolved": 0,
+      "resolverTranscripts": [
+        {
+          "conflict": 1,
+          "attempt": 1,
+          "path": "client/src/TodoItem.tsx",
+          "epoch": 2,
+          "hunksFile": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-2/conflict-1.hunks.txt",
+          "replyDir": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-2/reply-1-1",
+          "status": "RESOLVED",
+          "notes": "Frontier already carried task 2's `import {DueInput} from './DueInput';`; task 3 needs `import {isOverdue} from './overdue';` (used later in the read-only context by `const overdue = isOverdue(todo, new Date());`). Both imports are compatible and independently needed, so kept both plus the shared trailing blank line before the component declaration."
+        }
+      ]
+    },
+    {
+      "wave": 3,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-3/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-12/frontier/wave-3/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.388,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 4,
+    "tasks_planned": 4,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 4: the driver's pre-review pass was red (the Proof's exam failed: bun test tests/state-exams/due-date-marks-overdue.test.ts \u2014 exit 1) \u2014 one repair round before any reviewer read the patch"
+  ],
+  "amendments": [],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}

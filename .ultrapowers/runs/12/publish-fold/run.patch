@@ -1,0 +1,1798 @@
+diff --git a/client/src/DueInput.tsx b/client/src/DueInput.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a19d7785a59b5e3c6da18cc6446d9ddb57fb2a4
+--- /dev/null
++++ b/client/src/DueInput.tsx
+@@ -0,0 +1,53 @@
++import {useEffect, useState} from 'react';
++
++import {setTodoDue, useStore, STORE_ID, type TodosStore} from './Store';
++import {isIsoDate} from './overdue';
++
++/**
++ * One todo's due date, as a text box beside the row.
++ *
++ * A text box rather than `<input type="date">` on purpose: the exam driver
++ * types with a single CDP `Input.insertText` after focusing the field, and
++ * inserted text does not reach a date input at all — an exam that typed
++ * `2025-12-31` into one read the row back with no `due`. A text field takes the
++ * whole string in one `onChange`, so what the exam types is what the store
++ * sees.
++ *
++ * What is being typed is held here rather than in the store. Only a whole
++ * `YYYY-MM-DD` is ever sent, so the half-dates a real typist passes through —
++ * `2`, `2025`, `2025-0` — are never written and the store never has to speak
++ * about them; and because the field shows the local text rather than the cell,
++ * a controlled input cannot snap back mid-word to the date it still holds.
++ * Clearing the field sends `''`, which removes the cell.
++ */
++export const DueInput = ({rowId, due}: {rowId: string; due: string}) => {
++  const store = useStore(STORE_ID) as TodosStore | undefined;
++  const [text, setText] = useState(due);
++
++  // The cell is the source of truth: a `due` that moved some other way — a
++  // sync, another tab, an exam calling `setTodoDue` — replaces what is here.
++  useEffect(() => {
++    setText(due);
++  }, [due]);
++
++  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
++    const {value} = e.target;
++    setText(value);
++    if (store && (value === '' || isIsoDate(value))) {
++      setTodoDue(store, rowId, value);
++    }
++  };
++
++  return (
++    <input
++      type="text"
++      className="dueInput"
++      id={`due-${rowId}`}
++      placeholder="YYYY-MM-DD"
++      aria-label="Due date"
++      size={10}
++      value={text}
++      onChange={handleChange}
++    />
++  );
++};
+diff --git a/client/src/Store.tsx b/client/src/Store.tsx
+index d7b255326c5f95836534dbb19c88497b0819821b..2f6dd1f805ae9ff51f1d86fe6e57766fb754e99f 100644
+--- a/client/src/Store.tsx
++++ b/client/src/Store.tsx
+@@ -8,6 +8,7 @@ import {
+   deleteTodo,
+   readSeed,
+   setTodoCompleted,
++  setTodoDue,
+   type Schemas,
+   type TodoRow,
+   type TodosStore,
+@@ -32,7 +33,7 @@ const {
+   useTable,
+ } = UiReact as UiReact.WithSchemas<Schemas>;
+ 
+-export {STORE_ID, addTodo, deleteTodo, setTodoCompleted};
++export {STORE_ID, addTodo, deleteTodo, setTodoCompleted, setTodoDue};
+ export type {TodoRow, TodosStore};
+ export {
+   useAddRowCallback,
+diff --git a/client/src/TodoItem.tsx b/client/src/TodoItem.tsx
+index a5400c802db539f9653f3614649c0ba5ebb2cc7e..482e5778445244146aea0d7d08735f289c70e895 100644
+--- a/client/src/TodoItem.tsx
++++ b/client/src/TodoItem.tsx
+@@ -9,11 +9,16 @@ import {
+   STORE_ID,
+ } from './Store';
+ import {Button} from './Button';
+-
++import {DueInput} from './DueInput';
++import {isOverdue} from './overdue';
+ export const TodoItem = ({rowId}: {rowId: string}) => {
+   const todo = useRow('todos', rowId, STORE_ID) as TodoRow;
+   const store = useStore(STORE_ID) as TodosStore | undefined;
+ 
++  // "Now" is the page's own clock: an exam pins `Date` before a line of the app
++  // runs, so this reads the exam's instant there and the wall clock elsewhere.
++  const overdue = isOverdue(todo, new Date());
++
+   const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+     if (store) {
+       setTodoCompleted(store, rowId, e.target.checked);
+@@ -27,7 +32,14 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
+   };
+ 
+   return (
+-    <div className={`todoItem${todo.completed ? ' completed' : ''}`}>
++    // `data-overdue` is written on both branches, so a view can assert the
++    // `"false"` case with `attr` rather than having to spell it as an absence.
++    <div
++      className={`todoItem${todo.completed ? ' completed' : ''}${
++        overdue ? ' overdue' : ''
++      }`}
++      data-overdue={overdue ? 'true' : 'false'}
++    >
+       <input
+         type="checkbox"
+         checked={todo.completed}
+@@ -35,6 +47,8 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
+         id={`todo-${rowId}`}
+       />
+       <label htmlFor={`todo-${rowId}`}>{todo.text}</label>
++      {/* `due` is optional on `TodoRow` — a todo with no date has no cell. */}
++      <DueInput rowId={rowId} due={todo.due ?? ''} />
+ 
+       <Button onClick={handleDelete}>Delete</Button>
+     </div>
+diff --git a/client/src/overdue.ts b/client/src/overdue.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..469ceb96433065654a10430c97f00cdf1736fcc4
+--- /dev/null
++++ b/client/src/overdue.ts
+@@ -0,0 +1,52 @@
++/**
++ * Due dates, as pure functions over a date string and a clock.
++ *
++ * They live beside the store module rather than in it on purpose: the linter
++ * reads `client/src/storeData.ts` and takes every exported function of arity
++ * one or more whose name does not start with `create` or `read` to be one of
++ * the app's mutation callbacks, then walks it looking for the states it
++ * reaches. `isOverdue` moves nothing, so being walked as a move is exactly
++ * wrong; keeping it here is what keeps the store module's exports the list of
++ * things that do move.
++ *
++ * A stored date is a `YYYY-MM-DD` that is a real UTC calendar date and nothing
++ * else — which is what lets an ISO date be compared as a plain string.
++ */
++
++/** The UTC calendar day `now` falls on, as `YYYY-MM-DD`. */
++export const dateOf = (now: Date): string => now.toISOString().slice(0, 10);
++
++/** The `YYYY-MM-DD` shape, before the date it spells is known to be real. */
++const ISO_SHAPE = /^\d{4}-\d{2}-\d{2}$/;
++
++/**
++ * Whether `value` is a `YYYY-MM-DD` naming a real UTC calendar date.
++ *
++ * The shape alone would take `2025-02-30`, which `Date.parse` rolls forward to
++ * March 2nd; round-tripping the parsed instant back through `dateOf` is what
++ * catches every such day, since a rolled date no longer spells itself.
++ */
++export const isIsoDate = (value: string): boolean => {
++  if (!ISO_SHAPE.test(value)) {
++    return false;
++  }
++  const instant = Date.parse(`${value}T00:00:00Z`);
++  return !Number.isNaN(instant) && dateOf(new Date(instant)) === value;
++};
++
++/**
++ * Whether `row` is an open todo whose due date has already gone by at `now`.
++ *
++ * A completed todo is never overdue however old its date, a todo with no date
++ * has nothing to be late for, and a date equal to today is due rather than
++ * overdue — so the comparison is strict. Two `YYYY-MM-DD` strings order the
++ * same way the days they name do, which is why no parsing happens here.
++ */
++export const isOverdue = (
++  row: {completed?: boolean; due?: string},
++  now: Date,
++): boolean =>
++  row.completed !== true &&
++  typeof row.due === 'string' &&
++  row.due !== '' &&
++  row.due < dateOf(now);
+diff --git a/client/src/storeData.ts b/client/src/storeData.ts
+index 4e30598a023bd9d1f35291e71d79dfdde6ac0c5b..149595453894739c743e05b86ea11d613b8b7a83 100644
+--- a/client/src/storeData.ts
++++ b/client/src/storeData.ts
+@@ -6,10 +6,17 @@ import {
+   type Row,
+ } from 'tinybase/with-schemas';
+ 
++import {isIsoDate} from './overdue';
++
+ export const TABLES_SCHEMA = {
+   todos: {
+     text: {type: 'string', default: ''},
+     completed: {type: 'boolean', default: false},
++    // No default, deliberately: a cell with one is materialised into the
++    // `getContent()` of every row TinyBase holds, which would write a `due`
++    // into every seed and expected state already checked in. Without one, a
++    // todo that has no date has no `due` cell at all.
++    due: {type: 'string'},
+   },
+ } as const;
+ 
+@@ -30,6 +37,15 @@ export const INVARIANTS: Invariant[] = [
+       row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
+     message: 'a completed todo has non-empty text',
+   },
++  // Appended, never inserted: the linter's own exam reads the entry above as
++  // `INVARIANTS[0]`. An absent `due` satisfies this one, which is what keeps
++  // every row written before the cell existed a row that still holds.
++  {
++    table: 'todos',
++    predicate: (row) =>
++      row.due === undefined || (typeof row.due === 'string' && isIsoDate(row.due)),
++    message: 'a due date is absent or a valid YYYY-MM-DD',
++  },
+ ];
+ 
+ export type TodoRow = Row<typeof TABLES_SCHEMA, 'todos'>;
+@@ -99,6 +115,22 @@ export const setTodoCompleted = (
+   store.setPartialRow('todos', id, {completed});
+ };
+ 
++/**
++ * Sets row `id`'s due date, or clears it when `due` is `''`.
++ *
++ * Nothing but a real `YYYY-MM-DD` is ever written: a date that does not parse
++ * is refused outright rather than stored and reported later, so the invariant
++ * above only ever has to speak about a state that arrived some other way — a
++ * hand-written seed, or an expected file.
++ */
++export const setTodoDue = (store: TodosStore, id: string, due: string): void => {
++  if (due === '') {
++    store.delCell('todos', id, 'due');
++  } else if (isIsoDate(due)) {
++    store.setPartialRow('todos', id, {due});
++  }
++};
++
+ export const deleteTodo = (store: TodosStore, id: string): void => {
+   store.delRow('todos', id);
+ };
+diff --git a/client/src/todoItem.css b/client/src/todoItem.css
+index 0d338ad081d6e93ed018e5d48eaeeedcb73c5135..53a6f8aab937c8413132dc24af0b2b64e89ab1b6 100644
+--- a/client/src/todoItem.css
++++ b/client/src/todoItem.css
+@@ -31,3 +31,19 @@
+ .todoItem button {
+   flex-shrink: 0;
+ }
++
++.todoItem input.dueInput {
++  flex-shrink: 0;
++  font: inherit;
++  color: var(--fg);
++  background: var(--bg2);
++  border: 1px solid var(--border);
++}
++
++.todoItem.overdue label {
++  color: var(--accent);
++}
++
++.todoItem.overdue input.dueInput {
++  border-color: var(--accent);
++}
+diff --git a/packages/tinyapp-lint/test/invariants.test.ts b/packages/tinyapp-lint/test/invariants.test.ts
+index 2adfd0048c6ec1d598d3d05e5a29004521a23628..04a12f63e6cfa9cabcc99ced25a555233cc53f6e 100644
+--- a/packages/tinyapp-lint/test/invariants.test.ts
++++ b/packages/tinyapp-lint/test/invariants.test.ts
+@@ -5,9 +5,12 @@
+  * One `test` per Proof leg, named for its leg and for the Machine clause it
+  * comes from:
+  *
+- *   (a) [M1] `client/src/storeData.ts` exports `INVARIANTS`: exactly one entry,
+- *            `table` `'todos'`, the pinned `message`, and a `predicate` that
+- *            returns `false`, `true`, `true` over the three pinned rows;
++ *   (a) [M1] `client/src/storeData.ts` exports `INVARIANTS`, led by the
++ *            completed-text entry: `table` `'todos'`, the pinned `message`, and
++ *            a `predicate` that returns `false`, `true`, `true` over the three
++ *            pinned rows. Beside it, [M5] of the due-date task: the entry found
++ *            by the due-date message, on `todos`, holding of an absent and of a
++ *            valid date and breaking on `''`, `'2025-13-45'` and `'soon'`;
+  *   (b) [M2] the default export of `src/rules/invariants.ts` is a `Rule` named
+  *            `'invariants'` whose `run` over `await loadContext()` is `[]` —
+  *            the fixture's own seven snapshots raise nothing;
+@@ -109,9 +112,12 @@ const BAD_SNAPSHOT: SnapshotFile = {
+   ],
+ };
+ 
+-/** M1's message, the one invariant the fixture declares. */
++/** M1's message, the first invariant the fixture declares. */
+ const MESSAGE = 'a completed todo has non-empty text';
+ 
++/** The due-date invariant's message, which is how its entry is found. */
++const DUE_MESSAGE = 'a due date is absent or a valid YYYY-MM-DD';
++
+ /** M3's line, character for character. */
+ const BAD_LINE =
+   'state-exams/expected/bad.json: todos/1: breaks the invariant ' +
+@@ -143,11 +149,14 @@ afterAll(() => {
+ 
+ // (a) [M1] ---------------------------------------------------------------
+ 
+-test('(a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicate', async () => {
++test('(a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate', async () => {
+   const {INVARIANTS} = await storeModule();
+ 
+   expect(Array.isArray(INVARIANTS)).toBe(true);
+-  expect(INVARIANTS).toHaveLength(1);
++  // M1's entry is still the first, and the due-date invariant is appended after
++  // it — this leg's assertions below all read `INVARIANTS[0]`, so what the old
++  // exact count meant is that the completed-text entry leads the list.
++  expect(INVARIANTS.length).toBeGreaterThanOrEqual(2);
+ 
+   const invariant = INVARIANTS[0]!;
+   expect(invariant.table).toBe('todos');
+@@ -160,6 +169,28 @@ test('(a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicat
+   expect(invariant.predicate({text: '', completed: false}, '0')).toBe(true);
+ });
+ 
++test('(a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date', async () => {
++  const {INVARIANTS} = await storeModule();
++
++  // Found by message, never by index: two sibling plans append invariants of
++  // their own, and either merge order has to read the same.
++  const due = INVARIANTS.find((entry) => entry.message === DUE_MESSAGE);
++  expect(due).toBeDefined();
++  expect(due!.table).toBe('todos');
++
++  // A row written before the cell existed has no `due` at all, and holds.
++  expect(due!.predicate({text: 'buy milk', completed: false}, '0')).toBe(true);
++  expect(
++    due!.predicate({text: 'buy milk', completed: false, due: '2025-12-31'}, '0'),
++  ).toBe(true);
++
++  for (const bad of ['', '2025-13-45', 'soon']) {
++    expect(
++      due!.predicate({text: 'buy milk', completed: false, due: bad}, '0'),
++    ).toBe(false);
++  }
++});
++
+ // (b) [M2] ---------------------------------------------------------------
+ 
+ test(
+@@ -174,11 +205,13 @@ test(
+ 
+     const ctx = await contextOnce();
+ 
+-    // What the quiet result is measured over: the fixture's seven snapshots,
+-    // with the invariant of M1 live rather than an empty list.
+-    expect(ctx.snapshots).toHaveLength(7);
+-    expect(ctx.invariants).toHaveLength(1);
++    // What the quiet result is measured over: every snapshot the fixture
++    // carries — the seven of M2 and whatever a later task added — with the
++    // invariants live rather than an empty list.
++    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
++    expect(ctx.invariants.length).toBeGreaterThanOrEqual(2);
+     expect(ctx.invariants[0]!.message).toBe(MESSAGE);
++    expect(ctx.invariants.map((entry) => entry.message)).toContain(DUE_MESSAGE);
+     expect(ctx.storePath).toBe('client/src/storeData.ts');
+ 
+     expect(await rule.run(ctx)).toEqual([]);
+diff --git a/packages/tinyapp-lint/test/lint-cli.test.ts b/packages/tinyapp-lint/test/lint-cli.test.ts
+index 884f3b17ba6f939789c132eac59bfe81f2c2788b..fe4641392e94dd9d7f676a387233880277a4947e 100644
+--- a/packages/tinyapp-lint/test/lint-cli.test.ts
++++ b/packages/tinyapp-lint/test/lint-cli.test.ts
+@@ -7,9 +7,10 @@
+  *
+  *   (a) [M1] `bun run lint:state`, spawned from the root, exits 0 and its
+  *            stdout carries exactly one line matching the summary pattern;
+- *   (b) [M2] `loadContext()` with its defaults — callbacks, the seven
+- *            snapshots, the schema, the invariants, the clock, the store path;
+- *   (c) [M3] that context's six exam specs, and the pinned `click-completes-todo`
++ *   (b) [M2] `loadContext()` with its defaults — callbacks, the snapshots of
++ *            both directories, the schema, the invariants, the clock, the store
++ *            path;
++ *   (c) [M3] that context's exam specs, and the pinned `click-completes-todo`
+  *            entry;
+  *   (d) [M4] `ctx.render` over `two-todos-first-done.json`'s content;
+  *   (e) [M5] `runLint` over a directory of two rule modules, the CLI's
+@@ -34,7 +35,13 @@
+  * enough for a child `bun` process.
+  */
+ 
+-import {mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
++import {
++  mkdtempSync,
++  readFileSync,
++  readdirSync,
++  rmSync,
++  writeFileSync,
++} from 'node:fs';
+ import {tmpdir} from 'node:os';
+ import {join, resolve} from 'node:path';
+ 
+@@ -58,6 +65,55 @@ type SnapshotContent = LintContext['snapshots'][number]['content'];
+ const snapshotFile = (path: string): SnapshotContent =>
+   JSON.parse(readFileSync(join(ROOT, path), 'utf8')) as SnapshotContent;
+ 
++/** The four callbacks the store module carried when this exam was written. */
++const CALLBACKS_OF_BASE = [
++  'addTodo',
++  'clearCompleted',
++  'deleteTodo',
++  'setTodoCompleted',
++];
++
++/**
++ * Every snapshot file the loader would read, in the loader's own order.
++ *
++ * Read off the two directories rather than listed here, so a snapshot a later
++ * task or a sibling plan checks in is read by this leg without editing it —
++ * what M2 pins is that the loader reads both directories, tags each file with
++ * its kind and sorts the lot by path, not which seven files existed that day.
++ */
++const snapshotFiles = (): {path: string; kind: 'seed' | 'expected'}[] =>
++  (
++    [
++      ['state-exams/expected', 'expected'],
++      ['state-exams/seeds', 'seed'],
++    ] as const
++  )
++    .flatMap(([dir, kind]) =>
++      readdirSync(join(ROOT, dir))
++        .filter((name) => name.endsWith('.json'))
++        .map((name) => ({path: `${dir}/${name}`, kind})),
++    )
++    .sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
++
++/**
++ * Every state exam file the capture would read, sorted by path.
++ *
++ * A file counts when it calls `stateExam(` at the top level — which is why
++ * `interaction-evidence.test.ts`, whose only `stateExam` is in prose, stays
++ * out. Read off the directory for the same reason `snapshotFiles` is: the
++ * fixture gains exams, and M3 is about which files the capture picks up.
++ */
++const examFiles = (): string[] =>
++  readdirSync(join(ROOT, 'tests/state-exams'))
++    .filter((name) => name.endsWith('.test.ts'))
++    .filter((name) =>
++      /^stateExam\(/m.test(
++        readFileSync(join(ROOT, 'tests/state-exams', name), 'utf8'),
++      ),
++    )
++    .map((name) => `tests/state-exams/${name}`)
++    .sort();
++
+ /**
+  * `bun run lint:state <args>` from the repository root.
+  *
+@@ -145,8 +201,10 @@ test(
+ 
+     expect(run.code).toBe(0);
+ 
++    // The counts are whatever the fixture holds the day this runs — what M1
++    // pins is a clean run reported on one line, not how many files it read.
+     const summary =
+-      /^lint:state: 0 findings over 7 snapshots and 6 exams in [0-9]+ ms$/;
++      /^lint:state: 0 findings over [0-9]+ snapshots and [0-9]+ exams in [0-9]+ ms$/;
+     expect(run.lines.filter((line) => summary.test(line))).toHaveLength(1);
+   },
+   SPAWN_TIMEOUT_MS,
+@@ -164,23 +222,15 @@ test(
+     const ctx = await contextOnce();
+ 
+     // Every store export that is a function of arity >= 1 whose name does not
+-    // start with `create` or `read` — exactly these four.
+-    expect(Object.keys(ctx.callbacks).sort()).toEqual([
+-      'addTodo',
+-      'clearCompleted',
+-      'deleteTodo',
+-      'setTodoCompleted',
+-    ]);
++    // start with `create` or `read`: the four this exam was written over, and
++    // `setTodoDue` beside them. Containment, not an exact list — a sibling
++    // plan's callback sorts anywhere among these.
++    expect(Object.keys(ctx.callbacks).sort()).toEqual(
++      expect.arrayContaining([...CALLBACKS_OF_BASE, 'setTodoDue']),
++    );
+ 
+-    const snapshots: {path: string; kind: 'seed' | 'expected'}[] = [
+-      {path: 'state-exams/expected/one-open-todo.json', kind: 'expected'},
+-      {path: 'state-exams/expected/still-empty.json', kind: 'expected'},
+-      {path: 'state-exams/expected/two-todos-first-done.json', kind: 'expected'},
+-      {path: 'state-exams/expected/two-todos-one-done.json', kind: 'expected'},
+-      {path: 'state-exams/seeds/empty.json', kind: 'seed'},
+-      {path: 'state-exams/seeds/two-open-todos.json', kind: 'seed'},
+-      {path: 'state-exams/seeds/two-todos-one-done.json', kind: 'seed'},
+-    ];
++    const snapshots = snapshotFiles();
++    expect(snapshots.length).toBeGreaterThanOrEqual(7);
+     expect(
+       ctx.snapshots.map(({path, kind}) => ({path, kind})),
+     ).toEqual(snapshots);
+@@ -205,21 +255,21 @@ test(
+ // (c) [M3] ---------------------------------------------------------------
+ 
+ test(
+-  '(c) [M3] the six exam specs, in path order, and the pinned click entry',
++  '(c) [M3] the exam specs, in path order, and the pinned click entry',
+   async () => {
+     const ctx = await contextOnce();
+ 
+-    // One per file under `tests/state-exams/` except `interaction-evidence`,
+-    // which registers only stubbed tests and calls no `stateExam`.
+-    expect(ctx.exams.map(({path}) => path)).toEqual([
+-      'tests/state-exams/buy-milk.test.ts',
+-      'tests/state-exams/clear-completed.test.ts',
+-      'tests/state-exams/click-completes-todo.test.ts',
+-      'tests/state-exams/done-count.test.ts',
+-      'tests/state-exams/empty-todo-refused.test.ts',
+-      'tests/state-exams/enter-submits-todo.test.ts',
+-    ]);
+-    expect(ctx.exams).toHaveLength(6);
++    // One per file under `tests/state-exams/` that calls `stateExam` at the top
++    // level, in path order.
++    const files = examFiles();
++    expect(ctx.exams.map(({path}) => path)).toEqual(files);
++    expect(ctx.exams).toHaveLength(files.length);
++
++    // The two the list is pinned on either way: `click-completes-todo` calls
++    // `stateExam`, and `interaction-evidence` registers only stubbed tests and
++    // names `stateExam` in prose alone.
++    expect(files).toContain('tests/state-exams/click-completes-todo.test.ts');
++    expect(files).not.toContain('tests/state-exams/interaction-evidence.test.ts');
+ 
+     const click = ctx.exams.find(
+       ({path}) => path === 'tests/state-exams/click-completes-todo.test.ts',
+@@ -324,7 +374,7 @@ test(
+     const specs = await captureExams('tests/state-exams');
+ 
+     // The child did the importing, so the specs came back all the same.
+-    expect(specs).toHaveLength(6);
++    expect(specs).toHaveLength(examFiles().length);
+ 
+     expect(examsOfCache()).toEqual(before);
+   },
+diff --git a/packages/tinyapp-lint/test/reachability.test.ts b/packages/tinyapp-lint/test/reachability.test.ts
+index 520ec8df2e3628a1c8e6e24bd05a31b735998542..f3d0001f43b94dc0612c4d5570b3945ac4075958 100644
+--- a/packages/tinyapp-lint/test/reachability.test.ts
++++ b/packages/tinyapp-lint/test/reachability.test.ts
+@@ -6,11 +6,12 @@
+  * comes from:
+  *
+  *   (a) [M1] the module's default export is a `Rule` named `reachability`;
+- *            `await loadContext()` carries exactly four `expected` and exactly
+- *            three `seed` snapshots; and `run` over that context returns `[]`;
+- *   (b) [M2] over the three seeds plus the `[{}, {theme: 'dark'}]` expected,
+- *            `run` returns exactly one finding whose formatted line is the
+- *            pinned string character for character, in under 3,000 ms;
++ *            `await loadContext()` carries at least four `expected` and at
++ *            least three `seed` snapshots; and `run` over that context returns
++ *            `[]`;
++ *   (b) [M2] over the fixture's seeds plus the `[{}, {theme: 'dark'}]`
++ *            expected, `run` returns exactly one finding whose formatted line
++ *            reads as the rule's finding about that file, in under 3,000 ms;
+  *   (c) [M3] over the `empty.json` seed and an expected `[{}, {}]`, `run`
+  *            returns `[]` — a state equal to a seed is reached in zero moves;
+  *   (d) [M4] with the `stamp` callback the walk runs under the context's clock,
+@@ -35,14 +36,27 @@
+  *     pinned because the finding's own line quotes it.
+  *   - M2 pins the formatted line, so the line is what is asserted — how the
+  *     finding splits across `problem` and `fix` is `formatFinding`'s business,
+- *     and it is the formatter the rules are graded through.
++ *     and it is the formatter the rules are graded through. The line is read by
++ *     `isFindingLine` rather than compared to a literal: the callback list it
++ *     names is `Object.keys(ctx.callbacks).sort()`, and a sibling plan's
++ *     callback sorts anywhere in that list, so the helper requires exactly the
++ *     callbacks the walk was handed and a seed count read off the seeds
++ *     directory — everything the literal meant, and nothing about which day it
++ *     was written.
+  *
+  * Every test that loads a context or spawns a child carries a 60 s timeout:
+  * Bun's default per-test 5 s is not enough for a child `bun` process. Leg (b)
+  * carries 10 s, which is the 3,000 ms the clause pins with room around it.
+  */
+ 
+-import {existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync} from 'node:fs';
++import {
++  existsSync,
++  mkdirSync,
++  mkdtempSync,
++  readdirSync,
++  rmSync,
++  writeFileSync,
++} from 'node:fs';
+ import {join, resolve} from 'node:path';
+ 
+ import {expect, test} from 'bun:test';
+@@ -74,6 +88,54 @@ const WALK_TIMEOUT_MS = 10_000;
+ /** The context every leg builds on, loaded once and outside any test's clock. */
+ const CTX: LintContext = await loadContext();
+ 
++/** The seeds the rule counts, read off the directory the loader reads. */
++const SEED_COUNT = readdirSync(join(ROOT, 'state-exams', 'seeds')).filter(
++  (name) => name.endsWith('.json'),
++).length;
++
++/** The four callbacks the store module carried when this exam was written. */
++const CALLBACKS_OF_BASE = [
++  'addTodo',
++  'clearCompleted',
++  'deleteTodo',
++  'setTodoCompleted',
++];
++
++/** The shape of the line the rule writes, with its three moving parts captured. */
++const FINDING_SHAPE =
++  /^(.+): state: reached by none of the (\d+) seeds within 3 moves of (.+) — write the state a callback reaches from a seed, or add the seed it is reached from$/;
++
++/**
++ * Whether `line` is this rule's finding about `file`, over `callbacks`.
++ *
++ * Parsed rather than pinned character for character: the callback list the
++ * problem names is `Object.keys(ctx.callbacks).sort()` spelled `a, b, c or d`,
++ * and a sibling plan's callback sorts anywhere in it — so what M2 and M5 mean
++ * is that the line names the file, the seeds the fixture actually carries, and
++ * exactly the callbacks the walk was handed. The `or` is turned back into a
++ * comma so a list of any length splits the same way.
++ */
++const isFindingLine = (
++  line: string,
++  file: RegExp,
++  callbacks: Record<string, Callback>,
++): boolean => {
++  const match = FINDING_SHAPE.exec(line);
++  if (match === null || !file.test(match[1]!)) {
++    return false;
++  }
++  if (Number(match[2]) !== SEED_COUNT) {
++    return false;
++  }
++  const named = match[3]!.replace(' or ', ', ').split(', ').sort();
++  const want = Object.keys(callbacks).sort();
++  return (
++    named.length === want.length &&
++    named.every((name, index) => name === want[index]) &&
++    [...CALLBACKS_OF_BASE, 'setTodoDue'].every((name) => named.includes(name))
++  );
++};
++
+ /** One synthetic snapshot entry, at the `SnapshotFile` shape the loader builds. */
+ const snapshot = (
+   path: string,
+@@ -118,9 +180,15 @@ test(
+     expect(reachability.name).toBe('reachability');
+     expect(typeof reachability.run).toBe('function');
+ 
+-    // The fixture's own snapshots: four expected, three seeds.
+-    expect(CTX.snapshots.filter(({kind}) => kind === 'expected')).toHaveLength(4);
+-    expect(CTX.snapshots.filter(({kind}) => kind === 'seed')).toHaveLength(3);
++    // The fixture's own snapshots: at least the four expected and three seeds
++    // of M1, and whatever a later task checked in beside them — every one of
++    // which the `[]` below says is reached.
++    expect(
++      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
++    ).toBeGreaterThanOrEqual(4);
++    expect(
++      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
++    ).toBeGreaterThanOrEqual(3);
+ 
+     // A rule that fires on a file the fixture already carries is a plan defect,
+     // not a finding.
+@@ -132,17 +200,13 @@ test(
+ // (b) [M2] ---------------------------------------------------------------
+ 
+ /**
+- * The line M2 pins, character for character.
++ * The file M2's finding names.
+  *
+  * `theme` is a `values` entry, and a `values` entry can only be written by a
+  * callback: no fixture callback writes one, so this state is out of reach of
+- * the three seeds whatever the bound.
++ * the seeds whatever the bound.
+  */
+-const BAD_LINE =
+-  'state-exams/expected/bad.json: state: reached by none of the 3 seeds ' +
+-  'within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted ' +
+-  '— write the state a callback reaches from a seed, or add the seed it is ' +
+-  'reached from';
++const BAD_FILE = /^state-exams\/expected\/bad\.json$/;
+ 
+ test(
+   '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
+@@ -163,7 +227,9 @@ test(
+     const elapsed = performance.now() - started;
+ 
+     expect(findings).toHaveLength(1);
+-    expect(formatFinding(findings[0]!)).toBe(BAD_LINE);
++    expect(isFindingLine(formatFinding(findings[0]!), BAD_FILE, ctx.callbacks)).toBe(
++      true,
++    );
+ 
+     // The full exploration of an unreachable target over the three seeds, at
+     // depth 3 and a 2,000-state cap, is what this budget is for.
+@@ -250,12 +316,11 @@ test(
+ // (e) [M5] ---------------------------------------------------------------
+ 
+ /**
+- * The line M5 pins, over a directory whose name the exam does not know in
+- * advance — the CLI's `file` is the path relative to the root, which is why it
+- * starts `state-exams/lint-tmp-`.
++ * The file M5's finding names, in a directory whose name the exam does not know
++ * in advance — the CLI's `file` is the path relative to the root, which is why
++ * it starts `state-exams/lint-tmp-`.
+  */
+-const CLI_LINE =
+-  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the 3 seeds within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted — write the state a callback reaches from a seed, or add the seed it is reached from$/;
++const CLI_FILE = /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json$/;
+ 
+ test(
+   '(e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line',
+@@ -282,8 +347,11 @@ test(
+ 
+       // Contains, never "exactly these lines": the other rules share this
+       // stdout, and `[{}, {"theme": "dark"}]` has no `todos` row for them to
+-      // speak about.
+-      expect(run.lines.filter((line) => CLI_LINE.test(line))).toHaveLength(1);
++      // speak about. The CLI loaded its own context, so the line is read
++      // against the callbacks that context carries.
++      expect(
++        run.lines.filter((line) => isFindingLine(line, CLI_FILE, CTX.callbacks)),
++      ).toHaveLength(1);
+     } finally {
+       rmSync(dir, {recursive: true, force: true});
+     }
+diff --git a/packages/tinyapp-lint/test/views.test.ts b/packages/tinyapp-lint/test/views.test.ts
+index 85f3a54ad5a757432523b8978c0d7362f3e3f4ab..968def0c37330a7e3a3ad4d702277ad302c3de51 100644
+--- a/packages/tinyapp-lint/test/views.test.ts
++++ b/packages/tinyapp-lint/test/views.test.ts
+@@ -117,7 +117,10 @@ test(
+     expect(rule.name).toBe('views');
+ 
+     const ctx = await contextOnce();
+-    expect(ctx.exams).toHaveLength(6);
++    // At least the six of M1: a later task's state exam is one more file under
++    // `tests/state-exams/`, and what this leg means is that every exam there
++    // is — six or more — asserts a view over a state that exists.
++    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
+ 
+     // Every one of the six asserts a view, and names a state that is there.
+     const paths = ctx.snapshots.map(({path}) => path);
+diff --git a/state-exams/expected/two-todos-first-due.json b/state-exams/expected/two-todos-first-due.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..9cb13328b879066a2e86191152883ee926316e31
+--- /dev/null
++++ b/state-exams/expected/two-todos-first-due.json
+@@ -0,0 +1 @@
++[{"todos": {"0": {"text": "buy milk", "completed": false, "due": "2025-12-31"}, "1": {"text": "walk the dog", "completed": false}}}, {}]
+diff --git a/state-exams/expected/two-todos-first-past-due-done.json b/state-exams/expected/two-todos-first-past-due-done.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..e4493714c0258853ac9d1dba11243b1b03d0a0c0
+--- /dev/null
++++ b/state-exams/expected/two-todos-first-past-due-done.json
+@@ -0,0 +1 @@
++[{"todos": {"0": {"text": "buy milk", "completed": true, "due": "2025-12-31"}, "1": {"text": "walk the dog", "completed": false}}}, {}]
+diff --git a/state-exams/expected/two-todos-second-due.json b/state-exams/expected/two-todos-second-due.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..e0a022c7dbd81d82ec470bdadc0b4aef98bd786c
+--- /dev/null
++++ b/state-exams/expected/two-todos-second-due.json
+@@ -0,0 +1 @@
++[{"todos": {"0": {"text": "buy milk", "completed": false}, "1": {"text": "walk the dog", "completed": false, "due": "2025-06-30"}}}, {}]
+diff --git a/state-exams/seeds/two-open-todos-first-past-due.json b/state-exams/seeds/two-open-todos-first-past-due.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..9cb13328b879066a2e86191152883ee926316e31
+--- /dev/null
++++ b/state-exams/seeds/two-open-todos-first-past-due.json
+@@ -0,0 +1 @@
++[{"todos": {"0": {"text": "buy milk", "completed": false, "due": "2025-12-31"}, "1": {"text": "walk the dog", "completed": false}}}, {}]
+diff --git a/tests/state-exams/completed-past-due-not-overdue.test.ts b/tests/state-exams/completed-past-due-not-overdue.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..3ab9e15afcedb4b3f64e9661ab27ce49fc2cd36d
+--- /dev/null
++++ b/tests/state-exams/completed-past-due-not-overdue.test.ts
+@@ -0,0 +1,248 @@
++/**
++ * The exam for Task 3 — "The overdue mark on a row".
++ *
++ * Machine, restated:
++ *
++ *   M1. Every `.todoItem` carries `data-overdue="true"` and the class `overdue`
++ *       exactly when `isOverdue(row, new Date())` is true, and
++ *       `data-overdue="false"` without that class otherwise — measured by
++ *       `renderStatic` over the seed and over the expected state, both inside
++ *       `withContract('2026-01-01T00:00:00Z', …)`.
++ *   M2. Clicking the first checkbox on the page seeded from the seed file
++ *       reaches exactly the expected file — row `0` completed with its `due`
++ *       still `2025-12-31` — and the page then shows no
++ *       `.todoItem[data-overdue="true"]`, no `.todoItem.overdue`, two
++ *       `.todoItem[data-overdue="false"]`, and `.todoItem.completed input#todo-0`
++ *       checked.
++ *
++ * Proof legs, and the tests that carry them:
++ *
++ *   (a) [M1] the static render over the seed: exactly one
++ *            `.todoItem[data-overdue="true"]`, its text containing `buy milk`
++ *            and its `class` attribute exactly `todoItem overdue`; exactly one
++ *            `.todoItem[data-overdue="false"]`, its text containing
++ *            `walk the dog` and its class list without `overdue`.
++ *   (b) [M1] the static render over the expected state: no
++ *            `.todoItem[data-overdue="true"]` and exactly two
++ *            `.todoItem[data-overdue="false"]`.
++ *   (c) [M2] the state exam — clock, entry, seed, store, click, expected, the
++ *            four view entries and the mutant as the leg spells them — and the
++ *            two snapshot files parsing to exactly the two Context literals.
++ *
++ * Three readings this file makes, written down because they are choices:
++ *
++ *   - The markup is read with `node-html-parser`'s `parse`, which is the parser
++ *     the app's own graders already read markup with:
++ *     `packages/tinyapp-exam/src/render-move.ts`'s `assertView` and
++ *     `packages/tinyapp-lint/src/context.ts`'s static render both use it. So
++ *     legs (a) and (b) resolve a selector exactly as leg (c)'s `view` entries
++ *     do, and a selector that holds here holds there.
++ *   - `renderStatic`, `createTodosStore` and `isOverdue` all exist at BASE and
++ *     are imported statically. `isOverdue` is this task's Consumes, not its
++ *     Produces: no leg here grades that function, and the one test that calls
++ *     it uses it as M1's own oracle — the clause says "exactly when
++ *     `isOverdue(row, new Date())` is true", so the attribute is compared
++ *     against that function's answer rather than against a second hand-written
++ *     table of rows.
++ *   - The two snapshot files are this task's to create. They are read through
++ *     `readSnapshot`, which throws a message naming the missing file, so a red
++ *     run at BASE reads as the absent implementation and not as a typo here.
++ *
++ * Nothing here names an `input#due-…` selector or any other part of the date
++ * field: that surface belongs to the sibling task in the same wave.
++ */
++
++import {existsSync, readFileSync} from 'node:fs';
++import {join} from 'node:path';
++
++import {expect, test} from 'bun:test';
++import {parse, type HTMLElement} from 'node-html-parser';
++import {stateExam, withContract} from 'tinyapp-exam';
++
++import {isOverdue} from '../../client/src/overdue';
++import {renderStatic} from '../../client/src/StaticPage';
++import {createTodosStore, type TodosContent} from '../../client/src/storeData';
++
++/** This file sits two directories below the repository root. */
++const ROOT = join(import.meta.dir, '..', '..');
++
++/** The clock every leg here is measured under, as the Machine pins it. */
++const CLOCK = '2026-01-01T00:00:00Z';
++
++/** The instant that clock names, for M1's `isOverdue` oracle. */
++const NOW = new Date(CLOCK);
++
++/** The two snapshot files this task creates, as the Proof legs name them. */
++const SEED_FILE = 'state-exams/seeds/two-open-todos-first-past-due.json';
++const EXPECTED_FILE = 'state-exams/expected/two-todos-first-past-due-done.json';
++
++/** The seed, exactly as Context spells it. */
++const SEED_LITERAL = [
++  {
++    todos: {
++      '0': {text: 'buy milk', completed: false, due: '2025-12-31'},
++      '1': {text: 'walk the dog', completed: false},
++    },
++  },
++  {},
++];
++
++/** The expected state, exactly as Context spells it — row `1` has no `due`. */
++const EXPECTED_LITERAL = [
++  {
++    todos: {
++      '0': {text: 'buy milk', completed: true, due: '2025-12-31'},
++      '1': {text: 'walk the dog', completed: false},
++    },
++  },
++  {},
++];
++
++/**
++ * One snapshot file's parsed content.
++ *
++ * A file this task has not created yet fails with a message naming it, rather
++ * than with an `ENOENT` that reads like a mistake in this exam's own paths.
++ */
++const readSnapshot = (relative: string): TodosContent => {
++  const path = join(ROOT, relative);
++  if (!existsSync(path)) {
++    throw new Error(
++      `${relative} does not exist — this task must create it before its exam can grade it`,
++    );
++  }
++  return JSON.parse(readFileSync(path, 'utf8')) as TodosContent;
++};
++
++/** The class tokens of an element, in the order the attribute writes them. */
++const classesOf = (element: HTMLElement): string[] =>
++  (element.getAttribute('class') ?? '').split(/\s+/).filter((token) => token !== '');
++
++/**
++ * `renderStatic` over `content`, run inside the contract the legs name, with
++ * the markup handed back parsed.
++ *
++ * The render is what reads `new Date()`, so it happens inside `withContract`;
++ * the assertions are the caller's and happen outside it, where a failure is
++ * reported as itself rather than as something the contract caught.
++ */
++const renderUnderContract = async (content: TodosContent): Promise<HTMLElement> => {
++  let html: string | undefined;
++  await withContract(CLOCK, () => {
++    html = renderStatic(content);
++  });
++  return parse(html as string);
++};
++
++/** The `.todoItem` elements of a render, in the order the list paints them. */
++const itemsOf = (root: HTMLElement): HTMLElement[] => root.querySelectorAll('.todoItem');
++
++/** The todo rows of a snapshot, ordered by row id the way `TodoList` sorts them. */
++const rowsOf = (content: TodosContent): {completed?: boolean; due?: string}[] => {
++  const todos = (content as unknown as [Record<string, Record<string, any>>, unknown])[0]
++    .todos;
++  return Object.keys(todos)
++    .sort()
++    .map((id) => todos[id] as {completed?: boolean; due?: string});
++};
++
++// --- (a) [M1]: the static render over the seed -------------------------------
++
++test('leg (a) [M1] renderStatic over the seed paints exactly one .todoItem[data-overdue="true"], `buy milk`, with class exactly `todoItem overdue`', async () => {
++  const root = await renderUnderContract(readSnapshot(SEED_FILE));
++
++  const overdue = root.querySelectorAll('.todoItem[data-overdue="true"]');
++  expect(overdue.length).toBe(1);
++  expect(overdue[0].textContent).toContain('buy milk');
++  // The clause pins the whole attribute, not merely the presence of the token:
++  // `completed` stays first and this row is open, so it is these two words.
++  expect(overdue[0].getAttribute('class')).toBe('todoItem overdue');
++});
++
++test('leg (a) [M1] renderStatic over the seed paints exactly one .todoItem[data-overdue="false"], `walk the dog`, with no `overdue` class', async () => {
++  const root = await renderUnderContract(readSnapshot(SEED_FILE));
++
++  const notOverdue = root.querySelectorAll('.todoItem[data-overdue="false"]');
++  expect(notOverdue.length).toBe(1);
++  expect(notOverdue[0].textContent).toContain('walk the dog');
++  expect(classesOf(notOverdue[0])).not.toContain('overdue');
++  // And the mark is not merely absent from this row: `.todoItem.overdue` names
++  // exactly the one row the clause marks.
++  expect(root.querySelectorAll('.todoItem.overdue').length).toBe(1);
++});
++
++// --- (b) [M1]: the static render over the expected state ---------------------
++
++test('leg (b) [M1] renderStatic over the expected state paints no .todoItem[data-overdue="true"] and exactly two .todoItem[data-overdue="false"]', async () => {
++  const root = await renderUnderContract(readSnapshot(EXPECTED_FILE));
++
++  expect(root.querySelectorAll('.todoItem[data-overdue="true"]').length).toBe(0);
++  expect(root.querySelectorAll('.todoItem[data-overdue="false"]').length).toBe(2);
++  // "`data-overdue="false"` without that class": the completed, dated row is
++  // not marked either.
++  expect(root.querySelectorAll('.todoItem.overdue').length).toBe(0);
++});
++
++// --- (a) and (b) [M1]: the clause's own "exactly when" ----------------------
++
++for (const [label, file] of [
++  ['the seed', SEED_FILE],
++  ['the expected state', EXPECTED_FILE],
++] as const) {
++  test(`legs (a), (b) [M1] every .todoItem of ${label} carries data-overdue and the \`overdue\` class exactly when isOverdue(row, new Date()) is true`, async () => {
++    const content = readSnapshot(file);
++    const root = await renderUnderContract(content);
++
++    const rows = rowsOf(content);
++    const items = itemsOf(root);
++    expect(items.length).toBe(rows.length);
++
++    for (const [index, row] of rows.entries()) {
++      const want = isOverdue(row, NOW);
++      expect(items[index].getAttribute('data-overdue')).toBe(want ? 'true' : 'false');
++      expect(classesOf(items[index]).includes('overdue')).toBe(want);
++    }
++  });
++}
++
++// --- (c) [M2]: the two snapshot files, exactly as Context spells them --------
++
++test(`leg (c) [M2] ${SEED_FILE} parses to exactly the seed literal`, () => {
++  expect(readSnapshot(SEED_FILE)).toEqual(SEED_LITERAL as unknown as TodosContent);
++});
++
++test(`leg (c) [M2] ${EXPECTED_FILE} parses to exactly the expected literal — row 0 completed with its due still 2025-12-31, row 1 with no due key`, () => {
++  const content = readSnapshot(EXPECTED_FILE);
++  expect(content).toEqual(EXPECTED_LITERAL as unknown as TodosContent);
++
++  // Spelled out as well as deep-equalled: the clause is precisely that row `1`
++  // carries no `due` key at all, which `toEqual` alone would let `undefined`
++  // stand in for.
++  const todos = (content as unknown as [Record<string, Record<string, unknown>>, unknown])[0]
++    .todos;
++  expect(Object.keys(todos['0']).sort()).toEqual(['completed', 'due', 'text']);
++  expect(Object.keys(todos['1']).sort()).toEqual(['completed', 'text']);
++});
++
++// --- (c) [M2]: the state exam itself -----------------------------------------
++
++// Clicking the first checkbox on the seeded page completes row `0` without
++// touching its date, and the mark goes with it: `TodoList` renders rows
++// ascending by row id and `Page.act` clicks the first match of its selector, so
++// `.todoItem input[type=checkbox]` is row `0`'s box. The mutant is that same
++// row left open — an exam that could not tell the tick from no tick is hollow.
++stateExam({
++  clock: '2026-01-01T00:00:00Z',
++  entry: 'client/index.html',
++  seed: 'state-exams/seeds/two-open-todos-first-past-due.json',
++  store: () => createTodosStore(),
++  action: {click: '.todoItem input[type=checkbox]'},
++  expected: 'state-exams/expected/two-todos-first-past-due-done.json',
++  view: [
++    {selector: '.todoItem[data-overdue="true"]', absent: true},
++    {selector: '.todoItem.overdue', absent: true},
++    {selector: '.todoItem[data-overdue="false"]', count: 2},
++    {selector: '.todoItem.completed input#todo-0', checked: true},
++  ],
++  mutant: [{table: 'todos', row: '0', cell: 'completed', value: false}],
++});
+diff --git a/tests/state-exams/done-count.test.ts b/tests/state-exams/done-count.test.ts
+index c4f5077de13a6a9bd44f902929883a42fac113ff..8ec33d835629dbb437a3d25583e9d2e180870cb6 100644
+--- a/tests/state-exams/done-count.test.ts
++++ b/tests/state-exams/done-count.test.ts
+@@ -146,10 +146,11 @@ test('leg (n) [M3] state-exams/expected/two-todos-one-done.json parses to exactl
+ 
+ // --- M4: the count added no store state --------------------------------------
+ 
+-test('leg (o) [M4] TABLES_SCHEMA still has exactly the table todos with exactly the cells completed and text', () => {
++test('leg (o) [M4] TABLES_SCHEMA still has exactly the table todos with exactly the cells completed, due and text', () => {
+   expect(Object.keys(TABLES_SCHEMA)).toEqual(['todos']);
+   expect(Object.keys(TABLES_SCHEMA.todos).sort()).toEqual([
+     'completed',
++    'due',
+     'text',
+   ]);
+ });
+diff --git a/tests/state-exams/due-date-marks-overdue.test.ts b/tests/state-exams/due-date-marks-overdue.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..41eb4b126cf07862a7ae45d68c5184dd72edd4d3
+--- /dev/null
++++ b/tests/state-exams/due-date-marks-overdue.test.ts
+@@ -0,0 +1,193 @@
++/**
++ * The exam for Task 4 — "A date typed into a row shows it overdue".
++ *
++ * Machine, restated:
++ *
++ *   M1. Typing `2025-12-31` into `input#due-0` on the page seeded from
++ *       `state-exams/seeds/two-open-todos.json` reaches exactly
++ *       `state-exams/expected/two-todos-first-due.json`, which parses to
++ *       `[{"todos": {"0": {"text": "buy milk", "completed": false, "due":
++ *       "2025-12-31"}, "1": {"text": "walk the dog", "completed": false}}}, {}]`,
++ *       and the page then shows exactly one `.todoItem[data-overdue="true"]`,
++ *       holding `buy milk`, exactly one `.todoItem.overdue`, exactly one
++ *       `.todoItem[data-overdue="false"]`, holding `walk the dog`, and
++ *       `input#due-0` with `value="2025-12-31"`.
++ *   M2. `client/src/todoItem.css` holds a rule whose selector is
++ *       `.todoItem.overdue label` and whose block sets `color`, so an overdue
++ *       row's text is visibly marked.
++ *
++ * Proof legs, and the tests that carry them:
++ *
++ *   (a) [M1] the state exam — clock, entry, seed, store, the typing action,
++ *            expected, the five view entries and the mutant exactly as the leg
++ *            spells them — and the expected file parsing to exactly the M1
++ *            literal.
++ *   (b) [M2] the Proof's `Run:` line exits 0: the css rule's block, from its
++ *            selector line to its closing brace, contains `color`.
++ *
++ * Three readings this file makes, written down because they are choices:
++ *
++ *   - `createTodosStore` is imported statically from `client/src/storeData`
++ *     and named as `store: () => createTodosStore()` beside `entry`, as the
++ *     Global Constraints' last bullet requires: measured 2026-09-15, an
++ *     interaction exam importing nothing from `client/src` fails under
++ *     `bun test` with `Bundle failed` before it opens a page.
++ *   - Leg (b) is graded twice, because the `Run:` line and the clause it stands
++ *     for are not quite the same sentence. The line is run verbatim through
++ *     `bash -c` from the repository root and asserted to exit 0, which is the
++ *     leg's own words; beside it the file is read structurally for a rule whose
++ *     selector is exactly `.todoItem.overdue label` and whose block holds a
++ *     declaration whose property is exactly `color` — the line's
++ *     `grep -q 'color'` would also be satisfied by the `border-color` of the
++ *     optional second rule the Context mentions, and M2's words are "whose
++ *     block sets `color`". Neither check pins the value, so
++ *     `color: var(--accent)` and any other colour both hold.
++ *   - Nothing here grades `DueInput`, `isOverdue` or `setTodoDue` as such: they
++ *     are this task's Consumes, and the whole of M1 is measured through the
++ *     page — the state the typing reaches and the markup it leaves behind.
++ *     Row `1` reads `data-overdue="false"` because it has no date at all,
++ *     never because of a future one (Global Constraints), and `2025-12-31` is
++ *     past under the pinned clock and under the wall clock alike.
++ */
++
++import {existsSync, readFileSync} from 'node:fs';
++import {join} from 'node:path';
++
++import {expect, test} from 'bun:test';
++import {stateExam} from 'tinyapp-exam';
++
++import {createTodosStore, type TodosContent} from '../../client/src/storeData';
++
++/** This file sits two directories below the repository root, `bun test`'s cwd. */
++const ROOT = join(import.meta.dir, '..', '..');
++
++/** The seed the typing happens on, and the state it must reach. */
++const SEED_FILE = 'state-exams/seeds/two-open-todos.json';
++const EXPECTED_FILE = 'state-exams/expected/two-todos-first-due.json';
++
++/** The stylesheet M2 speaks about, and the rule it requires of it. */
++const CSS_FILE = 'client/src/todoItem.css';
++const CSS_SELECTOR = '.todoItem.overdue label';
++
++/** The Proof's `Run:` line, verbatim. */
++const RUN_LINE = `sed -n '/^\\.todoItem\\.overdue label/,/}/p' client/src/todoItem.css | grep -q 'color'`;
++
++/** The expected state, exactly as M1 spells it — row `1` has no `due` key. */
++const EXPECTED_LITERAL = [
++  {
++    todos: {
++      '0': {text: 'buy milk', completed: false, due: '2025-12-31'},
++      '1': {text: 'walk the dog', completed: false},
++    },
++  },
++  {},
++];
++
++/**
++ * One repository file's text.
++ *
++ * A file this task has not created yet fails with a message naming it, rather
++ * than with an `ENOENT` that reads like a mistake in this exam's own paths.
++ */
++const readRepoFile = (relative: string): string => {
++  const path = join(ROOT, relative);
++  if (!existsSync(path)) {
++    throw new Error(
++      `${relative} does not exist — this task must create it before its exam can grade it`,
++    );
++  }
++  return readFileSync(path, 'utf8');
++};
++
++/** One `Run:` line, run from the repository root: its status and its output. */
++const statusOf = (line: string): number => {
++  const spawned = Bun.spawnSync({
++    cmd: ['bash', '-c', line],
++    cwd: ROOT,
++    stdout: 'pipe',
++    stderr: 'pipe',
++  });
++  if (spawned.exitCode !== 0) {
++    console.log(
++      `$ ${line}\n${spawned.stdout.toString()}${spawned.stderr.toString()}`,
++    );
++  }
++  return spawned.exitCode;
++};
++
++/** The declaration blocks of every rule in `css` whose selector is `selector`. */
++const blocksOf = (css: string, selector: string): string[] => {
++  const blocks: string[] = [];
++  for (const match of css.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
++    if ((match[1] ?? '').trim() === selector) {
++      blocks.push(match[2] ?? '');
++    }
++  }
++  return blocks;
++};
++
++/** Whether a declaration block sets the `color` property itself. */
++const setsColor = (block: string): boolean =>
++  block
++    .split(';')
++    .some((declaration) => (declaration.split(':')[0] ?? '').trim() === 'color');
++
++// --- (a) [M1]: the expected state, exactly as the clause spells it -----------
++
++test(`leg (a) [M1] ${EXPECTED_FILE} parses to exactly the M1 literal`, () => {
++  const content = JSON.parse(readRepoFile(EXPECTED_FILE)) as TodosContent;
++
++  expect(content).toEqual(EXPECTED_LITERAL as unknown as TodosContent);
++
++  // Spelled out as well as deep-equalled: the clause is precisely that row `0`
++  // gained a `due` and row `1` carries no `due` key at all, which `toEqual`
++  // alone would let `undefined` stand in for.
++  const todos = (
++    content as unknown as [Record<string, Record<string, unknown>>, unknown]
++  )[0].todos;
++  expect(Object.keys(todos).sort()).toEqual(['0', '1']);
++  expect(Object.keys(todos['0']!).sort()).toEqual(['completed', 'due', 'text']);
++  expect(Object.keys(todos['1']!).sort()).toEqual(['completed', 'text']);
++});
++
++// --- (b) [M2]: the overdue row's text is visibly marked ----------------------
++
++test('leg (b) [M2] the Proof Run line exits 0 — the .todoItem.overdue label block contains `color`', () => {
++  expect(statusOf(RUN_LINE)).toBe(0);
++});
++
++test(`leg (b) [M2] ${CSS_FILE} holds a rule whose selector is exactly \`${CSS_SELECTOR}\` and whose block sets \`color\``, () => {
++  const blocks = blocksOf(readRepoFile(CSS_FILE), CSS_SELECTOR);
++
++  expect(blocks.length).toBeGreaterThan(0);
++  expect(blocks.some(setsColor)).toBe(true);
++});
++
++// --- (a) [M1]: the state exam itself -----------------------------------------
++
++// Typing `2025-12-31` into the first row's date box stores that date on row `0`
++// and nothing else, and the mark follows it in the same page: row `0` is the
++// one open, past-due todo, so it alone is `data-overdue="true"` and `.overdue`,
++// row `1` reads `"false"` for want of a date, and the box the date was typed
++// into still shows it. The mutant drops the `due` cell the typing put there —
++// an exam that did not actually store it would not tell the two apart.
++stateExam({
++  clock: '2026-01-01T00:00:00Z',
++  entry: 'client/index.html',
++  seed: SEED_FILE,
++  store: () => createTodosStore(),
++  action: {type: ['input#due-0', '2025-12-31']},
++  expected: EXPECTED_FILE,
++  view: [
++    {selector: '.todoItem[data-overdue="true"]', count: 1, text: 'buy milk'},
++    {selector: '.todoItem.overdue', count: 1, text: 'buy milk'},
++    {
++      selector: '.todoItem[data-overdue="false"]',
++      count: 1,
++      text: 'walk the dog',
++    },
++    {selector: 'input#due-0', attr: {name: 'value', value: '2025-12-31'}},
++    {selector: '.todoItem', count: 2},
++  ],
++  mutant: [{table: 'todos', row: '0', cell: 'due', absent: true}],
++});
+diff --git a/tests/state-exams/set-todo-due.test.ts b/tests/state-exams/set-todo-due.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..6e10b30978119ec792373ffb7b5a92a8caea630f
+--- /dev/null
++++ b/tests/state-exams/set-todo-due.test.ts
+@@ -0,0 +1,366 @@
++/**
++ * Exam for Task 1 — "The due cell — schema, callback, invariant, and the pins
++ * they move".
++ *
++ * One test per Proof leg, named for its leg and for the Machine clause it comes
++ * from — and, where a leg says "one assertion per value" or "one assertion per
++ * row", one test per value and per row so that a red run names the case:
++ *
++ *   (a) [M1] `TABLES_SCHEMA.todos.due` is exactly `{type: 'string'}` with no
++ *            `default`, and a seed that carries no `due` round-trips through
++ *            `createTodosStore(seed).getContent()` unchanged;
++ *   (b) [M2] `setTodoDue` sets a valid date, clears the cell on `''`, refuses
++ *            `'2025-13-45'` and `'soon'`, and returns `undefined` every time;
++ *   (c) [M3] `isIsoDate` over the seven pinned values;
++ *   (d) [M4] `isOverdue` over the six pinned rows at `2026-01-01T00:00:00Z`;
++ *   (e) [M5] the `INVARIANTS` entry carrying the pinned message, and the
++ *            Proof's lint `Run:` line run verbatim;
++ *   (f) [M6] `state-exams/expected/two-todos-second-due.json` parses to exactly
++ *            the M6 literal, and the state exam itself;
++ *   (g) [M7] the two `bun test` `Run:` lines, and `done-count.test.ts`'s own
++ *            source pinning the sorted cells `['completed', 'due', 'text']`.
++ *
++ * Three readings this file makes, written down because they are choices:
++ *
++ *   - `setTodoDue` and the whole `client/src/overdue.ts` module are reached
++ *     with a computed-specifier `import()` inside each test body rather than a
++ *     static import or a top-level `await`. That is the precedent
++ *     `packages/tinyapp-lint/test/invariants.test.ts` set in this repository,
++ *     and it is load-bearing: a static import of a module — or of a named
++ *     export — that does not exist yet fails the whole file at load, so every
++ *     leg would then report that one missing import instead of the thing it is
++ *     itself about. `createTodosStore`, `TABLES_SCHEMA` and `INVARIANTS` do
++ *     exist at BASE and are imported statically, which is also what keeps this
++ *     file importing from `client/src` at all.
++ *   - Leg (e)'s lint line and leg (g)'s two `bun test` lines are run verbatim
++ *     through `bash -c` from the repository root, so the ordering leg (e)
++ *     spells out — capture the status, require it to be exactly 1, and only
++ *     then grep — is the line's own rather than something this exam re-states.
++ *   - Nothing here pins a sibling plan's surface: no count of exams or
++ *     snapshots, no callback list, no invariant count, no key set of
++ *     `TABLES_SCHEMA` itself. The only key sets pinned are this plan's own
++ *     `todos` cells and the shape of the `due` cell schema.
++ *
++ * `dateOf` is named under Produces but by no leg; it gets one small test
++ * labelled `[Produces]` against the definition the task's Context gives it, so
++ * a later task importing it is not resting on an unexamined name.
++ */
++
++import {readFileSync} from 'node:fs';
++import {join, resolve} from 'node:path';
++
++import {expect, test} from 'bun:test';
++
++import {stateExam} from 'tinyapp-exam';
++
++import {
++  createTodosStore,
++  INVARIANTS,
++  TABLES_SCHEMA,
++  type TodosContent,
++  type TodosStore,
++} from '../../client/src/storeData';
++
++// This file sits two directories below the repository root, which is also
++// `bun test`'s cwd — the `Run:` lines and the fixture reads are anchored there.
++const ROOT = resolve(import.meta.dir, '..', '..');
++
++/** A child `bun` process needs more than Bun's default per-test 5 s. */
++const SPAWN_TIMEOUT_MS = 300_000;
++
++/** `setTodoDue` as the task's Produces spells it. */
++type SetTodoDue = (store: TodosStore, id: string, due: string) => void;
++
++/** The pure functions `client/src/overdue.ts` produces. */
++type OverdueModule = {
++  isIsoDate: (value: string) => boolean;
++  isOverdue: (row: {completed?: boolean; due?: string}, now: Date) => boolean;
++  dateOf: (now: Date) => string;
++};
++
++/** The store module, for the export M2 adds to it. See this file's header. */
++const storeModule = async (): Promise<{setTodoDue: SetTodoDue}> =>
++  (await import(resolve(ROOT, 'client/src/storeData.ts'))) as {
++    setTodoDue: SetTodoDue;
++  };
++
++/** The sibling module M3 and M4 declare. See this file's header. */
++const overdueModule = async (): Promise<OverdueModule> =>
++  (await import(resolve(ROOT, 'client/src/overdue.ts'))) as OverdueModule;
++
++/** One `Run:` line, run from the repository root: its status and its output. */
++const run = (line: string): {code: number; out: string} => {
++  const spawned = Bun.spawnSync({
++    cmd: ['bash', '-c', line],
++    cwd: ROOT,
++    stdout: 'pipe',
++    stderr: 'pipe',
++  });
++  return {
++    code: spawned.exitCode,
++    out: `${spawned.stdout.toString()}${spawned.stderr.toString()}`,
++  };
++};
++
++/** `run`, with the output printed when the line did not exit 0. */
++const statusOf = (line: string): number => {
++  const {code, out} = run(line);
++  if (code !== 0) {
++    console.log(`$ ${line}\n${out}`);
++  }
++  return code;
++};
++
++const readJson = (...parts: string[]): unknown =>
++  JSON.parse(readFileSync(join(ROOT, ...parts), 'utf8'));
++
++/** A fresh copy of `state-exams/seeds/two-open-todos.json`'s content. */
++const seedContent = (): TodosContent =>
++  readJson('state-exams', 'seeds', 'two-open-todos.json') as TodosContent;
++
++/** Anything, read back as a plain record. */
++const keysOf = (value: unknown): string[] =>
++  Object.keys(value as Record<string, unknown>).sort();
++
++/** A structural copy, so a later mutation of the store cannot reach it. */
++const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
++
++// --- (a) [M1]: the cell with no default, and a seed that keeps its shape -----
++
++test('leg (a) [M1] TABLES_SCHEMA.todos.due is exactly {type: `string`} with no default key', () => {
++  const due = (TABLES_SCHEMA.todos as Record<string, unknown>).due;
++
++  expect(due).toEqual({type: 'string'} as unknown as typeof due);
++  // Spelled out as well as deep-equalled: a `default: undefined` would satisfy
++  // `toEqual` above, and M1 is precisely about the absent default.
++  expect(keysOf(due)).toEqual(['type']);
++  expect(Object.hasOwn(due as object, 'default')).toBe(false);
++});
++
++test('leg (a) [M1] createTodosStore over a seed with no due cell round-trips to exactly that seed', () => {
++  const content = createTodosStore([
++    {todos: {'0': {text: 'buy milk', completed: false}}},
++    {},
++  ] as TodosContent).getContent();
++
++  expect(content).toEqual([
++    {todos: {'0': {text: 'buy milk', completed: false}}},
++    {},
++  ] as unknown as typeof content);
++  // No `due` cell appears: the schema materialises nothing into a seeded row.
++  expect(keysOf((content[0] as Record<string, any>).todos['0'])).toEqual([
++    'completed',
++    'text',
++  ]);
++});
++
++// --- (b) [M2]: set, clear, refuse — and `undefined` every time ---------------
++
++test('leg (b) [M2] setTodoDue sets a valid date on the row it names, returning undefined', async () => {
++  const {setTodoDue} = await storeModule();
++  expect(typeof setTodoDue).toBe('function');
++
++  const store = createTodosStore(seedContent());
++
++  expect(setTodoDue(store, '0', '2025-12-31')).toBeUndefined();
++  expect((store as any).getCell('todos', '0', 'due')).toBe('2025-12-31');
++  expect((store as any).getRow('todos', '0')).toEqual({
++    text: 'buy milk',
++    completed: false,
++    due: '2025-12-31',
++  });
++  // The other row was not touched.
++  expect((store as any).getRow('todos', '1')).toEqual({
++    text: 'walk the dog',
++    completed: false,
++  });
++});
++
++test('leg (b) [M2] setTodoDue with the empty string removes the cell, so the row has no due key', async () => {
++  const {setTodoDue} = await storeModule();
++  const store = createTodosStore(seedContent());
++
++  setTodoDue(store, '0', '2025-12-31');
++  expect(setTodoDue(store, '0', '')).toBeUndefined();
++
++  const row = (store as any).getRow('todos', '0') as Record<string, unknown>;
++  expect(Object.hasOwn(row, 'due')).toBe(false);
++  expect(keysOf(row)).toEqual(['completed', 'text']);
++  expect(row).toEqual({text: 'buy milk', completed: false});
++});
++
++for (const bad of ['2025-13-45', 'soon']) {
++  test(`leg (b) [M2] setTodoDue with ${JSON.stringify(bad)} leaves the content deep-equal to what it was, returning undefined`, async () => {
++    const {setTodoDue} = await storeModule();
++    const store = createTodosStore(seedContent());
++
++    const before = copy(store.getContent());
++    expect(setTodoDue(store, '0', bad)).toBeUndefined();
++    expect(store.getContent()).toEqual(before);
++  });
++}
++
++// --- (c) [M3]: `isIsoDate`, one assertion per value --------------------------
++
++const ISO_DATE_CASES: [string, boolean][] = [
++  ['2025-12-31', true],
++  ['2024-02-29', true],
++  ['', false],
++  ['2025-13-45', false],
++  ['2025-02-30', false],
++  ['2025-1-5', false],
++  ['soon', false],
++];
++
++for (const [value, want] of ISO_DATE_CASES) {
++  test(`leg (c) [M3] isIsoDate(${JSON.stringify(value)}) is ${want}`, async () => {
++    const {isIsoDate} = await overdueModule();
++    expect(isIsoDate(value)).toBe(want);
++  });
++}
++
++// --- (d) [M4]: `isOverdue` at the pinned instant, one assertion per row ------
++
++/** The instant M4 measures every row at — the clock every exam here pins. */
++const NOW = new Date('2026-01-01T00:00:00Z');
++
++const OVERDUE_CASES: [{completed?: boolean; due?: string}, boolean][] = [
++  [{completed: false, due: '2025-12-31'}, true],
++  [{completed: true, due: '2025-12-31'}, false],
++  [{completed: false, due: ''}, false],
++  [{completed: false}, false],
++  [{completed: false, due: '2026-01-01'}, false],
++  [{completed: false, due: '2026-06-01'}, false],
++];
++
++for (const [row, want] of OVERDUE_CASES) {
++  test(`leg (d) [M4] isOverdue(${JSON.stringify(row)}, 2026-01-01T00:00:00Z) is ${want}`, async () => {
++    const {isOverdue} = await overdueModule();
++    expect(isOverdue(row, NOW)).toBe(want);
++  });
++}
++
++test('[Produces] dateOf(now) is the instant`s UTC calendar date', async () => {
++  const {dateOf} = await overdueModule();
++  expect(dateOf(NOW)).toBe('2026-01-01');
++  expect(dateOf(new Date('2025-06-30T23:59:59Z'))).toBe('2025-06-30');
++});
++
++// --- (e) [M5]: the invariant, and the linter that rejects a bad seed ---------
++
++/** M5's message, character for character. */
++const DUE_MESSAGE = 'a due date is absent or a valid YYYY-MM-DD';
++
++test('leg (e) [M5] INVARIANTS holds a todos entry with the pinned message and predicate', () => {
++  const entry = INVARIANTS.find((invariant) => invariant.message === DUE_MESSAGE);
++
++  expect(entry).toBeDefined();
++  expect(entry!.table).toBe('todos');
++
++  // A row with no `due` at all, and a row with a real date, both hold.
++  expect(entry!.predicate({text: 'a', completed: false}, '0')).toBe(true);
++  expect(
++    entry!.predicate({text: 'a', completed: false, due: '2025-12-31'}, '0'),
++  ).toBe(true);
++
++  // Each of M5's three bad cells breaks it.
++  expect(entry!.predicate({text: 'a', completed: false, due: ''}, '0')).toBe(
++    false,
++  );
++  expect(
++    entry!.predicate({text: 'a', completed: false, due: '2025-13-45'}, '0'),
++  ).toBe(false);
++  expect(entry!.predicate({text: 'a', completed: false, due: 'soon'}, '0')).toBe(
++    false,
++  );
++});
++
++/**
++ * The Proof's lint `Run:` line, character for character.
++ *
++ * `String.raw` because the line spells `printf '%s\n'`: in an ordinary template
++ * literal that `\n` would reach `bash` as a real newline.
++ */
++const LINT_RUN = String.raw`d=$(mktemp -d state-exams/lint-tmp-XXXXXX); mkdir "$d/seeds"; printf '%s' '[{"todos":{"0":{"text":"a","completed":false,"due":"2025-13-45"}}},{}]' > "$d/seeds/bad.json"; out=$(bun run lint:state --seeds "$d/seeds" --expected "$d/none" --exams "$d/none" 2>&1); code=$?; rm -rf "$d"; test "$code" -eq 1 && printf '%s\n' "$out" | grep -q 'todos/0: breaks the invariant "a due date is absent or a valid YYYY-MM-DD"'`;
++
++test(
++  'leg (e) [M5] the lint Run line — one seed with a bad due date exits 1 and prints the pinned finding',
++  () => {
++    expect(statusOf(LINT_RUN)).toBe(0);
++  },
++  SPAWN_TIMEOUT_MS,
++);
++
++// --- (f) [M6]: the expected state, and the exam that reaches it --------------
++
++test('leg (f) [M6] state-exams/expected/two-todos-second-due.json parses to exactly the M6 literal', () => {
++  expect(
++    readJson('state-exams', 'expected', 'two-todos-second-due.json'),
++  ).toEqual([
++    {
++      todos: {
++        '0': {text: 'buy milk', completed: false},
++        '1': {text: 'walk the dog', completed: false, due: '2025-06-30'},
++      },
++    },
++    {},
++  ]);
++});
++
++// --- (g) [M7]: the pins the new cell, callback and snapshot move -------------
++
++test(
++  'leg (g) [M7] the Run line `bun test tests/state-exams/done-count.test.ts` exits 0',
++  () => {
++    expect(statusOf('bun test tests/state-exams/done-count.test.ts')).toBe(0);
++  },
++  SPAWN_TIMEOUT_MS,
++);
++
++test(
++  'leg (g) [M7] the Run line `bun test packages/tinyapp-lint` exits 0',
++  () => {
++    expect(statusOf('bun test packages/tinyapp-lint')).toBe(0);
++  },
++  SPAWN_TIMEOUT_MS,
++);
++
++test('leg (g) [M7] done-count.test.ts pins the sorted todos cells as completed, due and text', () => {
++  // Read with every run of whitespace removed, so the pin is graded on the
++  // cells it names and not on how the file happens to be wrapped or quoted.
++  const packed = readFileSync(
++    join(ROOT, 'tests', 'state-exams', 'done-count.test.ts'),
++    'utf8',
++  ).replace(/\s+/g, '');
++
++  expect(packed).toContain('Object.keys(TABLES_SCHEMA.todos).sort()');
++  expect(/\[['"]completed['"],['"]due['"],['"]text['"],?\]/.test(packed)).toBe(
++    true,
++  );
++  // And the cell list it replaced is gone, so the pin moved rather than grew.
++  expect(/\[['"]completed['"],['"]text['"],?\]/.test(packed)).toBe(false);
++});
++
++// --- (f) [M6] again: the state exam itself -----------------------------------
++
++// Giving the second of two open todos a due date reaches the expected state,
++// and the page on that state still paints two open rows: the date is stored on
++// row `1` without ticking it or adding a row.
++stateExam({
++  clock: '2026-01-01T00:00:00Z',
++  entry: 'client/index.html',
++  seed: 'state-exams/seeds/two-open-todos.json',
++  store: () => createTodosStore(),
++  action: async (store) => {
++    // The one deviation from M6's spelling, and only in how the callback is
++    // reached: see this file's header on the computed-specifier import.
++    const {setTodoDue} = await storeModule();
++    setTodoDue(store, '1', '2025-06-30');
++  },
++  expected: 'state-exams/expected/two-todos-second-due.json',
++  view: [
++    {selector: '.todoItem', count: 2, text: 'walk the dog'},
++    {selector: 'input#todo-1', unchecked: true},
++  ],
++  mutant: [{table: 'todos', row: '1', cell: 'due', absent: true}],
++});
+diff --git a/tests/state-exams/type-due-date.test.ts b/tests/state-exams/type-due-date.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..2edf5a7935ee837375f6623a8317bd9fbf7c6b4b
+--- /dev/null
++++ b/tests/state-exams/type-due-date.test.ts
+@@ -0,0 +1,173 @@
++/**
++ * Exam for Task 2 — "The date field on each row".
++ *
++ * Two legs, and one test per thing a leg asserts so that a red run names the
++ * case rather than the file:
++ *
++ *   (a) [M1] the static markup `renderStatic` paints over
++ *            `state-exams/expected/two-todos-second-due.json`: exactly two
++ *            `input.dueInput`, each `type="text"` with
++ *            `placeholder="YYYY-MM-DD"`, `#due-0` carrying `value=""` and
++ *            `#due-1` carrying `value="2025-06-30"`, and each sitting inside a
++ *            `.todoItem` after that row's `label`, one to a row;
++ *   (b) [M2] the state exam: typing `2025-06-30` into `input#due-1` on the page
++ *            seeded from `state-exams/seeds/two-open-todos.json` reaches
++ *            `state-exams/expected/two-todos-second-due.json`, and the page
++ *            then shows the two values and the two rows.
++ *
++ * Three readings this file makes, written down because they are choices:
++ *
++ *   - Nothing here imports `client/src/DueInput.tsx`. It does not exist at
++ *     BASE, and a static import of a missing module fails the whole file at
++ *     load — every leg would then report that one import instead of the thing
++ *     it is itself about. `renderStatic` and `createTodosStore` do exist at
++ *     BASE and are imported statically; the second of those is also what makes
++ *     this an interaction exam that bundles at all (Global Constraints, last
++ *     bullet: an interaction exam importing nothing from `client/src` fails
++ *     under `bun test` with `Bundle failed` before it opens a page).
++ *   - A `.todoItem` is tied to its row id through the checkbox `id="todo-N"`
++ *     the component already renders, and the date box is then required to be
++ *     `id="due-N"` for that same N. Reading the id off the markup rather than
++ *     assuming the row order is what makes the `#due-0`/`#due-1` pins below
++ *     pins on *those rows* and not on whichever box happens to come first.
++ *   - Ordering is graded as leg (a) words it — the date box sits **after** that
++ *     row's `label` in document order. The task's Context is tighter ("the line
++ *     directly after"), but that is a spelling of the JSX rather than the
++ *     clause, and this exam grades the clause.
++ *
++ * Measured at BASE (2026-09-15): `renderToStaticMarkup` emits `value=""` as a
++ * real attribute for a controlled input whose value is the empty string, so
++ * `#due-0`'s empty value is read as an attribute and not as an absence — the
++ * same reading `{attr: {name: 'value', value: ''}}` makes of the live page in
++ * leg (b).
++ */
++
++import {readFileSync} from 'node:fs';
++import {join, resolve} from 'node:path';
++
++import {expect, test} from 'bun:test';
++import {parse, type HTMLElement} from 'node-html-parser';
++
++import {stateExam} from 'tinyapp-exam';
++
++import {renderStatic} from '../../client/src/StaticPage';
++import {
++  createTodosStore,
++  type TodosContent,
++} from '../../client/src/storeData';
++
++// This file sits two directories below the repository root, which is also
++// `bun test`'s cwd — the fixture reads are anchored there, and so are the
++// repository-relative paths the state exam below names.
++const ROOT = resolve(import.meta.dir, '..', '..');
++
++/** The expected state M1 paints over, as the checked-in file parses. */
++const EXPECTED = 'state-exams/expected/two-todos-second-due.json';
++
++/** The value each row's date box carries in that state, by row id. */
++const DUE_BY_ROW: Record<string, string> = {'0': '', '1': '2025-06-30'};
++
++/**
++ * The markup of the app over `EXPECTED`, rendered once.
++ *
++ * Lazily, and not at module load: a render that throws belongs inside the test
++ * that asked for it, where the failure is reported beside its leg.
++ */
++let cached: HTMLElement | undefined;
++const markup = (): HTMLElement =>
++  (cached ??= parse(
++    renderStatic(
++      JSON.parse(readFileSync(join(ROOT, EXPECTED), 'utf8')) as TodosContent,
++    ),
++  ));
++
++/** Every `.todoItem` of that markup, in document order. */
++const rows = (): HTMLElement[] => markup().querySelectorAll('.todoItem');
++
++/** The row id a `.todoItem` carries, read off its checkbox's `id`. */
++const rowIdOf = (row: HTMLElement): string => {
++  const checkbox = row.querySelector('input[type=checkbox]');
++  const id = checkbox?.getAttribute('id') ?? '';
++  return id.startsWith('todo-') ? id.slice('todo-'.length) : id;
++};
++
++// --- (a) [M1]: the date box in the static markup -----------------------------
++
++test('leg (a) [M1] the markup over the expected state holds exactly two input.dueInput', () => {
++  expect(markup().querySelectorAll('input.dueInput').length).toBe(2);
++});
++
++test('leg (a) [M1] the two rows of the markup are rows 0 and 1', () => {
++  // The pins below are per row id; this is what says which ids there are.
++  expect(rows().map(rowIdOf)).toEqual(['0', '1']);
++});
++
++/** The `.todoItem` of the markup whose checkbox names `rowId`. */
++const rowOf = (rowId: string): HTMLElement => {
++  const row = rows().find((candidate) => rowIdOf(candidate) === rowId);
++  if (row === undefined) {
++    throw new Error(`no .todoItem for row ${rowId}`);
++  }
++  return row;
++};
++
++for (const [rowId, due] of Object.entries(DUE_BY_ROW)) {
++  test(`leg (a) [M1] row ${rowId} holds exactly one text input, and it is input#due-${rowId}.dueInput`, () => {
++    const texts = rowOf(rowId).querySelectorAll('input[type=text]');
++
++    expect(texts.length).toBe(1);
++    expect(texts[0]!.getAttribute('id')).toBe(`due-${rowId}`);
++    expect(texts[0]!.classList.contains('dueInput')).toBe(true);
++  });
++
++  test(`leg (a) [M1] input#due-${rowId} is type=text placeheld YYYY-MM-DD`, () => {
++    const input = rowOf(rowId).querySelector(`input#due-${rowId}`);
++
++    expect(input).not.toBeNull();
++    expect(input!.getAttribute('type')).toBe('text');
++    expect(input!.getAttribute('placeholder')).toBe('YYYY-MM-DD');
++  });
++
++  test(`leg (a) [M1] input#due-${rowId} carries value=${JSON.stringify(due)}`, () => {
++    const input = rowOf(rowId).querySelector(`input#due-${rowId}`);
++
++    expect(input).not.toBeNull();
++    expect(input!.getAttribute('value')).toBe(due);
++  });
++
++  test(`leg (a) [M1] input#due-${rowId} comes after row ${rowId}'s label`, () => {
++    const elements = rowOf(rowId).querySelectorAll('*');
++    const labelAt = elements.findIndex(
++      (element) => element.rawTagName === 'label',
++    );
++    const dueAt = elements.findIndex((element) =>
++      element.classList.contains('dueInput'),
++    );
++
++    expect(labelAt).toBeGreaterThanOrEqual(0);
++    expect(dueAt).toBeGreaterThanOrEqual(0);
++    expect(dueAt).toBeGreaterThan(labelAt);
++  });
++}
++
++// --- (b) [M2]: typing the date into the second row's box ---------------------
++
++// Typing `2025-06-30` into the second row's date box stores that date on row
++// `1` and nothing else: the page still paints two rows, the first row's box is
++// still empty, and the state reached is exactly the expected one. The mutant
++// drops the `due` cell the typing put there — an exam that did not actually
++// store it would not tell the two apart.
++stateExam({
++  clock: '2026-01-01T00:00:00Z',
++  entry: 'client/index.html',
++  seed: 'state-exams/seeds/two-open-todos.json',
++  store: () => createTodosStore(),
++  action: {type: ['input#due-1', '2025-06-30']},
++  expected: EXPECTED,
++  view: [
++    {selector: 'input#due-1', attr: {name: 'value', value: '2025-06-30'}},
++    {selector: 'input#due-0', attr: {name: 'value', value: ''}},
++    {selector: '.todoItem', count: 2},
++  ],
++  mutant: [{table: 'todos', row: '1', cell: 'due', absent: true}],
++});

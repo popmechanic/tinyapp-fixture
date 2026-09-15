@@ -1,0 +1,49 @@
+ * The tail every reachability line ends in, with the two things sibling work
+ * moves — the seed count and the callback list — left as capture groups.
+ *
+ * `theme` is a `values` entry no callback of the fixture writes (`setFilter`
+ * writes `filter`, and only the three names it knows), so this state is out of
+ * reach of the seeds whatever the bound.
+ */
+const FINDING_TAIL =
+  'reached by none of the (\\d+) seeds within 3 moves of (.+) — write the ' +
+  'state a callback reaches from a seed, or add the seed it is reached from$';
+
+/** The line M2 pins, over the file the finding quotes. */
+const BAD_LINE = new RegExp(
+  '^state-exams/expected/bad\\.json: state: ' + FINDING_TAIL,
+);
+
+/** `a, b, c or d` read back as the list it was written from. */
+const listOf = (text: string): string[] => text.replace(' or ', ', ').split(', ');
+
+/**
+ * One finding line against `pattern`: the two counts it quotes are the
+ * context's own, and the callbacks it names are the context's own, sorted.
+ */
+const expectFindingLine = (
+  line: string,
+  pattern: RegExp,
+  ctx: LintContext,
+): void => {
+  const match = pattern.exec(line);
+  expect(match).not.toBeNull();
+
+  expect(Number(match![1])).toBe(
+    ctx.snapshots.filter(({kind}) => kind === 'seed').length,
+  );
+
+  const named = listOf(match![2]!);
+  expect(named).toEqual([...named].sort());
+  expect(named).toEqual(Object.keys(ctx.callbacks).sort());
+  expect(named).toEqual(
+    expect.arrayContaining([
+      'addTodo',
+      'clearCompleted',
+      'deleteTodo',
+      'setTodoCompleted',
+    ]),
+  );
+  expect(named).toContain('setFilter');
+  expect(named).toContain('setTodoDue');
+};
