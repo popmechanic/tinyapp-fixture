@@ -24,3 +24,14 @@
 {"kind":"worker:end","label":"review:1:1","role":"reviewer","sessionId":"dbc67da5-f792-4745-93ca-25bbca682dd1","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":5720,"output":5370,"cacheRead":206836,"cacheCreation":24464,"costUsd":0.510908,"models":["claude-opus-5"]},"id":"01M2J2CAKC000058JXBJEN5ST3","ts":1789460359788}
 {"kind":"transcript:slice","label":"review:1:1","sessionId":"dbc67da5-f792-4745-93ca-25bbca682dd1","bytes":8720,"id":"01M2J2CAKE0000MNT98XQNBS1W","ts":1789460359790}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2J2CAKK000029AXFDBS3CFJ","ts":1789460359795}
+{"kind":"driver:wave-adopted","wave":1,"tasks":["1"],"headSha":"e83f1c0c743b20a85d1ca695f18cf0d338759427","id":"01M2J2CZTA0000P9SYRS7G38TG","ts":1789460381514}
+{"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2J2CZV600009F8VXB2S9HP0","ts":1789460381542}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":1,"id":"01M2J2D2DB0000R5S7QG65WQJZ","ts":1789460384171}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2J2D2FM0000J8CN1DV4RWCX","ts":1789460384244}
+{"kind":"driver:stage","stage":"finalize","id":"01M2J2D2GA00001T06J8VBZXZH","ts":1789460384266}
+{"kind":"driver:stage","stage":"gate","id":"01M2J2D2J10000Y839BZKKSAZS","ts":1789460384321}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2J2D2P50000F8K2ASJ4ST07","ts":1789460384453}
+{"kind":"driver:stage","stage":"approve","id":"01M2J2D2P60000DFQJW758SRSY","ts":1789460384454}
+{"kind":"driver:approved","stamp":"run-8","integrationBranch":"ultra/integration-run-8","id":"01M2J2D2R80000AH9K8TNARKBA","ts":1789460384520}
+{"kind":"run:open","runId":"run-8","base":"c952dadd06c308d18a6e240717a2a41a89f6dcc4","source":"fleet/publish-fold.mjs","id":"01M2J2D3E20000GFP3SC89SXMT","ts":1789460385218}
+{"kind":"driver:publish-fold","run":"8","attempt":"1","base":"c952dadd06c308d18a6e240717a2a41a89f6dcc4","tip":"c952dadd06c308d18a6e240717a2a41a89f6dcc4","candidate":"e83f1c0c743b20a85d1ca695f18cf0d338759427","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2J2D3SQ000075TE2HJFJ26C","ts":1789460385591}
