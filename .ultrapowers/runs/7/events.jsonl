@@ -48,3 +48,11 @@
 {"kind":"driver:check-run","task":"2","cmd":"bun run typecheck","exit":0,"minor":false,"iter":0,"id":"01M2HYDM7A0000SFCH3HNF2F5G","ts":1789456208106}
 {"kind":"worker:start","label":"review:2:1","role":"reviewer","sessionId":"7269c2e4-4b5d-47bd-a338-bb4244d5683d","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-7/clones/integration","model":"opus","id":"01M2HYDM7C00001Q4KRGHCQVY6","ts":1789456208108}
 {"kind":"driver:attention","task":"2","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2HYE2XP0000MQRKJG6YEFGC","ts":1789456223158}
+{"kind":"worker:end","label":"review:2:1","role":"reviewer","sessionId":"7269c2e4-4b5d-47bd-a338-bb4244d5683d","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":8125,"output":13989,"cacheRead":658785,"cacheCreation":91972,"costUsd":1.6394624999999998,"models":["claude-opus-5"]},"id":"01M2HYKGGD0000PBPD2D5K9X2J","ts":1789456400909}
+{"kind":"transcript:slice","label":"review:2:1","sessionId":"7269c2e4-4b5d-47bd-a338-bb4244d5683d","bytes":11583,"id":"01M2HYKGGK0000HF985FF0PAV7","ts":1789456400915}
+{"kind":"engine:phase","phase":"Wave 2","id":"01M2HYKGGQ0000YMG0DQHF3MNK","ts":1789456400919}
+{"kind":"driver:wave-adopted","wave":2,"tasks":["2"],"headSha":"8e64c65dbef034707da833785bfc00bda1dfb3f8","id":"01M2HYM01300007SNCQ1CW85J7","ts":1789456416803}
+{"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2HYM01X0000BVZB46393RKY","ts":1789456416829}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2HYM2FC00006BPF30Q0WJD4","ts":1789456419308}
+{"kind":"worker:start","label":"exam:3","role":"examiner","sessionId":"2258daa9-7b93-4105-bcbd-5776cbeaa2bc","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-7/clones/exam-3","model":"opus","id":"01M2HYM2V40000SJ0E9DMDQA8V","ts":1789456419684}
+{"kind":"worker:start","label":"impl:3","role":"implementer","sessionId":"a971734c-f764-4bdb-9134-610eddc40972","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-7/clones/task-3","model":"opus","id":"01M2HYM2V60000PSPCTE1N80RN","ts":1789456419686}
