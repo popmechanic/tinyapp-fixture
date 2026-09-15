@@ -1,0 +1,104 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "ecc95f84bcc72c3a1a45f27d76abd46eabb91b6a36ebd17ce839262a2995f856",
+      "verdict": "pass",
+      "reason": "Each of M1-M8 has a leg that fails on a named differing cell, absent table or file, the hand-computed literals follow from the seeds, and M9's eight Run lines pin the loosened assertions and the linter suite's exit."
+    },
+    "2": {
+      "hash": "815ce30e68ac92143afd5812143f7c9184c6b6e11903656f7e232fe12181d1b5",
+      "verdict": "pass",
+      "reason": "M1's stateExam plus the toEqual of the restored file against the written-out seed literal, M2's exactly-once and button-text regexes, M3's absence check and one Run grep per M4 row each falsify their clause, and the pinned end state follows by hand."
+    }
+  },
+  "tally": {
+    "dispatched": 5,
+    "rejected": 1,
+    "rounds": {
+      "1": {
+        "dispatched": 2,
+        "pass": 1,
+        "fail": 1
+      },
+      "2": {
+        "dispatched": 1,
+        "pass": 1,
+        "fail": 0
+      },
+      "3": {
+        "dispatched": 1,
+        "pass": 1,
+        "fail": 0
+      },
+      "4": {
+        "dispatched": 1,
+        "pass": 1,
+        "fail": 0
+      }
+    }
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "1",
+      "hash": "94eff8202c38339d03f7b366ffa85cde90c96287870c3531ef9bdfe7b8030dad",
+      "verdict": "pass"
+    },
+    {
+      "round": 1,
+      "task": "2",
+      "hash": "9dae9c7909f6f598effb1a98be11c46c95b94a59c3dadc65b68dd1703c2f0f56",
+      "verdict": "fail",
+      "reason": "M1 pinned the end state deep-equal to the seed but nothing pinned the content of two-open-todos-restored.json; fixed by pinning the file's content in M1 and adding a toEqual leg against the seed literal."
+    },
+    {
+      "round": 2,
+      "task": "2",
+      "hash": "815ce30e68ac92143afd5812143f7c9184c6b6e11903656f7e232fe12181d1b5",
+      "verdict": "pass"
+    },
+    {
+      "round": 3,
+      "task": "1",
+      "hash": "8de3d4a8ae7be8d6f9dd1a2e8ae11d438dabd24f83e5755e4730730d97128d9b",
+      "verdict": "pass",
+      "note": "re-dispatched after M9 and the Proof gained the third BASE pin, client/test/todos-store.test.ts leg (c), found by the compile's BASE fact line"
+    },
+    {
+      "round": 4,
+      "task": "1",
+      "hash": "ecc95f84bcc72c3a1a45f27d76abd46eabb91b6a36ebd17ce839262a2995f856",
+      "verdict": "pass",
+      "note": "re-dispatched after the coordinator's reading: the prototype reddened 10 of the linter's own tests under packages/tinyapp-lint/test (17 pass, 10 fail); the four files joined Task 1's Files with their pins loosened to what they meant, the Global Check narrowed to packages/tinyapp-lint/src, and bun test packages/tinyapp-lint measured 27 pass, 0 fail"
+    }
+  ],
+  "authoring": {
+    "minutes": 23,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Where does the deleted row wait?",
+        "options": [
+          "A `trash` table",
+          "A single store value"
+        ],
+        "recommended": "A `trash` table",
+        "picked": "A `trash` table"
+      },
+      {
+        "question": "Execute",
+        "options": [
+          "Ultrapowers",
+          "Subagent-Driven",
+          "Inline"
+        ],
+        "recommended": "Ultrapowers",
+        "picked": "Ultrapowers"
+      }
+    ]
+  }
+}
