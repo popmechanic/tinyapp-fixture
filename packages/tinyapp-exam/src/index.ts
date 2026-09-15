@@ -13,13 +13,26 @@ export {launchBrowser} from './browser';
 export type {Action, Browser, Page} from './browser';
 
 export {withContract} from './contract';
-export {diffContent, renderDiff, storeMove} from './store-move';
-export {assertView, renderHtml, renderMove, REFLECT_CHECKED} from './render-move';
+export {
+  browserStoreMove,
+  diffContent,
+  renderDiff,
+  storeMove,
+  READ_CONTENT,
+} from './store-move';
+export {
+  assertView,
+  bundleOf,
+  pageFor,
+  renderHtml,
+  renderMove,
+  REFLECT_CHECKED,
+} from './render-move';
 export type {RenderResult} from './render-move';
 export {applyMutant, mutantPath} from './mutant';
 export {evidenceDir, examStem, writeEvidence} from './evidence';
 
-export {VALUES_TABLE} from './types';
+export {actionsOf, isCallbackAction, VALUES_TABLE} from './types';
 export type {
   Cell,
   Difference,

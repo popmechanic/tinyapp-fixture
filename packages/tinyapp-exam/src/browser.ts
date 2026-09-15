@@ -24,6 +24,9 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
 import {REFLECT_CHECKED} from './render-move';
+import type {Action} from './types';
+
+export type {Action} from './types';
 
 /** Where the fleet image keeps its headless shell. */
 const DEFAULT_BINARY = '/headless-shell/headless-shell';
@@ -40,11 +43,16 @@ const CALL_TIMEOUT_MS = 30_000;
 /** How long `close()` waits for a polite `Browser.close` before it kills. */
 const EXIT_GRACE_MS = 2_000;
 
-/** One thing an exam does to a page. */
-export type Action =
-  | {click: string}
-  | {type: [string, string]}
-  | {key: [string, string]};
+/**
+ * The longest `data:` URL Chromium will navigate to, in characters.
+ *
+ * Over it the navigation is refused silently: no error, no load event, and a
+ * caller waiting on the load waits for a page that will never come. So the
+ * length is measured before the navigation and the call rejects instead — which
+ * is why the exam bundles minified, the difference between ~1.06 M characters
+ * and ~2.59 M for this fixture.
+ */
+const DATA_URL_CEILING = 2_097_152;
 
 /** One open page: act on it, read from it, photograph it, close it. */
 export interface Page {
@@ -62,7 +70,10 @@ export interface Page {
 export interface Browser {
   /** The arguments it was spawned with, `argv[0]` the binary. */
   readonly argv: string[];
-  /** Opens `html` as a page whose clock is pinned to `clock`. */
+  /**
+   * Opens `html` as a page whose clock is pinned to `clock`, rejecting when the
+   * `data:` URL it would need is over the browser's ceiling.
+   */
   open(opts: {html: string; clock: string}): Promise<Page>;
   /** Ends the process and removes its user data directory. */
   close(): Promise<void>;
@@ -475,6 +486,15 @@ export const launchBrowser = async (opts?: {
 
     open: async ({html, clock}: {html: string; clock: string}): Promise<Page> => {
       const pin = clockPin(clock);
+      const url = `data:text/html;base64,${Buffer.from(html, 'utf8').toString('base64')}`;
+      // Checked before a target is even created: a URL over the ceiling is a
+      // navigation that never lands, and waiting on it is the hang.
+      if (url.length > DATA_URL_CEILING) {
+        throw new Error(
+          `browser: page is ${url.length} characters, over the data: URL ceiling of ${DATA_URL_CEILING}`,
+        );
+      }
+
       const created = (await connection.send('Target.createTarget', {
         url: 'about:blank',
       })) as {targetId?: string};
@@ -497,11 +517,7 @@ export const launchBrowser = async (opts?: {
       // Armed before the navigation: the load of a `data:` URL can beat a
       // listener registered after the call returns.
       const loaded = connection.once('Page.loadEventFired', sessionId);
-      await connection.send(
-        'Page.navigate',
-        {url: `data:text/html;base64,${Buffer.from(html, 'utf8').toString('base64')}`},
-        sessionId,
-      );
+      await connection.send('Page.navigate', {url}, sessionId);
       await loaded;
 
       const page = pageOn(connection, sessionId, targetId);

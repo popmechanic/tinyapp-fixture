@@ -1,14 +1,26 @@
 /**
  * The store move: load a seed, run one action under the determinism contract,
  * and report every cell that differs from the state the examiner expected.
+ *
+ * There are two forms of it, because there are two forms of action. A callback
+ * runs against a store this process makes, and `withContract` is what pins its
+ * clock and unplugs its network. An interaction runs in a page — the app's own
+ * click handler, its own reducer, its own store — and the contract there is the
+ * driver's: a clock pinned before a line of the app runs and every request
+ * blocked in the browser. Both forms run twice on a fresh start and must agree.
  */
 
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 
+import type {Browser, Page} from './browser';
 import {withContract} from './contract';
+import {pageFor} from './render-move';
 import {
   VALUES_TABLE,
+  actionsOf,
+  isCallbackAction,
+  type Action,
   type Cell,
   type Difference,
   type ExamStore,
@@ -18,6 +30,7 @@ import {
 
 export {withContract} from './contract';
 export type {
+  Action,
   Cell,
   Difference,
   ExamRecord,
@@ -115,6 +128,14 @@ const runOnce = async <S extends ExamStore>(
   spec: StateExamSpec<S>,
   seed: Snapshot,
 ): Promise<S> => {
+  if (spec.store === undefined) {
+    throw new Error('store move: a callback action needs a store');
+  }
+  if (!isCallbackAction(spec.action)) {
+    throw new Error('store move: an interaction needs a page');
+  }
+  const action = spec.action;
+
   const store = spec.store();
   store.setContent(seed);
 
@@ -125,7 +146,7 @@ const runOnce = async <S extends ExamStore>(
     );
   }
 
-  await withContract(spec.clock, () => spec.action(store));
+  await withContract(spec.clock, () => action(store));
   return store;
 };
 
@@ -158,4 +179,115 @@ export const storeMove = async <S extends ExamStore>(
   }
 
   return {content: first, diff: diffContent(first, readSnapshot(spec.expected)), ms};
+};
+
+/** The one expression the exam reads a page's store through. */
+export const READ_CONTENT =
+  'JSON.stringify(window.__TINYAPP_STORE__.getContent())';
+
+/** What one page of the browser store move gave up. */
+type PageRun = {
+  content: Snapshot;
+  actionMs: number;
+  shotMs: number | null;
+  shot?: {dom: string; screenshot: Uint8Array};
+};
+
+/**
+ * Opens one page on `html`, performs `actions` in order, and reads its store.
+ *
+ * `photograph` asks for the picture and the markup of this very page, after the
+ * interaction and before it is closed — the whole point of the browser form is
+ * that the evidence is of the page the action happened in.
+ */
+const actOnPage = async (
+  browser: Browser,
+  html: string,
+  clock: string,
+  actions: Action[],
+  photograph: boolean,
+): Promise<PageRun> => {
+  const page: Page = await browser.open({html, clock});
+  try {
+    const started = performance.now();
+    for (const action of actions) {
+      await page.act(action);
+    }
+    const actionMs = Math.max(0, performance.now() - started);
+
+    const read = await page.evaluate(READ_CONTENT);
+    // The page answers a string; a stand-in browser may answer the pair itself.
+    const content = (
+      typeof read === 'string' ? JSON.parse(read) : read
+    ) as Snapshot;
+
+    if (!photograph) {
+      return {content, actionMs, shotMs: null};
+    }
+    const shotStarted = performance.now();
+    const shot = await page.snapshot();
+    return {content, actionMs, shotMs: Math.max(0, performance.now() - shotStarted), shot};
+  } finally {
+    await page.close().catch(() => {});
+  }
+};
+
+/**
+ * Runs one state exam's store move in the browser, for an action that is an
+ * interaction rather than a callback.
+ *
+ * Resolves `{content, diff, ms, actionMs, renderMs, dom, screenshot}` — the
+ * page's store content after the interaction, its difference from
+ * `spec.expected`, the wall of the whole first page, of its interaction alone
+ * and of its picture alone, and the picture and markup of that same first page.
+ * Rejects with `nondeterministic store:` when a
+ * second fresh page, acted on the same way, reaches a different content.
+ *
+ * The bundle is built once and both pages are opened from it, so the two runs
+ * differ in nothing the exam controls.
+ */
+export const browserStoreMove = async <S extends ExamStore>(
+  spec: StateExamSpec<S>,
+  browser: Browser,
+  opts: {minify?: boolean} = {},
+): Promise<{
+  content: Snapshot;
+  diff: Difference[];
+  ms: number;
+  actionMs: number;
+  renderMs: number;
+  dom: string;
+  screenshot: Uint8Array;
+}> => {
+  if (spec.entry === undefined || spec.entry === '') {
+    throw new Error('store move: an interaction needs an entry to open');
+  }
+  const actions = actionsOf(spec.action);
+  const seed = readSnapshot(spec.seed);
+  const html = await pageFor(spec.entry, seed, opts);
+
+  const started = performance.now();
+  const first = await actOnPage(browser, html, spec.clock, actions, true);
+  const ms = Math.max(0, performance.now() - started);
+
+  // A second fresh page catches what the pinned clock could not — a `Math.random`,
+  // an id drawn from anywhere but the store. Only the first page is photographed.
+  const second = await actOnPage(browser, html, spec.clock, actions, false);
+  if (JSON.stringify(first.content) !== JSON.stringify(second.content)) {
+    throw new Error(
+      `nondeterministic store: ${spec.seed}\n${renderDiff(
+        diffContent(first.content, second.content),
+      )}`,
+    );
+  }
+
+  return {
+    content: first.content,
+    diff: diffContent(first.content, readSnapshot(spec.expected)),
+    ms,
+    actionMs: first.actionMs,
+    renderMs: first.shotMs ?? 0,
+    dom: first.shot?.dom ?? '',
+    screenshot: first.shot?.screenshot ?? new Uint8Array(),
+  };
 };
