@@ -1,0 +1,182 @@
+{
+  "integrationBranch": "ultra/integration-run-6",
+  "baseSha": "1f8e0a65e1c7c960d61c87d84d9b75ec2bf2a7c1",
+  "waves": [
+    [
+      "1",
+      "3"
+    ],
+    [
+      "2"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)",
+    "2 -> 4 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "ae170bb4c1bf48288be2fbc5e39c2be64bdbf2de",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-6/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "Explicit error path gap in the CDP connection: `once()` (packages/tinyapp-exam/src/browser.ts:221-225) has neither a timeout nor a close path, and `give()` (184-190) rejects only `pending` calls, never `waiters`. Every `send()` is bounded by CALL_TIMEOUT_MS, but the one place the driver awaits an *event* \u2014 `await loaded` in `open()` (505-511) \u2014 is unbounded: a navigation whose `Page.loadEventFired` never arrives, or a browser that dies mid-navigation (socket close fires `give`, which clears `pending` and leaves the waiter dangling), leaves `open()` pending forever. This does not surface in this task's exam, but Task 2 consumes `open()` inside a state exam whose contract is that a browser failure is a red with a `browser: ` line \u2014 a hang there is an exam that never returns instead of one that fails. The fix is inside this task's own FILES.; Tension between the peer-written exam and the second GLOBAL CONSTRAINT (\"A missing browser binary is a red exam that names the path, never a skip\"), which carries no `Check:` command \u2014 this is my reading of the prose. `packages/tinyapp-exam/test/browser.test.ts` legs (b), (c) and (d) open with `if (!BROWSER) return;`, so on a machine with no Chromium at `$TINYAPP_BROWSER` or `/headless-shell/headless-shell` the suite reports 5/5 pass having proven nothing about open/act/snapshot \u2014 a silent green, mitigated only by the console.log at the top of the file. The task's own Context asks for exactly this (\"the suite is green on a laptop without Chromium and full on the fleet\"), which is why the actor is the plan and not the implementer: no edit inside this tree resolves the contradiction without contradicting the task text. Nothing is unproven on this run \u2014 EXAM EVIDENCE shows 60 expect() calls across the five legs, which is the full-fleet count, so the browser legs really executed against the image's binary. Recorded for the operator to settle if the constraint is meant to bind this unit exam too.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "stateExams": []
+    },
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "fix-loop-exhausted",
+      "notes": "AGENTS.md: the Key Files bullet this task adds ends with a statement that inverts the tree's actual behavior \u2014 \"while a normal page sets no such handle **and starts neither the persister nor the synchronizer**\". It is the *seeded* page that starts neither (`client/src/Store.tsx:57-61` renders `SeededStore` when a seed is present and `StoreLinks`, which creates the persister and the synchronizer, when it is not). A normal page starts both \u2014 that is exactly what M3's kept BASE rule and leg (g) of `client/test/seeded-store.test.ts` assert, and what the two adjacent bullets (\"The primary Store file also initializes persistence / synchronization\") say. The diff therefore writes a false sentence into the repo's agent-facing guidance, in the one paragraph M4 asked to be true. M4 itself is still satisfied (the seeded-page/normal-page handle claim is stated, and both the Proof's `sed | grep` Run and leg (d) of the exam pass), so the fix is a reordering of the trailing clause and nothing else; the grep and leg (d) regexes (`__TINYAPP_STORE__.*normal page`, `/seed/i`) still match the proposed text.",
+      "tier": "opus",
+      "review": "lean",
+      "fixIterations": 0,
+      "proposedPatches": 1,
+      "proofFixes": 0,
+      "examEdited": [],
+      "stateExams": []
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "blocked-after-fix",
+      "notes": "The single blocking finding \u2014 `bun test packages/tinyapp-exam/test/browser-exam.test.ts` exit 1 \u2014 is red only because a sibling's work is missing, and I made no code change this round rather than churn the implementation to chase it.\n\nThe exam is 13 pass / 1 fail. The one failure is leg (f) [M1] \"end to end, a click on the fixture app completes the todo the store reports\", which dies at `browser store: window.__TINYAPP_STORE__ unreadable: evaluate: TypeError: Cannot read properties of undefined (reading 'getContent')`. M1 pins that read verbatim as `JSON.parse(await page.evaluate('JSON.stringify(window.__TINYAPP_STORE__.getContent())'))`, and the task's own Context states the global is \"Task 3's work, landing in the same wave, which is why the exam's browser legs read the store through the shared literal and, when the global is absent on the tree, fail with the message the exam names rather than pass\". `window.__TINYAPP_STORE__` is set by `client/src/Store.tsx`, owned by sibling task 3 (`popmechanic-tinyapp-fixture#59pq`); on this tree `client/src/storeData.ts` reads `window.__TINYAPP_SEED__` but nothing ever assigns `__TINYAPP_STORE__`. Nothing inside my file scope (`packages/tinyapp-exam/**`) can supply it without faking the very thing the leg exists to prove.\n\nI verified that rather than asserting it. I temporarily added to `SeededStore` in `client/src/Store.tsx` an effect setting `window.__TINYAPP_STORE__ = {getContent: () => store.getContent()}`, ran the leg, and it passed in full \u2014 the click, the `[tables, values]` read, `storeDiff: []`, all four view assertions, `walls.browser: 'ran'`, `walls.render: 'ran'`, a numeric `action_ms`, `contract.json` equal to `{clock, breach: null, pinned_in_page: true}`, and the six evidence files. So every part of leg (f) that depends on my code is already correct. The patch was reverted; `git diff -- client/src/Store.tsx` is empty and no sibling-owned path is touched in what I return.\n\nEverything else the driver re-runs is green on the tree as handed back: `bun test packages/tinyapp-exam/test/render-move.test.ts packages/tinyapp-exam/test/state-exam.test.ts` \u2192 35 pass, exit 0; both grep `Run:` lines \u2192 exit 0; `bun run typecheck` \u2192 exit 0.\n\nOn the kata (`popmechanic-tinyapp-fixture#nx9m`) I posted the finding and the verification, added the `blocked-by 59pq` edge, and set `work.attention` to `stuck` with a message naming that sibling. No commit was made because no file changed \u2014 HEAD is still b96f26e, plus the driver-handed `browser-exam.test.ts` staged as it arrived. Once 59pq's seeded page exposes `window.__TINYAPP_STORE__`, this exam goes 14/14 with no further edit here.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 1,
+      "examEdited": [],
+      "stateExams": [
+        {
+          "exam": "state-exam",
+          "store_ms": 0.4094750000000005,
+          "render_ms": 593.959926,
+          "render": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": " a green spec with no run directory is ok, its mutant killed, its render skipped [2.05ms]\n(pass) leg (a) [M1]: opts.main defaults to Bun.main, so an omitted main stems this file [1.56ms]\n(pass) leg (b) [M3]: a red store move reports the diff table and never reaches the renderer [1.71ms]\n(pass) leg (c) [M4]: a green store move with a renderer posts once and files the dom and the picture [72.80ms]\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [55.79ms]\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [1.27ms]\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [0.66ms]\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.45ms]\n(pass) state exam: state-exam [0.73ms]\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [26.54ms]\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.32ms]\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.16ms]\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [48.97ms]\n(pass) task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index [0.34ms]\n(pass) task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not [689.22ms]\n\npackages/tinyapp-exam/test/render-move.test.ts:\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [10.60ms]\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.22ms]\n(pass) leg (b) [M2]: every entry that holds contributes no string [1.76ms]\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [0.92ms]\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.46ms]\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.36ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.28ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.16ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.19ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [72.39ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [57.87ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [59.21ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [102.83ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.17ms]\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [69.99ms]\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.05ms]\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.03ms]\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [70.01ms]\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.26ms]\n\npackages/tinyapp-exam/test/contract.test.ts:\n(pass) leg (h) [M5]: a clock that is not a non-empty string is refused before fn runs [0.29ms]\n(pass) leg (h) [M5]: a throwing fn rejects with its own message and the clock is restored [0.17ms]\n(pass) leg (i) [M5]: inside the contract the clock is pinned, and afterwards it is the real one again [0.19ms]\n(pass) leg (j) [M5][M6]: a fetch is a breach naming the url, and fetch plus the clock are restored [0.16ms]\n(pass) leg (k) [M5][M6]: a WebSocket is a breach naming the url, and WebSocket plus the clock are restored [0.17ms]\n(pass) leg (l) [M6]: after a green fn, fetch and WebSocket are the originals again [0.11ms]\n\n 119 pass\n 0 fail\n 519 expect() calls\nRan 119 tests across 14 files. [3.21s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 461969,
+    "blockingFindings": 1,
+    "blockingPerReviewerMinute": 0.1298788446843836
+  },
+  "baseline": {
+    "passed": true,
+    "output": "y, in list order [0.23ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.12ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.07ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.13ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [86.94ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [56.11ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [61.59ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [90.15ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.17ms]\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [67.90ms]\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.07ms]\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.03ms]\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [70.58ms]\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.16ms]\n\npackages/tinyapp-exam/test/contract.test.ts:\n(pass) leg (h) [M5]: a clock that is not a non-empty string is refused before fn runs [0.19ms]\n(pass) leg (h) [M5]: a throwing fn rejects with its own message and the clock is restored [0.11ms]\n(pass) leg (i) [M5]: inside the contract the clock is pinned, and afterwards it is the real one again [0.12ms]\n(pass) leg (j) [M5][M6]: a fetch is a breach naming the url, and fetch plus the clock are restored [0.10ms]\n(pass) leg (k) [M5][M6]: a WebSocket is a breach naming the url, and WebSocket plus the clock are restored [0.09ms]\n(pass) leg (l) [M6]: after a green fn, fetch and WebSocket are the originals again [0.06ms]\n\n 114 pass\n 0 fail\n 459 expect() calls\nRan 114 tests across 13 files. [2.28s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "c47461907d858d143815f686aeec29a2691e08d6",
+      "branches": [
+        "1"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-6/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-6/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.424,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 1,
+    "tasks_planned": 4,
+    "complete": false
+  },
+  "missingDeliverables": [
+    {
+      "task": "3",
+      "files": [
+        "AGENTS.md",
+        "client/src/Store.tsx",
+        "client/src/storeData.ts",
+        "client/test/seeded-store-global.test.ts",
+        "client/test/seeded-store.test.ts"
+      ]
+    },
+    {
+      "task": "2",
+      "files": [
+        "packages/tinyapp-exam/src/render-move.ts",
+        "packages/tinyapp-exam/src/state-exam.ts",
+        "packages/tinyapp-exam/src/store-move.ts",
+        "packages/tinyapp-exam/src/types.ts",
+        "packages/tinyapp-exam/test/browser-exam.test.ts",
+        "packages/tinyapp-exam/test/render-move.test.ts",
+        "packages/tinyapp-exam/test/state-exam.test.ts"
+      ]
+    },
+    {
+      "task": "4",
+      "files": [
+        "README.md",
+        "state-exams/expected/one-open-todo-typed.json",
+        "tests/state-exams/click-completes-todo.test.ts",
+        "tests/state-exams/enter-submits-todo.test.ts",
+        "tests/state-exams/interaction-evidence.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 3: examiner: (c) first half \u2014 \"the BASE seeded-store test by the first `Run:` line\" \u2014 Not unsatisfiable, noted for completeness: the Proof assigns that half to its own `Run:` command (`bun test client/test/seeded-store.test.ts`), which the driver runs; an exam file cannot run another test file. The new-exam half of leg (c) is fully encoded, and the exam is written so it does not break that BASE file when both run in one `bun test` process.",
+    "task 2: out-of-FILES: packages/tinyapp-exam/src/index.ts \u2014 re-exports browserStoreMove, pageOf and the BrowserStoreMoveResult/StoreMoveResult types so the sealed package still re-exports its whole vocabulary; state-exam.test.ts leg (g) counts those names.",
+    "task 2: plan-defect: the plan's move from the POST to the local driver did not account for Chromium's ~2,097,152-character ceiling on the data: URL the global constraints mandate. This app's unminified bundle is ~1.94 MB, so the page never navigates and the open hangs rather than failing readably (bisect: 1024 kB opens, 1536 kB hangs). bundleOf now builds with minify: true (789 KB, ~1.06 M chars of base64). Minification is deterministic, so the two-fresh-pages byte-for-byte agreement is unaffected; it costs only identifier names, which no view reads. Recorded on the kata for whoever grows the app past roughly twice its current size.",
+    "task 2: the driver's pre-review pass was red (the Proof's exam failed: bun test packages/tinyapp-exam/test/browser-exam.test.ts \u2014 exit 1) \u2014 one repair round before any reviewer read the patch"
+  ],
+  "unfinished": [
+    "4: blocked \u2014 depends on a failed task"
+  ],
+  "completenessFindings": [],
+  "blockedWaves": []
+}

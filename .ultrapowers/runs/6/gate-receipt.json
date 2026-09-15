@@ -1,0 +1,61 @@
+{
+  "mode": "gate",
+  "stamp": "run-6",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-6/report.json",
+  "branch": "ultra/integration-run-6",
+  "gateCheck": {
+    "verdict": "BLOCKED",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": false,
+        "detail": "failed/blocked tasks left declared deliverables unproduced: [{\"task\": \"3\", \"files\": [\"AGENTS.md\", \"client/src/Store.tsx\", \"client/src/storeData.ts\", \"client/test/seeded-store-global.test.ts\", \"client/test/seeded-store.test.ts\"]}, {\"task\": \"2\", \"files\": [\"packages/tinyapp-exam/src/render-move.ts\", \"packages/tinyapp-exam/src/state-exam.ts\", \"packages/tinyapp-exam/src/store-move.ts\", \"packages/tinyapp-exam/src/types.ts\", \"packages/tinyapp-exam/test/browser-exam.test.ts\", \"packages/tinyapp-exam/test/render-move.test.ts\", \"packages/tinyapp-exam/test/state-exam.test.ts\"]}, {\"task\": \"4\", \"files\": [\"README.md\", \"state-exams/expected/one-open-todo-typed.json\", \"tests/state-exams/click-completes-todo.test.ts\", \"tests/state-exams/enter-submits-todo.test.ts\", \"tests/state-exams/interaction-evidence.test.ts\"]}]"
+      }
+    ],
+    "acks": [
+      {
+        "type": "coverage",
+        "detail": "green suite but 1/4 tasks merged \u2014 a passing suite over an incomplete merge is a false-green"
+      }
+    ],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 1,
+  "suite": {
+    "passed": true,
+    "unattributed": [],
+    "output": " a green spec with no run directory is ok, its mutant killed, its render skipped [2.05ms]\n(pass) leg (a) [M1]: opts.main defaults to Bun.main, so an omitted main stems this file [1.56ms]\n(pass) leg (b) [M3]: a red store move reports the diff table and never reaches the renderer [1.71ms]\n(pass) leg (c) [M4]: a green store move with a renderer posts once and files the dom and the picture [72.80ms]\n(pass) leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector [55.79ms]\n(pass) leg (d) [M5]: a mutant the expected state already carries is a hollow exam [1.27ms]\n(pass) leg (e) [M6]: an action that reaches for the network fails as that breach line [0.66ms]\n(pass) leg (e) [M6]: an empty clock fails as the contract line, with no breach recorded [0.45ms]\n(pass) state exam: state-exam [0.73ms]\n(pass) leg (f) [M7]: a file calling stateExam with a hollow mutant exits non-zero saying so [26.54ms]\n(pass) leg (g) [M8]: the two manifests and the thirteen exports of the sealed package [0.32ms]\n(pass) leg (h) [M9]: both first-run exams are written as exams of this helper [0.16ms]\n(pass) leg (h) [M9]: bun test over the two first-run exams exits 0 [48.97ms]\n(pass) task 1, leg (a) [M1]: STATE_EXAM_TIMEOUT_MS is 120000, from the module and from the index [0.34ms]\n(pass) task 1, leg (a) [M1]: the registered exam outlives --timeout 50 where a plain test does not [689.22ms]\n\npackages/tinyapp-exam/test/render-move.test.ts:\n(pass) leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and leaves no script src [10.60ms]\n(pass) leg (a) [M1]: every module script of the entry is replaced, not only the first [1.22ms]\n(pass) leg (b) [M2]: every entry that holds contributes no string [1.76ms]\n(pass) leg (c) [M2]: each failing entry contributes exactly one string naming its selector [0.92ms]\n(pass) leg (c) [M2]: one non-conforming match fails the universal, and count still holds [0.46ms]\n(pass) leg (c) [M2]: a list reports one string per failing entry, in list order [0.36ms]\n(pass) leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called [0.28ms]\n(pass) leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too [0.16ms]\n(pass) leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not [0.19ms]\n(pass) leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view [72.39ms]\n(pass) leg (g) [M4]: failures are assertView of the returned dom [57.87ms]\n(pass) leg (h) [M5]: a non-2xx response rejects with render failed: [59.21ms]\n(pass) leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not [102.83ms]\n(pass) leg (j) [M6]: the tree manifests carry node-html-parser [0.17ms]\n(pass) task 1, leg (b) [M2]: the reflection writes each box once and then only on a change [69.99ms]\n(pass) task 1, leg (c) [M3]: no single quote anywhere in REFLECT_CHECKED [0.05ms]\n(pass) task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked and observes [0.03ms]\n(pass) task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}] [70.01ms]\n(pass) task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator for this package [0.26ms]\n\npackages/tinyapp-exam/test/contract.test.ts:\n(pass) leg (h) [M5]: a clock that is not a non-empty string is refused before fn runs [0.29ms]\n(pass) leg (h) [M5]: a throwing fn rejects with its own message and the clock is restored [0.17ms]\n(pass) leg (i) [M5]: inside the contract the clock is pinned, and afterwards it is the real one again [0.19ms]\n(pass) leg (j) [M5][M6]: a fetch is a breach naming the url, and fetch plus the clock are restored [0.16ms]\n(pass) leg (k) [M5][M6]: a WebSocket is a breach naming the url, and WebSocket plus the clock are restored [0.17ms]\n(pass) leg (l) [M6]: after a green fn, fetch and WebSocket are the originals again [0.11ms]\n\n 119 pass\n 0 fail\n 519 expect() calls\nRan 119 tests across 14 files. [3.21s]\n"
+  },
+  "verdict": "BLOCKED"
+}
