@@ -1,0 +1,21 @@
+{
+  "tasks": {
+    "1": {"hash": "bb9caa31d72c44b0d7a39ea97cde387626ac969deab2fc6840ca9b1aa5bbdaf2", "verdict": "pass", "reason": "M1's rejection, argv, tmpdir and close checks; M2's in-page fetch and WebSocket failures plus both clock reads; M3's click, type and Enter side effects and the exact no-match message; M4's data-checked and PNG signature plus post-close rejection; M5's import against the BASE manifest list."},
+    "2": {"hash": "63594e2c5f67b98f25233fca713e81f096cfcf20d2fed81710cc7c8dc6cd8e9e", "verdict": "pass", "reason": "One row per Action form plus the nondeterminism reject and the seed/inlined-script html checks for M1; exact open and snapshot counts and the zero grep for M2; skipped vs tmpdir for M3; concrete walls and contract values for M4; the browser: failure in both forms and the still-killed mutant for M5; the two Run lines for M6."},
+    "3": {"hash": "8daae3776bfe81f05abf2d79eb79fa36a04051f55bdf337e7c77815f3e0d9253", "verdict": "pass", "reason": "M1 by comparing the global's getContent to the seed and to the app store after a mutation; M2 by undefined with the seed absent; M3 by the kept BASE run plus WebSocket and getDb counts with an unseeded positive control; M4 by a section-scoped ordered grep."},
+    "4": {"hash": "74de6ca350aa4ca54c685e180f37ca19f8288ad58a8847707aa2aea6d6fd395b", "verdict": "pass", "reason": "M1/M2 by the exams passing plus text reads of their literals and the expected file's single row; M3 by the child-process evidence with pinned contents and the swapped-expected negative that must exit non-zero; M4 by a section-scoped ordered grep."}
+  },
+  "tally": {"dispatched": 10, "rejected": 6, "rounds": {"1": {"dispatched": 4, "rejected": 4}, "2": {"dispatched": 4, "rejected": 2}, "3": {"dispatched": 2, "rejected": 0}}},
+  "history": [
+    {"round": 1, "task": "1", "verdict": "fail", "reason": "'well under a second' had no clock; WebSocket and new Date() halves of M2 untested"},
+    {"round": 1, "task": "2", "verdict": "fail", "reason": "type and key rows of M1 untested; M5's callback+entry row untested"},
+    {"round": 1, "task": "3", "verdict": "fail", "reason": "M3's persister half had no absence leg"},
+    {"round": 1, "task": "4", "verdict": "fail", "reason": "M4's grep pinned three of eight words; view and mutant sub-clauses unread"},
+    {"round": 2, "task": "1", "verdict": "fail", "reason": "grep -c pass masked bun's exit code; type-only exports in M5; default path and flags unexercised"},
+    {"round": 2, "task": "2", "verdict": "fail", "reason": "M6's 'under a comment' unfalsifiable; 'exactly renderHtml's page' uncompared"},
+    {"round": 2, "task": "3", "verdict": "pass"},
+    {"round": 2, "task": "4", "verdict": "pass"},
+    {"round": 3, "task": "1", "verdict": "pass"},
+    {"round": 3, "task": "2", "verdict": "pass"}
+  ]
+}
