@@ -1,28 +1,34 @@
 // Exam for task 6, legs (a)-(h): `stateExam` — the three moves composed, the package
 // sealed, the two first-run exams written.
 //
+// Re-aimed by run-7's task 2, which retired the remote renderer: the page is opened in a
+// browser rather than posted to one, so `opts.browser` is where a leg hands the helper its
+// renderer and the skip rule is the entry's absence rather than an unset environment.
+//
 // M1. `runStateExam(spec, opts)` — `opts.env` defaulting to `process.env`, `opts.main` to
-//     `Bun.main`, `opts.fetchImpl` to `fetch` — resolves `{ok, failure, record, dir}` where
-//     `dir` is `evidenceDir(examStem(opts.main), opts.env)`, the six-or-four evidence files
-//     of `record` have been written into `dir`, and `record.mutant` is
+//     `Bun.main`, `opts.browser` to one this call launches — resolves `{ok, failure, record,
+//     dir}` where `dir` is `evidenceDir(examStem(opts.main), opts.env)`, the six-or-four
+//     evidence files of `record` have been written into `dir`, and `record.mutant` is
 //     `{killed: diffContent(content, applyMutant(expected, spec.mutant)).length > 0,
 //     path: mutantPath(spec.mutant), edits: spec.mutant}`.
-// M2. On a green spec with an `env` lacking `ULTRA_RUN_DIR`: `ok` is `true`, `failure` is
-//     `null`, `record.storeDiff` is `[]`, `record.mutant.killed` is `true`,
-//     `record.walls.render` is `skipped` with `render_ms` `null`, `record.contract` is
-//     `{clock: '2026-01-01T00:00:00Z', breach: null}`, and `store_ms` and `mutant_ms` are
-//     finite numbers greater than or equal to 0.
+// M2. On a green spec that names no `entry`: `ok` is `true`, `failure` is `null`,
+//     `record.storeDiff` is `[]`, `record.mutant.killed` is `true`, `record.walls.render` is
+//     `skipped` with `render_ms` `null`, `record.walls.browser` is `skipped` with
+//     `action_ms` `null`, `record.contract` is `{clock: '2026-01-01T00:00:00Z', breach: null,
+//     pinned_in_page: false}`, and `store_ms` and `mutant_ms` are finite numbers greater than
+//     or equal to 0.
 // M3. When the store move's diff is non-empty, `ok` is `false`, `failure` begins
 //     `store move: expected state not reached` and contains `renderDiff(diff)`,
-//     `record.storeDiff` is that diff, and `opts.fetchImpl` is called 0 times even when `env`
-//     carries both `TINYAPP_RENDER_URL` and `ULTRA_RUN_DIR`.
-// M4. When the store move's diff is empty and `env` carries both `TINYAPP_RENDER_URL` and
-//     `ULTRA_RUN_DIR`, `opts.fetchImpl` is called exactly once, `record.walls.render` is
-//     `ran` with a finite `render_ms`, `dir` is
+//     `record.storeDiff` is that diff, and `opts.browser.open` is called 0 times even when
+//     the spec names an entry and `env` carries `ULTRA_RUN_DIR`.
+// M4. When the store move's diff is empty and the spec names an `entry`, `opts.browser.open`
+//     is called exactly once, `record.walls.render` is `ran` with a finite `render_ms`,
+//     `record.walls.browser` is `ran`, `dir` is
 //     `<ULTRA_RUN_DIR>/state-exams/task-<ULTRA_TASK>/<stem>-<ULTRA_EXAM_PASS>` and holds
 //     `dom.html` and `screenshot.png`; a non-empty `failures` from the render move makes
 //     `ok` `false` with `failure` beginning `render: view not satisfied` and containing each
-//     failure string.
+//     failure string. A run directory is not one of the move's triggers: an entry with no
+//     `ULTRA_RUN_DIR` renders all the same and files its evidence under `os.tmpdir()`.
 // M5. When the mutant applied to the expected state is not distinguished, `ok` is `false`,
 //     `failure` is exactly `hollow exam: mutant <mutantPath(spec.mutant)> not distinguished`,
 //     and `record.mutant.killed` is `false`.
@@ -37,7 +43,7 @@
 //     `src/index.ts` and `dependencies` `tinybase` and `node-html-parser`; the root
 //     `package.json` `devDependencies` carries `tinyapp-exam` as `workspace:*` and no
 //     `node-html-parser`; `scripts.typecheck` ends with
-//     `bunx tsc -p packages/tinyapp-exam --noEmit`; `src/index.ts` exports the thirteen
+//     `bunx tsc -p packages/tinyapp-exam --noEmit`; `src/index.ts` exports the fifteen
 //     names. (`bun install --frozen-lockfile` and `bunx tsc -p packages/tinyapp-exam
 //     --noEmit` are the Proof's own `Run:` lines; this file checks the manifests and the
 //     runtime resolution of the workspace link those two lines rest on.)
@@ -46,9 +52,10 @@
 //     `createTodosStore` and `addTodo` from `../../client/src/storeData` and declares
 //     `clock`, `entry`, a `seed`, an `expected`, a `view` and a `mutant`.
 //
-// No leg dials anything: every `fetch` a leg exercises is an injected `fetchImpl` or the
-// contract's blocked one, the renderer URL is a placeholder on `.invalid`, and the two
-// subprocesses this file spawns run with `ULTRA_RUN_DIR` empty so their render move skips.
+// No leg dials anything and no leg in this file spawns a browser: every page a leg renders
+// is opened in a stand-in `Browser` handed in through `opts.browser`, and the specs the two
+// subprocesses declare name no entry, so their render move skips. The only sockets the two
+// first-run exams of leg (h) are party to are the driver's own loopback ones.
 
 import {afterAll, expect, test} from 'bun:test';
 import {existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync} from 'node:fs';
@@ -56,6 +63,7 @@ import {tmpdir} from 'node:os';
 import {basename, join, relative, resolve} from 'node:path';
 
 import {addTodo, createTodosStore} from '../../../client/src/storeData';
+import type {Browser} from '../src/browser';
 import {renderDiff} from '../src/store-move';
 import {runStateExam, stateExam} from '../src/state-exam';
 import * as stateExamModule from '../src/state-exam';
@@ -83,30 +91,31 @@ const HOLLOW_MUTANT: MutantEdit[] = [
 /** The mutant's name, spelled out rather than derived. */
 const MUTANT_PATH = 'todos/0/completed';
 
-/** The placeholder renderer. Never dialled: every leg that names it injects a `fetchImpl`. */
-const RENDER_URL = 'http://renderer.invalid/v4/accounts/x/browser-rendering';
+/** The entry the legs that render name — the fixture's own document. */
+const ENTRY = atRoot('client/index.html');
 
 /** The url the breach leg's action reaches for. The contract throws before any socket. */
 const BREACH_URL = 'http://127.0.0.1:9/x';
 
-/** The DOM the stubbed renderer hands back: the scaffold's markup, one open todo. */
+/** The DOM the stand-in browser hands back: the scaffold's markup, one open todo. */
 const FIXTURE_DOM =
   '<div id="todoList"><div class="todoItem"><input type="checkbox" data-checked="false"><label>buy milk</label></div></div>';
 
-/** The four bytes the stub sends as base64 and the helper must land in `screenshot.png`. */
+/** The four bytes the stand-in photographs with, and the helper must land in `screenshot.png`. */
 const PNG_BYTES = [137, 80, 78, 71];
-const PNG_BASE64 = Buffer.from(PNG_BYTES).toString('base64');
 
 /** The four files every record leaves, and the six a record with a picture leaves. */
 const FOUR_FILES = ['contract.json', 'mutant.json', 'store-diff.json', 'walls.json'];
 const SIX_FILES = [...FOUR_FILES, 'dom.html', 'screenshot.png'].sort();
 
-/** The thirteen names M8 says `src/index.ts` exports. */
+/** The fifteen names M8 says `src/index.ts` exports. */
 const EXPORTS = [
   'stateExam',
   'runStateExam',
   'storeMove',
+  'browserStoreMove',
   'renderMove',
+  'launchBrowser',
   'applyMutant',
   'diffContent',
   'renderDiff',
@@ -142,11 +151,16 @@ afterAll(() => {
   }
 });
 
-/** The green spec of M2; `over` supplies whichever fields a leg varies. */
+/**
+ * The green spec of M2; `over` supplies whichever fields a leg varies.
+ *
+ * It names no `entry` on purpose: the render move's one trigger is now an entry,
+ * so the plain green spec is the skipped-render spec, and a leg that wants the
+ * move passes `{entry: ENTRY}` and a browser to open it in.
+ */
 const greenSpec = (over: Record<string, unknown> = {}): StateExamSpec =>
   ({
     clock: CLOCK,
-    entry: atRoot('client/index.html'),
     seed: atRoot('state-exams/seeds/empty.json'),
     store: createTodosStore,
     action: (store: any) => {
@@ -157,33 +171,46 @@ const greenSpec = (over: Record<string, unknown> = {}): StateExamSpec =>
     ...over,
   }) as unknown as StateExamSpec;
 
-/** The env of legs (b) and (c): a renderer, a run directory, a task and a pass. */
+/** The env of legs (b) and (c): a run directory, a task and a pass. */
 const runEnv = (runDir: string): Record<string, string | undefined> => ({
-  TINYAPP_RENDER_URL: RENDER_URL,
   ULTRA_RUN_DIR: runDir,
   ULTRA_TASK: '1',
   ULTRA_EXAM_PASS: '0',
 });
 
-/** A `fetchImpl` that counts its calls and answers with a fresh `respond()`. */
-const recorder = (respond: () => Response) => {
-  const calls: string[] = [];
-  const fetchImpl = ((url: unknown) => {
-    calls.push(String(url));
-    return Promise.resolve(respond());
-  }) as unknown as typeof fetch;
-  return {calls, fetchImpl};
-};
+/** What one stand-in browser saw: the pages opened in it, and how they were used. */
+type Recorded = {opened: {html: string; clock: string}[]; snapshots: number; closed: number};
 
-/** The stub of leg (c): a 200 carrying the fixture DOM and the four png bytes. */
-const okResponse = (): Response =>
-  new Response(
-    JSON.stringify({
-      success: true,
-      result: {content: FIXTURE_DOM, screenshot: PNG_BASE64},
-    }),
-    {status: 200},
-  );
+/**
+ * A `Browser` that opens pages without a browser.
+ *
+ * The exam under test is the composition — which move runs, what it records,
+ * what it writes — so the renderer these legs hand it answers a fixed DOM and
+ * four bytes of picture rather than spawning Chromium. The real binary is leg
+ * (g) of the driver's own exam; nothing here needs it.
+ */
+const standIn = (): {browser: Browser; seen: Recorded} => {
+  const seen: Recorded = {opened: [], snapshots: 0, closed: 0};
+  const browser: Browser = {
+    argv: ['/stand-in/chrome'],
+    open: async ({html, clock}) => {
+      seen.opened.push({html, clock});
+      return {
+        act: async () => {},
+        evaluate: async () => '[{},{}]',
+        snapshot: async () => {
+          seen.snapshots += 1;
+          return {dom: FIXTURE_DOM, screenshot: new Uint8Array(PNG_BYTES)};
+        },
+        close: async () => {
+          seen.closed += 1;
+        },
+      };
+    },
+    close: async () => {},
+  };
+  return {browser, seen};
+};
 
 /** The `failure` of a red run, asserted to be a string before it is read. */
 const failureOf = (result: {failure: string | null}): string => {
@@ -201,10 +228,11 @@ const filesIn = (dir: string): string[] => readdirSync(dir).sort();
 
 // ---------------------------------------------------------- (a) [M1] [M2]
 
-test('leg (a) [M1] [M2]: a green spec with no run directory is ok, its mutant killed, its render skipped', async () => {
+test('leg (a) [M1] [M2]: a green spec naming no entry is ok, its mutant killed, its render skipped', async () => {
   const spec = greenSpec();
+  const {browser, seen} = standIn();
   const result = remember(
-    await runStateExam(spec, {env: {}, main: '/x/buy-milk.test.ts'}),
+    await runStateExam(spec, {env: {}, main: '/x/buy-milk.test.ts', browser}),
   );
 
   // M2: the whole verdict of a green run.
@@ -213,7 +241,17 @@ test('leg (a) [M1] [M2]: a green spec with no run directory is ok, its mutant ki
   expect(result.record.storeDiff).toEqual([]);
   expect(result.record.walls.render).toBe('skipped');
   expect(result.record.walls.render_ms).toBeNull();
-  expect(result.record.contract).toEqual({clock: CLOCK, breach: null});
+  expect(result.record.contract).toEqual({
+    clock: CLOCK,
+    breach: null,
+    pinned_in_page: false,
+  });
+
+  // M2: no entry, no page — the renderer was handed over and never used, and the
+  // record says as much on both of the keys that speak for the browser.
+  expect(seen.opened.length).toBe(0);
+  expect(result.record.walls.browser).toBe('skipped');
+  expect(result.record.walls.action_ms).toBeNull();
 
   // M1: the mutant block is exactly `{killed, path, edits}` off the spec's own edits.
   expect(result.record.mutant).toEqual({
@@ -241,8 +279,14 @@ test('leg (a) [M1] [M2]: a green spec with no run directory is ok, its mutant ki
     JSON.parse(readFileSync(join(result.dir, name), 'utf8')) as unknown;
   expect(read('store-diff.json')).toEqual([]);
   expect(read('mutant.json')).toEqual({killed: true, path: MUTANT_PATH, edits: MUTANT});
-  expect(read('contract.json')).toEqual({clock: CLOCK, breach: null});
+  expect(read('contract.json')).toEqual({
+    clock: CLOCK,
+    breach: null,
+    pinned_in_page: false,
+  });
   expect(read('walls.json')).toEqual(result.record.walls);
+  // M4: the walls file carries the two keys this run added, at their skipped values.
+  expect(read('walls.json')).toMatchObject({browser: 'skipped', action_ms: null});
 });
 
 test('leg (a) [M1]: opts.main defaults to Bun.main, so an omitted main stems this file', async () => {
@@ -256,18 +300,18 @@ test('leg (a) [M1]: opts.main defaults to Bun.main, so an omitted main stems thi
 
 // ---------------------------------------------------------------- (b) [M3]
 
-test('leg (b) [M3]: a red store move reports the diff table and never reaches the renderer', async () => {
+test('leg (b) [M3]: a red store move reports the diff table and never opens a page', async () => {
   const runDir = scratch('red-store');
   const expected = fixture('expected-completed.json', [
     {todos: {'0': {text: 'buy milk', completed: true}}},
     {},
   ]);
-  const {calls, fetchImpl} = recorder(okResponse);
+  const {browser, seen} = standIn();
 
-  const result = await runStateExam(greenSpec({expected}), {
+  const result = await runStateExam(greenSpec({expected, entry: ENTRY}), {
     env: runEnv(runDir),
     main: '/x/buy-milk.test.ts',
-    fetchImpl,
+    browser,
   });
 
   expect(result.ok).toBe(false);
@@ -285,8 +329,10 @@ test('leg (b) [M3]: a red store move reports the diff table and never reaches th
     {table: 'todos', row: '0', cell: 'completed', got: false, wanted: true},
   ]);
 
-  // A red store needs no picture: the renderer is configured and still never dialled.
-  expect(calls.length).toBe(0);
+  // A red store needs no picture: the spec names an entry, the run directory is set,
+  // and the renderer is still never asked for a page.
+  expect(seen.opened.length).toBe(0);
+  expect(result.record.walls.browser).toBe('skipped');
 
   // M1: the record still lands, at the engine's path, with no dom and no screenshot.
   expect(result.dir).toBe(join(runDir, 'state-exams', 'task-1', 'buy-milk-0'));
@@ -296,23 +342,35 @@ test('leg (b) [M3]: a red store move reports the diff table and never reaches th
 // ---------------------------------------------------------------- (c) [M4]
 
 test(
-  'leg (c) [M4]: a green store move with a renderer posts once and files the dom and the picture',
+  'leg (c) [M4]: a green store move with an entry opens one page and files the dom and the picture',
   async () => {
     const runDir = scratch('render-ran');
-    const {calls, fetchImpl} = recorder(okResponse);
+    const {browser, seen} = standIn();
 
     const result = await runStateExam(
-      greenSpec({view: [{selector: '.todoItem', count: 1, text: 'buy milk'}]}),
-      {env: runEnv(runDir), main: '/x/buy-milk.test.ts', fetchImpl},
+      greenSpec({
+        entry: ENTRY,
+        view: [{selector: '.todoItem', count: 1, text: 'buy milk'}],
+      }),
+      {env: runEnv(runDir), main: '/x/buy-milk.test.ts', browser},
     );
 
     expect(result.ok).toBe(true);
     expect(result.failure).toBeNull();
-    expect(calls.length).toBe(1);
+
+    // One page, opened with the spec's own clock, photographed once and closed.
+    expect(seen.opened.length).toBe(1);
+    expect(seen.opened[0]!.clock).toBe(CLOCK);
+    expect(seen.snapshots).toBe(1);
+    expect(seen.closed).toBe(1);
 
     expect(result.record.walls.render).toBe('ran');
+    expect(result.record.walls.browser).toBe('ran');
     expect(typeof result.record.walls.render_ms).toBe('number');
     expect(Number.isFinite(result.record.walls.render_ms as number)).toBe(true);
+    // The action was a callback, so there is no interaction to have timed.
+    expect(result.record.walls.action_ms).toBeNull();
+    expect(result.record.contract.pinned_in_page).toBe(false);
 
     expect(result.dir).toBe(join(runDir, 'state-exams', 'task-1', 'buy-milk-0'));
     expect(filesIn(result.dir)).toEqual(SIX_FILES);
@@ -325,19 +383,43 @@ test(
 );
 
 test(
+  'leg (c) [M4]: an entry with no run directory renders all the same, under the temp directory',
+  async () => {
+    const {browser, seen} = standIn();
+
+    const result = remember(
+      await runStateExam(greenSpec({entry: ENTRY}), {
+        env: {},
+        main: '/x/buy-milk.test.ts',
+        browser,
+      }),
+    );
+
+    // The run directory is not one of the move's triggers; the entry is.
+    expect(result.ok).toBe(true);
+    expect(seen.opened.length).toBe(1);
+    expect(result.record.walls.render).toBe('ran');
+    expect(result.record.walls.browser).toBe('ran');
+
+    expect(result.dir.startsWith(tmpdir())).toBe(true);
+    expect(filesIn(result.dir)).toEqual(SIX_FILES);
+  },
+  120000,
+);
+
+test(
   'leg (c) [M4]: a view the rendered dom does not satisfy is a render failure naming its selector',
   async () => {
     const runDir = scratch('render-red');
-    const {calls, fetchImpl} = recorder(okResponse);
+    const {browser, seen} = standIn();
 
-    const result = await runStateExam(greenSpec({view: [{selector: '.todoItem', count: 2}]}), {
-      env: runEnv(runDir),
-      main: '/x/buy-milk.test.ts',
-      fetchImpl,
-    });
+    const result = await runStateExam(
+      greenSpec({entry: ENTRY, view: [{selector: '.todoItem', count: 2}]}),
+      {env: runEnv(runDir), main: '/x/buy-milk.test.ts', browser},
+    );
 
     expect(result.ok).toBe(false);
-    expect(calls.length).toBe(1);
+    expect(seen.opened.length).toBe(1);
 
     const failure = failureOf(result);
     expect(failure.startsWith('render: view not satisfied')).toBe(true);
@@ -417,9 +499,8 @@ test('leg (e) [M6]: an empty clock fails as the contract line, with no breach re
 
 // The green half of M7, live: this call registers one bun test named
 // `state exam: state-exam` — `examStem(Bun.main)` of this very file — and that test passes
-// as part of this file's run. `TINYAPP_RENDER_URL` is cleared first so the registered
-// exam's render move skips whatever the ambient environment carries: no test here dials.
-delete process.env.TINYAPP_RENDER_URL;
+// as part of this file's run. The spec names no entry, so the registered exam takes the
+// render move's skipped branch and this file still spawns no browser of its own.
 stateExam(greenSpec());
 
 /** The hollow exam file M7's red half runs, importing by absolute path. */
@@ -434,7 +515,6 @@ const hollowSource = (): string =>
     '',
     'stateExam({',
     `  clock: ${JSON.stringify(CLOCK)},`,
-    "  entry: 'client/index.html',",
     "  seed: 'state-exams/seeds/empty.json',",
     '  store: createTodosStore,',
     "  action: (store) => { addTodo(store, 'buy milk'); },",
@@ -444,7 +524,7 @@ const hollowSource = (): string =>
     '',
   ].join('\n');
 
-/** Run `bun test <paths>` from the repository root with the renderer switched off. */
+/** Run `bun test <paths>` from the repository root, evidence filed under the temp dir. */
 const bunTest = (paths: string[]) => {
   const spawned = Bun.spawnSync(['bun', 'test', ...paths], {
     cwd: repoRoot,
@@ -477,7 +557,7 @@ test(
 
 // ---------------------------------------------------------------- (g) [M8]
 
-test('leg (g) [M8]: the two manifests and the thirteen exports of the sealed package', async () => {
+test('leg (g) [M8]: the two manifests and the fifteen exports of the sealed package', async () => {
   const readJson = (path: string): Record<string, any> =>
     JSON.parse(readFileSync(resolve(repoRoot, path), 'utf8')) as Record<string, any>;
 
@@ -502,7 +582,7 @@ test('leg (g) [M8]: the two manifests and the thirteen exports of the sealed pac
   // workspace link makes — the same one `tests/state-exams/*` rely on.
   const specifier: string = 'tinyapp-exam';
   const helper = (await import(specifier)) as Record<string, unknown>;
-  expect(EXPORTS.length).toBe(13);
+  expect(EXPORTS.length).toBe(15);
   for (const name of EXPORTS) {
     expect(typeof helper[name]).toBe('function');
   }
@@ -577,8 +657,8 @@ test(
 //     sibling file registering a plain `test` that awaits 300 ms, run the same way, exits
 //     non-zero with `timed out after 50ms` in its output.
 //
-// Neither spawn dials anything: both run with `ULTRA_RUN_DIR` and `TINYAPP_RENDER_URL`
-// empty, so the exam the slow file registers takes the render move's skipped branch.
+// Neither spawn dials anything and neither opens a browser: the spec the slow file
+// registers names no entry, so its exam takes the render move's skipped branch.
 
 /** `STATE_EXAM_TIMEOUT_MS` off a module namespace — `undefined` until it is exported. */
 const timeoutOf = (module: object): unknown =>
@@ -596,7 +676,6 @@ const slowSource = (): string =>
     '',
     'stateExam({',
     `  clock: ${JSON.stringify(CLOCK)},`,
-    "  entry: 'client/index.html',",
     "  seed: 'state-exams/seeds/empty.json',",
     '  store: createTodosStore,',
     "  action: async (store) => { await Bun.sleep(300); addTodo(store, 'buy milk'); },",
@@ -617,11 +696,11 @@ const plainSource = (): string =>
     '',
   ].join('\n');
 
-/** `bun test --timeout 50 <path>` from the repository root, run directory and renderer off. */
+/** `bun test --timeout 50 <path>` from the repository root, with no run directory. */
 const bunTestAt50 = (path: string) => {
   const spawned = Bun.spawnSync(['bun', 'test', '--timeout', '50', path], {
     cwd: repoRoot,
-    env: {...process.env, ULTRA_RUN_DIR: '', TINYAPP_RENDER_URL: ''},
+    env: {...process.env, ULTRA_RUN_DIR: ''},
   });
   return {
     exitCode: spawned.exitCode,

@@ -48,6 +48,8 @@ export const Store = ({onReady}: {onReady?: () => void}) => {
   // Read the seed once, at mount: which of the two components below renders
   // must not flip between renders, since each holds its own hooks.
   const [seed] = useState(readSeed);
+  // Handing the seed on is also what exposes `window.__TINYAPP_STORE__`:
+  // `createTodosStore` sets the handle when — and only when — it is seeded.
   const store = useCreateMergeableStore(() => createTodosStore(seed));
 
   useProvideStore(STORE_ID, store);

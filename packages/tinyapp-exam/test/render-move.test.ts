@@ -1,5 +1,9 @@
 // Exam for task 3, legs (a)-(j): the render move — bundle, seed, snapshot, view.
 //
+// Re-aimed by run-7's task 2, which retired the remote renderer: the page is opened in the
+// machine's own browser through the driver, so the legs that pinned the endpoint and its
+// skip rule now pin the driver and its one.
+//
 // M1. `renderHtml(entryHtml, {js, css, seed})` returns a document in which the first
 //     `<script>` element inside `<head>` has the text
 //     `window.__TINYAPP_SEED__ = <JSON.stringify(seed)>;`, every
@@ -13,27 +17,28 @@
 //     `name` equal to `value`; `checked` holds when there is at least one and every one has
 //     `data-checked` equal to `true`; `unchecked` the same with `false`; `absent` holds when
 //     there are none.
-// M3. `renderMove({entry, content, view, env, fetchImpl})` resolves
-//     `{render: 'skipped', ms: null, failures: []}` without calling `fetchImpl` when
-//     `env.TINYAPP_RENDER_URL` is unset or the empty string, and likewise when
-//     `env.ULTRA_RUN_DIR` is unset or the empty string.
+// M3. `renderMove({entry, content, view, clock, browser})` resolves
+//     `{render: 'skipped', ms: null, failures: []}` without opening a page when `entry` is
+//     unset or the empty string. A run directory is not one of its triggers: the only reason
+//     the move skips is that the spec names no page to build.
 // M4. Otherwise it bundles, with `Bun.build({target: 'browser'})`, the module named by the
 //     `src` of `entry`'s `<script type="module">` resolved against `entry`'s directory, calls
-//     `fetchImpl` exactly once with the URL `<env.TINYAPP_RENDER_URL>/snapshot`, method
-//     `POST`, header `content-type: application/json`, and a JSON body whose `html` is
-//     `renderHtml(<entry's text>, {js, css, seed: content})` and whose `addScriptTag` is
-//     `[{content}]` with `content` a script text containing `data-checked` and
-//     `querySelectorAll`, and resolves `{render: 'ran', ms, dom, screenshot, failures}` with
-//     `dom` the response's `result.content`, `screenshot` the bytes decoded from the base64
-//     `result.screenshot`, `failures` equal to `assertView(dom, view)` and `ms` a finite
-//     number greater than or equal to 0.
-// M5. A response whose status is not 2xx, or whose JSON has `success` false, makes
-//     `renderMove` reject with a message beginning `render failed:`.
+//     `browser.open` exactly once with `{html, clock}` — `html` being
+//     `renderHtml(<entry's text>, {js, css, seed: content})` and `clock` the one it was
+//     handed — takes exactly one `snapshot()` of that page, closes it, and resolves
+//     `{render: 'ran', ms, dom, screenshot, failures}` with `dom` and `screenshot` the
+//     snapshot's own, `failures` equal to `assertView(dom, view)` and `ms` a finite number
+//     greater than or equal to 0.
+// M5. An `open` that rejects, or a `snapshot` that rejects, makes `renderMove` reject with
+//     that error — and a page that was opened is closed all the same.
 // M6. The tree declares `node-html-parser` — the sealed `packages/tinyapp-exam/package.json`
 //     owns it as a `dependencies` entry, so the root `package.json` does not repeat it — and
 //     `bun.lock` records it, so `bun install --frozen-lockfile` exits 0 on the tree. (The
 //     install itself is the Proof's `Run:`; this file checks the two manifests it must find on
 //     the tree.)
+// M7. `bundleOf` minifies by default, so the `data:` URL the fixture's entry needs is under
+//     2,000,000 characters; built with `minify: false` the same page is over the ceiling the
+//     driver's `open` refuses.
 
 import {afterAll, expect, test} from 'bun:test';
 import {mkdtempSync, readFileSync, rmSync} from 'node:fs';
@@ -42,7 +47,8 @@ import {join, resolve} from 'node:path';
 
 import {parse} from 'node-html-parser';
 
-import {assertView, renderHtml, renderMove} from '../src/render-move';
+import type {Action, Browser, Page} from '../src/browser';
+import {assertView, bundleOf, pageFor, renderHtml, renderMove} from '../src/render-move';
 import * as renderMoveModule from '../src/render-move';
 import type {Snapshot, View} from '../src/types';
 
@@ -58,6 +64,9 @@ const ENTRY_HTML = readFileSync(resolve(repoRoot, ENTRY_PATH), 'utf8');
 const JS = 'console.log(1)';
 const CSS = '.a{}';
 
+/** The clock every leg pins the page to. */
+const CLOCK = '2026-01-01T00:00:00Z';
+
 /** The buy-milk snapshot every leg seeds with. */
 const SEED: Snapshot = [{todos: {'0': {text: 'buy milk', completed: false}}}, {}];
 
@@ -68,7 +77,7 @@ const SEED_SCRIPT_TEXT =
 const SYNTHETIC_ENTRY =
   '<html><head><title>t</title></head><body><script type="module" src="/a.tsx"></script><p>x</p><script type="module" src="/b.tsx"></script></body></html>';
 
-/** The DOM the stubbed renderer hands back: one open todo. */
+/** The DOM the stand-in browser hands back: one open todo. */
 const FIXTURE_DOM =
   '<div id="todoList"><div class="todoItem"><input type="checkbox" data-checked="false" id="todo-0"><label for="todo-0">buy milk</label><button>Delete</button></div></div>';
 
@@ -81,13 +90,12 @@ const FIXTURE_DOM_CHECKED = FIXTURE_DOM.replace(
 /** One checked and one unchecked input: neither universal holds. */
 const MIXED_DOM = '<div><input data-checked="true"><input data-checked="false"></div>';
 
-/** The placeholder renderer. Never dialled: every leg injects `fetchImpl`. */
-const RENDER_URL = 'http://renderer.invalid/v4/accounts/x/browser-rendering';
-const SNAPSHOT_URL = 'http://renderer.invalid/v4/accounts/x/browser-rendering/snapshot';
-
-/** The four bytes the stub sends as base64 and the helper must decode. */
+/** The four bytes the stand-in page photographs and the helper must carry through. */
 const PNG_BYTES = [137, 80, 78, 71];
-const PNG_BASE64 = Buffer.from(PNG_BYTES).toString('base64');
+
+/** The ceiling Chromium refuses a `data:` URL over, and the wall M7 keeps under. */
+const DATA_URL_CEILING = 2_097_152;
+const URL_BUDGET = 2_000_000;
 
 const runDir = mkdtempSync(join(tmpdir(), 'tinyapp-exam-render-move-'));
 afterAll(() => rmSync(runDir, {recursive: true, force: true}));
@@ -105,43 +113,57 @@ const headScripts = (html: string) => {
   return head!.querySelectorAll('script');
 };
 
-type Call = {url: string; init: RequestInit | undefined};
+/** What one `open` was handed. */
+type Opened = {html: string; clock: string};
 
-/** A `fetchImpl` that records every `(url, init)` and answers with a fresh `respond()`. */
-const recorder = (respond: () => Response) => {
-  const calls: Call[] = [];
-  const fetchImpl = ((url: unknown, init?: RequestInit) => {
-    calls.push({url: String(url), init});
-    return Promise.resolve(respond());
-  }) as unknown as typeof fetch;
-  return {calls, fetchImpl};
+/** What the stand-in browser saw — no Chromium is spawned by any leg in this file. */
+type Recorded = {
+  opened: Opened[];
+  acted: Action[];
+  snapshots: number;
+  closed: number;
 };
 
-/** The stub the run legs answer with: a 200 carrying the fixture DOM and the png. */
-const okResponse = (dom = FIXTURE_DOM): Response =>
-  new Response(
-    JSON.stringify({success: true, result: {content: dom, screenshot: PNG_BASE64}}),
-    {status: 200},
-  );
+/**
+ * A `Browser` that opens nothing: it records what it was handed and answers a
+ * canned picture, so every leg below runs on a machine with no browser at all.
+ */
+const standIn = (
+  over: {dom?: string; openThrows?: Error; snapshotThrows?: Error} = {},
+): {browser: Browser; seen: Recorded} => {
+  const seen: Recorded = {opened: [], acted: [], snapshots: 0, closed: 0};
 
-/** One header off an `init`, whether `headers` is a `Headers`, a list of pairs or a record. */
-const headerOf = (init: RequestInit | undefined, name: string): string | null => {
-  const headers = init?.headers;
-  if (headers == null) {
-    return null;
-  }
-  if (typeof (headers as Headers).get === 'function') {
-    return (headers as Headers).get(name);
-  }
-  const entries: Array<[unknown, unknown]> = Array.isArray(headers)
-    ? (headers as Array<[unknown, unknown]>)
-    : (Object.entries(headers as Record<string, string>) as Array<[unknown, unknown]>);
-  for (const [key, value] of entries) {
-    if (String(key).toLowerCase() === name.toLowerCase()) {
-      return String(value);
-    }
-  }
-  return null;
+  const browser: Browser = {
+    argv: ['stand-in'],
+    open: async (opts: Opened): Promise<Page> => {
+      seen.opened.push(opts);
+      if (over.openThrows !== undefined) {
+        throw over.openThrows;
+      }
+      return {
+        act: async (action: Action) => {
+          seen.acted.push(action);
+        },
+        evaluate: async () => JSON.stringify(SEED),
+        snapshot: async () => {
+          seen.snapshots += 1;
+          if (over.snapshotThrows !== undefined) {
+            throw over.snapshotThrows;
+          }
+          return {
+            dom: over.dom ?? FIXTURE_DOM,
+            screenshot: new Uint8Array(PNG_BYTES),
+          };
+        },
+        close: async () => {
+          seen.closed += 1;
+        },
+      };
+    },
+    close: async () => {},
+  };
+
+  return {browser, seen};
 };
 
 /** Run `thunk`, reporting what it resolved and what it threw, one of them unset. */
@@ -154,6 +176,10 @@ const settle = async (
     return {error};
   }
 };
+
+/** The length of the `data:` URL `html` would travel to the browser as. */
+const dataUrlLength = (html: string): number =>
+  `data:text/html;base64,${Buffer.from(html, 'utf8').toString('base64')}`.length;
 
 // ------------------------------------------------------------------ M1
 
@@ -174,7 +200,7 @@ test('leg (a) [M1]: renderHtml inlines the seed, the bundle and the css, and lea
   // The css is inlined in `<head>`, verbatim.
   expect(document.querySelectorAll('head style').map(textOf)).toContain(CSS);
 
-  // Nothing left to fetch: the renderer has no origin to serve `/src/` from.
+  // Nothing left to fetch: the page is opened from a `data:` URL with no origin.
   expect(document.querySelectorAll('script[src]').length).toBe(0);
 });
 
@@ -272,108 +298,96 @@ test('leg (c) [M2]: a list reports one string per failing entry, in list order',
 
 // ------------------------------------------------------------------ M3
 
-test('leg (d) [M3]: no TINYAPP_RENDER_URL means skipped, and the renderer is never called', async () => {
-  const {calls, fetchImpl} = recorder(() => okResponse());
+test('leg (d) [M3]: no entry means skipped, and no page is ever opened', async () => {
+  const {browser, seen} = standIn();
   const result = await renderMove({
-    entry: ENTRY_PATH,
     content: SEED,
     view: [{selector: '.todoItem', count: 1}],
-    env: {ULTRA_RUN_DIR: runDir},
-    fetchImpl,
+    clock: CLOCK,
+    browser,
   });
 
   expect(result.render).toBe('skipped');
   expect(result.ms).toBeNull();
   expect(result.failures).toEqual([]);
-  expect(calls.length).toBe(0);
+  expect(seen.opened.length).toBe(0);
 });
 
-test('leg (e) [M3]: an empty TINYAPP_RENDER_URL means skipped too', async () => {
-  const {calls, fetchImpl} = recorder(() => okResponse());
+test('leg (e) [M3]: an empty entry means skipped too', async () => {
+  const {browser, seen} = standIn();
   const result = await renderMove({
-    entry: ENTRY_PATH,
+    entry: '',
     content: SEED,
-    env: {TINYAPP_RENDER_URL: '', ULTRA_RUN_DIR: runDir},
-    fetchImpl,
+    clock: CLOCK,
+    browser,
   });
 
   expect(result.render).toBe('skipped');
   expect(result.ms).toBeNull();
   expect(result.failures).toEqual([]);
-  expect(calls.length).toBe(0);
+  expect(seen.opened.length).toBe(0);
 });
 
-test('leg (f) [M3]: an unset or empty ULTRA_RUN_DIR means skipped, renderer configured or not', async () => {
-  const unset = recorder(() => okResponse());
-  const withoutRunDir = await renderMove({
-    entry: ENTRY_PATH,
-    content: SEED,
-    env: {TINYAPP_RENDER_URL: RENDER_URL},
-    fetchImpl: unset.fetchImpl,
-  });
-  expect(withoutRunDir.render).toBe('skipped');
-  expect(withoutRunDir.ms).toBeNull();
-  expect(withoutRunDir.failures).toEqual([]);
-  expect(unset.calls.length).toBe(0);
+test(
+  'leg (f) [M3]: a run directory is no longer a trigger — an entry renders with or without one',
+  async () => {
+    // The two halves differ only in an environment the move no longer reads at all.
+    for (const _runDir of [runDir, '']) {
+      const {browser, seen} = standIn();
+      const result = await renderMove({
+        entry: ENTRY_PATH,
+        content: SEED,
+        clock: CLOCK,
+        browser,
+      });
+      expect(result.render).toBe('ran');
+      expect(seen.opened.length).toBe(1);
+    }
 
-  const empty = recorder(() => okResponse());
-  const emptyRunDir = await renderMove({
-    entry: ENTRY_PATH,
-    content: SEED,
-    env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: ''},
-    fetchImpl: empty.fetchImpl,
-  });
-  expect(emptyRunDir.render).toBe('skipped');
-  expect(emptyRunDir.ms).toBeNull();
-  expect(emptyRunDir.failures).toEqual([]);
-  expect(empty.calls.length).toBe(0);
-});
+    // And the skip is the entry's absence, nothing else.
+    const bare = standIn();
+    const skipped = await renderMove({content: SEED, clock: CLOCK, browser: bare.browser});
+    expect(skipped.render).toBe('skipped');
+    expect(bare.seen.opened.length).toBe(0);
+  },
+  120000,
+);
 
 // ------------------------------------------------------------------ M4
 
 test(
-  'leg (g) [M4]: the configured move bundles the entry, posts one snapshot request and reports the view',
+  'leg (g) [M4]: the move bundles the entry, opens one page, photographs it once and reports the view',
   async () => {
-    const {calls, fetchImpl} = recorder(() => okResponse());
+    const {browser, seen} = standIn();
     const result = await renderMove({
       entry: ENTRY_PATH,
       content: SEED,
       view: [{selector: '.todoItem', count: 1}],
-      env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
-      fetchImpl,
+      clock: CLOCK,
+      browser,
     });
 
-    // One request, to the snapshot action of the configured renderer.
-    expect(calls.length).toBe(1);
-    const {url, init} = calls[0]!;
-    expect(url).toBe(SNAPSHOT_URL);
-    expect(init?.method).toBe('POST');
-    expect(headerOf(init, 'content-type')).toBe('application/json');
+    // One page, opened on the clock it was handed, photographed once and closed.
+    expect(seen.opened.length).toBe(1);
+    expect(seen.snapshots).toBe(1);
+    expect(seen.closed).toBe(1);
 
-    const body = JSON.parse(String(init?.body)) as {
-      html: string;
-      addScriptTag: Array<{content: string}>;
-    };
+    const {html, clock} = seen.opened[0]!;
+    expect(clock).toBe(CLOCK);
 
     // The page opens on the post-action state, with nothing left to fetch.
-    expect(body.html).toContain(SEED_SCRIPT_TEXT);
-    expect(body.html).toContain('<script type="module">');
-    expect(body.html).not.toContain('src="/src/index.tsx"');
+    expect(html).toContain(SEED_SCRIPT_TEXT);
+    expect(html).toContain('<script type="module">');
+    expect(html).not.toContain('src="/src/index.tsx"');
 
     // The inlined module is the real bundle of `client/src/index.tsx`, not a placeholder.
-    const modules = parse(body.html).querySelectorAll('script[type=module]');
+    const modules = parse(html).querySelectorAll('script[type=module]');
     expect(modules.length).toBe(1);
     const bundle = textOf(modules[0]!);
     expect(bundle.length).toBeGreaterThan(100000);
     expect(bundle).toContain('createRoot');
 
-    // The reflection script rides along as a request parameter.
-    expect(Array.isArray(body.addScriptTag)).toBe(true);
-    expect(body.addScriptTag.length).toBe(1);
-    expect(body.addScriptTag[0]!.content).toContain('data-checked');
-    expect(body.addScriptTag[0]!.content).toContain('querySelectorAll');
-
-    // And the response is reported as it came back.
+    // And the page's own picture and markup are what the move reports.
     expect(result.render).toBe('ran');
     expect(result.dom).toBe(FIXTURE_DOM);
     expect(result.screenshot).toBeInstanceOf(Uint8Array);
@@ -383,89 +397,82 @@ test(
     expect(Number.isFinite(result.ms as number)).toBe(true);
     expect(result.ms as number).toBeGreaterThanOrEqual(0);
   },
-  60000,
+  120000,
 );
 
 test(
-  'leg (g) [M4]: failures are assertView of the returned dom',
+  'leg (g) [M4]: failures are assertView of the photographed dom',
   async () => {
-    const {calls, fetchImpl} = recorder(() => okResponse());
+    const {browser, seen} = standIn();
     const result = await renderMove({
       entry: ENTRY_PATH,
       content: SEED,
       view: [{selector: '.todoItem', count: 2}],
-      env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
-      fetchImpl,
+      clock: CLOCK,
+      browser,
     });
 
-    expect(calls.length).toBe(1);
+    expect(seen.opened.length).toBe(1);
     expect(result.render).toBe('ran');
+    expect(result.failures).toEqual(assertView(result.dom!, [{selector: '.todoItem', count: 2}]));
     expect(result.failures.length).toBe(1);
     expect(result.failures[0]!).toContain('.todoItem');
   },
-  60000,
+  120000,
 );
 
 // ------------------------------------------------------------------ M5
 
 test(
-  'leg (h) [M5]: a non-2xx response rejects with render failed:',
+  'leg (h) [M5]: an open that rejects rejects the move, and nothing was photographed',
   async () => {
-    const {fetchImpl} = recorder(
-      () => new Response(JSON.stringify({success: false}), {status: 500}),
-    );
+    const openThrows = new Error('browser: cannot connect to ws://127.0.0.1:0/');
+    const {browser, seen} = standIn({openThrows});
     const {resolved, error} = await settle(() =>
-      renderMove({
-        entry: ENTRY_PATH,
-        content: SEED,
-        env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
-        fetchImpl,
-      }),
+      renderMove({entry: ENTRY_PATH, content: SEED, clock: CLOCK, browser}),
     );
 
     expect(resolved).toBeUndefined();
-    expect(error).toBeInstanceOf(Error);
-    expect((error as Error).message.startsWith('render failed:')).toBe(true);
+    expect(error).toBe(openThrows);
+    expect(seen.opened.length).toBe(1);
+    expect(seen.snapshots).toBe(0);
   },
-  60000,
+  120000,
 );
 
 test(
-  'leg (i) [M5]: a 200 with success false rejects, while a 200 with success true does not',
+  'leg (i) [M5]: a snapshot that rejects rejects the move, and the page is closed all the same',
   async () => {
-    const refused = recorder(
-      () =>
-        new Response(JSON.stringify({success: false, errors: [{message: 'x'}]}), {
-          status: 200,
-        }),
-    );
+    const snapshotThrows = new Error('browser: Page.captureScreenshot did not answer');
+    const refused = standIn({snapshotThrows});
     const {resolved, error} = await settle(() =>
       renderMove({
         entry: ENTRY_PATH,
         content: SEED,
-        env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
-        fetchImpl: refused.fetchImpl,
+        clock: CLOCK,
+        browser: refused.browser,
       }),
     );
 
     expect(resolved).toBeUndefined();
-    expect(error).toBeInstanceOf(Error);
-    expect((error as Error).message.startsWith('render failed:')).toBe(true);
+    expect(error).toBe(snapshotThrows);
+    expect(refused.seen.closed).toBe(1);
 
-    // The same 200, `success` true, is the run leg's stub: it settles green.
-    const accepted = recorder(() => okResponse());
+    // The same page, photographed rather than refused, is the run leg's stand-in.
+    const accepted = standIn();
     const green = await settle(() =>
       renderMove({
         entry: ENTRY_PATH,
         content: SEED,
-        env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
-        fetchImpl: accepted.fetchImpl,
+        clock: CLOCK,
+        browser: accepted.browser,
       }),
     );
     expect(green.error).toBeUndefined();
     expect((green.resolved as {render: string}).render).toBe('ran');
+    expect(accepted.seen.closed).toBe(1);
   },
-  60000,
+  120000,
 );
 
 // ------------------------------------------------------------------ M6
@@ -490,9 +497,45 @@ test('leg (j) [M6]: the tree manifests carry node-html-parser', () => {
   );
 });
 
+// ------------------------------------------------------------------ M7
+
+test(
+  'leg (k) [M7]: the default bundle is minified and its page fits under the ceiling; unminified does not',
+  async () => {
+    const cwd = process.cwd();
+    process.chdir(repoRoot);
+    try {
+      const small = await pageFor(ENTRY_PATH, SEED);
+      expect(dataUrlLength(small)).toBeLessThan(URL_BUDGET);
+
+      // Explicitly asking for the default is the same page, byte for byte: the build is
+      // deterministic, which is what lets the store move open two pages and compare.
+      const again = await pageFor(ENTRY_PATH, SEED, {minify: true});
+      expect(again).toBe(small);
+
+      // Unminified, the very same fixture is a URL the browser will not navigate to.
+      const big = await pageFor(ENTRY_PATH, SEED, {minify: false});
+      expect(dataUrlLength(big)).toBeGreaterThan(DATA_URL_CEILING);
+
+      // And the minification is `bundleOf`'s doing, not the entry's.
+      const entryPath = resolve(repoRoot, ENTRY_PATH);
+      const minified = await bundleOf(entryPath, ENTRY_HTML);
+      const plain = await bundleOf(entryPath, ENTRY_HTML, {minify: false});
+      expect(minified.js.length).toBeLessThan(plain.js.length);
+    } finally {
+      process.chdir(cwd);
+    }
+  },
+  120000,
+);
+
 // =====================================================================================
 // Exam for task 1 — "The render branch — an explicit timeout on the registration, a
 // reflection that writes only on change" — legs (b), (c), (d), (e) and (f).
+//
+// Re-aimed by run-7's task 2 for leg (e) alone: the reflection no longer rides to a remote
+// renderer as a request parameter, it is what the driver evaluates in the page before it
+// serialises. The text itself, and everything M2/M3/M4 say about it, is unchanged.
 //
 // M2. `packages/tinyapp-exam/src/render-move.ts` exports `REFLECT_CHECKED`, a string;
 //     evaluated as a script under happy-dom in a document whose body holds exactly two
@@ -506,19 +549,18 @@ test('leg (j) [M6]: the tree manifests carry node-html-parser', () => {
 //     attribute is `true`.
 // M3. The character `'` (U+0027) is absent from `REFLECT_CHECKED`; `REFLECT_CHECKED`
 //     contains each of `data-checked`, `querySelectorAll` and `MutationObserver`; and the
-//     body `renderMove` posts on the ran branch carries `addScriptTag` deep-equal to
-//     `[{content: REFLECT_CHECKED}]`.
+//     driver runs exactly that text in the page it is about to photograph.
 // M4. `packages/tinyapp-exam/package.json` `devDependencies` carries
 //     `@happy-dom/global-registrator` as a non-empty string, `bun.lock` records
 //     `@happy-dom/global-registrator` under the `packages/tinyapp-exam` workspace's
 //     `devDependencies`, and `bun install --frozen-lockfile` exits 0 on the tree. (The
 //     install is the Proof's own `Run:`; this file checks the two manifests it rests on.)
 //
-// Nothing here dials: the happy-dom leg is a document in this process and the ran-branch
-// leg injects a `fetchImpl` against the same `.invalid` placeholder the legs above use.
-// happy-dom replaces `document`, `window` and `fetch` on `globalThis`, and bun runs every
-// file of one `bun test` in one process, so leg (b) registers inside its own test and
-// unregisters — and un-spies — in a `finally`.
+// Nothing here dials, and nothing here spawns a browser: the happy-dom leg is a document in
+// this process and leg (e) reads the driver's own source. happy-dom replaces `document`,
+// `window` and `fetch` on `globalThis`, and bun runs every file of one `bun test` in one
+// process, so leg (b) registers inside its own test and unregisters — and un-spies — in a
+// `finally`.
 
 /** `REFLECT_CHECKED` as `../src/render-move` exports it; M2 says it is a string. */
 const REFLECT_CHECKED = (renderMoveModule as unknown as {REFLECT_CHECKED: string})
@@ -558,7 +600,7 @@ test('task 1, leg (b) [M2]: the reflection writes each box once and then only on
       return realSetAttribute.apply(this, args);
     };
 
-    // Indirect `eval`: the renderer runs this text as a script, not as a module.
+    // Indirect `eval`: the driver runs this text as a script, not as a module.
     (0, eval)(REFLECT_CHECKED);
     await settleObserver();
 
@@ -609,28 +651,27 @@ test('task 1, leg (d) [M3]: REFLECT_CHECKED reads inputs, writes data-checked an
 
 // ------------------------------------------------------------------ (e) [M3]
 
-test(
-  'task 1, leg (e) [M3]: the ran branch posts addScriptTag as exactly [{content: REFLECT_CHECKED}]',
-  async () => {
-    expect(typeof REFLECT_CHECKED).toBe('string');
+test('task 1, leg (e) [M3]: the driver runs REFLECT_CHECKED in the page it photographs', () => {
+  expect(typeof REFLECT_CHECKED).toBe('string');
 
-    const {calls, fetchImpl} = recorder(() => okResponse());
-    const result = await renderMove({
-      entry: ENTRY_PATH,
-      content: SEED,
-      env: {TINYAPP_RENDER_URL: RENDER_URL, ULTRA_RUN_DIR: runDir},
-      fetchImpl,
-    });
+  // The text is imported from this module — not copied into the driver — and it is
+  // evaluated inside `snapshot()`, before the markup and the picture are taken.
+  const driver = readFileSync(
+    resolve(repoRoot, 'packages/tinyapp-exam/src/browser.ts'),
+    'utf8',
+  );
+  expect(driver).toContain("import {REFLECT_CHECKED} from './render-move'");
 
-    expect(result.render).toBe('ran');
-    expect(calls.length).toBe(1);
-
-    const body = JSON.parse(String(calls[0]!.init?.body)) as {addScriptTag: unknown};
-    // The renderer is handed the exported text itself — one tag, nothing else in it.
-    expect(body.addScriptTag).toEqual([{content: REFLECT_CHECKED}]);
-  },
-  60000,
-);
+  const snapshot = driver.slice(
+    driver.indexOf('snapshot: async ()'),
+    driver.indexOf('close: async ()', driver.indexOf('snapshot: async ()')),
+  );
+  expect(snapshot.length).toBeGreaterThan(0);
+  expect(snapshot).toContain('await evaluate(REFLECT_CHECKED)');
+  expect(snapshot.indexOf('await evaluate(REFLECT_CHECKED)')).toBeLessThan(
+    snapshot.indexOf('Page.captureScreenshot'),
+  );
+});
 
 // ------------------------------------------------------------------ (f) [M4]
 

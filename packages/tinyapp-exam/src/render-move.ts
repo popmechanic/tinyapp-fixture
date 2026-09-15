@@ -1,11 +1,12 @@
 /**
  * The render move: build the app into one self-contained page that opens on the
- * post-action state, ask the renderer for that page's DOM and picture, and read
- * the DOM against the small view vocabulary.
+ * post-action state, open that page in the machine's own browser, and read its
+ * DOM against the small view vocabulary.
  *
- * A machine with no renderer configured records `skipped` — never a pass. The
- * two triggers are deliberate: the suite at the fold has no run directory, a
- * laptop has no renderer URL, and both mean "nothing was looked at".
+ * The renderer is local and always was meant to be: the page arrives as a
+ * `data:` URL, every request it makes is blocked before it leaves, and the only
+ * socket in the exam is the driver's loopback one. A spec that names no `entry`
+ * has no page to build and records `skipped` — never a pass.
  */
 
 import {readFileSync} from 'node:fs';
@@ -13,6 +14,7 @@ import {dirname, resolve} from 'node:path';
 
 import {parse, TextNode, type HTMLElement} from 'node-html-parser';
 
+import type {Browser} from './browser';
 import type {Snapshot, View} from './types';
 
 export type {Snapshot, Tables, Values, View} from './types';
@@ -163,7 +165,7 @@ export const assertView = (
 };
 
 /**
- * The script the renderer injects before it serialises: it copies each input's
+ * The script run in the page before it is serialised: it copies each input's
  * `checked` property onto a `data-checked` attribute, and keeps copying, since
  * the app paints after load.
  *
@@ -182,18 +184,40 @@ export const REFLECT_CHECKED =
   'f();new MutationObserver(f).observe(document.documentElement,' +
   '{subtree:true,childList:true,attributes:true})})()';
 
-/** The base64 payload as bytes. */
-const fromBase64 = (base64: string): Uint8Array =>
-  Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
-
 /**
  * Bundles the module the entry names, resolved against the entry's directory —
  * `/src/index.tsx` in `client/index.html` is `client/src/index.tsx`, not a path
  * on the filesystem root.
+ *
+ * It builds the app for production by default — minified, with
+ * `process.env.NODE_ENV` defined to `"production"` — and both halves of that are
+ * load-bearing rather than tidy.
+ *
+ * Minified, because the page travels to the browser as a `data:` URL, and this
+ * fixture built for development is a URL of ~2.59 M characters, over the ceiling
+ * `open` refuses. Production, because a *development* React double-invokes the
+ * initialiser of a component under `<StrictMode>`, which this app's `<Store/>`
+ * is: `useCreateMergeableStore(() => createTodosStore(seed))` therefore makes two
+ * stores, TinyBase keeps the first and renders from it, while the fixture's
+ * `exposeStore` records the last. `window.__TINYAPP_STORE__` is then a stale twin
+ * of the store the page is showing, and the interaction the store move performs
+ * lands in the UI's store while the read goes to the other one — a click that
+ * visibly ticks the box reads back uncompleted. A production build invokes once,
+ * and the handle is the store the page renders from.
+ *
+ * Both are pinned to the one `minify` knob, and `NODE_ENV` is defined either way
+ * rather than inherited from the shell: a build that changed with the ambient
+ * environment would break the determinism the two-page rule rests on, and a
+ * production build that was merely unminified would come in at ~1.96 M
+ * characters — under the ceiling, so `minify: false` would no longer show it
+ * being refused. `minify: false` is the development build, which is what a test
+ * that wants to see that refusal asks for. Both builds are deterministic, so the
+ * two pages the store move opens still agree byte for byte.
  */
-const bundleOf = async (
+export const bundleOf = async (
   entryPath: string,
   entryHtml: string,
+  opts: {minify?: boolean} = {},
 ): Promise<{js: string; css: string}> => {
   const src = parse(entryHtml, PARSE)
     .querySelector('script[type=module][src]')
@@ -202,9 +226,14 @@ const bundleOf = async (
     throw new Error(`render failed: ${entryPath} names no module script`);
   }
 
+  const production = opts.minify ?? true;
   const built = await Bun.build({
     entrypoints: [resolve(dirname(entryPath), src.replace(/^\/+/, ''))],
     target: 'browser',
+    minify: production,
+    define: {
+      'process.env.NODE_ENV': production ? '"production"' : '"development"',
+    },
   });
   if (!built.success) {
     throw new Error(`render failed: ${built.logs.join('\n')}`);
@@ -225,67 +254,59 @@ const bundleOf = async (
   };
 };
 
+/** The entry document, read and bundled into one page seeded with `content`. */
+export const pageFor = async (
+  entry: string,
+  content: Snapshot,
+  opts: {minify?: boolean} = {},
+): Promise<string> => {
+  const entryPath = resolve(process.cwd(), entry);
+  const entryHtml = readFileSync(entryPath, 'utf8');
+  const {js, css} = await bundleOf(entryPath, entryHtml, opts);
+  return renderHtml(entryHtml, {js, css, seed: content});
+};
+
 /**
  * Runs the render move for one snapshot.
  *
- * Resolves `{render: 'skipped', ms: null, failures: []}` — without dialling
- * anything — when either `TINYAPP_RENDER_URL` or `ULTRA_RUN_DIR` is unset or
- * empty. Otherwise it bundles the entry, posts the page to the renderer's
- * `snapshot` action and resolves that call's DOM, picture, view failures and
- * wall. Rejects with a message beginning `render failed:` when the renderer
- * answers outside 2xx or with `success` false.
+ * Resolves `{render: 'skipped', ms: null, failures: []}` — without opening
+ * anything — when the spec names no `entry`; there is then no page to build, and
+ * that is the only reason the move skips. A run directory is not one of them: a
+ * laptop renders too, and its evidence lands in a temp directory.
+ *
+ * Otherwise it bundles the entry, opens the page in `browser`, and resolves that
+ * page's DOM, picture, view failures and wall. The page is closed before it
+ * resolves; the browser is the caller's to close.
  */
 export const renderMove = async (args: {
-  entry: string;
+  entry?: string;
   content: Snapshot;
   view?: View | View[];
-  env: Record<string, string | undefined>;
-  fetchImpl?: typeof fetch;
+  clock: string;
+  browser: Browser;
+  minify?: boolean;
 }): Promise<RenderResult> => {
-  const {entry, content, view, env, fetchImpl} = args;
-  const base = env.TINYAPP_RENDER_URL;
-  const runDir = env.ULTRA_RUN_DIR;
-  if (base === undefined || base === '' || runDir === undefined || runDir === '') {
+  const {entry, content, view, clock, browser, minify} = args;
+  if (entry === undefined || entry === '') {
     return {render: 'skipped', ms: null, failures: []};
   }
 
   const started = performance.now();
-  const entryPath = resolve(process.cwd(), entry);
-  const entryHtml = readFileSync(entryPath, 'utf8');
-  const {js, css} = await bundleOf(entryPath, entryHtml);
+  const html = await pageFor(entry, content, {minify});
 
-  const response = await (fetchImpl ?? fetch)(
-    `${base.replace(/\/+$/, '')}/snapshot`,
-    {
-      method: 'POST',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify({
-        html: renderHtml(entryHtml, {js, css, seed: content}),
-        addScriptTag: [{content: REFLECT_CHECKED}],
-      }),
-    },
-  );
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    throw new Error(`render failed: ${response.status} ${detail}`.trimEnd());
+  const page = await browser.open({html, clock});
+  let shot: {dom: string; screenshot: Uint8Array};
+  try {
+    shot = await page.snapshot();
+  } finally {
+    await page.close().catch(() => {});
   }
 
-  const payload = (await response.json()) as {
-    success?: boolean;
-    errors?: unknown;
-    result?: {content?: string; screenshot?: string};
-  };
-  if (payload?.success !== true) {
-    throw new Error(`render failed: ${JSON.stringify(payload?.errors ?? payload)}`);
-  }
-
-  const dom = payload.result?.content ?? '';
   return {
     render: 'ran',
     ms: Math.max(0, performance.now() - started),
-    dom,
-    screenshot: fromBase64(payload.result?.screenshot ?? ''),
-    failures: assertView(dom, view),
+    dom: shot.dom,
+    screenshot: shot.screenshot,
+    failures: assertView(shot.dom, view),
   };
 };

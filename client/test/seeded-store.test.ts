@@ -135,6 +135,10 @@ test('leg (f) [M6]: a seeded render shows the seed and starts no persister, no s
   expect(syncs).toBe(0);
   expect(sockets).toBe(0);
 
+  // The same render hands the store over for an exam to read.
+  expect(window.__TINYAPP_STORE__).toBeDefined();
+  expect(window.__TINYAPP_STORE__?.getContent()).toEqual(SEED as any);
+
   root.unmount();
 });
 
@@ -157,6 +161,9 @@ test('leg (g) [M6]: an unseeded render into a fresh Provider starts the persiste
   expect(persisters - persistersBefore).toBeGreaterThanOrEqual(1);
   expect(syncs - syncsBefore).toBeGreaterThanOrEqual(1);
   expect(sockets - socketsBefore).toBeGreaterThanOrEqual(1);
+
+  // A normal page exposes nothing, even on a page that held a seed before.
+  expect(window.__TINYAPP_STORE__).toBeUndefined();
 
   root.unmount();
 });

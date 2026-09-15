@@ -23,6 +23,26 @@ export type TodosContent = Content<Schemas>;
 
 export const STORE_ID = 'todos';
 
+// The seeded page hands its store back the way it was handed its seed: on
+// `window`, under a name the exam knows. A normal page leaves no such handle,
+// so the two are told apart by its absence and not by its contents.
+declare global {
+  interface Window {
+    __TINYAPP_STORE__?: TodosStore;
+  }
+}
+
+const exposeStore = (store: TodosStore | undefined): void => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  if (store === undefined) {
+    delete window.__TINYAPP_STORE__;
+  } else {
+    window.__TINYAPP_STORE__ = store;
+  }
+};
+
 export const createTodosStore = (seed?: TodosContent): TodosStore => {
   const store = createMergeableStore()
     .setTablesSchema(TABLES_SCHEMA)
@@ -35,7 +55,11 @@ export const createTodosStore = (seed?: TodosContent): TodosStore => {
       },
       {},
     ]);
-  return seed === undefined ? store : store.setContent(seed);
+  const created: TodosStore = seed === undefined ? store : store.setContent(seed);
+  // Only a seeded store is exposed; creating an unseeded one on a page that
+  // once held a seed clears the handle rather than leaving a stale one.
+  exposeStore(seed === undefined ? undefined : created);
+  return created;
 };
 
 // The three mutations below are the single code path shared by the UI's

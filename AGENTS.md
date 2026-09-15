@@ -28,6 +28,10 @@ initial in-memory data does not overwrite persisted data during startup.
   TinyBase Store.
 - The primary Store file also initializes persistence.
 - The primary Store file also initializes synchronization.
+- A seeded page (one opened with `window.__TINYAPP_SEED__` set) also sets
+  `window.__TINYAPP_STORE__` so an exam can read the store; a normal page sets
+  no such handle. The seeded page is the one that starts neither the persister
+  nor the synchronizer.
 - `client/src/App.tsx` contains the main application UI.
 - `client/src/config.tsx` contains synchronization configuration.
 - `server/index.tsx` contains the synchronization server.
