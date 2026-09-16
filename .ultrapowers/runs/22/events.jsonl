@@ -95,3 +95,8 @@
 {"kind":"handshake:settled","task":"3","expected":"state-exams/expected/two-todos-first-done.json","id":"01M2NE3XCN000156XZR90FP11P","ts":1789573330325}
 {"kind":"engine:log","line":"task 3 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2NE3XCP00001TWTXKQPRBD0","ts":1789573330326}
 {"kind":"engine:phase","phase":"Wave 2","id":"01M2NE3XDT000065QP4M9HB8CG","ts":1789573330362}
+{"kind":"driver:wave-adopted","wave":2,"tasks":["2","3","4"],"headSha":"4fa714b7ca099fd46be33aaf8392935299b5baf2","why":"released","released":["5"],"applied":{"2":"base","3":"base","4":"base"},"id":"01M2NE9JPH0000EPXC9FXGDX8C","ts":1789573515985}
+{"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2NE9JR40000J761XV2601NR","ts":1789573516036}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2NE9QW60000QPEX9YDXT2GP","ts":1789573521286}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":2,"id":"01M2NE9SJ50000E04T0R46NA3E","ts":1789573523013}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- client/src/storeData.ts server packages/tinyapp-history state-exams README.md","exit":0,"minor":false,"wave":2,"id":"01M2NE9SJF0000HEQTMAJA3EN6","ts":1789573523023}
