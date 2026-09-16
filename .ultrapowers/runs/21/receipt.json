@@ -1,0 +1,313 @@
+{
+  "ok": true,
+  "stamp": "run-21",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-21"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "2 task(s) in 2 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The pinned cell and the Pin button \u2014 a click reaches the pinned state, and that state is what this task posts",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          ".gitignore",
+          "client/src/Store.tsx",
+          "client/src/TodoItem.tsx",
+          "client/src/storeData.ts",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/two-todos-second-pinned.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`pinTodo(store: TodosStore, id: string, pinned: boolean): void`",
+            "`TABLES_SCHEMA`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "Pinned todos first \u2014 the exam seeded from what Task 1 posted",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/TodoList.tsx",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/two-todos-second-pinned-done.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`pinTodo(store: TodosStore, id: string, pinned: boolean): void`",
+            "`TABLES_SCHEMA`"
+          ],
+          "produces": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ],
+      [
+        "2"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The pinned cell and the Pin button \u2014 a click reaches the pinned state, and that state is what this task posts",
+          "files": [
+            ".gitignore",
+            "client/src/Store.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-pinned.json",
+            "tests/state-exams/pin-todo.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`pinTodo(store: TodosStore, id: string, pinned: boolean): void`",
+              "`TABLES_SCHEMA`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            ".gitignore",
+            "client/src/Store.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/storeData.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-pinned.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/pin-todo.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/pin-todo.test.ts",
+          "proofRuns": [
+            "grep -qx 'state-exams/posted/' .gitignore",
+            "bun test tests/state-exams/delete-to-trash.test.ts tests/state-exams/undo-delete.test.ts",
+            "bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/pin-todo.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              ".gitignore",
+              "client/src/Store.tsx",
+              "client/src/TodoItem.tsx",
+              "client/src/storeData.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/two-todos-second-pinned.json",
+              "tests/state-exams/pin-todo.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/pin-todo.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/pin-todo.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/pin-todo.test.ts": "tests/state-exams/pin-todo.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/pin-todo.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`pinTodo(store: TodosStore, id: string, pinned: boolean): void`",
+              "`TABLES_SCHEMA`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "Pinned todos first \u2014 the exam seeded from what Task 1 posted",
+          "files": [
+            "client/src/TodoList.tsx",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-pinned-done.json",
+            "tests/state-exams/pinned-first.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`pinTodo(store: TodosStore, id: string, pinned: boolean): void`",
+              "`TABLES_SCHEMA`"
+            ],
+            "produces": [
+              "none"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/TodoList.tsx",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-pinned-done.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/pinned-first.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/pinned-first.test.ts",
+          "proofRuns": [],
+          "proofGuards": [],
+          "factsheet": {
+            "files": [
+              "client/src/TodoList.tsx",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/two-todos-second-pinned-done.json",
+              "tests/state-exams/pinned-first.test.ts"
+            ],
+            "deletes": [],
+            "guards": [],
+            "proofTests": [
+              "tests/state-exams/pinned-first.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/pinned-first.test.ts": "tests/state-exams/pinned-first.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/pinned-first.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`pinTodo(store: TodosStore, id: string, pinned: boolean): void`",
+              "`TABLES_SCHEMA`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The pinned cell and the Pin button \u2014 a click reaches th\u2026",
+      "Pinned todos first \u2014 the exam seeded from what Task 1 p\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The `pinned` cell has no schema `default`, on `todos` or on `trash`: a todo that is not pinned has no `pinned` cell at all, so every seed and expected file checked in before the cell existed loads to itself byte for byte. A `default` on any cell or value this plan adds is a finding.\n- Nothing under `state-exams/posted/` is written by a person or by a task: the driver writes `state-exams/posted/<producer task id>.json` from the producer's `state.reached` post before the consumer's exam first runs, and `.gitignore` keeps the directory out of every patch, so no posted file reaches the integration branch or the pull request. A task that creates, edits or checks in a file under `state-exams/posted/` is a finding.\n- Task 2's exam reads its seed from `state-exams/posted/1.json` and from nothing under `state-exams/seeds/`; an exam that falls back to a seed file when the posted file is absent is a finding \u2014 an absent post is the handshake's `absent` case and must stay visible.\n- The Pin button follows the Delete button inside every `.todoItem`: the exams already on the tree click a row's Delete as the first `.todoItem button`, and a button placed before it would take that click.\n- The linter's four test files under `packages/tinyapp-lint/test/` keep their count and list pins loosened only to containment and tree-computed counts, never re-pinned to a new exact literal (both folds of 2026-09-15).",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src server state-exams/seeds",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-21/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-21/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-21/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-21/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
