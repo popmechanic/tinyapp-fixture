@@ -39,7 +39,19 @@ export type MutantEdit =
   | {table: string; row: string; absent: true};
 
 /**
- * One thing an exam does to a page: click what a selector names, type text into
+ * How an exam names the one control it acts on.
+ *
+ * A string is a CSS selector, read by `DOM.querySelector` exactly as it always
+ * was. The object is the way a person names a control — "the checkbox called
+ * buy milk" — a role and the *accessible name* the browser computes for it, so
+ * the locator survives a restyling that rewrites every class on the page and
+ * reaches a control no selector can express: a `<span role="checkbox">` named
+ * only by its `aria-label` carries nothing a selector could match on.
+ */
+export type Locator = string | {role: string, name: string};
+
+/**
+ * One thing an exam does to a page: click what a locator names, type text into
  * it, or press a key on it.
  *
  * It lives here rather than beside the driver so the store move can name the
@@ -47,9 +59,9 @@ export type MutantEdit =
  * so `Action` reads the same from either module.
  */
 export type Action =
-  | {click: string}
-  | {type: [string, string]}
-  | {key: [string, string]};
+  | {click: Locator}
+  | {type: [Locator, string]}
+  | {key: [Locator, string]};
 
 /** One assertion about the rendered DOM. */
 export type View = {

@@ -41,7 +41,7 @@
 //     driver's `open` refuses.
 
 import {afterAll, expect, test} from 'bun:test';
-import {mkdtempSync, readFileSync, rmSync} from 'node:fs';
+import {mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 
@@ -698,3 +698,206 @@ test('task 1, leg (f) [M4]: the manifests carry @happy-dom/global-registrator fo
   expect(block).toContain('"devDependencies"');
   expect(block).toContain('"@happy-dom/global-registrator"');
 });
+
+// =====================================================================================
+// Exam for task 3 — "The exam finds a control by role and name — and reads a shadcn page",
+// legs (d) and (f).
+//
+// M4. `assertView`'s `checked` holds of a match whose `data-checked` attribute is `"true"` or
+//     whose `aria-checked` attribute is `"true"`, and `unchecked` of one whose `data-checked`
+//     or `aria-checked` is `"false"` — still at least one match, every match reading so — and
+//     every `checked`/`unchecked` view that held over a `data-checked` DOM at BASE holds
+//     unchanged: over `<span role="checkbox" aria-checked="true" id="a"></span><span
+//     role="checkbox" aria-checked="false" id="b"></span>`, `{selector: '#a', checked: true}`
+//     and `{selector: '#b', unchecked: true}` hold and `{selector: '[role=checkbox]',
+//     checked: true}` fails with `a match is not checked`.
+// M6. `bundleOf` runs Tailwind v4 in the bundle: with `bun-plugin-tailwind` among
+//     `Bun.build`'s `plugins`, an entry whose module imports a stylesheet beginning
+//     `@import "tailwindcss";` and whose source carries `className="flex"` bundles to a `css`
+//     containing `.flex{display:flex}` and no `@tailwind` text, and an entry whose stylesheet
+//     is the plain rule `.x{color:red}` bundles to a `css` containing `.x{color:red}`.
+//
+// Neither leg opens a browser. Leg (f) builds with Bun's own bundler, into directories it
+// makes under the repository root and removes in a `finally` — Tailwind's source scan starts
+// at `process.cwd()` and skips gitignored paths, so a fixture under `os.tmpdir()`, or under
+// `node_modules/`, `dist/` or `.wrangler/`, would generate nothing at all.
+
+// ---------------------------------------------------------------- fixtures
+
+/** The markup M4 names: one checkbox span reading checked, one reading unchecked. */
+const TWO_SPANS =
+  '<span role="checkbox" aria-checked="true" id="a"></span>' +
+  '<span role="checkbox" aria-checked="false" id="b"></span>';
+
+/** One `data-checked` input and one `aria-checked` span, both reading checked. */
+const BOTH_SPELLINGS =
+  '<div id="box"><input data-checked="true" id="p">' +
+  '<span role="checkbox" aria-checked="true" id="q"></span></div>';
+
+/** The same pair, both reading unchecked. */
+const BOTH_SPELLINGS_CLEAR = BOTH_SPELLINGS.replace(/"true"/g, '"false"');
+
+/** The entry document each temporary bundle fixture ships. */
+const TEMP_ENTRY_HTML =
+  '<!doctype html><html><head><meta charset="utf-8"></head><body><div id="root"></div>' +
+  '<script type="module" src="/entry.tsx"></script></body></html>';
+
+/** The gitignored prefixes leg (f) keeps its fixtures out of. */
+const GITIGNORED = ['node_modules/', 'dist/', '.wrangler/'];
+
+/**
+ * A temporary entry under the repository root: an `index.html` naming `entry.tsx`, that
+ * module, and the stylesheet it imports. The caller removes `dir`.
+ */
+const bundleFixture = (
+  label: string,
+  css: string,
+  module: string,
+): {dir: string; entry: string} => {
+  const dir = mkdtempSync(join(repoRoot, `tinyapp-exam-${label}-`));
+  writeFileSync(join(dir, 'entry.css'), css, 'utf8');
+  writeFileSync(join(dir, 'entry.tsx'), module, 'utf8');
+  writeFileSync(join(dir, 'index.html'), TEMP_ENTRY_HTML, 'utf8');
+  return {dir, entry: join(dir, 'index.html')};
+};
+
+// ------------------------------------------------------------------ (d) [M4]
+
+test('task 3, leg (d) [M4]: checked and unchecked read aria-checked as well as data-checked', () => {
+  // The two spans M4 spells: the one that reads checked, and the one that reads unchecked.
+  expect(assertView(TWO_SPANS, {selector: '#a', checked: true})).toEqual([]);
+  expect(assertView(TWO_SPANS, {selector: '#b', unchecked: true})).toEqual([]);
+
+  // A selector matching both fails either universal, and the sentence is the one M4 names.
+  expect(assertView(TWO_SPANS, {selector: '[role=checkbox]', checked: true})).toEqual([
+    'view [role=checkbox]: a match is not checked',
+  ]);
+  expect(assertView(TWO_SPANS, {selector: '[role=checkbox]', unchecked: true})).toEqual([
+    'view [role=checkbox]: a match is not unchecked',
+  ]);
+
+  // Still at least one match: nothing matching is a failure, not a vacuous pass.
+  expect(assertView(TWO_SPANS, {selector: '#nope', checked: true})).toEqual([
+    'view #nope: expected at least one checked match, found none',
+  ]);
+  expect(assertView(TWO_SPANS, {selector: '#nope', unchecked: true})).toEqual([
+    'view #nope: expected at least one unchecked match, found none',
+  ]);
+
+  // And every match reading so, whichever attribute each one reads it through: the `or` in
+  // M4 is a per-match one, so a `data-checked` input and an `aria-checked` span satisfy the
+  // same universal together.
+  expect(assertView(BOTH_SPELLINGS, {selector: '#box > *', checked: true})).toEqual([]);
+  expect(assertView(BOTH_SPELLINGS, {selector: '#box > *', unchecked: true})).toEqual([
+    'view #box > *: a match is not unchecked',
+  ]);
+  expect(assertView(BOTH_SPELLINGS_CLEAR, {selector: '#box > *', unchecked: true})).toEqual([]);
+  expect(assertView(BOTH_SPELLINGS_CLEAR, {selector: '#box > *', checked: true})).toEqual([
+    'view #box > *: a match is not checked',
+  ]);
+
+  // Every `checked`/`unchecked` view that held over a `data-checked` DOM at BASE holds
+  // unchanged — the same three DOMs legs (b) and (c) above read, with the whole failure
+  // string pinned rather than a containment.
+  expect(
+    assertView(FIXTURE_DOM, {selector: '.todoItem input[type=checkbox]', unchecked: true}),
+  ).toEqual([]);
+  expect(assertView(FIXTURE_DOM_CHECKED, {selector: '.todoItem input', checked: true})).toEqual(
+    [],
+  );
+  expect(assertView(FIXTURE_DOM, {selector: '.todoItem input', checked: true})).toEqual([
+    'view .todoItem input: a match is not checked',
+  ]);
+  expect(assertView(FIXTURE_DOM_CHECKED, {selector: '.todoItem input', unchecked: true})).toEqual(
+    ['view .todoItem input: a match is not unchecked'],
+  );
+  expect(assertView(MIXED_DOM, {selector: 'input', checked: true})).toEqual([
+    'view input: a match is not checked',
+  ]);
+  expect(assertView(MIXED_DOM, {selector: 'input', unchecked: true})).toEqual([
+    'view input: a match is not unchecked',
+  ]);
+  expect(assertView(MIXED_DOM, {selector: '.missing', checked: true})).toEqual([
+    'view .missing: expected at least one checked match, found none',
+  ]);
+
+  // The rest of the vocabulary is untouched by M4: count, text, attr and absent still read
+  // over the same DOM exactly as they did.
+  expect(assertView(FIXTURE_DOM, {selector: '.todoItem', count: 1})).toEqual([]);
+  expect(assertView(FIXTURE_DOM, {selector: '.todoItem', text: 'buy milk'})).toEqual([]);
+  expect(
+    assertView(FIXTURE_DOM, {selector: '.todoItem input', attr: {name: 'id', value: 'todo-0'}}),
+  ).toEqual([]);
+  expect(assertView(FIXTURE_DOM, {selector: '.missing', absent: true})).toEqual([]);
+});
+
+// ------------------------------------------------------------------ (f) [M6]
+
+test(
+  'task 3, leg (f) [M6]: bundleOf runs Tailwind v4 in the bundle, and leaves a plain stylesheet alone',
+  async () => {
+    // M6's premise, spelled where it can be read: the plugin is the one the bundler runs.
+    const renderMoveSource = readFileSync(
+      resolve(repoRoot, 'packages/tinyapp-exam/src/render-move.ts'),
+      'utf8',
+    );
+    expect(renderMoveSource.includes('bun-plugin-tailwind')).toBe(true);
+
+    // It is a `dependencies` entry of the sealed helper package, already on the tree — this
+    // task touches no manifest.
+    const manifest = JSON.parse(
+      readFileSync(resolve(repoRoot, 'packages/tinyapp-exam/package.json'), 'utf8'),
+    ) as {dependencies?: Record<string, string>};
+    expect(typeof manifest.dependencies?.['bun-plugin-tailwind']).toBe('string');
+    expect(typeof manifest.dependencies?.['tailwindcss']).toBe('string');
+
+    const cwd = process.cwd();
+    process.chdir(repoRoot);
+    const tailwindFixture = bundleFixture(
+      'tailwind',
+      '@import "tailwindcss";\n',
+      "import './entry.css';\n\nexport const App = () => <div className=\"flex\">tailwind</div>;\n",
+    );
+    const plainFixture = bundleFixture(
+      'plain',
+      '.x{color:red}\n',
+      "import './entry.css';\n\nexport const App = () => <div className=\"tinyapp-plain\">plain</div>;\n",
+    );
+
+    try {
+      // Both fixtures are inside the repository and outside every gitignored path, which is
+      // the only reason Tailwind's scan reaches their source at all.
+      for (const {dir} of [tailwindFixture, plainFixture]) {
+        const relativePath = dir.slice(repoRoot.length + 1);
+        expect(dir.startsWith(`${repoRoot}/`)).toBe(true);
+        for (const ignored of GITIGNORED) {
+          expect(relativePath.startsWith(ignored)).toBe(false);
+        }
+      }
+
+      // The stylesheet begins `@import "tailwindcss";` and the module's source carries
+      // `className="flex"`, so the utility is generated into the bundle's css…
+      const tailwindBundle = await bundleOf(
+        tailwindFixture.entry,
+        readFileSync(tailwindFixture.entry, 'utf8'),
+      );
+      expect(tailwindBundle.js.length).toBeGreaterThan(0);
+      expect(tailwindBundle.css).toContain('.flex{display:flex}');
+      // …and nothing is left for a browser to do with an `@tailwind` of its own.
+      expect(tailwindBundle.css.includes('@tailwind')).toBe(false);
+
+      // A stylesheet that asks for no Tailwind at all comes through as the rule it is.
+      const plainBundle = await bundleOf(
+        plainFixture.entry,
+        readFileSync(plainFixture.entry, 'utf8'),
+      );
+      expect(plainBundle.js.length).toBeGreaterThan(0);
+      expect(plainBundle.css).toContain('.x{color:red}');
+    } finally {
+      rmSync(tailwindFixture.dir, {recursive: true, force: true});
+      rmSync(plainFixture.dir, {recursive: true, force: true});
+      process.chdir(cwd);
+    }
+  },
+  120000,
+);

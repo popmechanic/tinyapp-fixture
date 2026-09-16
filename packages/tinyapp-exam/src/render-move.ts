@@ -12,6 +12,7 @@
 import {readFileSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
 
+import tailwind from 'bun-plugin-tailwind';
 import {parse, TextNode, type HTMLElement} from 'node-html-parser';
 
 import type {Browser} from './browser';
@@ -96,10 +97,27 @@ export const renderHtml = (
   return root.toString();
 };
 
-/** True when there is at least one element and every one reads `data-checked`. */
+/**
+ * True when there is at least one element and every one reads `<want>` off
+ * either `data-checked` or `aria-checked`.
+ *
+ * Two attributes because there are two kinds of checkbox on the page. A real
+ * `<input type="checkbox">` carries its state as a DOM property, invisible in
+ * markup, which the renderer's injected script copies onto `data-checked`. A
+ * shadcn checkbox is base-ui's `<span role="checkbox">`, which carries
+ * `aria-checked="true"|"false"` as a real attribute of its own — written by
+ * React's static render too, so the linter reads it without reflecting
+ * anything. Base-ui's own `data-checked=""` is the empty string, neither
+ * spelling, so a `checked` view of one of those spans is answered by its
+ * `aria-checked` alone.
+ */
+const readsChecked = (element: HTMLElement, want: 'true' | 'false'): boolean =>
+  element.getAttribute('data-checked') === want ||
+  element.getAttribute('aria-checked') === want;
+
+/** True when there is at least one element and every one reads `<want>`. */
 const allRead = (matched: HTMLElement[], want: 'true' | 'false'): boolean =>
-  matched.length > 0 &&
-  matched.every((element) => element.getAttribute('data-checked') === want);
+  matched.length > 0 && matched.every((element) => readsChecked(element, want));
 
 /** Why this view does not hold of its matched elements, `null` when it does. */
 const breachOf = (view: View, matched: HTMLElement[]): string | null => {
@@ -142,7 +160,9 @@ const breachOf = (view: View, matched: HTMLElement[]): string | null => {
  * `views` of `undefined` asserts nothing.
  *
  * `checked` and `unchecked` read the `data-checked` attribute the renderer's
- * injected script writes — `checked` is a DOM property, invisible in markup.
+ * injected script writes — `checked` is a DOM property, invisible in markup —
+ * or the `aria-checked` a `role="checkbox"` element carries in the markup
+ * itself.
  */
 export const assertView = (
   html: string,
@@ -231,6 +251,13 @@ export const bundleOf = async (
     entrypoints: [resolve(dirname(entryPath), src.replace(/^\/+/, ''))],
     target: 'browser',
     minify: production,
+    // Bun's bundler does not run Tailwind: a stylesheet saying
+    // `@import "tailwindcss";` comes out the far side with `@tailwind
+    // utilities;` still in it and not one generated class. `bun-plugin-tailwind`
+    // is what compiles it, and a page whose `.flex` never got generated is a
+    // page the exam photographs unstyled. A plain stylesheet passes through it
+    // unchanged, so the plugin costs the non-Tailwind entry nothing.
+    plugins: [tailwind],
     define: {
       'process.env.NODE_ENV': production ? '"production"' : '"development"',
     },

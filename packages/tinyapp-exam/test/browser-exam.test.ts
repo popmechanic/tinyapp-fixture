@@ -945,8 +945,8 @@ test(
             entry: atRoot('client/index.html'),
             seed: atRoot('state-exams/seeds/two-open-todos.json'),
             expected: EXPECTED_G,
-            action: {click: '.todoItem input[type=checkbox]'} as Action,
-            view: [{selector: '.todoItem', count: 2}],
+            action: {click: {role: 'checkbox', name: 'buy milk'}} as Action,
+            view: [{selector: '#todoList li', count: 2}],
           }),
           {env: {}, main: '/x/click-completes-todo.test.ts', browser: real.browser},
         ),
@@ -980,7 +980,7 @@ test(
       PNG_SIGNATURE,
     );
     expect(readFileSync(join(result.dir, 'dom.html'), 'utf8')).toBe(result.record.dom);
-    expect((result.record.dom ?? '').includes('todoItem')).toBe(true);
+    expect((result.record.dom ?? '').includes('id="todoList"')).toBe(true);
     expect(result.record.mutant.killed).toBe(true);
   },
   600_000,
@@ -999,7 +999,7 @@ test(
             entry: atRoot('client/index.html'),
             seed: atRoot('state-exams/seeds/two-open-todos.json'),
             expected: EXPECTED_G,
-            action: {click: '.todoItem input[type=checkbox]'} as Action,
+            action: {click: {role: 'checkbox', name: 'buy milk'}} as Action,
           }),
           {
             env: {},

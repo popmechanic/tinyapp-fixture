@@ -263,7 +263,7 @@ stateExam({
   },
   expected: 'state-exams/expected/two-todos-one-done.json',
   view: [
-    {selector: '.todoItem', count: 2},
+    {selector: '#todoList li', count: 2},
     {selector: '#doneCount', count: 1, text: '1 of 2 done'},
   ],
   mutant: [{table: 'todos', row: '1', cell: 'completed', value: false}],

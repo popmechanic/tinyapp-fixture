@@ -277,8 +277,11 @@ test(
       'state-exams/expected/two-todos-first-done.json',
     );
     expect(click!.view).toEqual([
-      {selector: '.todoItem.completed input[type=checkbox]', checked: true},
-      {selector: '.todoItem', count: 2},
+      {
+        selector: '#todoList li[data-completed="true"] [role=checkbox]',
+        checked: true,
+      },
+      {selector: '#todoList li', count: 2},
     ]);
   },
   SPAWN_TIMEOUT_MS,
@@ -297,13 +300,17 @@ test(
     const html = ctx.render(content);
     const doc = parse(html);
 
+    // The row's checkbox is the design system's: a `role="checkbox"` element
+    // carrying `aria-checked`, which React's static render writes as a real
+    // attribute — the same attribute `assertView` and the `views` rule read
+    // beside `data-checked`.
     const todo0 = doc.querySelector('#todo-0');
     expect(todo0).not.toBeNull();
-    expect(todo0!.getAttribute('data-checked')).toBe('true');
+    expect(todo0!.getAttribute('aria-checked')).toBe('true');
 
     const todo1 = doc.querySelector('#todo-1');
     expect(todo1).not.toBeNull();
-    expect(todo1!.getAttribute('data-checked')).toBe('false');
+    expect(todo1!.getAttribute('aria-checked')).toBe('false');
 
     // Every `input`, not merely the two checkboxes — that is what makes this
     // markup read to `assertView` the way a rendered page's does.
@@ -315,7 +322,7 @@ test(
         .map((input) => input.outerHTML),
     ).toEqual([]);
 
-    expect(doc.querySelectorAll('.todoItem')).toHaveLength(2);
+    expect(doc.querySelectorAll('#todoList li')).toHaveLength(2);
 
     // Verbatim: `renderToStaticMarkup` writes no comment nodes, so the
     // counter's text is contiguous.

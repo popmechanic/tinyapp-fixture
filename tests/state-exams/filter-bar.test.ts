@@ -88,8 +88,8 @@ const runLine = (line: string): number => {
 test('leg (e) [M5] renderStatic over two-todos-one-done-filter-done.json paints one done row, `1 of 2 done`, and Done active', () => {
   expect(
     assertView(renderStatic(contentOf(DONE_PATH)), [
-      {selector: '.todoItem', count: 1, text: 'walk the dog'},
-      {selector: '.todoItem.completed', count: 1},
+      {selector: '#todoList li', count: 1, text: 'walk the dog'},
+      {selector: '#todoList li[data-completed="true"]', count: 1},
       {selector: '#doneCount', count: 1, text: '1 of 2 done'},
       {selector: '#filter-done', count: 1, attr: {name: 'data-active', value: 'true'}},
       {selector: '#filter-all', count: 1, attr: {name: 'data-active', value: 'false'}},
@@ -105,7 +105,7 @@ test('leg (e) [M5] renderStatic over two-todos-one-done-filter-done.json paints 
 test('leg (f) [M6] renderStatic over the seed paints both rows, `1 of 2 done`, All active, and three buttons in #filterBar', () => {
   expect(
     assertView(renderStatic(contentOf(SEED_PATH)), [
-      {selector: '.todoItem', count: 2},
+      {selector: '#todoList li', count: 2},
       {selector: '#doneCount', count: 1, text: '1 of 2 done'},
       {selector: '#filter-all', count: 1, attr: {name: 'data-active', value: 'true'}},
       {selector: '#filterBar button', count: 3},
@@ -169,12 +169,12 @@ test(
 
 // --- M1–M4: the one state exam of this file ----------------------------------
 
-// Legs (a)–(d). (a) [M1] clicking `#filter-open` on the page over the seed
+// Legs (a)–(d). (a) [M1] clicking the button named `Open` on the page over the seed
 // leaves the page store's `getContent()` exactly the seed's tables beside
 // `{filter: 'open'}` — the content of the open-filtered expected file — and
 // unticking row `1` of that expected state would have been noticed.
-// (b) [M2] that page shows exactly one `.todoItem`, `buy milk`, and no
-// `.todoItem.completed`. (c) [M3] its `#doneCount` reads `1 of 2 done`, the
+// (b) [M2] that page shows exactly one `#todoList li`, `buy milk`, and no
+// `#todoList li[data-completed="true"]`. (c) [M3] its `#doneCount` reads `1 of 2 done`, the
 // seed's own count, unmoved by the filter. (d) [M4] `#filter-open` carries
 // `data-active="true"` and the other two `"false"`, each matching one element.
 stateExam({
@@ -182,11 +182,11 @@ stateExam({
   entry: 'client/index.html',
   seed: SEED_PATH,
   store: () => createTodosStore(),
-  action: {click: '#filter-open'},
+  action: {click: {role: 'button', name: 'Open'}},
   expected: OPEN_PATH,
   view: [
-    {selector: '.todoItem', count: 1, text: 'buy milk'},
-    {selector: '.todoItem.completed', absent: true},
+    {selector: '#todoList li', count: 1, text: 'buy milk'},
+    {selector: '#todoList li[data-completed="true"]', absent: true},
     {selector: '#doneCount', count: 1, text: '1 of 2 done'},
     {selector: '#filter-open', count: 1, attr: {name: 'data-active', value: 'true'}},
     {selector: '#filter-all', count: 1, attr: {name: 'data-active', value: 'false'}},

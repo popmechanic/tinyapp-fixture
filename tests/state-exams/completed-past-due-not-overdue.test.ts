@@ -3,30 +3,33 @@
  *
  * Machine, restated:
  *
- *   M1. Every `.todoItem` carries `data-overdue="true"` and the class `overdue`
- *       exactly when `isOverdue(row, new Date())` is true, and
- *       `data-overdue="false"` without that class otherwise — measured by
- *       `renderStatic` over the seed and over the expected state, both inside
- *       `withContract('2026-01-01T00:00:00Z', …)`.
- *   M2. Clicking the first checkbox on the page seeded from the seed file
- *       reaches exactly the expected file — row `0` completed with its `due`
- *       still `2025-12-31` — and the page then shows no
- *       `.todoItem[data-overdue="true"]`, no `.todoItem.overdue`, two
- *       `.todoItem[data-overdue="false"]`, and `.todoItem.completed input#todo-0`
+ *   M1. Every `#todoList li` carries `data-overdue="true"` exactly when
+ *       `isOverdue(row, new Date())` is true and `data-overdue="false"`
+ *       otherwise — measured by `renderStatic` over the seed and over the
+ *       expected state, both inside `withContract('2026-01-01T00:00:00Z', …)`.
+ *       The clause read "and the class `overdue`" while the row carried one;
+ *       the re-platform took every class of the app's own off the page and left
+ *       the mark on the attribute alone, which is what the legs below read.
+ *   M2. Clicking the checkbox named `buy milk` on the page seeded from the seed
+ *       file reaches exactly the expected file — row `0` completed with its
+ *       `due` still `2025-12-31` — and the page then shows no
+ *       `#todoList li[data-overdue="true"]`, two
+ *       `#todoList li[data-overdue="false"]`, and the completed row's `#todo-0`
  *       checked.
  *
  * Proof legs, and the tests that carry them:
  *
  *   (a) [M1] the static render over the seed: exactly one
- *            `.todoItem[data-overdue="true"]`, its text containing `buy milk`
- *            and its `class` attribute exactly `todoItem overdue`; exactly one
- *            `.todoItem[data-overdue="false"]`, its text containing
- *            `walk the dog` and its class list without `overdue`.
+ *            `#todoList li[data-overdue="true"]`, its text containing
+ *            `buy milk`; exactly one `#todoList li[data-overdue="false"]`, its
+ *            text containing `walk the dog`; and neither row carrying an
+ *            `overdue` class, because no row carries a class of the app's own
+ *            at all.
  *   (b) [M1] the static render over the expected state: no
- *            `.todoItem[data-overdue="true"]` and exactly two
- *            `.todoItem[data-overdue="false"]`.
+ *            `#todoList li[data-overdue="true"]` and exactly two
+ *            `#todoList li[data-overdue="false"]`.
  *   (c) [M2] the state exam — clock, entry, seed, store, click, expected, the
- *            four view entries and the mutant as the leg spells them — and the
+ *            three view entries and the mutant as the leg spells them — and the
  *            two snapshot files parsing to exactly the two Context literals.
  *
  * Three readings this file makes, written down because they are choices:
@@ -134,8 +137,9 @@ const renderUnderContract = async (content: TodosContent): Promise<HTMLElement> 
   return parse(html as string);
 };
 
-/** The `.todoItem` elements of a render, in the order the list paints them. */
-const itemsOf = (root: HTMLElement): HTMLElement[] => root.querySelectorAll('.todoItem');
+/** The row elements of a render, in the order the list paints them. */
+const itemsOf = (root: HTMLElement): HTMLElement[] =>
+  root.querySelectorAll('#todoList li');
 
 /** The todo rows of a snapshot, ordered by row id the way `TodoList` sorts them. */
 const rowsOf = (content: TodosContent): {completed?: boolean; due?: string}[] => {
@@ -148,39 +152,45 @@ const rowsOf = (content: TodosContent): {completed?: boolean; due?: string}[] =>
 
 // --- (a) [M1]: the static render over the seed -------------------------------
 
-test('leg (a) [M1] renderStatic over the seed paints exactly one .todoItem[data-overdue="true"], `buy milk`, with class exactly `todoItem overdue`', async () => {
+test('leg (a) [M1] renderStatic over the seed paints exactly one #todoList li[data-overdue="true"], `buy milk`, marked by the attribute and not by a class', async () => {
   const root = await renderUnderContract(readSnapshot(SEED_FILE));
 
-  const overdue = root.querySelectorAll('.todoItem[data-overdue="true"]');
+  const overdue = root.querySelectorAll('#todoList li[data-overdue="true"]');
   expect(overdue.length).toBe(1);
   expect(overdue[0].textContent).toContain('buy milk');
-  // The clause pins the whole attribute, not merely the presence of the token:
-  // `completed` stays first and this row is open, so it is these two words.
-  expect(overdue[0].getAttribute('class')).toBe('todoItem overdue');
+  // The clause pinned the whole `class` attribute while the row carried
+  // `todoItem overdue`. Both words are gone with the stylesheets, and what
+  // stands in their place is that the mark is the attribute: no class of the
+  // app's own names this state on any row.
+  expect(classesOf(overdue[0])).not.toContain('overdue');
+  expect(classesOf(overdue[0])).not.toContain('todoItem');
 });
 
-test('leg (a) [M1] renderStatic over the seed paints exactly one .todoItem[data-overdue="false"], `walk the dog`, with no `overdue` class', async () => {
+test('leg (a) [M1] renderStatic over the seed paints exactly one #todoList li[data-overdue="false"], `walk the dog`, with no `overdue` class', async () => {
   const root = await renderUnderContract(readSnapshot(SEED_FILE));
 
-  const notOverdue = root.querySelectorAll('.todoItem[data-overdue="false"]');
+  const notOverdue = root.querySelectorAll('#todoList li[data-overdue="false"]');
   expect(notOverdue.length).toBe(1);
   expect(notOverdue[0].textContent).toContain('walk the dog');
   expect(classesOf(notOverdue[0])).not.toContain('overdue');
-  // And the mark is not merely absent from this row: `.todoItem.overdue` names
-  // exactly the one row the clause marks.
-  expect(root.querySelectorAll('.todoItem.overdue').length).toBe(1);
 });
 
 // --- (b) [M1]: the static render over the expected state ---------------------
 
-test('leg (b) [M1] renderStatic over the expected state paints no .todoItem[data-overdue="true"] and exactly two .todoItem[data-overdue="false"]', async () => {
+test('leg (b) [M1] renderStatic over the expected state paints no #todoList li[data-overdue="true"] and exactly two #todoList li[data-overdue="false"]', async () => {
   const root = await renderUnderContract(readSnapshot(EXPECTED_FILE));
 
-  expect(root.querySelectorAll('.todoItem[data-overdue="true"]').length).toBe(0);
-  expect(root.querySelectorAll('.todoItem[data-overdue="false"]').length).toBe(2);
-  // "`data-overdue="false"` without that class": the completed, dated row is
-  // not marked either.
-  expect(root.querySelectorAll('.todoItem.overdue').length).toBe(0);
+  expect(
+    root.querySelectorAll('#todoList li[data-overdue="true"]').length,
+  ).toBe(0);
+  expect(
+    root.querySelectorAll('#todoList li[data-overdue="false"]').length,
+  ).toBe(2);
+  // "without that class": the completed, dated row is not marked either, and
+  // no row is marked by a class in the first place.
+  expect(
+    itemsOf(root).filter((item) => classesOf(item).includes('overdue')).length,
+  ).toBe(0);
 });
 
 // --- (a) and (b) [M1]: the clause's own "exactly when" ----------------------
@@ -189,7 +199,7 @@ for (const [label, file] of [
   ['the seed', SEED_FILE],
   ['the expected state', EXPECTED_FILE],
 ] as const) {
-  test(`legs (a), (b) [M1] every .todoItem of ${label} carries data-overdue and the \`overdue\` class exactly when isOverdue(row, new Date()) is true`, async () => {
+  test(`legs (a), (b) [M1] every row of ${label} carries data-overdue exactly when isOverdue(row, new Date()) is true, and no \`overdue\` class either way`, async () => {
     const content = readSnapshot(file);
     const root = await renderUnderContract(content);
 
@@ -200,7 +210,7 @@ for (const [label, file] of [
     for (const [index, row] of rows.entries()) {
       const want = isOverdue(row, NOW);
       expect(items[index].getAttribute('data-overdue')).toBe(want ? 'true' : 'false');
-      expect(classesOf(items[index]).includes('overdue')).toBe(want);
+      expect(classesOf(items[index]).includes('overdue')).toBe(false);
     }
   });
 }
@@ -226,23 +236,23 @@ test(`leg (c) [M2] ${EXPECTED_FILE} parses to exactly the expected literal — r
 
 // --- (c) [M2]: the state exam itself -----------------------------------------
 
-// Clicking the first checkbox on the seeded page completes row `0` without
-// touching its date, and the mark goes with it: `TodoList` renders rows
-// ascending by row id and `Page.act` clicks the first match of its selector, so
-// `.todoItem input[type=checkbox]` is row `0`'s box. The mutant is that same
-// row left open — an exam that could not tell the tick from no tick is hollow.
+// Clicking the checkbox named `buy milk` on the seeded page completes row `0`
+// without touching its date, and the mark goes with it. The box is named rather
+// than selected: `buy milk` is row `0`'s text and so its checkbox's accessible
+// name, which lands on that row whatever order the list paints in. The mutant
+// is that same row left open — an exam that could not tell the tick from no
+// tick is hollow.
 stateExam({
   clock: '2026-01-01T00:00:00Z',
   entry: 'client/index.html',
   seed: 'state-exams/seeds/two-open-todos-first-past-due.json',
   store: () => createTodosStore(),
-  action: {click: '.todoItem input[type=checkbox]'},
+  action: {click: {role: 'checkbox', name: 'buy milk'}},
   expected: 'state-exams/expected/two-todos-first-past-due-done.json',
   view: [
-    {selector: '.todoItem[data-overdue="true"]', absent: true},
-    {selector: '.todoItem.overdue', absent: true},
-    {selector: '.todoItem[data-overdue="false"]', count: 2},
-    {selector: '.todoItem.completed input#todo-0', checked: true},
+    {selector: '#todoList li[data-overdue="true"]', absent: true},
+    {selector: '#todoList li[data-overdue="false"]', count: 2},
+    {selector: '#todoList li[data-completed="true"] #todo-0', checked: true},
   ],
   mutant: [{table: 'todos', row: '0', cell: 'completed', value: false}],
 });

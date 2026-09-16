@@ -78,21 +78,22 @@ const ONE_OPEN_TODO = [{todos: {'0': {text: 'buy milk', completed: false}}}, {}]
 
 // --- Leg (a) [M1]: the one state exam of the file ----------------------------
 
-// Clicking the first `.todoItem`'s `button` — its Delete, the only button in
-// the row — takes row `0` out of the list and leaves it whole in `trash`, the
-// page then shows exactly the one remaining open todo, and the mutant that
-// drops the trash row is killed, so an exam that never looked at `trash` could
-// not have passed.
+// Clicking the button named `Delete buy milk` — row `0`'s Delete, named after
+// the row it deletes so that two rows are never two buttons called `Delete` —
+// takes row `0` out of the list and leaves it whole in `trash`, the page then
+// shows exactly the one remaining open todo, and the mutant that drops the
+// trash row is killed, so an exam that never looked at `trash` could not have
+// passed.
 stateExam({
   clock: '2026-01-01T00:00:00Z',
   entry: 'client/index.html',
   seed: 'state-exams/seeds/two-open-todos.json',
   store: () => sd.createTodosStore(),
-  action: {click: '.todoItem button'},
+  action: {click: {role: 'button', name: 'Delete buy milk'}},
   expected: 'state-exams/expected/two-open-todos-first-trashed.json',
   view: [
-    {selector: '.todoItem', count: 1, text: 'walk the dog'},
-    {selector: '.todoItem input[type=checkbox]', unchecked: true},
+    {selector: '#todoList li', count: 1, text: 'walk the dog'},
+    {selector: '#todoList li [role=checkbox]', unchecked: true},
   ],
   mutant: [{table: 'trash', row: '0', absent: true}],
 });

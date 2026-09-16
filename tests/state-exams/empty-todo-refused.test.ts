@@ -13,7 +13,7 @@ stateExam({
   },
   expected: 'state-exams/expected/still-empty.json',
   view: [
-    {selector: '.todoItem', absent: true},
+    {selector: '#todoList li', absent: true},
     {selector: '#todoList', count: 1},
   ],
   mutant: [{table: 'todos', row: '0', cell: 'text', value: ''}],

@@ -21,7 +21,7 @@ const Main = () => {
   const [loading, setLoading] = useState(true);
 
   return (
-    <div id="app">
+    <div id="app" className="mx-auto w-full max-w-5xl px-6 py-8">
       <StrictMode>
         <Store onReady={() => setLoading(false)} />
         {loading ? (

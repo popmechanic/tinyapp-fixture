@@ -65,11 +65,24 @@ const nameOf = (match: HTMLElement, index: number, n: number): string => {
     : `#${id}`;
 };
 
-/** Every match reading `data-checked="<want>"`, named, comma-separated. */
+/**
+ * Every match reading `<want>`, named, comma-separated.
+ *
+ * `data-checked` is how an `<input>`'s checked property reaches the markup —
+ * the capture's render reflects it the way a live page does — and
+ * `aria-checked` is how a `role="checkbox"` element carries the same state in
+ * markup of its own, which React's static render writes as a real attribute. So
+ * the fix line reads both, exactly as `assertView` does: the rule and the exam
+ * would otherwise disagree about which matches are checked.
+ */
 const readingChecked = (matched: HTMLElement[], want: 'true' | 'false'): string =>
   matched
     .map((match, index) => ({match, index}))
-    .filter(({match}) => match.getAttribute('data-checked') === want)
+    .filter(
+      ({match}) =>
+        match.getAttribute('data-checked') === want ||
+        match.getAttribute('aria-checked') === want,
+    )
     .map(({match, index}) => nameOf(match, index, matched.length))
     .join(', ');
 

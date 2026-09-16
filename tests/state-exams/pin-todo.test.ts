@@ -96,10 +96,11 @@ const RUN_LINE_TIMEOUT_MS = 600_000;
 
 // --- Leg (a) [M1]: the one state exam of the file ----------------------------
 
-// Clicking `#pin-1` marks the second todo pinned and moves nothing else: the
-// store reaches exactly the expected state, the page then shows the one pinned
-// row and the one unpinned row, `#pin-1` reading Unpin and `#pin-0` still
-// there, and the mutant that drops the `pinned` cell from the expected state is
+// Clicking the button named `Pin walk the dog` — row `1`'s Pin, named after
+// the row it pins so that two rows are never two buttons called `Pin` — marks
+// the second todo pinned and moves nothing else: the store reaches exactly the
+// expected state, the page then shows the one pinned row and the one unpinned
+// row, `#pin-1` reading Unpin and `#pin-0` still there, and the mutant that drops the `pinned` cell from the expected state is
 // killed — so an exam that never looked at that cell could not have passed. The
 // view's `text` is a contains-match, which is why the whole button text is left
 // to leg (f).
@@ -108,14 +109,22 @@ stateExam({
   entry: 'client/index.html',
   seed: 'state-exams/seeds/two-open-todos.json',
   store: () => sd.createTodosStore(),
-  action: {click: '#pin-1'},
+  action: {click: {role: 'button', name: 'Pin walk the dog'}},
   expected: EXPECTED_PATH,
   view: [
-    {selector: '.todoItem[data-pinned="true"]', count: 1, text: 'walk the dog'},
-    {selector: '.todoItem[data-pinned="false"]', count: 1, text: 'buy milk'},
+    {
+      selector: '#todoList li[data-pinned="true"]',
+      count: 1,
+      text: 'walk the dog',
+    },
+    {
+      selector: '#todoList li[data-pinned="false"]',
+      count: 1,
+      text: 'buy milk',
+    },
     {selector: '#pin-1', count: 1, text: 'Unpin'},
     {selector: '#pin-0', count: 1},
-    {selector: '.todoItem', count: 2},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: [{table: 'todos', row: '1', cell: 'pinned', absent: true}],
 });
@@ -213,34 +222,40 @@ test('leg (f) [M6] renderStatic over the M1 literal paints one pinned row and on
   expect(
     assertView(renderStatic(TWO_TODOS_SECOND_PINNED), [
       {
-        selector: '.todoItem[data-pinned="true"]',
+        selector: '#todoList li[data-pinned="true"]',
         count: 1,
         text: 'walk the dog',
       },
-      {selector: '.todoItem[data-pinned="false"]', count: 1, text: 'buy milk'},
+      {
+        selector: '#todoList li[data-pinned="false"]',
+        count: 1,
+        text: 'buy milk',
+      },
     ]),
   ).toEqual([]);
 });
 
-test('leg (f) [M6] that markup carries `<button id="pin-1" type="button">Unpin</button>` once and the Pin button of row 0 once', () => {
+test('leg (f) [M6] that markup carries the button `#pin-1` reading Unpin once and the Pin button of row 0 once', () => {
   const html = renderStatic(TWO_TODOS_SECOND_PINNED);
 
   // Counted through `?? []` so a missing button reads as `0` rather than as a
-  // null dereference, and the regex spans the whole element so `Unpin` on an
-  // unpinned row's button matches nothing.
+  // null dereference, and each regex spans the whole element so `Unpin` on an
+  // unpinned row's button matches nothing. The button carries the design
+  // system's own attributes between its tag name and its id now — a class, a
+  // `data-slot`, its accessible name — so the attributes are matched as
+  // whatever the component puts there rather than pinned word for word.
   expect(
-    (html.match(/<button id="pin-1" type="button">Unpin<\/button>/g) ?? [])
-      .length,
+    (html.match(/<button[^>]*id="pin-1"[^>]*>Unpin<\/button>/g) ?? []).length,
   ).toBe(1);
   expect(
-    (html.match(/<button id="pin-0" type="button">Pin<\/button>/g) ?? []).length,
+    (html.match(/<button[^>]*id="pin-0"[^>]*>Pin<\/button>/g) ?? []).length,
   ).toBe(1);
 });
 
 test('leg (f) [M6] the Pin button follows Delete inside a row', () => {
   const html = renderStatic(TWO_TODOS_SECOND_PINNED);
   const firstPin = html.indexOf('id="pin-');
-  const rowStart = html.indexOf('class="todoItem');
+  const rowStart = html.indexOf('<li ');
 
   // Asserted before the ordering so that markup with no Pin button at all says
   // so, rather than reading as `1590 < -1`.
@@ -249,8 +264,8 @@ test('leg (f) [M6] the Pin button follows Delete inside a row', () => {
 
   expect(html.indexOf('>Delete<')).toBeLessThan(firstPin);
   // And within the row itself, not merely earlier in the page: the slice of the
-  // first `.todoItem` that precedes the first Pin button holds that row's
-  // Delete, which is the click the exams already on the tree depend on.
+  // first row that precedes the first Pin button holds that row's Delete,
+  // which is the click the exams already on the tree depend on.
   expect(html.slice(rowStart, firstPin)).toContain('>Delete<');
 });
 

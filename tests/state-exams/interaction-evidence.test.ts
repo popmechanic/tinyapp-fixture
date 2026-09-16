@@ -165,8 +165,15 @@ const objectLiterals = (text: string): string[] => text.match(/\{[^{}]*\}/g) ?? 
 const literalWith = (text: string, ...patterns: RegExp[]): string | undefined =>
   objectLiterals(text).find((chunk) => patterns.every((p) => p.test(chunk)));
 
-/** The Enter exam's selector, either inner quoting a CSS attribute allows. */
-const PLACEHOLDER = String.raw`input\[placeholder=\\?["']What needs to be done\?\\?["']\]`;
+/**
+ * The Enter exam's locator: the new-todo box, by role and accessible name.
+ *
+ * It was `input[placeholder="What needs to be done?"]` — a tag and an attribute
+ * of the app's own words. Every interaction on this tree names its control the
+ * way a person would instead, so the pattern is the object literal, spaced any
+ * way a formatter leaves it and quoted either way.
+ */
+const NEW_TODO_LOCATOR = String.raw`\{\s*role\s*:\s*(['"\`])textbox\1\s*,\s*name\s*:\s*(['"\`])New todo\2\s*\}`;
 
 /** Runs one shell line from the repository root and returns its status. */
 const runLine = (line: string): number | null =>
@@ -198,25 +205,32 @@ test('leg (a) [M1]: the click exam names the entry, the seed, the click, the exp
   expect(source).toContain('client/index.html');
   expect(source).toContain('state-exams/seeds/two-open-todos.json');
 
-  // `action: {click: '.todoItem input[type=checkbox]'}`.
-  expect(source).toMatch(/click\s*:\s*(['"`])\.todoItem input\[type=checkbox\]\1/);
+  // `action: {click: {role: 'checkbox', name: 'buy milk'}}`.
+  expect(source).toMatch(
+    /click\s*:\s*\{\s*role\s*:\s*(['"`])checkbox\1\s*,\s*name\s*:\s*(['"`])buy milk\2\s*\}/,
+  );
 
   // `expected`: the new file, not the BASE `two-todos-one-done.json`.
   expect(source).toContain('state-exams/expected/two-todos-first-done.json');
 
-  // The view entry `{selector: '.todoItem.completed input[type=checkbox]',
-  // checked: true}` — `\bchecked` so `unchecked: true` cannot stand in for it.
+  // The view entry `{selector: '#todoList li[data-completed="true"]
+  // [role=checkbox]', checked: true}` — `\bchecked` so `unchecked: true` cannot
+  // stand in for it.
   expect(
     literalWith(
       source,
-      /selector\s*:\s*(['"`])\.todoItem\.completed input\[type=checkbox\]\1/,
+      /selector\s*:\s*(['"`])#todoList li\[data-completed="true"\] \[role=checkbox\]\1/,
       /\bchecked\s*:\s*true/,
     ),
   ).toBeDefined();
 
-  // The view entry `{selector: '.todoItem', count: 2}`.
+  // The view entry `{selector: '#todoList li', count: 2}`.
   expect(
-    literalWith(source, /selector\s*:\s*(['"`])\.todoItem\1/, /count\s*:\s*2/),
+    literalWith(
+      source,
+      /selector\s*:\s*(['"`])#todoList li\1/,
+      /count\s*:\s*2/,
+    ),
   ).toBeDefined();
 
   // The mutant edit `{table: 'todos', row: '0', cell: 'completed', value: false}`.
@@ -267,22 +281,22 @@ test('leg (b) [M2]: the Enter exam names the entry, the seed, the type then the 
   expect(source).toContain('state-exams/seeds/empty.json');
   expect(source).toContain('state-exams/expected/one-open-todo.json');
 
-  // `{type: ['input[placeholder="What needs to be done?"]', 'buy milk']}`.
+  // `{type: [{role: 'textbox', name: 'New todo'}, 'buy milk']}`.
   const typed = source.match(
     new RegExp(
-      String.raw`type\s*:\s*\[\s*(['"\`])` +
-        PLACEHOLDER +
-        String.raw`\1\s*,\s*(['"\`])buy milk\2\s*\]`,
+      String.raw`type\s*:\s*\[\s*` +
+        NEW_TODO_LOCATOR +
+        String.raw`\s*,\s*(['"\`])buy milk\3\s*\]`,
     ),
   );
   expect(typed).not.toBeNull();
 
-  // `{key: ['input[placeholder="What needs to be done?"]', 'Enter']}`.
+  // `{key: [{role: 'textbox', name: 'New todo'}, 'Enter']}`.
   const pressed = source.match(
     new RegExp(
-      String.raw`key\s*:\s*\[\s*(['"\`])` +
-        PLACEHOLDER +
-        String.raw`\1\s*,\s*(['"\`])Enter\2\s*\]`,
+      String.raw`key\s*:\s*\[\s*` +
+        NEW_TODO_LOCATOR +
+        String.raw`\s*,\s*(['"\`])Enter\3\s*\]`,
     ),
   );
   expect(pressed).not.toBeNull();
@@ -291,11 +305,11 @@ test('leg (b) [M2]: the Enter exam names the entry, the seed, the type then the 
   expect(typed?.index ?? -1).toBeGreaterThanOrEqual(0);
   expect(pressed?.index ?? -1).toBeGreaterThan(typed?.index ?? -1);
 
-  // The view entry `{selector: '.todoItem', count: 1, text: 'buy milk'}`.
+  // The view entry `{selector: '#todoList li', count: 1, text: 'buy milk'}`.
   expect(
     literalWith(
       source,
-      /selector\s*:\s*(['"`])\.todoItem\1/,
+      /selector\s*:\s*(['"`])#todoList li\1/,
       /count\s*:\s*1/,
       /text\s*:\s*(['"`])buy milk\1/,
     ),
@@ -340,8 +354,10 @@ test(
     expect(mutant.path).toBe('todos/0/completed');
 
     // The markup shows the clicked row done and its box reflected as ticked.
+    // The row said so with `class="todoItem completed"` while it had classes of
+    // the app's own; it says so with the attribute the views read now.
     const dom = readEvidence(dir, 'dom.html');
-    expect(dom).toContain('class="todoItem completed"');
+    expect(dom).toContain('data-completed="true"');
     expect(dom).toContain('data-checked="true"');
 
     // The picture is a PNG: 89 50 4E 47.

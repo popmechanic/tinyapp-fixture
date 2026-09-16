@@ -1,4 +1,6 @@
-import './todoItem.css';
+import {Button} from '@/components/ui/button';
+import {Checkbox} from '@/components/ui/checkbox';
+
 import {
   deleteTodo,
   pinTodo,
@@ -9,7 +11,6 @@ import {
   type TodosStore,
   STORE_ID,
 } from './Store';
-import {Button} from './Button';
 import {DueInput} from './DueInput';
 import {isOverdue} from './overdue';
 export const TodoItem = ({rowId}: {rowId: string}) => {
@@ -20,9 +21,9 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
   // runs, so this reads the exam's instant there and the wall clock elsewhere.
   const overdue = isOverdue(todo, new Date());
 
-  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToggle = (checked: boolean) => {
     if (store) {
-      setTodoCompleted(store, rowId, e.target.checked);
+      setTodoCompleted(store, rowId, checked);
     }
   };
 
@@ -44,33 +45,56 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
   };
 
   return (
-    // `data-overdue` and `data-pinned` are written on both branches, so a view
-    // can assert the `"false"` case with `attr` rather than having to spell it
-    // as an absence.
-    <div
-      className={`todoItem${todo.completed ? ' completed' : ''}${
-        overdue ? ' overdue' : ''
-      }${pinned ? ' pinned' : ''}`}
+    // The three states `todoItem.css` carried as classes are three `data-*`
+    // attributes, written on both branches so a view can assert the `"false"`
+    // case with `attr` rather than having to spell it as an absence — and the
+    // row is the `group` the text below reads its strike-through and its
+    // overdue colour off, so the marks are Tailwind variants rather than
+    // classes of our own.
+    <li
+      data-completed={todo.completed ? 'true' : 'false'}
       data-overdue={overdue ? 'true' : 'false'}
       data-pinned={pinned ? 'true' : 'false'}
+      className="group flex items-center gap-3 border-b border-border p-3 last:border-b-0"
     >
-      <input
-        type="checkbox"
+      {/* `render` is what puts the row's id on the checkbox *root* — the
+          `<span role="checkbox">` an exam names and a view reads `aria-checked`
+          off. Passed as a plain `id` it would land on base-ui's visually hidden
+          `<input>` instead, which is `aria-hidden` and carries no role. A
+          `<label htmlFor>` would name a native input and gives a span nothing,
+          so the name is the todo's own text as `aria-label`. */}
+      <Checkbox
+        render={<span id={`todo-${rowId}`} />}
+        aria-label={todo.text}
         checked={todo.completed}
-        onChange={handleToggle}
-        id={`todo-${rowId}`}
+        onCheckedChange={handleToggle}
       />
-      <label htmlFor={`todo-${rowId}`}>{todo.text}</label>
+      <span className="flex-1 select-none group-data-[completed=true]:line-through group-data-[completed=true]:opacity-60 group-data-[overdue=true]:text-primary">
+        {todo.text}
+      </span>
       {/* `due` is optional on `TodoRow` — a todo with no date has no cell. */}
-      <DueInput rowId={rowId} due={todo.due ?? ''} />
+      <DueInput rowId={rowId} due={todo.due ?? ''} todoText={todo.text} />
 
-      <Button onClick={handleDelete}>Delete</Button>
-      {/* After Delete, deliberately: the exams already on the tree click a
-          row's Delete as the first `.todoItem button`, and a button placed
-          before it would take that click. */}
-      <button id={`pin-${rowId}`} type="button" onClick={handlePin}>
+      {/* Two rows would otherwise carry two buttons both named `Delete`, and a
+          role-and-name locator picks the first in tree order: the row's own
+          text is what makes each name reach one button. */}
+      <Button
+        variant="outline"
+        size="sm"
+        aria-label={`Delete ${todo.text}`}
+        onClick={handleDelete}
+      >
+        Delete
+      </Button>
+      <Button
+        id={`pin-${rowId}`}
+        variant="outline"
+        size="sm"
+        aria-label={`${pinned ? 'Unpin' : 'Pin'} ${todo.text}`}
+        onClick={handlePin}
+      >
         {pinned ? 'Unpin' : 'Pin'}
-      </button>
-    </div>
+      </Button>
+    </li>
   );
 };

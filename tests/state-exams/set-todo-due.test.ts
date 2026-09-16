@@ -362,8 +362,8 @@ stateExam({
   },
   expected: 'state-exams/expected/two-todos-second-due.json',
   view: [
-    {selector: '.todoItem', count: 2, text: 'walk the dog'},
-    {selector: 'input#todo-1', unchecked: true},
+    {selector: '#todoList li', count: 2, text: 'walk the dog'},
+    {selector: '#todo-1', unchecked: true},
   ],
   mutant: [{table: 'todos', row: '1', cell: 'due', absent: true}],
 });

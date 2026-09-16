@@ -170,10 +170,10 @@ stateExam({
   expected: 'state-exams/expected/two-todos-one-done.json',
   view: [
     {selector: '#doneCount', count: 1, text: '1 of 2 done'},
-    {selector: 'input#todo-1', checked: true},
-    {selector: 'input#todo-0', unchecked: true},
-    {selector: '.todoItem.completed', count: 1},
-    {selector: '.todoItem', count: 2},
+    {selector: '#todo-1', checked: true},
+    {selector: '#todo-0', unchecked: true},
+    {selector: '#todoList li[data-completed="true"]', count: 1},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: [{table: 'todos', row: '1', cell: 'completed', value: false}],
 });

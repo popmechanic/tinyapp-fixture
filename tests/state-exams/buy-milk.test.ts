@@ -13,8 +13,8 @@ stateExam({
   },
   expected: 'state-exams/expected/one-open-todo.json',
   view: [
-    {selector: '.todoItem', count: 1, text: 'buy milk'},
-    {selector: '.todoItem input[type=checkbox]', unchecked: true},
+    {selector: '#todoList li', count: 1, text: 'buy milk'},
+    {selector: '#todoList li [role=checkbox]', unchecked: true},
   ],
   mutant: [{table: 'todos', row: '0', cell: 'completed', value: true}],
 });
