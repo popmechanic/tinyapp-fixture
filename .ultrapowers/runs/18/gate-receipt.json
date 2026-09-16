@@ -1,0 +1,61 @@
+{
+  "mode": "gate",
+  "stamp": "run-18",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-18/report.json",
+  "branch": "ultra/integration-run-18",
+  "gateCheck": {
+    "verdict": "BLOCKED",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": false,
+        "detail": "merge-sha guard unavailable \u2014 result lacks waveMerges[last].headSha (budget-exhausted or SKIPPED-only run); inspect and redirect/re-run"
+      },
+      {
+        "name": "head-match",
+        "ok": false,
+        "detail": "skipped \u2014 no recorded merge headSha to compare"
+      },
+      {
+        "name": "git-verified",
+        "ok": false,
+        "detail": "gitVerified is not true \u2014 the completeness critic could not confirm it reviewed the recorded merge HEAD; the review is unverified"
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": false,
+        "detail": "failed/blocked tasks left declared deliverables unproduced: [{\"task\": \"4\", \"files\": [\"client/index.html\", \"client/src/App.tsx\", \"client/src/Button.tsx\", \"client/src/ClearCompleted.tsx\", \"client/src/DoneCount.tsx\", \"client/src/DueInput.tsx\", \"client/src/FilterBar.tsx\", \"client/src/Info.tsx\", \"client/src/Input.tsx\", \"client/src/Loading.tsx\", \"client/src/Title.tsx\", \"client/src/TodoInput.tsx\", \"client/src/TodoItem.tsx\", \"client/src/TodoList.tsx\", \"client/src/TopBar.tsx\", \"client/src/UndoDelete.tsx\", \"client/src/button.css\", \"client/src/filterBar.css\", \"client/src/index.css\", \"client/src/info.css\", \"client/src/input.css\", \"client/src/loading.css\", \"client/src/title.css\", \"client/src/todoInput.css\", \"client/src/todoItem.css\", \"client/src/todoList.css\", \"client/src/topBar.css\", \"packages/tinyapp-exam/test/browser-exam.test.ts\", \"packages/tinyapp-lint/test/lint-cli.test.ts\", \"packages/tinyapp-lint/test/views.test.ts\", \"tests/state-exams/buy-milk.test.ts\", \"tests/state-exams/clear-completed.test.ts\", \"tests/state-exams/click-by-name-completes-todo.test.ts\", \"tests/state-exams/click-completes-todo.test.ts\", \"tests/state-exams/completed-past-due-not-overdue.test.ts\", \"tests/state-exams/delete-to-trash.test.ts\", \"tests/state-exams/derived-exam.test.ts\", \"tests/state-exams/design-system-installed.test.ts\", \"tests/state-exams/done-count.test.ts\", \"tests/state-exams/due-date-marks-overdue.test.ts\", \"tests/state-exams/empty-todo-refused.test.ts\", \"tests/state-exams/enter-submits-todo.test.ts\", \"tests/state-exams/filter-bar.test.ts\", \"tests/state-exams/filter-done.test.ts\", \"tests/state-exams/interaction-evidence.test.ts\", \"tests/state-exams/mutant-from-diff.test.ts\", \"tests/state-exams/session-transitions.test.ts\", \"tests/state-exams/set-filter.test.ts\", \"tests/state-exams/set-todo-due.test.ts\", \"tests/state-exams/store-history.test.ts\", \"tests/state-exams/styled-page.test.ts\", \"tests/state-exams/type-due-date.test.ts\", \"tests/state-exams/undo-delete.test.ts\"]}]"
+      }
+    ],
+    "acks": [
+      {
+        "type": "coverage",
+        "detail": "green suite but 0/4 tasks merged \u2014 a passing suite over an incomplete merge is a false-green"
+      }
+    ],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 1,
+  "suite": {
+    "passed": false,
+    "unattributed": [],
+    "output": "not run \u2014 no wave merged"
+  },
+  "verdict": "BLOCKED"
+}
