@@ -6,6 +6,7 @@ import {
 } from 'tinybase/with-schemas';
 
 import {isIsoDate} from './overdue';
+import {isNormalizedTags, normalizeTags, parseTags} from './todoTags';
 
 // The cells of a todo, written once. `todos` and `trash` are both this literal,
 // so a cell a later change adds to a todo is a cell of a trashed todo by
@@ -23,6 +24,12 @@ const TODO_CELLS = {
   // into every row would rewrite all eighteen snapshots checked in before the
   // cell existed. A todo that is not pinned has no `pinned` cell at all.
   pinned: {type: 'boolean'},
+  // The tags of a todo, as one string: the tags joined by `,` with no spaces,
+  // no empty tag and no repeat, in the order they were typed. No default, for
+  // `due`'s reason — a `tags: ''` materialised into every row would rewrite
+  // every snapshot checked in before the cell existed. A todo with no tags has
+  // no `tags` cell at all. `todoTags.ts` is the spelling; this is the type.
+  tags: {type: 'string'},
 } as const;
 
 export const TABLES_SCHEMA = {
@@ -39,6 +46,10 @@ export const TABLES_SCHEMA = {
 // value is how the app says All.
 export const VALUES_SCHEMA = {
   filter: {type: 'string'},
+  // The chosen tag filter: one tag, or absent. No default either, and for the
+  // same reason — a store nobody has filtered by tag carries no `tag` value,
+  // which is how the app says every tag.
+  tag: {type: 'string'},
 } as const;
 
 // What every row of a table must satisfy, whoever wrote the row: the UI, an
@@ -75,6 +86,17 @@ export const INVARIANTS: Invariant[] = [
     predicate: (row) =>
       row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
     message: 'a completed todo in the trash has non-empty text',
+  },
+  // Appended for the same reason as the two above. An absent `tags` satisfies
+  // it, so every row written before the cell existed is a row that still
+  // holds; a row that has the cell holds only if the cell is what
+  // `normalizeTags` would have written — no blanks, no spaces, no repeats.
+  {
+    table: 'todos',
+    predicate: (row) =>
+      row.tags === undefined ||
+      (typeof row.tags === 'string' && isNormalizedTags(row.tags)),
+    message: 'tags are absent or a comma-joined list of distinct non-empty tags',
   },
 ];
 
@@ -191,6 +213,54 @@ export const pinTodo = (store: TodosStore, id: string, pinned: boolean): void =>
     store.setPartialRow('todos', id, {pinned: true});
   } else {
     store.delCell('todos', id, 'pinned');
+  }
+};
+
+/**
+ * Sets todo `id`'s tags from what was typed, or clears them when it names none.
+ *
+ * `text` is whatever a reader typed — `'home, urgent'`, `' , '`, a repeat — and
+ * what is stored is `normalizeTags` of it, so the cell only ever holds the tidy
+ * list the invariant beside the schema asks for. Clearing deletes the cell
+ * rather than writing `''`, so a todo that has been tagged and untagged is byte
+ * for byte the todo it was, exactly as unpinning leaves it.
+ *
+ * An id the list does not hold is left alone, for `pinTodo`'s reason:
+ * `setPartialRow` on a missing row would create a phantom row out of the
+ * schema's defaults rather than fail.
+ */
+export const setTodoTags = (store: TodosStore, id: string, text: string): void => {
+  if (!store.hasRow('todos', id)) {
+    return;
+  }
+  const tags = normalizeTags(text);
+  if (tags === '') {
+    store.delCell('todos', id, 'tags');
+  } else {
+    store.setPartialRow('todos', id, {tags});
+  }
+};
+
+/**
+ * Chooses the tag to filter by, or clears the choice when `tag` is `''`.
+ *
+ * Only a single already-normalized tag is ever written: `'home,urgent'` is two
+ * tags and not one, and `' home'` is a tag nobody typed that way, so both leave
+ * the store exactly as it was rather than being tidied into something the
+ * caller did not ask for.
+ *
+ * The tag is deliberately *not* checked against the table — a filter on a tag
+ * no row carries any more is `activeTag`'s business, which reads a stale filter
+ * as no filter, so a tag that goes out of use never strands the list.
+ */
+export const setTagFilter = (store: TodosStore, tag: string): void => {
+  if (tag === '') {
+    store.delValue('tag');
+    return;
+  }
+  const tags = parseTags(tag);
+  if (tags.length === 1 && tags[0] === tag) {
+    store.setValue('tag', tag);
   }
 };
 

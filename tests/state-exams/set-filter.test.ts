@@ -145,9 +145,16 @@ test('leg (d) [M3] VALUES_SCHEMA.filter is exactly {type: "string"} with no defa
   expect(VALUES_SCHEMA.filter).toEqual({type: 'string'});
   expect('default' in VALUES_SCHEMA.filter).toBe(false);
 
-  expect(JSON.parse(createTodosStore().getValuesSchemaJson())).toEqual({
-    filter: {type: 'string'},
-  });
+  // Loosened from the whole-schema literal to the `filter` entry it meant: a
+  // sibling plan adds a values entry of its own (`tag`, the chosen tag filter),
+  // and what this leg is about is that *this* task's entry is a bare string
+  // with no default and that a fresh store carries no filter — not how many
+  // entries the values schema held the day it was written. Deliberately not
+  // re-pinned to the new two-entry literal, which is that task's to pin.
+  const valuesSchema = JSON.parse(
+    createTodosStore().getValuesSchemaJson(),
+  ) as Record<string, unknown>;
+  expect(valuesSchema.filter).toEqual({type: 'string'});
   expect(createTodosStore().getValue('filter')).toBe(undefined);
 });
 
