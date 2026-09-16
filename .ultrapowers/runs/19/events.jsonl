@@ -75,3 +75,13 @@
 {"kind":"engine:log","line":"task 2 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2MFVB3F0001MA0ZG39RXTQS","ts":1789541592175}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2MFVB6W0000P1FWCV5HFZNJ","ts":1789541592284}
 {"kind":"worker:start","label":"resolve:wave1:1:1","role":"resolver","sessionId":"9f9c6bfc-345b-4f64-bb62-37b2919f1a5b","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-19/clones/integration","model":null,"id":"01M2MFVBHS000014HW338JAJR9","ts":1789541592633}
+{"kind":"worker:end","label":"resolve:wave1:1:1","role":"resolver","sessionId":"9f9c6bfc-345b-4f64-bb62-37b2919f1a5b","exitCode":143,"timedOut":true,"outcome":"retry","class":"sigterm","status":null,"meter":null,"id":"01M2MGPTP40000H04ERGKG8NAF","ts":1789542492868}
+{"kind":"transcript:slice","label":"resolve:wave1:1:1","sessionId":"9f9c6bfc-345b-4f64-bb62-37b2919f1a5b","bytes":6838,"id":"01M2MGPTPB000073621984C6ZM","ts":1789542492875}
+{"kind":"engine:log","line":"wave 1 fold blocked: resolver dispatch threw on bun.lock: WORKER_SIGTERM: SIGTERM: killed with no envelope (exit 143)","id":"01M2MGPTPD0000P2MZWQ4PT5AX","ts":1789542492877}
+{"kind":"driver:wave-blocked","wave":1,"tasks":["1","2","3"],"detail":"resolver dispatch threw on bun.lock: WORKER_SIGTERM: SIGTERM: killed with no envelope (exit 143)","why":"released","released":["4"],"applied":{"1":"base","2":"base","3":"base"},"id":"01M2MGPTPE0000C3R1XBQ6BBTN","ts":1789542492878}
+{"kind":"engine:log","line":"epoch 1 BLOCKED: resolver dispatch threw on bun.lock: WORKER_SIGTERM: SIGTERM: killed with no envelope (exit 143)","id":"01M2MGPV3C00000WKKFRMNKN3P","ts":1789542493292}
+{"kind":"engine:log","line":"task 4 skipped: upstream dependency failed","id":"01M2MGPV3C00019YWMC7EFH0AH","ts":1789542493292}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2MGPV660000CK7ZF4MPS0K4","ts":1789542493382}
+{"kind":"driver:stage","stage":"finalize","id":"01M2MGPV6M0000301GN7CY7Z45","ts":1789542493396}
+{"kind":"driver:stage","stage":"gate","id":"01M2MGPV7T0000Y07S7MJEWX4B","ts":1789542493434}
+{"kind":"driver:fail","verdict":"gate-blocked","detail":"ultra_gate exited 1 — gate receipt is the terminal artifact","id":"01M2MGPVAW0000X0KDXMX4QHJF","ts":1789542493532}
