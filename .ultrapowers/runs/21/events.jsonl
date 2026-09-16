@@ -27,3 +27,10 @@
 {"kind":"handshake:settled","task":"1","expected":"state-exams/expected/two-todos-second-pinned.json","id":"01M2MJR3V30000NMVNQTYQH6V6","ts":1789544632163}
 {"kind":"engine:log","line":"task 1 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2MJR3V40000VJMX6BHN8RZ3","ts":1789544632164}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2MJR3W80000W2HSA4RSSTHE","ts":1789544632200}
+{"kind":"driver:wave-adopted","wave":1,"tasks":["1"],"headSha":"410bf977bdd760692866bcd55ff8b4627c06e3cd","why":"released","released":["2"],"applied":{"1":"base"},"id":"01M2MJWEN60000VY6D3R9CXRR0","ts":1789544774310}
+{"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2MJWEP500000R2NVPKB50KX","ts":1789544774341}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":1,"id":"01M2MJWKC10000AYYRK47H39KQ","ts":1789544779137}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":1,"id":"01M2MJWMPH0000PX387Z27X58V","ts":1789544780497}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src server state-exams/seeds","exit":0,"minor":false,"wave":1,"id":"01M2MJWMPQ0000FRVK8GW6N65F","ts":1789544780503}
+{"kind":"worker:start","label":"exam:2","role":"examiner","sessionId":"a3667d1e-9c93-4f40-910f-c84978d90401","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-21/clones/exam-2","model":"opus","id":"01M2MJWN3W00004HK1NJDQWMTF","ts":1789544780924}
+{"kind":"worker:start","label":"impl:2","role":"implementer","sessionId":"663d8352-9475-4fed-8eb1-075cae125a16","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-21/clones/task-2","model":"opus","id":"01M2MJWN3Y0000QPV8PFRPN0YX","ts":1789544780926}
