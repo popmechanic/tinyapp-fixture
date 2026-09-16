@@ -97,3 +97,17 @@
 {"kind":"handshake:settled","task":"3","expected":"state-exams/expected/default-todos-plus-buy-milk.json","id":"01M2NYFRES0001TC10KPCBF2AF","ts":1789590495705}
 {"kind":"engine:log","line":"task 3 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2NYFRET0000CS7GZ0021109","ts":1789590495706}
 {"kind":"engine:phase","phase":"Wave 2","id":"01M2NYFRFS00009TM5685EG9V4","ts":1789590495737}
+{"kind":"driver:wave-adopted","wave":2,"tasks":["3"],"headSha":"2eaa2ac690323a43139e9c74e3ffe876e21c8dfe","why":"end","applied":{"3":"base"},"id":"01M2NZHVZ00000MN9RJC3T5ZEJ","ts":1789591613408}
+{"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2NZHW030000FF2P6G43XZ1X","ts":1789591613443}
+{"kind":"driver:integrated-check","cmd":"bun run lint:ui","exit":0,"minor":false,"wave":2,"id":"01M2NZHWNM00009XVB2ZFZ09F5","ts":1789591614132}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2NZJ2AZ0000Y0F14P304EEY","ts":1789591619935}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":2,"id":"01M2NZJG0G0000FTMKZ8R5YPNG","ts":1789591633936}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- server packages/tinyapp-history packages/tinyapp-lint/src/rules client/src/components client/src/TodoItem.tsx client/src/TodoList.tsx client/src/TodoInput.tsx client/src/index.tsx","exit":0,"minor":false,"wave":2,"id":"01M2NZJG0T00007H7XPVAVNB48","ts":1789591633946}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2NZJG5D0000GGPE0Q2B4TWB","ts":1789591634093}
+{"kind":"driver:stage","stage":"finalize","id":"01M2NZJG7E0000BXMBHJ0NRWAP","ts":1789591634158}
+{"kind":"driver:stage","stage":"gate","id":"01M2NZJG9F0000TEVM3VDGGRP6","ts":1789591634223}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2NZJGD8000053YJHDF3SZV1","ts":1789591634344}
+{"kind":"driver:stage","stage":"approve","id":"01M2NZJGD80001RG1XSPFXS7XJ","ts":1789591634344}
+{"kind":"driver:approved","stamp":"run-23","integrationBranch":"ultra/integration-run-23","id":"01M2NZJGEG0000KAWAPAQ19G0C","ts":1789591634384}
+{"kind":"run:open","runId":"run-23","base":"7d578da59ff3311cc6a83c61f64bfaad62bfa17b","source":"fleet/publish-fold.mjs","id":"01M2NZJJ2H00002YVSE64S953K","ts":1789591636049}
+{"kind":"driver:publish-fold","run":"23","attempt":"1","base":"7d578da59ff3311cc6a83c61f64bfaad62bfa17b","tip":"7d578da59ff3311cc6a83c61f64bfaad62bfa17b","candidate":"2eaa2ac690323a43139e9c74e3ffe876e21c8dfe","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2NZJKNX0000F9G9CP3QYCJB","ts":1789591637693}

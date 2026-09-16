@@ -1,0 +1,404 @@
+{
+  "integrationBranch": "ultra/integration-run-23",
+  "baseSha": "7d578da59ff3311cc6a83c61f64bfaad62bfa17b",
+  "waves": [
+    [
+      "1",
+      "2"
+    ],
+    [
+      "3"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 3 (interface)",
+    "2 -> 3 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "e86e21fdcf7214b0a275b4236144932a982106e4",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-23/patches/task-1.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "concern: pre-existing (not mine, outside FILES): `packages/tinyapp-exam/test/render-move.test.ts` fails 6 tests when run as its own `bun test` invocation \u2014 `Could not resolve: \"@/components/ui/button\"` (and input/checkbox) while bundling `client/index.html`. That drags down `packages/tinyapp-exam/test/browser-exam.test.ts` leg (f), which spawns exactly that invocation. Confirmed pre-existing by reverting `client/src/Store.tsx` and `client/src/storeData.ts` to BASE `7d578da` and re-running: the same 6 failures. Both files are outside this task's FILES and outside its PROOFS; the full `bun test` run with my changes is 537 pass / 2 fail, the 2 being this pair.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789586726514,
+      "stateExams": [
+        {
+          "exam": "exam-page",
+          "store_ms": 1.2249560000000201,
+          "render_ms": 1067.3794930000001,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "14f4ce52270c98b875c1cba1ce9edfe47bab8e95",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-23/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "M7 ends on a teardown assertion for every failing species (\"after every outcome above no child of the test process is a Chromium and a `fetch` from Bun to the exam's origin rejects\"), and leg (g) prescribes the source of that origin as \"read off `data-origin` in `record.dom`\". For two of the six species \u2014 never-ready (`packages/tinyapp-exam/test/persistence-move.test.ts`, 'leg (g) [M7]: a page that never reports its persister is red on the ready wall') and never-persisting ('...rows that never match the store are red on the persist wall') \u2014 the walk in `packages/tinyapp-exam/src/persistence-move.ts` returns before `record.domBefore` or `record.dom` is ever set, so no markup and no `data-origin` exists to read. `assertClosed` therefore skips the `fetch`-rejects half for exactly those two (it guards on `originOf(record) !== null`), and only the \"no Chromium child\" half is established there. The server-stopped half is in fact honoured by the `finally` in `measure` (`server.stop(true)`), so this is a gap in what the exam can witness, not a defect in the tree: as leg (g) is written, no faithful implementation can assert it for a species whose record carries no page. Closing it would need the origin surfaced somewhere other than the DOM (e.g. an optional field on the outcome or record), which is a change to the helper's public shape the task does not ask for. Recorded so the operator knows M7's last clause is established for four of the six species rather than all six.; concern: plan-defect: the Proof's fifth `Run:` line \u2014 `bun test packages/tinyapp-exam/test/state-exam.test.ts packages/tinyapp-exam/test/evidence.test.ts packages/tinyapp-exam/test/render-move.test.ts` \u2014 is already red at BASE and this task cannot make it green. Measured in a detached worktree at 7d578da: 36 pass / 9 fail there, and 36 pass / 9 fail in this tree \u2014 identical test for test. Every failure is `Could not resolve: \"@/components/ui/button\"` (and siblings) out of `bundleOf`. Cause, reproduced minimally: under Bun 1.4.0 on this image, `Bun.build` inside a `bun test` process resolves tsconfig `paths` from the repository-root tsconfig only, and BASE commit 7d578da added `@/*` imports to `client/src/*` without a root tsconfig; the same build under `bun run`/`bun -e` succeeds because it walks to `client/tsconfig.json`. The task's own Context records its measurements under Bun 1.4.2, so this is plausibly a version difference rather than something anyone saw when 7d578da landed. Full-suite comparison, also identical: BASE 537 pass / 2 fail, this tree 537 pass / 2 fail; `bun test packages/tinyapp-lint packages/tinyapp-exam` 100 pass / 29 fail in both. A real fix belongs to whoever owns `client/` or the Bun pin: rewrite the `@/\u2026` imports as relative, pin Bun 1.4.2, or add a root tsconfig *and* move the five `tsc`-shelling tests onto `--ignoreConfig`.; concern: out-of-FILES (not taken): adding a repository-root `tsconfig.json` mapping `@/*` to `./client/src/*`. Tried and measured: it does clear all 29 bundling failures and leaves `bun run typecheck`, `bun run lint:state` and `bun run lint:ui` at 0, but a `tsconfig.json` in the root makes every `tsc` the suite spawns with files on its command line emit `error TS5112: tsconfig.json is present but will not be loaded if files are specified on commandline`, and five tests in `browser.test.ts` and its neighbours assert `tsc`'s output is empty \u2014 full suite 534 pass / 5 fail with it against 537 pass / 2 fail without. It trades nine reds for five different ones, so it is not a fix and was reverted; the tree carries no root tsconfig.; concern: The two `Test:` paths (`packages/tinyapp-exam/test/persistence-move.test.ts` and `tests/state-exams/persistence-exam.test.ts`) are untouched, per the brief, so M1's `bun run lint:state`-with-that-file-present and all of M8 are unverified from here. `bun run lint:state` exits 0 on this tree as it stands (0 findings over 20 snapshots and 24 exams), and the capture child links the three new names \u2014 checked separately \u2014 but the exact wording of M8's red-registration leg rests on the peer's exam.; concern: out-of-FILES (not taken): `tests/state-exams/styled-page.test.ts` leg (f) [M6] \u2014 which spawns `bun test packages/tinyapp-lint packages/tinyapp-exam` \u2014 is still red, the one survivor of the two [M6] meta-legs that were red at BASE. That child is now 127 pass / 17 fail (BASE: 100 / 29). The 17 are a different mechanism from the 12 this fix reached: `error: Cannot find module '@/components/ui/button' from client/src/TodoInput.tsx`, raised by Bun's *runtime* module loader when `loadContext()` dynamically imports the client modules run-22 gave `@/` imports \u2014 same missing `paths` map, a resolver no `Bun.build` option or bundler plugin can set. (Those lint files pass in the whole-suite run and when `packages/tinyapp-lint` runs alone; only this child combination is red.) Fixing it needs one of: rewriting `client/src/*`'s `@/\u2026` imports to relative paths \u2014 blocked outright, since a Global Constraints Check pins `client/src/components`, `TodoItem.tsx`, `TodoList.tsx`, `TodoInput.tsx` and `index.tsx` byte-for-byte against BASE; a root `tsconfig.json`, rejected for TS5112; or a runtime resolver plugin preloaded via `bunfig.toml`, out of FILES and repo-wide. None is in this task's FILES, and this leg is in no Proof `Run:` or Check of this task.; concern: unsatisfiable (recorded by the examiner, unchanged by this round): leg (g)'s never-ready species cannot assert the closed-origin fetch \u2014 a run that never reaches ready carries no `dom`, so the record has no `data-origin` and the exam cannot learn the OS-chosen port. The exam asserts the empty browser list for all six species and the closed-origin fetch for the five whose record carries a DOM.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 1,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789589825716,
+      "stateExams": [
+        {
+          "exam": "breach",
+          "store_ms": 118.61030399999981,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": false,
+          "contract": "contract breach: ws://localhost:8787/"
+        },
+        {
+          "exam": "buy-bread",
+          "store_ms": 169.8636630000001,
+          "render_ms": 20.586189999999988,
+          "render": "ran",
+          "action_ms": 6.675241000000824,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "hollow",
+          "store_ms": 161.68019399999866,
+          "render_ms": 20.473289999999906,
+          "render": "ran",
+          "action_ms": 8.176095999999234,
+          "browser": "ran",
+          "mutant_killed": false,
+          "contract": "ok"
+        },
+        {
+          "exam": "honest",
+          "store_ms": 159.2419259999997,
+          "render_ms": 21.750005000000783,
+          "render": "ran",
+          "action_ms": 8.712475000000268,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "leak",
+          "store_ms": 164.6106660000005,
+          "render_ms": 37.10586300000068,
+          "render": "ran",
+          "action_ms": 6.445044000000053,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "never-persisting",
+          "store_ms": 177.01400400000057,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": 8.457479999999123,
+          "browser": "ran",
+          "mutant_killed": false,
+          "contract": "ok"
+        },
+        {
+          "exam": "never-ready",
+          "store_ms": 584.6864820000001,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": false,
+          "contract": "ok"
+        },
+        {
+          "exam": "persistence-exam",
+          "store_ms": 1087.855059,
+          "render_ms": 242.35925099999986,
+          "render": "ran",
+          "action_ms": 166.01924299999996,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "red",
+          "store_ms": 164.875446,
+          "render_ms": 21.967493999999988,
+          "render": "ran",
+          "action_ms": 9.619041999999979,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "rows-gone",
+          "store_ms": 163.8738659999999,
+          "render_ms": 39.522219999998924,
+          "render": "ran",
+          "action_ms": 7.868281000000934,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "state-exam",
+          "store_ms": 0.5109809999999015,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "view",
+          "store_ms": 179.31869799999913,
+          "render_ms": 35.83007899999939,
+          "render": "ran",
+          "action_ms": 9.135603999999148,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "9b7c0ad419595ee9f3b3f1e334373d5da64666ea",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-23/patches/task-3.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789590495706,
+      "stateExams": [
+        {
+          "exam": "added-todo-survives-reload",
+          "store_ms": 284.04266900000005,
+          "render_ms": 108.44050500000003,
+          "render": "ran",
+          "action_ms": 37.99161099999992,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "completed-todo-survives-reload",
+          "store_ms": 301.85864200000015,
+          "render_ms": 117.87888099999986,
+          "render": "ran",
+          "action_ms": 38.90276199999994,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "ion and an entry is the same red [1.30ms]\n(pass) leg (e) [M5]: the mutant move is unchanged \u2014 a green click spec still kills its mutant [0.16ms]\n(pass) leg (f) [M6]: the two re-aimed test files pass, and neither names the endpoint or its stub [5367.42ms]\n(pass) leg (g) [M1] [M7]: a click on the fixture completes the todo, read through the page store, under the ceiling [2165.06ms]\n(pass) leg (g) [M7]: forced unminified, the url is over the ceiling and the exam says so rather than hanging [213.62ms]\n(pass) leg (g) [M7]: `open` refuses a data: url over the ceiling within 15 s, naming it [110.88ms]\n\npackages/tinyapp-lint/test/references.test.ts:\n(pass) (a) [M1] the rule is named `references` and says nothing about the fixture [208.70ms]\n(pass) (b) [M2] the dangling `owner` is one finding, formatted exactly as pinned [0.45ms]\n(pass) (c) [M3] a resolvable reference, and a row without the cell, are both silent [0.18ms]\n(pass) (d) [M4] a snapshot without the referenced table names the missing row [0.13ms]\n(pass) (e) [M5] the fixture store module, and `lint:state` over one seeded violation [141.77ms]\n\npackages/tinyapp-lint/test/reachability.test.ts:\n(pass) (a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached [15053.69ms]\n(pass) (b) [M2] an unreachable expected state is one finding, on the pinned line [4391.35ms]\n(pass) (c) [M3] a state equal to a seed is reached in zero moves [0.15ms]\n(pass) (d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract [0.90ms]\n$ bun packages/tinyapp-lint/src/cli.ts --expected \"/home/exedev/target/.claude/ultrapowers/run-run-23/clones/integration/state-exams/lint-tmp-SZkLCb/expected\" --exams \"/home/exedev/target/.claude/ultrapowers/run-run-23/clones/integration/state-exams/lint-tmp-SZkLCb/exams\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [4136.70ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [14028.63ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [210.27ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.17ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [8.74ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-zuS8IL\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [352.28ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [235.77ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.34ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.40ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [209.18ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.48ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.49ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [2069.41ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [299.45ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.93ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.05ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [8.06ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.18ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [13826.07ms]\n\n 586 pass\n 0 fail\n 1936 expect() calls\nRan 586 tests across 51 files. [1111.24s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run lint:ui",
+      "exit": 0,
+      "stdout": "$ node node_modules/eslint/bin/eslint.js client/src\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 20 snapshots and 26 exams in 1601 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server packages/tinyapp-history packages/tinyapp-lint/src/rules client/src/components client/src/TodoItem.tsx client/src/TodoList.tsx client/src/TodoInput.tsx client/src/index.tsx",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:ui",
+      "exit": 0,
+      "stdout": "$ node node_modules/eslint/bin/eslint.js client/src\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 23 snapshots and 26 exams in 13973 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server packages/tinyapp-history packages/tinyapp-lint/src/rules client/src/components client/src/TodoItem.tsx client/src/TodoList.tsx client/src/TodoInput.tsx client/src/index.tsx",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 263783,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "inyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [2128.45ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [372.78ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.19ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [16.00ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-klCc4h\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [340.88ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [215.51ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.21ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.19ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [204.13ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.39ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.36ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1170.80ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [256.63ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [3.10ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.28ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.60ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.16ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1515.74ms]\n\n 539 pass\n 0 fail\n 1713 expect() calls\nRan 539 tests across 45 files. [416.82s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "7dabbb9fc28055f08fcb6d18f8bf8416964f959a",
+      "branches": [
+        "1",
+        "2"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "2eaa2ac690323a43139e9c74e3ffe876e21c8dfe",
+      "branches": [
+        "3"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-23/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-23/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 1.176,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-23/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-23/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.409,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 3,
+    "tasks_planned": 3,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 1: pre-existing (not mine, outside FILES): `packages/tinyapp-exam/test/render-move.test.ts` fails 6 tests when run as its own `bun test` invocation \u2014 `Could not resolve: \"@/components/ui/button\"` (and input/checkbox) while bundling `client/index.html`. That drags down `packages/tinyapp-exam/test/browser-exam.test.ts` leg (f), which spawns exactly that invocation. Confirmed pre-existing by reverting `client/src/Store.tsx` and `client/src/storeData.ts` to BASE `7d578da` and re-running: the same 6 failures. Both files are outside this task's FILES and outside its PROOFS; the full `bun test` run with my changes is 537 pass / 2 fail, the 2 being this pair.",
+    "task 1: amendment (files): `client/src/sqlite.tsx` \u2014 listed in FILES as Modify, left byte-for-byte unchanged. \u2014 M2 mocks `getDb` out of `client/src/sqlite`, so a `window.__TINYAPP_DB__` written inside `getDb` would be mocked away and unobservable by the exam. The Context offers both placements; only the persister factory in `Store.tsx` is measurable, so the whole handover lives there.",
+    "task 1: amendment (clause): M3's \"Rendering the unseeded `Store` with no flag leaves `window.__TINYAPP_STORE__`, `window.__TINYAPP_DB__` and `window.__TINYAPP_PERSISTER__` all undefined\" (and M2's never-resolving-`load` leg) \u2014 read as a property of the render rather than of whatever the process last left on `window`, so `Store` clears both new handles at mount. \u2014 Bun runs a test file's renders in one process on one leaked window. Without the clear, the flagged render of leg (b) leaves `__TINYAPP_DB__` and `__TINYAPP_PERSISTER__` set, and the later legs would read that leftover instead of the render under test. `exposeStore` already applies exactly this rule to `__TINYAPP_STORE__`; a freshly-mounted page has in fact opened and loaded nothing, so clearing keeps the unflagged page 'exactly the page it was at BASE \u2014 handles absent' literally true.",
+    "task 1: every mutant killed (exam-page) \u2014 no reviewer was dispatched (reviewOnStateExams off)",
+    "task 2: plan-defect: the Proof's fifth `Run:` line \u2014 `bun test packages/tinyapp-exam/test/state-exam.test.ts packages/tinyapp-exam/test/evidence.test.ts packages/tinyapp-exam/test/render-move.test.ts` \u2014 is already red at BASE and this task cannot make it green. Measured in a detached worktree at 7d578da: 36 pass / 9 fail there, and 36 pass / 9 fail in this tree \u2014 identical test for test. Every failure is `Could not resolve: \"@/components/ui/button\"` (and siblings) out of `bundleOf`. Cause, reproduced minimally: under Bun 1.4.0 on this image, `Bun.build` inside a `bun test` process resolves tsconfig `paths` from the repository-root tsconfig only, and BASE commit 7d578da added `@/*` imports to `client/src/*` without a root tsconfig; the same build under `bun run`/`bun -e` succeeds because it walks to `client/tsconfig.json`. The task's own Context records its measurements under Bun 1.4.2, so this is plausibly a version difference rather than something anyone saw when 7d578da landed. Full-suite comparison, also identical: BASE 537 pass / 2 fail, this tree 537 pass / 2 fail; `bun test packages/tinyapp-lint packages/tinyapp-exam` 100 pass / 29 fail in both. A real fix belongs to whoever owns `client/` or the Bun pin: rewrite the `@/\u2026` imports as relative, pin Bun 1.4.2, or add a root tsconfig *and* move the five `tsc`-shelling tests onto `--ignoreConfig`.",
+    "task 2: out-of-FILES (not taken): adding a repository-root `tsconfig.json` mapping `@/*` to `./client/src/*`. Tried and measured: it does clear all 29 bundling failures and leaves `bun run typecheck`, `bun run lint:state` and `bun run lint:ui` at 0, but a `tsconfig.json` in the root makes every `tsc` the suite spawns with files on its command line emit `error TS5112: tsconfig.json is present but will not be loaded if files are specified on commandline`, and five tests in `browser.test.ts` and its neighbours assert `tsc`'s output is empty \u2014 full suite 534 pass / 5 fail with it against 537 pass / 2 fail without. It trades nine reds for five different ones, so it is not a fix and was reverted; the tree carries no root tsconfig.",
+    "task 2: The two `Test:` paths (`packages/tinyapp-exam/test/persistence-move.test.ts` and `tests/state-exams/persistence-exam.test.ts`) are untouched, per the brief, so M1's `bun run lint:state`-with-that-file-present and all of M8 are unverified from here. `bun run lint:state` exits 0 on this tree as it stands (0 findings over 20 snapshots and 24 exams), and the capture child links the three new names \u2014 checked separately \u2014 but the exact wording of M8's red-registration leg rests on the peer's exam.",
+    "task 2: amendment (files): No file outside FILES was written, added or deleted. Two diagnostic artefacts existed transiently and are gone: a root `tsconfig.json` (written to measure the fix described in the concerns, then removed) and `probe-scratch.ts` at the repository root plus a throwaway `packages/tinyapp-exam/test/zz-probe.test.ts` (browser and bundler probes, both removed). A detached `git worktree` at BASE under `.basecheck` was created for the BASE-vs-tree comparison and removed with `git worktree remove --force`. `git status --porcelain` is empty and `git diff --stat 7d578da HEAD` names exactly the thirteen `writes` paths. \u2014 The brief asks that any edit outside FILES be declared. None landed, but the measurements behind the two concerns above required writing and then removing these files, and a later reader comparing the commit against the run's logs should not have to wonder whether they left anything behind.",
+    "task 2: examiner: (g) [M7] \u2014 the origin-fetch half, for the never-ready species only \u2014 Leg (g) asks that every species end with the browser gone and the loopback origin refusing. The exam learns the OS-chosen port from `data-origin` in the record's DOM, and per M6 and the move's order a run that never reaches ready carries no `dom` \u2014 so that one species leaves no port to dial and no way to prove the server closed beyond the empty browser list. The exam asserts no surviving browser for all six species and the closed-origin fetch for the five whose record carries a DOM.",
+    "task 2: the driver's pre-review pass was red (the Proof's Run: command failed: bun test packages/tinyapp-exam/test/state-exam.test.ts packages/tinyapp-exam/test/evidence.test.ts packages/tinyapp-exam/test/render-move.test.ts \u2014 exit 1; the Proof's exam failed: bun test packages/tinyapp-exam/test/persistence-move.test.ts tests/state-exams/persistence-exam.test.ts \u2014 exit 1) \u2014 one repair round before any reviewer read the patch",
+    "task 2: out-of-FILES (not taken): `tests/state-exams/styled-page.test.ts` leg (f) [M6] \u2014 which spawns `bun test packages/tinyapp-lint packages/tinyapp-exam` \u2014 is still red, the one survivor of the two [M6] meta-legs that were red at BASE. That child is now 127 pass / 17 fail (BASE: 100 / 29). The 17 are a different mechanism from the 12 this fix reached: `error: Cannot find module '@/components/ui/button' from client/src/TodoInput.tsx`, raised by Bun's *runtime* module loader when `loadContext()` dynamically imports the client modules run-22 gave `@/` imports \u2014 same missing `paths` map, a resolver no `Bun.build` option or bundler plugin can set. (Those lint files pass in the whole-suite run and when `packages/tinyapp-lint` runs alone; only this child combination is red.) Fixing it needs one of: rewriting `client/src/*`'s `@/\u2026` imports to relative paths \u2014 blocked outright, since a Global Constraints Check pins `client/src/components`, `TodoItem.tsx`, `TodoList.tsx`, `TodoInput.tsx` and `index.tsx` byte-for-byte against BASE; a root `tsconfig.json`, rejected for TS5112; or a runtime resolver plugin preloaded via `bunfig.toml`, out of FILES and repo-wide. None is in this task's FILES, and this leg is in no Proof `Run:` or Check of this task.",
+    "task 2: unsatisfiable (recorded by the examiner, unchanged by this round): leg (g)'s never-ready species cannot assert the closed-origin fetch \u2014 a run that never reaches ready carries no `dom`, so the record has no `data-origin` and the exam cannot learn the OS-chosen port. The exam asserts the empty browser list for all six species and the closed-origin fetch for the five whose record carries a DOM.",
+    "task 2: amendment (clause): The referee's PROPOSED PATCH for the fifth Run line \u2014 `paths: {\"@/*\": [\"../../client/src/*\"]}` in `packages/tinyapp-exam/tsconfig.json` \u2014 was not applied, because it does not work: measured on this image (Bun 1.4.0) with a throwaway probe test, the build still fails `Could not resolve: \"@/components/ui/button\"`. Bun's bundler under `bun test` does not consult the entrypoint's nearest tsconfig; it reads a `paths` map from the process's working directory only. The same red is fixed instead inside FILES, by `bundleOf` reading that nearest tsconfig itself and applying its `paths` through an `onResolve` plugin. \u2014 The issue text says a PROPOSED PATCH is a suggestion, to be applied when right and argued with when not. This one is a correct diagnosis of the symptom with a remedy that does not move it, so applying it would have left the Run line red while adding a misleading `paths` map to a package tsconfig that has no `@/` imports of its own.",
+    "task 2: amendment (files): No file outside FILES was written, added or deleted, and `git status --porcelain` is empty at the commit. Four scratch artefacts existed transiently and are gone: `packages/tinyapp-exam/test/zzprobe.test.ts` and `zztmp/` (the resolution probes), `tests/state-exams/zzroot.test.ts` (the same probe from a second location), a root `tsconfig.json` written once to re-confirm it is the only thing that works, and `zzout.txt` (a captured test log). `packages/tinyapp-exam/tsconfig.json` was edited to test the proposed patch and restored byte-for-byte from a backup copy, which was itself removed. \u2014 The brief asks that any edit outside FILES be declared. None landed in the commit, but the measurements behind the amendment above and the remaining concern required writing and then removing these files, and a later reader comparing the commit against the run's logs should not have to wonder whether any of them stayed.",
+    "task 3: every mutant killed (added-todo-survives-reload, completed-todo-survives-reload) \u2014 no reviewer was dispatched (reviewOnStateExams off)"
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "files",
+      "what": "`client/src/sqlite.tsx` \u2014 listed in FILES as Modify, left byte-for-byte unchanged.",
+      "why": "M2 mocks `getDb` out of `client/src/sqlite`, so a `window.__TINYAPP_DB__` written inside `getDb` would be mocked away and unobservable by the exam. The Context offers both placements; only the persister factory in `Store.tsx` is measurable, so the whole handover lives there."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M3's \"Rendering the unseeded `Store` with no flag leaves `window.__TINYAPP_STORE__`, `window.__TINYAPP_DB__` and `window.__TINYAPP_PERSISTER__` all undefined\" (and M2's never-resolving-`load` leg) \u2014 read as a property of the render rather than of whatever the process last left on `window`, so `Store` clears both new handles at mount.",
+      "why": "Bun runs a test file's renders in one process on one leaked window. Without the clear, the flagged render of leg (b) leaves `__TINYAPP_DB__` and `__TINYAPP_PERSISTER__` set, and the later legs would read that leftover instead of the render under test. `exposeStore` already applies exactly this rule to `__TINYAPP_STORE__`; a freshly-mounted page has in fact opened and loaded nothing, so clearing keeps the unflagged page 'exactly the page it was at BASE \u2014 handles absent' literally true."
+    },
+    {
+      "task": "2",
+      "amends": "files",
+      "what": "No file outside FILES was written, added or deleted. Two diagnostic artefacts existed transiently and are gone: a root `tsconfig.json` (written to measure the fix described in the concerns, then removed) and `probe-scratch.ts` at the repository root plus a throwaway `packages/tinyapp-exam/test/zz-probe.test.ts` (browser and bundler probes, both removed). A detached `git worktree` at BASE under `.basecheck` was created for the BASE-vs-tree comparison and removed with `git worktree remove --force`. `git status --porcelain` is empty and `git diff --stat 7d578da HEAD` names exactly the thirteen `writes` paths.",
+      "why": "The brief asks that any edit outside FILES be declared. None landed, but the measurements behind the two concerns above required writing and then removing these files, and a later reader comparing the commit against the run's logs should not have to wonder whether they left anything behind."
+    },
+    {
+      "task": "2",
+      "amends": "clause",
+      "what": "The referee's PROPOSED PATCH for the fifth Run line \u2014 `paths: {\"@/*\": [\"../../client/src/*\"]}` in `packages/tinyapp-exam/tsconfig.json` \u2014 was not applied, because it does not work: measured on this image (Bun 1.4.0) with a throwaway probe test, the build still fails `Could not resolve: \"@/components/ui/button\"`. Bun's bundler under `bun test` does not consult the entrypoint's nearest tsconfig; it reads a `paths` map from the process's working directory only. The same red is fixed instead inside FILES, by `bundleOf` reading that nearest tsconfig itself and applying its `paths` through an `onResolve` plugin.",
+      "why": "The issue text says a PROPOSED PATCH is a suggestion, to be applied when right and argued with when not. This one is a correct diagnosis of the symptom with a remedy that does not move it, so applying it would have left the Run line red while adding a misleading `paths` map to a package tsconfig that has no `@/` imports of its own."
+    },
+    {
+      "task": "2",
+      "amends": "files",
+      "what": "No file outside FILES was written, added or deleted, and `git status --porcelain` is empty at the commit. Four scratch artefacts existed transiently and are gone: `packages/tinyapp-exam/test/zzprobe.test.ts` and `zztmp/` (the resolution probes), `tests/state-exams/zzroot.test.ts` (the same probe from a second location), a root `tsconfig.json` written once to re-confirm it is the only thing that works, and `zzout.txt` (a captured test log). `packages/tinyapp-exam/tsconfig.json` was edited to test the proposed patch and restored byte-for-byte from a backup copy, which was itself removed.",
+      "why": "The brief asks that any edit outside FILES be declared. None landed in the commit, but the measurements behind the amendment above and the remaining concern required writing and then removing these files, and a later reader comparing the commit against the run's logs should not have to wonder whether any of them stayed."
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
