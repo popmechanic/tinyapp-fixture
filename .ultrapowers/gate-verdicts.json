@@ -1,0 +1,117 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "b012a966cda7aff29c21d67e2b0b514c8ec38f8f7f5889a1482de1f1ea62b8ad",
+      "verdict": "pass",
+      "reason": "Each handle and link clause (M1-M3) is pinned by an identity (toBe) leg plus a negative leg naming the absent handle or the zero count, the never-resolving load leg separates the db handle from the persister handle at the layer the sentence names, and M5's ordering literal lands in AGENTS.md's Key Files section, which exists at BASE and is in the task's Files."
+    },
+    "2": {
+      "hash": "8bb2636c1c3183778b46c70251f452d6b0fec13946c6f821b82d513fc8144530",
+      "verdict": "pass",
+      "reason": "M2's rule applied by hand yields exactly the pinned two-table result, M6's eight names are the sorted set beside BASE's four-or-six, every M7 species and each sentence conjunct (the port-distinct leak server counted at 0, the WebSocket breach, the ready and persist timeouts, the red-registration child at exit 1) has a real-browser leg a non-refusing, non-reloading or red-swallowing driver would fail, and every BASE line a clause changes is in a file the task names."
+    },
+    "3": {
+      "hash": "187d3cf1794448a085f6b8564a805fedaeb33a41320134d634441b7a9ff6acf1",
+      "verdict": "pass",
+      "reason": "Seed rows '1','2' make '0' the lowest free id, so M2 is seed plus row '0' 'buy milk' and M3 is seed plus row '1' completed, the counts (3, 2) and ids (#todo-0/1/2) follow, each mutant flips a cell the expected literal pins, and M2/M3 are discharged by a real-page persistenceExam that reloads and reads the store and the SQLite rows rather than a file diff."
+    }
+  },
+  "tally": {
+    "base": "7d578da59ff3311cc6a83c61f64bfaad62bfa17b",
+    "dispatched": 7,
+    "rejected": 4,
+    "rounds": {
+      "1": {
+        "dispatched": 3,
+        "rejected": 1
+      },
+      "2": {
+        "dispatched": 1,
+        "rejected": 1
+      },
+      "3": {
+        "dispatched": 1,
+        "rejected": 1
+      },
+      "4": {
+        "dispatched": 1,
+        "rejected": 1
+      },
+      "5": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    },
+    "note": "Round 1: tasks 1 and 3 pass; task 2 rejected (M1 said bun run lint:state exits 0 but no leg ran it - a Run line added, leg (a) cites it). Round 2: task 2 rejected (the Claim promised any page that dials out is red, while an off-origin HTTP request is refused and only a WebSocket is a breach - the Claim reworded to say exactly that). Round 3: task 2 rejected (the request-refusal conjunct was read off a fetch of an .invalid name, which a driver refusing nothing also fails - replaced by a second loopback server the exam runs, measured 0 requests). Round 4: task 2 rejected (the registered test's name and its throw on a red outcome had no falsifying leg - a child bun test over a temp red exam file, exit 1, its output naming the test and the failure). Round 5: task 2 pass."
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "2",
+      "hash": "50441af682368db2fd0c153d39c7d4963e28dcf6e2c76f7e206724feb893dfdc",
+      "verdict": "fail",
+      "reason": "M1 asserts bun run lint:state exits 0 over tests/state-exams/persistence-exam.test.ts importing all three new names, but no leg or Run line executes the lint - leg (a) only greps the three strings out of capture-plugin.ts."
+    },
+    {
+      "round": 2,
+      "task": "2",
+      "hash": "94a253faed04eec58ffdab1cbeb16c4f5765dab2852d3f8ce92d6d5c16589413",
+      "verdict": "fail",
+      "reason": "The sentence promises that a page that tries to dial out is a red exam, but M3/M5 make the honest stand-in itself dial out (fetch of https://example.invalid/x recorded as failed) and resolve ok true, while M4 reds only a WebSocket construction."
+    },
+    {
+      "round": 3,
+      "task": "2",
+      "hash": "380d58b36d12b06a4dd0896794dde76d4ad0efeb4e3e05acf981a60ef6c31133",
+      "verdict": "fail",
+      "reason": "M3's only leg for the request-refusal conjunct is data-blocked=failed on a fetch of https://example.invalid/x, which a driver that blocks nothing also satisfies since the .invalid TLD never resolves."
+    },
+    {
+      "round": 4,
+      "task": "2",
+      "hash": "10b2228bb2363ea45df54a2dc44154711aecbbf9ea6f37fde2496cc3d0a52ded",
+      "verdict": "fail",
+      "reason": "M8's throw of an Error with message failure when ok is false and the registered name persistence exam: <stem> have no falsifying leg - leg (h) only runs the honest green exam."
+    }
+  ],
+  "authoring": {
+    "minutes": 33,
+    "probes": 14,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Which bundles do we author now?",
+        "options": [
+          "#728 evidence record",
+          "#995 fixture persistence exam",
+          "Worker seam: #1054 + #410 + #1051",
+          "Scripts and docs: #873 + #1040 + #1045"
+        ],
+        "recommended": "#728 evidence record",
+        "picked": "#995 fixture persistence exam"
+      },
+      {
+        "question": "Claim and summary",
+        "options": [
+          "Confirm as quoted",
+          "Tighter summary"
+        ],
+        "recommended": "Confirm as quoted",
+        "picked": "Confirm as quoted"
+      },
+      {
+        "question": "Execute it how?",
+        "options": [
+          "Ultrapowers on the fixture now",
+          "Hold until run-166 lands",
+          "Inline"
+        ],
+        "recommended": "Ultrapowers on the fixture now",
+        "picked": "Ultrapowers on the fixture now"
+      }
+    ]
+  }
+}
