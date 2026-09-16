@@ -1,0 +1,495 @@
+{
+  "ok": true,
+  "stamp": "run-23",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-23"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "3 task(s) in 2 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The exam flag \u2014 an unseeded page that carries `window.__TINYAPP_EXAM__` hands the exam its store, its SQLite handle and its persister, and dials no socket",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "AGENTS.md",
+          "client/src/Store.tsx",
+          "client/src/sqlite.tsx",
+          "client/src/storeData.ts",
+          "client/src/vite-env.d.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`readExamFlag(): boolean`",
+            "`__TINYAPP_EXAM__`",
+            "`__TINYAPP_DB__`",
+            "`__TINYAPP_PERSISTER__`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The persistence move \u2014 the helper serves the page unseeded from a loopback origin, acts, waits for the save, reloads, and reads the store and the rows back",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "README.md",
+          "packages/tinyapp-exam/src/browser.ts",
+          "packages/tinyapp-exam/src/evidence.ts",
+          "packages/tinyapp-exam/src/index.ts",
+          "packages/tinyapp-exam/src/persistence-move.ts",
+          "packages/tinyapp-exam/src/render-move.ts",
+          "packages/tinyapp-exam/src/state-exam.ts",
+          "packages/tinyapp-exam/src/types.ts",
+          "packages/tinyapp-exam/test/fixtures/persistence/app.js",
+          "packages/tinyapp-exam/test/fixtures/persistence/entry.html",
+          "packages/tinyapp-exam/test/fixtures/persistence/expected-one-row.json",
+          "packages/tinyapp-exam/test/fixtures/persistence/hello.txt",
+          "packages/tinyapp-lint/src/capture-plugin.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`persistenceExam(spec: PersistenceExamSpec): void`",
+            "`runPersistenceExam(spec: PersistenceExamSpec, opts?: ExamOptions): Promise<ExamOutcome>`",
+            "`contentOf(stamped: unknown): Snapshot`",
+            "`PersistenceExamSpec`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The two persistence exams on the fixture \u2014 a todo added survives a reload, a todo completed survives a reload",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "state-exams/expected/default-todos-first-done.json",
+          "state-exams/expected/default-todos-plus-buy-milk.json",
+          "state-exams/seeds/default-todos.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`persistenceExam(spec: PersistenceExamSpec): void`",
+            "`__TINYAPP_DB__`",
+            "`__TINYAPP_PERSISTER__`"
+          ],
+          "produces": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "3",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1",
+        "2"
+      ],
+      [
+        "3"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The exam flag \u2014 an unseeded page that carries `window.__TINYAPP_EXAM__` hands the exam its store, its SQLite handle and its persister, and dials no socket",
+          "files": [
+            "AGENTS.md",
+            "client/src/Store.tsx",
+            "client/src/sqlite.tsx",
+            "client/src/storeData.ts",
+            "client/src/vite-env.d.ts",
+            "client/test/exam-page.test.ts",
+            "tests/state-exams/exam-page.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`readExamFlag(): boolean`",
+              "`__TINYAPP_EXAM__`",
+              "`__TINYAPP_DB__`",
+              "`__TINYAPP_PERSISTER__`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "AGENTS.md",
+            "client/src/Store.tsx",
+            "client/src/sqlite.tsx",
+            "client/src/storeData.ts",
+            "client/src/vite-env.d.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/exam-page.test.ts",
+            "client/test/exam-page.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/exam-page.test.ts client/test/exam-page.test.ts",
+          "proofRuns": [
+            "sed -n '/^## Key Files/,/^## Working Method/p' AGENTS.md | tr '\\n' ' ' | grep -q '__TINYAPP_EXAM__.*__TINYAPP_DB__.*__TINYAPP_PERSISTER__'",
+            "sed -n '/^## Key Files/,/^## Working Method/p' AGENTS.md | tr '\\n' ' ' | grep -q '__TINYAPP_STORE__.*normal page'",
+            "bun test client/test/seeded-store.test.ts client/test/seeded-store-global.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/exam-page.test.ts",
+            "client/test/exam-page.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "AGENTS.md",
+              "client/src/Store.tsx",
+              "client/src/sqlite.tsx",
+              "client/src/storeData.ts",
+              "client/src/vite-env.d.ts",
+              "client/test/exam-page.test.ts",
+              "tests/state-exams/exam-page.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/exam-page.test.ts",
+              "client/test/exam-page.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/exam-page.test.ts",
+              "client/test/exam-page.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/exam-page.test.ts": "tests/state-exams/exam-page.test.ts",
+              "client/test/exam-page.test.ts": "client/test/exam-page.test.ts"
+            },
+            "driverOwned": [
+              "client/test/exam-page.test.ts",
+              "tests/state-exams/exam-page.test.ts"
+            ],
+            "siblingOwned": [
+              "README.md",
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/evidence.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/persistence-move.ts",
+              "packages/tinyapp-exam/src/render-move.ts",
+              "packages/tinyapp-exam/src/state-exam.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/fixtures/persistence/app.js",
+              "packages/tinyapp-exam/test/fixtures/persistence/entry.html",
+              "packages/tinyapp-exam/test/fixtures/persistence/expected-one-row.json",
+              "packages/tinyapp-exam/test/fixtures/persistence/hello.txt",
+              "packages/tinyapp-exam/test/persistence-move.test.ts",
+              "packages/tinyapp-lint/src/capture-plugin.ts",
+              "tests/state-exams/persistence-exam.test.ts"
+            ],
+            "produces": [
+              "`readExamFlag(): boolean`",
+              "`__TINYAPP_EXAM__`",
+              "`__TINYAPP_DB__`",
+              "`__TINYAPP_PERSISTER__`"
+            ],
+            "consumes": []
+          }
+        },
+        {
+          "id": "2",
+          "title": "The persistence move \u2014 the helper serves the page unseeded from a loopback origin, acts, waits for the save, reloads, and reads the store and the rows back",
+          "files": [
+            "README.md",
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/evidence.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/persistence-move.ts",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/fixtures/persistence/app.js",
+            "packages/tinyapp-exam/test/fixtures/persistence/entry.html",
+            "packages/tinyapp-exam/test/fixtures/persistence/expected-one-row.json",
+            "packages/tinyapp-exam/test/fixtures/persistence/hello.txt",
+            "packages/tinyapp-exam/test/persistence-move.test.ts",
+            "packages/tinyapp-lint/src/capture-plugin.ts",
+            "tests/state-exams/persistence-exam.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`persistenceExam(spec: PersistenceExamSpec): void`",
+              "`runPersistenceExam(spec: PersistenceExamSpec, opts?: ExamOptions): Promise<ExamOutcome>`",
+              "`contentOf(stamped: unknown): Snapshot`",
+              "`PersistenceExamSpec`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "README.md",
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/evidence.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/persistence-move.ts",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/state-exam.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/fixtures/persistence/app.js",
+            "packages/tinyapp-exam/test/fixtures/persistence/entry.html",
+            "packages/tinyapp-exam/test/fixtures/persistence/expected-one-row.json",
+            "packages/tinyapp-exam/test/fixtures/persistence/hello.txt",
+            "packages/tinyapp-lint/src/capture-plugin.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/persistence-move.test.ts",
+            "tests/state-exams/persistence-exam.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/persistence-move.test.ts tests/state-exams/persistence-exam.test.ts",
+          "proofRuns": [
+            "bunx tsc -p packages/tinyapp-exam --noEmit",
+            "bun run lint:state",
+            "grep -q persistenceExam packages/tinyapp-lint/src/capture-plugin.ts",
+            "sed -n '/^## State exams/,$p' README.md | tr '\\n' ' ' | grep -q 'persistenceExam.*__TINYAPP_EXAM__.*rows.json.*persist_ms.*reload_ms'",
+            "bun test packages/tinyapp-exam/test/state-exam.test.ts packages/tinyapp-exam/test/evidence.test.ts packages/tinyapp-exam/test/render-move.test.ts"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/persistence-move.test.ts",
+            "tests/state-exams/persistence-exam.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "README.md",
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/evidence.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/persistence-move.ts",
+              "packages/tinyapp-exam/src/render-move.ts",
+              "packages/tinyapp-exam/src/state-exam.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/fixtures/persistence/app.js",
+              "packages/tinyapp-exam/test/fixtures/persistence/entry.html",
+              "packages/tinyapp-exam/test/fixtures/persistence/expected-one-row.json",
+              "packages/tinyapp-exam/test/fixtures/persistence/hello.txt",
+              "packages/tinyapp-exam/test/persistence-move.test.ts",
+              "packages/tinyapp-lint/src/capture-plugin.ts",
+              "tests/state-exams/persistence-exam.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-exam/test/persistence-move.test.ts",
+              "tests/state-exams/persistence-exam.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-exam/test/persistence-move.test.ts",
+              "tests/state-exams/persistence-exam.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-exam/test/persistence-move.test.ts": "packages/tinyapp-exam/test/persistence-move.test.ts",
+              "tests/state-exams/persistence-exam.test.ts": "tests/state-exams/persistence-exam.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-exam/test/persistence-move.test.ts",
+              "tests/state-exams/persistence-exam.test.ts"
+            ],
+            "siblingOwned": [
+              "AGENTS.md",
+              "client/src/Store.tsx",
+              "client/src/sqlite.tsx",
+              "client/src/storeData.ts",
+              "client/src/vite-env.d.ts",
+              "client/test/exam-page.test.ts",
+              "tests/state-exams/exam-page.test.ts"
+            ],
+            "produces": [
+              "`persistenceExam(spec: PersistenceExamSpec): void`",
+              "`runPersistenceExam(spec: PersistenceExamSpec, opts?: ExamOptions): Promise<ExamOutcome>`",
+              "`contentOf(stamped: unknown): Snapshot`",
+              "`PersistenceExamSpec`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "3",
+          "title": "The two persistence exams on the fixture \u2014 a todo added survives a reload, a todo completed survives a reload",
+          "files": [
+            "state-exams/expected/default-todos-first-done.json",
+            "state-exams/expected/default-todos-plus-buy-milk.json",
+            "state-exams/seeds/default-todos.json",
+            "tests/state-exams/added-todo-survives-reload.test.ts",
+            "tests/state-exams/completed-todo-survives-reload.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`persistenceExam(spec: PersistenceExamSpec): void`",
+              "`__TINYAPP_DB__`",
+              "`__TINYAPP_PERSISTER__`"
+            ],
+            "produces": [
+              "none"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "state-exams/expected/default-todos-first-done.json",
+            "state-exams/expected/default-todos-plus-buy-milk.json",
+            "state-exams/seeds/default-todos.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/added-todo-survives-reload.test.ts",
+            "tests/state-exams/completed-todo-survives-reload.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/added-todo-survives-reload.test.ts tests/state-exams/completed-todo-survives-reload.test.ts",
+          "proofRuns": [],
+          "proofGuards": [
+            "tests/state-exams/added-todo-survives-reload.test.ts",
+            "tests/state-exams/completed-todo-survives-reload.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "state-exams/expected/default-todos-first-done.json",
+              "state-exams/expected/default-todos-plus-buy-milk.json",
+              "state-exams/seeds/default-todos.json",
+              "tests/state-exams/added-todo-survives-reload.test.ts",
+              "tests/state-exams/completed-todo-survives-reload.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/added-todo-survives-reload.test.ts",
+              "tests/state-exams/completed-todo-survives-reload.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/added-todo-survives-reload.test.ts",
+              "tests/state-exams/completed-todo-survives-reload.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/added-todo-survives-reload.test.ts": "tests/state-exams/added-todo-survives-reload.test.ts",
+              "tests/state-exams/completed-todo-survives-reload.test.ts": "tests/state-exams/completed-todo-survives-reload.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/added-todo-survives-reload.test.ts",
+              "tests/state-exams/completed-todo-survives-reload.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`persistenceExam(spec: PersistenceExamSpec): void`",
+              "`__TINYAPP_DB__`",
+              "`__TINYAPP_PERSISTER__`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 Unseededs",
+      "The two persistence exams on the fixture \u2014 a todo added\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The page contract, one literal for all three tasks: a page opened with no `window.__TINYAPP_SEED__` and with `window.__TINYAPP_EXAM__ === true` sets `window.__TINYAPP_STORE__` to the store it renders from, `window.__TINYAPP_DB__` to the `sqlite3.oo1.DB` handle `getDb()` resolved, and `window.__TINYAPP_PERSISTER__` to its persister only once that persister's `load()` has resolved \u2014 and creates no synchronizer and constructs no `WebSocket`. A seeded page is exactly the page it was at BASE, flag or no flag; an unseeded page without the flag is exactly the page it was at BASE \u2014 handles absent, persister and synchronizer both started. Any other global written on `window` is a finding.\n- No network: the only sockets in a persistence exam are the helper's own loopback ones \u2014 the CDP socket to the Chromium it spawned and the page's requests to the origin the helper serves on `127.0.0.1`. A request to any other origin is failed in the browser before it leaves, a `WebSocket` constructed in the page is a contract breach the exam reports, and nothing in any task reads or dials anything off the machine.\n- Every wall a persistence exam measures \u2014 `persist_ms`, `reload_ms`, the rest of `walls.json` \u2014 is reported on the record and asserted only finite and non-negative; a leg or a Check that bounds a wall is a finding (run-18, 2026-09-16).\n- A persistence exam owns its storage: one browser per exam with its own `--user-data-dir`, one loopback origin per exam with an OS-chosen port, both removed or stopped in a `finally` whatever the verdict, so two exams in one `bun test` never share a `localStorage`.\n- No schema `default` on any cell or value this plan touches, and no cell or value added: `TABLES_SCHEMA` and `VALUES_SCHEMA` are byte-for-byte what they were at BASE, so every seed and expected file on the tree \u2014 twenty snapshots at BASE \u2014 loads through `createTodosStore` to its own content.\n- The linter's four test files under `packages/tinyapp-lint/test/` keep their count and list pins loosened only to containment and tree-computed counts, never re-pinned to a new exact literal (both folds of 2026-09-15); `lint-cli.test.ts` pins the sorted list of `storeData.ts`'s callbacks, so no task exports a new function with a parameter from that module.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run lint:ui",
+        "minor": false
+      },
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- server packages/tinyapp-history packages/tinyapp-lint/src/rules client/src/components client/src/TodoItem.tsx client/src/TodoList.tsx client/src/TodoInput.tsx client/src/index.tsx",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-23/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-23/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-23/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-23/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for regenerateCmd \u2014 the lockfile regenerator is derived from the same lockfile/manifest beside the bootstrap (and only when the bootstrap itself was derived) and stamped in the args file and receipt; there is no knob for it",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "regenerateCmd": "bun install",
+  "regenerateCmdSource": "detected:bun-lockfile"
+}
