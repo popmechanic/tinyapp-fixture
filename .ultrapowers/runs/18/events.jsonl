@@ -43,3 +43,4 @@
 {"kind":"engine:log","line":"task 1 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2ME8ZV00001D1P07KRA2FER","ts":1789539942240}
 {"kind":"worker:end","label":"exam:2","role":"examiner","sessionId":"08d67ef1-45ea-4d33-92a4-11da28aa37a6","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":5466,"output":52208,"cacheRead":5668467,"cacheCreation":124078,"costUsd":5.407543500000001,"models":["claude-opus-5"]},"id":"01M2ME9RVX0000K19V8N2KFFB2","ts":1789539967869}
 {"kind":"transcript:slice","label":"exam:2","sessionId":"08d67ef1-45ea-4d33-92a4-11da28aa37a6","bytes":11316,"id":"01M2ME9RW5000080XVPV5WQJT0","ts":1789539967877}
+{"kind":"driver:attention","task":"2","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2MEA1RW000038Y953G1NWE2","ts":1789539976988}
