@@ -1,0 +1,482 @@
+{
+  "ok": true,
+  "stamp": "run-24",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-24"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "3 task(s) in 2 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The tags cell, the tag value and their readings \u2014 `todoTags.ts` is the one spelling, and the count line says how many are tagged",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/DoneCount.tsx",
+          "client/src/storeData.ts",
+          "client/src/todoTags.ts",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/two-todos-second-tagged.json",
+          "tests/state-exams/set-filter.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+            "`setTagFilter(store: TodosStore, tag: string): void`",
+            "`parseTags(text: string): string[]`",
+            "`normalizeTags(text: string): string`",
+            "`isNormalizedTags(tags: string): boolean`",
+            "`tagsInUse(table: Record<string, {tags?: string}>): string[]`",
+            "`countTagged(table: Record<string, {tags?: string}>): number`",
+            "`activeTag(value: unknown, inUse: readonly string[]): string`",
+            "`hasTag(tags: string | undefined, tag: string): boolean`",
+            "`TABLES_SCHEMA`",
+            "`VALUES_SCHEMA`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The tags box on every row \u2014 what I type is what the todo carries",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/TagsInput.tsx",
+          "client/src/TodoItem.tsx",
+          "tests/state-exams/type-due-date.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+            "`normalizeTags(text: string): string`",
+            "`TABLES_SCHEMA`"
+          ],
+          "produces": [
+            "`TagsInput`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "One chip per tag in use \u2014 clicking a chip shows only the todos wearing that tag",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/FilterBar.tsx",
+          "client/src/TodoList.tsx",
+          "packages/tinyapp-lint/test/invariants.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/reachability.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/two-todos-second-tagged-filter-home.json",
+          "state-exams/seeds/two-todos-second-tagged.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`setTagFilter(store: TodosStore, tag: string): void`",
+            "`tagsInUse(table: Record<string, {tags?: string}>): string[]`",
+            "`activeTag(value: unknown, inUse: readonly string[]): string`",
+            "`hasTag(tags: string | undefined, tag: string): boolean`",
+            "`VALUES_SCHEMA`"
+          ],
+          "produces": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ],
+      [
+        "2",
+        "3"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The tags cell, the tag value and their readings \u2014 `todoTags.ts` is the one spelling, and the count line says how many are tagged",
+          "files": [
+            "client/src/DoneCount.tsx",
+            "client/src/storeData.ts",
+            "client/src/todoTags.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-tagged.json",
+            "tests/state-exams/set-filter.test.ts",
+            "tests/state-exams/set-todo-tags.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+              "`setTagFilter(store: TodosStore, tag: string): void`",
+              "`parseTags(text: string): string[]`",
+              "`normalizeTags(text: string): string`",
+              "`isNormalizedTags(tags: string): boolean`",
+              "`tagsInUse(table: Record<string, {tags?: string}>): string[]`",
+              "`countTagged(table: Record<string, {tags?: string}>): number`",
+              "`activeTag(value: unknown, inUse: readonly string[]): string`",
+              "`hasTag(tags: string | undefined, tag: string): boolean`",
+              "`TABLES_SCHEMA`",
+              "`VALUES_SCHEMA`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/DoneCount.tsx",
+            "client/src/storeData.ts",
+            "client/src/todoTags.ts",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-tagged.json",
+            "tests/state-exams/set-filter.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/set-todo-tags.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/set-todo-tags.test.ts",
+          "proofRuns": [
+            "bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts",
+            "bun test tests/state-exams/done-count.test.ts tests/state-exams/filter-bar.test.ts tests/state-exams/set-filter.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/set-todo-tags.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/DoneCount.tsx",
+              "client/src/storeData.ts",
+              "client/src/todoTags.ts",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/two-todos-second-tagged.json",
+              "tests/state-exams/set-filter.test.ts",
+              "tests/state-exams/set-todo-tags.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/set-todo-tags.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/set-todo-tags.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/set-todo-tags.test.ts": "tests/state-exams/set-todo-tags.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/set-todo-tags.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+              "`setTagFilter(store: TodosStore, tag: string): void`",
+              "`parseTags(text: string): string[]`",
+              "`normalizeTags(text: string): string`",
+              "`isNormalizedTags(tags: string): boolean`",
+              "`tagsInUse(table: Record<string, {tags?: string}>): string[]`",
+              "`countTagged(table: Record<string, {tags?: string}>): number`",
+              "`activeTag(value: unknown, inUse: readonly string[]): string`",
+              "`hasTag(tags: string | undefined, tag: string): boolean`",
+              "`TABLES_SCHEMA`",
+              "`VALUES_SCHEMA`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "The tags box on every row \u2014 what I type is what the todo carries",
+          "files": [
+            "client/src/TagsInput.tsx",
+            "client/src/TodoItem.tsx",
+            "tests/state-exams/type-due-date.test.ts",
+            "tests/state-exams/type-tags.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+              "`normalizeTags(text: string): string`",
+              "`TABLES_SCHEMA`"
+            ],
+            "produces": [
+              "`TagsInput`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/TagsInput.tsx",
+            "client/src/TodoItem.tsx",
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/type-tags.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/type-tags.test.ts",
+          "proofRuns": [
+            "bun test tests/state-exams/type-due-date.test.ts tests/state-exams/styled-page.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/type-tags.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/TagsInput.tsx",
+              "client/src/TodoItem.tsx",
+              "tests/state-exams/type-due-date.test.ts",
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/type-tags.test.ts": "tests/state-exams/type-tags.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/FilterBar.tsx",
+              "client/src/TodoList.tsx",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/two-todos-second-tagged-filter-home.json",
+              "state-exams/seeds/two-todos-second-tagged.json",
+              "tests/state-exams/tag-filter.test.ts"
+            ],
+            "produces": [
+              "`TagsInput`"
+            ],
+            "consumes": [
+              "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+              "`normalizeTags(text: string): string`",
+              "`TABLES_SCHEMA`"
+            ]
+          }
+        },
+        {
+          "id": "3",
+          "title": "One chip per tag in use \u2014 clicking a chip shows only the todos wearing that tag",
+          "files": [
+            "client/src/FilterBar.tsx",
+            "client/src/TodoList.tsx",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-tagged-filter-home.json",
+            "state-exams/seeds/two-todos-second-tagged.json",
+            "tests/state-exams/tag-filter.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`setTagFilter(store: TodosStore, tag: string): void`",
+              "`tagsInUse(table: Record<string, {tags?: string}>): string[]`",
+              "`activeTag(value: unknown, inUse: readonly string[]): string`",
+              "`hasTag(tags: string | undefined, tag: string): boolean`",
+              "`VALUES_SCHEMA`"
+            ],
+            "produces": [
+              "none"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/FilterBar.tsx",
+            "client/src/TodoList.tsx",
+            "packages/tinyapp-lint/test/invariants.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/reachability.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/two-todos-second-tagged-filter-home.json",
+            "state-exams/seeds/two-todos-second-tagged.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/tag-filter.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/tag-filter.test.ts",
+          "proofRuns": [
+            "bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts",
+            "bun test tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/set-filter.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/tag-filter.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/FilterBar.tsx",
+              "client/src/TodoList.tsx",
+              "packages/tinyapp-lint/test/invariants.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/reachability.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/two-todos-second-tagged-filter-home.json",
+              "state-exams/seeds/two-todos-second-tagged.json",
+              "tests/state-exams/tag-filter.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/tag-filter.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/tag-filter.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/tag-filter.test.ts": "tests/state-exams/tag-filter.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/tag-filter.test.ts"
+            ],
+            "siblingOwned": [
+              "client/src/TagsInput.tsx",
+              "client/src/TodoItem.tsx",
+              "tests/state-exams/type-due-date.test.ts",
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "produces": [],
+            "consumes": [
+              "`setTagFilter(store: TodosStore, tag: string): void`",
+              "`tagsInUse(table: Record<string, {tags?: string}>): string[]`",
+              "`activeTag(value: unknown, inUse: readonly string[]): string`",
+              "`hasTag(tags: string | undefined, tag: string): boolean`",
+              "`VALUES_SCHEMA`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The tags cell, the tag value and their readings \u2014 `todo\u2026",
+      "2 parallel tasks"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The synced shape is untouched: `client/src/Store.tsx` \u2014 the one `MergeableStore`, its `createSqliteWasmPersister` and its `createWsSynchronizer` \u2014 and `server/` are byte-identical to BASE, and the tags ride the store like every other cell. A task that opens a second store, a second socket or a second persister is a finding.\n- No new dependency: `package.json`, `client/package.json`, `server/package.json` and `bun.lock` are byte-identical to BASE. Every import this plan adds resolves against what is already installed.\n- The design system's tokens and nothing else: a colour is a declared token of `client/src/index.css`, a class is one Tailwind generates, a shadcn component (`Button`, `Input`, `Badge`) is restyled only through its variants \u2014 the six `@shadcn/lint` rules are the definition and `bun run lint:ui`'s word is final. A raw colour, an inline `style=`, an arbitrary value or a class outside the system is a finding.\n- No schema `default` on the `tags` cell or the `tag` value: a todo with no tags has no `tags` cell, a store with no tag filter has no `tag` value, and every seed and expected file checked in before this plan loads through `createTodosStore` to itself byte for byte. A `default` on anything this plan adds is a finding.\n- Every control this plan adds carries an accessible name \u2014 the tags box is named `Tags for <todo text>`, a chip is named `Tag <tag>` \u2014 and every interaction in an exam names its control by role and name; a view selector is an id, a tag, a `data-*` attribute or shadcn's `data-slot`, never a class of the app's own.\n- `#doneCount`'s text stays exactly `<n> of <m> done`: the linter's own exam pins the literal `<span id=\"doneCount\">1 of 2 done</span>`, so the tagged total is its own element `#taggedCount` beside it and never a change to that span.\n- The linter's four test files under `packages/tinyapp-lint/test/` keep their count and list pins loosened only to containment and tree-computed counts, never re-pinned to a new exact literal (both folds of 2026-09-15). The same rule holds for any exam already on the tree that a task loosens: a pin on the number of inputs in a row is loosened to the id of the one it meant, never re-pinned to the new number.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run lint:ui",
+        "minor": false
+      },
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/config.ts client/src/index.css client/src/components packages/tinyapp-exam packages/tinyapp-lint/src packages/tinyapp-history package.json client/package.json server/package.json bun.lock",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-24/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-24/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-24/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-24/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for regenerateCmd \u2014 the lockfile regenerator is derived from the same lockfile/manifest beside the bootstrap (and only when the bootstrap itself was derived) and stamped in the args file and receipt; there is no knob for it",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "regenerateCmd": "bun install",
+  "regenerateCmdSource": "detected:bun-lockfile"
+}
