@@ -73,3 +73,6 @@
 {"kind":"worker:end","label":"review:2:1","role":"reviewer","sessionId":"a7ce707f-5f8f-443a-b850-6a2b5e82bc2b","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":11825,"output":18928,"cacheRead":1315066,"cacheCreation":93391,"costUsd":2.1237679999999997,"models":["claude-opus-5"]},"id":"01M2NXVA560000P4TS4378Q0K1","ts":1789589825702}
 {"kind":"transcript:slice","label":"review:2:1","sessionId":"a7ce707f-5f8f-443a-b850-6a2b5e82bc2b","bytes":11492,"id":"01M2NXVA5J00007H4KYBXZ0CZJ","ts":1789589825714}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2NXVA8H0000YHQPQC575N5N","ts":1789589825809}
+{"kind":"driver:wave-adopted","wave":1,"tasks":["1","2"],"headSha":"7dabbb9fc28055f08fcb6d18f8bf8416964f959a","why":"released","released":["3"],"applied":{"1":"base","2":"base"},"id":"01M2NY90DD0000V61QB4EG71KQ","ts":1789590274477}
+{"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2NY90FS000050R3V3K0C6JC","ts":1789590274553}
+{"kind":"driver:integrated-check","cmd":"bun run lint:ui","exit":0,"minor":false,"wave":1,"id":"01M2NY915E0000XP40BKETJXNP","ts":1789590275246}
