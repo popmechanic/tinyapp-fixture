@@ -1,0 +1,913 @@
+{
+  "ok": true,
+  "stamp": "run-20",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-20"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "5 task(s) in 3 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Every package the plan needs, installed once \u2014 the one writer of the manifests and the lockfile",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "client/package.json",
+          "package.json",
+          "packages/tinyapp-exam/package.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`bun.lock`",
+            "`lint:ui`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "shadcn/ui installed on the client \u2014 Tailwind v4 on Vite, the tokens, the four components",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/components.json",
+          "client/src/components/ui/badge.tsx",
+          "client/src/components/ui/button.tsx",
+          "client/src/components/ui/checkbox.tsx",
+          "client/src/components/ui/input.tsx",
+          "client/src/index.css",
+          "client/src/index.tsx",
+          "client/src/lib/utils.ts",
+          "client/tsconfig.json",
+          "client/vite.config.js"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`bun.lock`"
+          ],
+          "produces": [
+            "`Button`",
+            "`Input`",
+            "`Checkbox`",
+            "`Badge`",
+            "`client/src/index.css`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The exam finds a control by role and name \u2014 and reads a shadcn page",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/browser.ts",
+          "packages/tinyapp-exam/src/index.ts",
+          "packages/tinyapp-exam/src/render-move.ts",
+          "packages/tinyapp-exam/src/types.ts",
+          "packages/tinyapp-lint/src/rules/views.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`bun.lock`"
+          ],
+          "produces": [
+            "`Locator`",
+            "`act(action: Action): Promise<void>`",
+            "`assertView(html: string, views: View | View[] | undefined): string[]`",
+            "`bundleOf(entryPath: string, entryHtml: string, opts?: {minify?: boolean}): Promise<{js: string; css: string}>`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "`lint:ui` \u2014 the six rules as one script, with their own exam",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "eslint.config.mjs"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`bun.lock`",
+            "`lint:ui`"
+          ],
+          "produces": [
+            "`eslint.config.mjs`"
+          ]
+        }
+      },
+      {
+        "id": "5",
+        "title": "The re-platform \u2014 every stylesheet gone, every view and interaction on the system, `lint:ui` green",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/index.html",
+          "client/src/App.tsx",
+          "client/src/Button.tsx",
+          "client/src/ClearCompleted.tsx",
+          "client/src/DoneCount.tsx",
+          "client/src/DueInput.tsx",
+          "client/src/FilterBar.tsx",
+          "client/src/Info.tsx",
+          "client/src/Input.tsx",
+          "client/src/Loading.tsx",
+          "client/src/Title.tsx",
+          "client/src/TodoInput.tsx",
+          "client/src/TodoItem.tsx",
+          "client/src/TodoList.tsx",
+          "client/src/TopBar.tsx",
+          "client/src/UndoDelete.tsx",
+          "client/src/button.css",
+          "client/src/filterBar.css",
+          "client/src/index.css",
+          "client/src/info.css",
+          "client/src/input.css",
+          "client/src/loading.css",
+          "client/src/title.css",
+          "client/src/todoInput.css",
+          "client/src/todoItem.css",
+          "client/src/todoList.css",
+          "client/src/topBar.css",
+          "packages/tinyapp-exam/test/browser-exam.test.ts",
+          "packages/tinyapp-lint/test/lint-cli.test.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "tests/state-exams/buy-milk.test.ts",
+          "tests/state-exams/clear-completed.test.ts",
+          "tests/state-exams/click-by-name-completes-todo.test.ts",
+          "tests/state-exams/click-completes-todo.test.ts",
+          "tests/state-exams/completed-past-due-not-overdue.test.ts",
+          "tests/state-exams/delete-to-trash.test.ts",
+          "tests/state-exams/derived-exam.test.ts",
+          "tests/state-exams/design-system-installed.test.ts",
+          "tests/state-exams/done-count.test.ts",
+          "tests/state-exams/due-date-marks-overdue.test.ts",
+          "tests/state-exams/empty-todo-refused.test.ts",
+          "tests/state-exams/enter-submits-todo.test.ts",
+          "tests/state-exams/filter-bar.test.ts",
+          "tests/state-exams/filter-done.test.ts",
+          "tests/state-exams/interaction-evidence.test.ts",
+          "tests/state-exams/mutant-from-diff.test.ts",
+          "tests/state-exams/session-transitions.test.ts",
+          "tests/state-exams/set-filter.test.ts",
+          "tests/state-exams/set-todo-due.test.ts",
+          "tests/state-exams/store-history.test.ts",
+          "tests/state-exams/type-due-date.test.ts",
+          "tests/state-exams/undo-delete.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`Locator`",
+            "`Button`",
+            "`Input`",
+            "`Checkbox`",
+            "`Badge`",
+            "`lint:ui`",
+            "`assertView(html: string, views: View | View[] | undefined): string[]`"
+          ],
+          "produces": [
+            "nothing"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "2",
+        "to": "5",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "2",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "1",
+        "to": "5",
+        "why": "interface"
+      },
+      {
+        "from": "3",
+        "to": "5",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ],
+      [
+        "2",
+        "3",
+        "4"
+      ],
+      [
+        "5"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "Every package the plan needs, installed once \u2014 the one writer of the manifests and the lockfile",
+          "files": [
+            "bun.lock",
+            "client/package.json",
+            "package.json",
+            "packages/tinyapp-exam/package.json",
+            "tests/dependencies-installed.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`bun.lock`",
+              "`lint:ui`"
+            ]
+          },
+          "tier": null,
+          "review": "lean",
+          "writes": [
+            "bun.lock",
+            "client/package.json",
+            "package.json",
+            "packages/tinyapp-exam/package.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/dependencies-installed.test.ts"
+          ],
+          "testCmd": "bun test tests/dependencies-installed.test.ts",
+          "proofRuns": [
+            "bun install --frozen-lockfile",
+            "bun run typecheck",
+            "bun run lint:state"
+          ],
+          "proofGuards": [
+            "tests/dependencies-installed.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "bun.lock",
+              "client/package.json",
+              "package.json",
+              "packages/tinyapp-exam/package.json",
+              "tests/dependencies-installed.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/dependencies-installed.test.ts"
+            ],
+            "proofTests": [
+              "tests/dependencies-installed.test.ts"
+            ],
+            "landing": {
+              "tests/dependencies-installed.test.ts": "tests/dependencies-installed.test.ts"
+            },
+            "driverOwned": [
+              "tests/dependencies-installed.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`bun.lock`",
+              "`lint:ui`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "2",
+          "title": "shadcn/ui installed on the client \u2014 Tailwind v4 on Vite, the tokens, the four components",
+          "files": [
+            "client/components.json",
+            "client/src/components/ui/badge.tsx",
+            "client/src/components/ui/button.tsx",
+            "client/src/components/ui/checkbox.tsx",
+            "client/src/components/ui/input.tsx",
+            "client/src/index.css",
+            "client/src/index.tsx",
+            "client/src/lib/utils.ts",
+            "client/tsconfig.json",
+            "client/vite.config.js",
+            "tests/state-exams/design-system-installed.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`bun.lock`"
+            ],
+            "produces": [
+              "`Button`",
+              "`Input`",
+              "`Checkbox`",
+              "`Badge`",
+              "`client/src/index.css`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/components.json",
+            "client/src/components/ui/badge.tsx",
+            "client/src/components/ui/button.tsx",
+            "client/src/components/ui/checkbox.tsx",
+            "client/src/components/ui/input.tsx",
+            "client/src/index.css",
+            "client/src/index.tsx",
+            "client/src/lib/utils.ts",
+            "client/tsconfig.json",
+            "client/vite.config.js"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/design-system-installed.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/design-system-installed.test.ts",
+          "proofRuns": [
+            "bun run typecheck",
+            "bun install --frozen-lockfile"
+          ],
+          "proofGuards": [
+            "tests/state-exams/design-system-installed.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/components.json",
+              "client/src/components/ui/badge.tsx",
+              "client/src/components/ui/button.tsx",
+              "client/src/components/ui/checkbox.tsx",
+              "client/src/components/ui/input.tsx",
+              "client/src/index.css",
+              "client/src/index.tsx",
+              "client/src/lib/utils.ts",
+              "client/tsconfig.json",
+              "client/vite.config.js",
+              "tests/state-exams/design-system-installed.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/design-system-installed.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/design-system-installed.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/design-system-installed.test.ts": "tests/state-exams/design-system-installed.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/design-system-installed.test.ts"
+            ],
+            "siblingOwned": [
+              "eslint.config.mjs",
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/render-move.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/lint-ui.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts"
+            ],
+            "produces": [
+              "`Button`",
+              "`Input`",
+              "`Checkbox`",
+              "`Badge`",
+              "`client/src/index.css`"
+            ],
+            "consumes": [
+              "`bun.lock`"
+            ]
+          }
+        },
+        {
+          "id": "3",
+          "title": "The exam finds a control by role and name \u2014 and reads a shadcn page",
+          "files": [
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/browser.test.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts",
+            "packages/tinyapp-lint/src/rules/views.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "tests/state-exams/click-by-name-completes-todo.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`bun.lock`"
+            ],
+            "produces": [
+              "`Locator`",
+              "`act(action: Action): Promise<void>`",
+              "`assertView(html: string, views: View | View[] | undefined): string[]`",
+              "`bundleOf(entryPath: string, entryHtml: string, opts?: {minify?: boolean}): Promise<{js: string; css: string}>`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/render-move.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-lint/src/rules/views.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/browser.test.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts",
+            "tests/state-exams/click-by-name-completes-todo.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/browser.test.ts packages/tinyapp-exam/test/render-move.test.ts tests/state-exams/click-by-name-completes-todo.test.ts",
+          "proofRuns": [
+            "bunx tsc -p packages/tinyapp-exam --noEmit",
+            "bun install --frozen-lockfile",
+            "grep -q Locator packages/tinyapp-exam/src/index.ts"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/browser.test.ts",
+            "packages/tinyapp-exam/test/render-move.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "tests/state-exams/click-by-name-completes-todo.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/render-move.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-exam/test/browser.test.ts": "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts": "packages/tinyapp-exam/test/render-move.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts": "tests/state-exams/click-by-name-completes-todo.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts"
+            ],
+            "siblingOwned": [
+              "client/components.json",
+              "client/src/components/ui/badge.tsx",
+              "client/src/components/ui/button.tsx",
+              "client/src/components/ui/checkbox.tsx",
+              "client/src/components/ui/input.tsx",
+              "client/src/index.css",
+              "client/src/index.tsx",
+              "client/src/lib/utils.ts",
+              "client/tsconfig.json",
+              "client/vite.config.js",
+              "eslint.config.mjs",
+              "tests/lint-ui.test.ts",
+              "tests/state-exams/design-system-installed.test.ts"
+            ],
+            "produces": [
+              "`Locator`",
+              "`act(action: Action): Promise<void>`",
+              "`assertView(html: string, views: View | View[] | undefined): string[]`",
+              "`bundleOf(entryPath: string, entryHtml: string, opts?: {minify?: boolean}): Promise<{js: string; css: string}>`"
+            ],
+            "consumes": [
+              "`bun.lock`"
+            ]
+          }
+        },
+        {
+          "id": "4",
+          "title": "`lint:ui` \u2014 the six rules as one script, with their own exam",
+          "files": [
+            "eslint.config.mjs",
+            "tests/lint-ui.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`bun.lock`",
+              "`lint:ui`"
+            ],
+            "produces": [
+              "`eslint.config.mjs`"
+            ]
+          },
+          "tier": null,
+          "review": "lean",
+          "writes": [
+            "eslint.config.mjs"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/lint-ui.test.ts"
+          ],
+          "testCmd": "bun test tests/lint-ui.test.ts",
+          "proofRuns": [
+            "bun install --frozen-lockfile"
+          ],
+          "proofGuards": [
+            "tests/lint-ui.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "eslint.config.mjs",
+              "tests/lint-ui.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/lint-ui.test.ts"
+            ],
+            "proofTests": [
+              "tests/lint-ui.test.ts"
+            ],
+            "landing": {
+              "tests/lint-ui.test.ts": "tests/lint-ui.test.ts"
+            },
+            "driverOwned": [
+              "tests/lint-ui.test.ts"
+            ],
+            "siblingOwned": [
+              "client/components.json",
+              "client/src/components/ui/badge.tsx",
+              "client/src/components/ui/button.tsx",
+              "client/src/components/ui/checkbox.tsx",
+              "client/src/components/ui/input.tsx",
+              "client/src/index.css",
+              "client/src/index.tsx",
+              "client/src/lib/utils.ts",
+              "client/tsconfig.json",
+              "client/vite.config.js",
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/render-move.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/browser.test.ts",
+              "packages/tinyapp-exam/test/render-move.test.ts",
+              "packages/tinyapp-lint/src/rules/views.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts",
+              "tests/state-exams/design-system-installed.test.ts"
+            ],
+            "produces": [
+              "`eslint.config.mjs`"
+            ],
+            "consumes": [
+              "`bun.lock`",
+              "`lint:ui`"
+            ]
+          }
+        }
+      ],
+      [
+        {
+          "id": "5",
+          "title": "The re-platform \u2014 every stylesheet gone, every view and interaction on the system, `lint:ui` green",
+          "files": [
+            "client/index.html",
+            "client/src/App.tsx",
+            "client/src/ClearCompleted.tsx",
+            "client/src/DoneCount.tsx",
+            "client/src/DueInput.tsx",
+            "client/src/FilterBar.tsx",
+            "client/src/Info.tsx",
+            "client/src/Loading.tsx",
+            "client/src/Title.tsx",
+            "client/src/TodoInput.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/TodoList.tsx",
+            "client/src/TopBar.tsx",
+            "client/src/UndoDelete.tsx",
+            "client/src/index.css",
+            "packages/tinyapp-exam/test/browser-exam.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "tests/state-exams/buy-milk.test.ts",
+            "tests/state-exams/clear-completed.test.ts",
+            "tests/state-exams/click-by-name-completes-todo.test.ts",
+            "tests/state-exams/click-completes-todo.test.ts",
+            "tests/state-exams/completed-past-due-not-overdue.test.ts",
+            "tests/state-exams/delete-to-trash.test.ts",
+            "tests/state-exams/derived-exam.test.ts",
+            "tests/state-exams/design-system-installed.test.ts",
+            "tests/state-exams/done-count.test.ts",
+            "tests/state-exams/due-date-marks-overdue.test.ts",
+            "tests/state-exams/empty-todo-refused.test.ts",
+            "tests/state-exams/enter-submits-todo.test.ts",
+            "tests/state-exams/filter-bar.test.ts",
+            "tests/state-exams/filter-done.test.ts",
+            "tests/state-exams/interaction-evidence.test.ts",
+            "tests/state-exams/mutant-from-diff.test.ts",
+            "tests/state-exams/session-transitions.test.ts",
+            "tests/state-exams/set-filter.test.ts",
+            "tests/state-exams/set-todo-due.test.ts",
+            "tests/state-exams/store-history.test.ts",
+            "tests/state-exams/styled-page.test.ts",
+            "tests/state-exams/type-due-date.test.ts",
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`Locator`",
+              "`Button`",
+              "`Input`",
+              "`Checkbox`",
+              "`Badge`",
+              "`lint:ui`",
+              "`assertView(html: string, views: View | View[] | undefined): string[]`"
+            ],
+            "produces": [
+              "nothing"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/index.html",
+            "client/src/App.tsx",
+            "client/src/Button.tsx",
+            "client/src/ClearCompleted.tsx",
+            "client/src/DoneCount.tsx",
+            "client/src/DueInput.tsx",
+            "client/src/FilterBar.tsx",
+            "client/src/Info.tsx",
+            "client/src/Input.tsx",
+            "client/src/Loading.tsx",
+            "client/src/Title.tsx",
+            "client/src/TodoInput.tsx",
+            "client/src/TodoItem.tsx",
+            "client/src/TodoList.tsx",
+            "client/src/TopBar.tsx",
+            "client/src/UndoDelete.tsx",
+            "client/src/button.css",
+            "client/src/filterBar.css",
+            "client/src/index.css",
+            "client/src/info.css",
+            "client/src/input.css",
+            "client/src/loading.css",
+            "client/src/title.css",
+            "client/src/todoInput.css",
+            "client/src/todoItem.css",
+            "client/src/todoList.css",
+            "client/src/topBar.css",
+            "packages/tinyapp-exam/test/browser-exam.test.ts",
+            "packages/tinyapp-lint/test/lint-cli.test.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "tests/state-exams/buy-milk.test.ts",
+            "tests/state-exams/clear-completed.test.ts",
+            "tests/state-exams/click-by-name-completes-todo.test.ts",
+            "tests/state-exams/click-completes-todo.test.ts",
+            "tests/state-exams/completed-past-due-not-overdue.test.ts",
+            "tests/state-exams/delete-to-trash.test.ts",
+            "tests/state-exams/derived-exam.test.ts",
+            "tests/state-exams/design-system-installed.test.ts",
+            "tests/state-exams/done-count.test.ts",
+            "tests/state-exams/due-date-marks-overdue.test.ts",
+            "tests/state-exams/empty-todo-refused.test.ts",
+            "tests/state-exams/enter-submits-todo.test.ts",
+            "tests/state-exams/filter-bar.test.ts",
+            "tests/state-exams/filter-done.test.ts",
+            "tests/state-exams/interaction-evidence.test.ts",
+            "tests/state-exams/mutant-from-diff.test.ts",
+            "tests/state-exams/session-transitions.test.ts",
+            "tests/state-exams/set-filter.test.ts",
+            "tests/state-exams/set-todo-due.test.ts",
+            "tests/state-exams/store-history.test.ts",
+            "tests/state-exams/type-due-date.test.ts",
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/styled-page.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/styled-page.test.ts",
+          "proofRuns": [
+            "bun run lint:ui",
+            "test \"$(ls client/src/*.css)\" = client/src/index.css",
+            "bun test tests/state-exams",
+            "bun test packages/tinyapp-lint packages/tinyapp-exam",
+            "test \"$(git diff --name-status $ULTRA_BASE -- tests/state-exams | grep -c -E '^[DR]')\" -eq 0"
+          ],
+          "proofGuards": [
+            "tests/state-exams/styled-page.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/index.html",
+              "client/src/App.tsx",
+              "client/src/Button.tsx",
+              "client/src/ClearCompleted.tsx",
+              "client/src/DoneCount.tsx",
+              "client/src/DueInput.tsx",
+              "client/src/FilterBar.tsx",
+              "client/src/Info.tsx",
+              "client/src/Input.tsx",
+              "client/src/Loading.tsx",
+              "client/src/Title.tsx",
+              "client/src/TodoInput.tsx",
+              "client/src/TodoItem.tsx",
+              "client/src/TodoList.tsx",
+              "client/src/TopBar.tsx",
+              "client/src/UndoDelete.tsx",
+              "client/src/button.css",
+              "client/src/filterBar.css",
+              "client/src/index.css",
+              "client/src/info.css",
+              "client/src/input.css",
+              "client/src/loading.css",
+              "client/src/title.css",
+              "client/src/todoInput.css",
+              "client/src/todoItem.css",
+              "client/src/todoList.css",
+              "client/src/topBar.css",
+              "packages/tinyapp-exam/test/browser-exam.test.ts",
+              "packages/tinyapp-lint/test/lint-cli.test.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "tests/state-exams/buy-milk.test.ts",
+              "tests/state-exams/clear-completed.test.ts",
+              "tests/state-exams/click-by-name-completes-todo.test.ts",
+              "tests/state-exams/click-completes-todo.test.ts",
+              "tests/state-exams/completed-past-due-not-overdue.test.ts",
+              "tests/state-exams/delete-to-trash.test.ts",
+              "tests/state-exams/derived-exam.test.ts",
+              "tests/state-exams/design-system-installed.test.ts",
+              "tests/state-exams/done-count.test.ts",
+              "tests/state-exams/due-date-marks-overdue.test.ts",
+              "tests/state-exams/empty-todo-refused.test.ts",
+              "tests/state-exams/enter-submits-todo.test.ts",
+              "tests/state-exams/filter-bar.test.ts",
+              "tests/state-exams/filter-done.test.ts",
+              "tests/state-exams/interaction-evidence.test.ts",
+              "tests/state-exams/mutant-from-diff.test.ts",
+              "tests/state-exams/session-transitions.test.ts",
+              "tests/state-exams/set-filter.test.ts",
+              "tests/state-exams/set-todo-due.test.ts",
+              "tests/state-exams/store-history.test.ts",
+              "tests/state-exams/styled-page.test.ts",
+              "tests/state-exams/type-due-date.test.ts",
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "deletes": [
+              "client/src/Button.tsx",
+              "client/src/Input.tsx",
+              "client/src/button.css",
+              "client/src/filterBar.css",
+              "client/src/info.css",
+              "client/src/input.css",
+              "client/src/loading.css",
+              "client/src/title.css",
+              "client/src/todoInput.css",
+              "client/src/todoItem.css",
+              "client/src/todoList.css",
+              "client/src/topBar.css"
+            ],
+            "guards": [
+              "tests/state-exams/styled-page.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/styled-page.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/styled-page.test.ts": "tests/state-exams/styled-page.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/styled-page.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`Locator`",
+              "`Button`",
+              "`Input`",
+              "`Checkbox`",
+              "`Badge`",
+              "`lint:ui`",
+              "`assertView(html: string, views: View | View[] | undefined): string[]`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "Every package the plan needs, installed once \u2014 the one \u2026",
+      "3 parallel tasks",
+      "The re-platform \u2014 every stylesheet gone, every view and\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The store is untouched: `client/src/storeData.ts` is byte-identical to BASE, no callback, cell, value or `default` is added, and no file under `state-exams/` is created, edited or deleted \u2014 every exam of this plan reaches a state that is already on the tree. A schema `default` anywhere is a finding.\n- `bun run lint:ui` is this plan's deliverable, so it is not a `Check:` of this plan: at BASE the script does not exist, the driver runs every `Check:` in every clone of waves 1 and 2 and on each adopted tree, and a missing script \u2014 or, once Task 1 writes it, the app's own seven baseline findings \u2014 is a red blocking check that would fail a wave before Task 5 could make it green. It runs instead as Task 5's `Run:` (paid once, in the wave-3 clone and again on the adopted tree). From the next fixture plan on, every plan carries `- Check: bun run lint:ui`, blocking; `(minor)` on that line is the experiment's rollback.\n- In the system means: a colour is a declared token, a size is on the scale, a class is one Tailwind generates, a shadcn component is restyled only through its variants \u2014 the six `@shadcn/lint` rules are the definition and the linter's word is final. A class the linter flags, an inline `style=`, or a `<style>` element in `client/index.html` is a finding; `client/src/index.css` is the one stylesheet and the one place a colour is written.\n- Every interactive element carries an accessible name (`aria-label` or visible text), every interaction in an exam names its control by role and name, and every view selector is an id, a tag, a `data-*` attribute or shadcn's `data-slot` \u2014 never one of the app's own classes. A control the accessibility tree cannot name is a red exam that says so.\n- The linter's four test files under `packages/tinyapp-lint/test/` keep their count and list pins loosened only to containment and tree-computed counts, never re-pinned to a new exact literal (both folds of 2026-09-15); a selector or markup literal in them follows the markup, that is all.\n- One writer for the manifests: Task 1 alone edits `package.json`, `client/package.json`, `packages/tinyapp-exam/package.json` and `bun.lock`, and the lockfile is regenerated by `bun install`, never by hand. Every other task leaves all four byte-identical to the tree it started from \u2014 a diff to any of them in Tasks 2\u20135 is a finding \u2014 and `bun install --frozen-lockfile` (a `Run:` of Tasks 2, 3 and 4, and `render-move.test.ts`'s own leg) is what reads that.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- client/src/storeData.ts server packages/tinyapp-history state-exams README.md",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-20/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-20/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-20/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-20/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
