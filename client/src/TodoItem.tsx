@@ -1,6 +1,7 @@
 import './todoItem.css';
 import {
   deleteTodo,
+  pinTodo,
   setTodoCompleted,
   useRow,
   useStore,
@@ -31,14 +32,27 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
     }
   };
 
+  // `pinned` is optional on `TodoRow`, like `due`: an unpinned todo has no
+  // cell at all, so the absence reads as `false` here rather than anywhere
+  // downstream.
+  const pinned = todo.pinned === true;
+
+  const handlePin = () => {
+    if (store) {
+      pinTodo(store, rowId, !pinned);
+    }
+  };
+
   return (
-    // `data-overdue` is written on both branches, so a view can assert the
-    // `"false"` case with `attr` rather than having to spell it as an absence.
+    // `data-overdue` and `data-pinned` are written on both branches, so a view
+    // can assert the `"false"` case with `attr` rather than having to spell it
+    // as an absence.
     <div
       className={`todoItem${todo.completed ? ' completed' : ''}${
         overdue ? ' overdue' : ''
-      }`}
+      }${pinned ? ' pinned' : ''}`}
       data-overdue={overdue ? 'true' : 'false'}
+      data-pinned={pinned ? 'true' : 'false'}
     >
       <input
         type="checkbox"
@@ -51,6 +65,12 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
       <DueInput rowId={rowId} due={todo.due ?? ''} />
 
       <Button onClick={handleDelete}>Delete</Button>
+      {/* After Delete, deliberately: the exams already on the tree click a
+          row's Delete as the first `.todoItem button`, and a button placed
+          before it would take that click. */}
+      <button id={`pin-${rowId}`} type="button" onClick={handlePin}>
+        {pinned ? 'Unpin' : 'Pin'}
+      </button>
     </div>
   );
 };

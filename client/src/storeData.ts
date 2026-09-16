@@ -19,6 +19,10 @@ const TODO_CELLS = {
   // into every seed and expected state already checked in. Without one, a
   // todo that has no date has no `due` cell at all.
   due: {type: 'string'},
+  // No default either, and for `due`'s reason: a `pinned: false` materialised
+  // into every row would rewrite all eighteen snapshots checked in before the
+  // cell existed. A todo that is not pinned has no `pinned` cell at all.
+  pinned: {type: 'boolean'},
 } as const;
 
 export const TABLES_SCHEMA = {
@@ -155,6 +159,28 @@ export const setTodoDue = (store: TodosStore, id: string, due: string): void => 
     store.delCell('todos', id, 'due');
   } else if (isIsoDate(due)) {
     store.setPartialRow('todos', id, {due});
+  }
+};
+
+/**
+ * Pins todo `id`, or unpins it.
+ *
+ * Unpinning deletes the cell rather than writing `false`, so a todo that has
+ * been pinned and unpinned is byte for byte the todo it was — the shape every
+ * snapshot checked in before the cell existed still has. A `delCell` of a cell
+ * that is not there is a no-op, so unpinning an unpinned todo is one too.
+ *
+ * An id the list does not hold is left alone: `setPartialRow` on a missing row
+ * would create a phantom row out of the schema's defaults rather than fail.
+ */
+export const pinTodo = (store: TodosStore, id: string, pinned: boolean): void => {
+  if (!store.hasRow('todos', id)) {
+    return;
+  }
+  if (pinned) {
+    store.setPartialRow('todos', id, {pinned: true});
+  } else {
+    store.delCell('todos', id, 'pinned');
   }
 };
 
