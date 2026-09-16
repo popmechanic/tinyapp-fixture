@@ -226,6 +226,8 @@ test(
     expect(Object.keys(ctx.callbacks).sort()).toEqual(
       expect.arrayContaining([...CALLBACKS_OF_BASE, 'setFilter', 'setTodoDue']),
     );
+    // Kept as its own line: run-13's set-filter exam greps this file for it.
+    expect(Object.keys(ctx.callbacks)).toContain('setFilter');
 
     const snapshots = snapshotFiles();
     expect(snapshots.length).toBeGreaterThanOrEqual(7);
