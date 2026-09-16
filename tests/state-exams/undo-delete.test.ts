@@ -165,10 +165,11 @@ for (const [leg, what, line] of [
 
 // --- Leg (a) [M1]: the one state exam of this file ---------------------------
 
-// Clicking the first `.todoItem`'s `button` — its Delete, the only button in the
-// row, and rows render ascending by id — deletes row `'0'`; clicking
-// `#undoDelete`, which exists only because that row is now waiting, puts it
-// back. The page store's `getContent()` is then deep-equal to the seed content,
+// Clicking the button named `Delete buy milk` — row `0`'s Delete — deletes row
+// `'0'`; clicking the button named `Undo`, which exists only because that row is
+// now waiting, puts it back. Both are named the way a person would name them,
+// and the second has no name to carry until the first has run.
+// The page store's `getContent()` is then deep-equal to the seed content,
 // the page shows exactly the two todos and the button is gone, and the mutant
 // that drops row `'0'` from the expected state is killed — so an exam that never
 // looked at the restored row could not have passed.
@@ -177,11 +178,14 @@ stateExam({
   entry: 'client/index.html',
   seed: 'state-exams/seeds/two-open-todos.json',
   store: () => createTodosStore(),
-  action: [{click: '.todoItem button'}, {click: '#undoDelete'}],
+  action: [
+    {click: {role: 'button', name: 'Delete buy milk'}},
+    {click: {role: 'button', name: 'Undo'}},
+  ],
   expected: 'state-exams/expected/two-open-todos-restored.json',
   view: [
     {selector: '#undoDelete', absent: true},
-    {selector: '.todoItem', count: 2},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: [{table: 'todos', row: '0', absent: true}],
 });

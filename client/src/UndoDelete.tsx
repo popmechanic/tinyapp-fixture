@@ -1,3 +1,5 @@
+import {Button} from '@/components/ui/button';
+
 import {useStore, useTable, type TodosStore, STORE_ID} from './Store';
 import {undoDelete} from './storeData';
 
@@ -19,8 +21,13 @@ export const UndoDelete = () => {
   }
 
   return (
-    <button id="undoDelete" type="button" onClick={handleUndoDelete}>
+    <Button
+      id="undoDelete"
+      variant="outline"
+      className="mt-4 ml-2"
+      onClick={handleUndoDelete}
+    >
       Undo
-    </button>
+    </Button>
   );
 };

@@ -62,8 +62,8 @@ stateExam({
   },
   expected: 'state-exams/expected/one-open-todo.json',
   view: [
-    {selector: '.todoItem', count: 1, text: 'buy milk'},
-    {selector: '.todoItem input[type=checkbox]', unchecked: true},
+    {selector: '#todoList li', count: 1, text: 'buy milk'},
+    {selector: '#todoList li [role=checkbox]', unchecked: true},
     {selector: '#clearCompleted', count: 1, text: 'Clear completed'},
   ],
   mutant: [

@@ -86,16 +86,16 @@ const RUN_7: ExamSpec = {
   seed: 'state-exams/seeds/two-open-todos.json',
   expected: 'state-exams/expected/two-todos-one-done.json',
   view: [
-    {selector: '.todoItem input[type=checkbox]', checked: true},
-    {selector: '.todoItem', count: 2},
+    {selector: '#todoList li [role=checkbox]', checked: true},
+    {selector: '#todoList li', count: 2},
   ],
-  action: [{click: '.todoItem input[type=checkbox]'}],
+  action: [{click: {role: 'checkbox', name: 'buy milk'}}],
 };
 
 /** The line M2 and M6 both pin, character for character. */
 const RUN_7_LINE =
   'tests/state-exams/run-7.test.ts: ' +
-  'view .todoItem input[type=checkbox] over state-exams/expected/two-todos-one-done.json: ' +
+  'view #todoList li [role=checkbox] over state-exams/expected/two-todos-one-done.json: ' +
   'a match is not checked — name the narrower selector: #todo-1';
 
 /** The `seed` and `action` M3–M5 leave open. See this file's header. */
@@ -161,13 +161,13 @@ test(
       ...CARRIED,
       path: 'tests/state-exams/count.test.ts',
       expected: 'state-exams/expected/two-todos-one-done.json',
-      view: {selector: '.todoItem', count: 1},
+      view: {selector: '#todoList li', count: 1},
     });
 
     expect(findings).toHaveLength(1);
     expect(formatFinding(findings[0]!)).toBe(
       'tests/state-exams/count.test.ts: ' +
-        'view .todoItem over state-exams/expected/two-todos-one-done.json: ' +
+        'view #todoList li over state-exams/expected/two-todos-one-done.json: ' +
         'expected 1 matches, found 2 — expect count 2, or name a narrower selector',
     );
   },
@@ -185,7 +185,10 @@ test(
         ...CARRIED,
         path: 'tests/state-exams/corrected.test.ts',
         expected: 'state-exams/expected/two-todos-first-done.json',
-        view: {selector: '.todoItem.completed input[type=checkbox]', checked: true},
+        view: {
+          selector: '#todoList li[data-completed="true"] [role=checkbox]',
+          checked: true,
+        },
       }),
     ).toEqual([]);
 
@@ -195,7 +198,7 @@ test(
       ...CARRIED,
       path: 'tests/state-exams/unchecked.test.ts',
       expected: 'state-exams/expected/two-todos-one-done.json',
-      view: {selector: '.todoItem input[type=checkbox]', unchecked: true},
+      view: {selector: '#todoList li [role=checkbox]', unchecked: true},
     });
 
     expect(findings).toHaveLength(1);
@@ -205,7 +208,7 @@ test(
     expect(findings[0]).toEqual({
       file: 'tests/state-exams/unchecked.test.ts',
       subject:
-        'view .todoItem input[type=checkbox] over state-exams/expected/two-todos-one-done.json',
+        'view #todoList li [role=checkbox] over state-exams/expected/two-todos-one-done.json',
       problem: 'a match is not unchecked',
       fix: 'name the narrower selector: #todo-0',
     });
@@ -234,7 +237,7 @@ test(
       ...CARRIED,
       path: 'tests/state-exams/lost.test.ts',
       expected: 'state-exams/expected/missing.json',
-      view: {selector: '.todoItem input[type=checkbox]', checked: true},
+      view: {selector: '#todoList li [role=checkbox]', checked: true},
     });
 
     expect(findings).toHaveLength(1);
@@ -262,11 +265,11 @@ stateExam({
   clock: '2026-01-01T00:00:00Z',
   entry: 'client/index.html',
   seed: '${RUN_7.seed}',
-  action: [{click: '.todoItem input[type=checkbox]'}],
+  action: [{click: {role: 'checkbox', name: 'buy milk'}}],
   expected: '${RUN_7.expected}',
   view: [
-    {selector: '.todoItem input[type=checkbox]', checked: true},
-    {selector: '.todoItem', count: 2},
+    {selector: '#todoList li [role=checkbox]', checked: true},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: [],
 });
@@ -274,7 +277,7 @@ stateExam({
 
 /** The line M6 pins, for a file whose path the CLI writes against the root. */
 const RUN_7_CLI_LINE =
-  /^state-exams\/lint-tmp-[^/]+\/exams\/run-7\.test\.ts: view \.todoItem input\[type=checkbox\] over state-exams\/expected\/two-todos-one-done\.json: a match is not checked — name the narrower selector: #todo-1$/;
+  /^state-exams\/lint-tmp-[^/]+\/exams\/run-7\.test\.ts: view #todoList li \[role=checkbox\] over state-exams\/expected\/two-todos-one-done\.json: a match is not checked — name the narrower selector: #todo-1$/;
 
 test(
   '(f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line',

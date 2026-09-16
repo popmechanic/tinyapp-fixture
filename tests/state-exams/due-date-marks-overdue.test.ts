@@ -3,27 +3,29 @@
  *
  * Machine, restated:
  *
- *   M1. Typing `2025-12-31` into `input#due-0` on the page seeded from
+ *   M1. Typing `2025-12-31` into the box named `Due date for buy milk` on the
+ *       page seeded from
  *       `state-exams/seeds/two-open-todos.json` reaches exactly
  *       `state-exams/expected/two-todos-first-due.json`, which parses to
  *       `[{"todos": {"0": {"text": "buy milk", "completed": false, "due":
  *       "2025-12-31"}, "1": {"text": "walk the dog", "completed": false}}}, {}]`,
- *       and the page then shows exactly one `.todoItem[data-overdue="true"]`,
- *       holding `buy milk`, exactly one `.todoItem.overdue`, exactly one
- *       `.todoItem[data-overdue="false"]`, holding `walk the dog`, and
- *       `input#due-0` with `value="2025-12-31"`.
- *   M2. `client/src/todoItem.css` holds a rule whose selector is
- *       `.todoItem.overdue label` and whose block sets `color`, so an overdue
- *       row's text is visibly marked.
+ *       and the page then shows exactly one `#todoList li[data-overdue="true"]`,
+ *       holding `buy milk`, exactly one `#todoList li[data-overdue="false"]`,
+ *       holding `walk the dog`, and `#due-0` with `value="2025-12-31"`.
+ *   M2. The overdue row's text is visibly marked — once by
+ *       `client/src/todoItem.css`'s `.todoItem.overdue label { color: … }`, now
+ *       by the utility variant that replaced it: the row's text carries
+ *       `group-data-[overdue=true]:text-primary`, and `--primary` is a token
+ *       declared in `client/src/index.css`.
  *
  * Proof legs, and the tests that carry them:
  *
  *   (a) [M1] the state exam — clock, entry, seed, store, the typing action,
- *            expected, the five view entries and the mutant exactly as the leg
+ *            expected, the four view entries and the mutant exactly as the leg
  *            spells them — and the expected file parsing to exactly the M1
  *            literal.
- *   (b) [M2] the Proof's `Run:` line exits 0: the css rule's block, from its
- *            selector line to its closing brace, contains `color`.
+ *   (b) [M2] the Proof's `Run:` line exits 0: the row's text carries the
+ *            overdue variant that paints it.
  *
  * Three readings this file makes, written down because they are choices:
  *
@@ -35,13 +37,14 @@
  *   - Leg (b) is graded twice, because the `Run:` line and the clause it stands
  *     for are not quite the same sentence. The line is run verbatim through
  *     `bash -c` from the repository root and asserted to exit 0, which is the
- *     leg's own words; beside it the file is read structurally for a rule whose
- *     selector is exactly `.todoItem.overdue label` and whose block holds a
- *     declaration whose property is exactly `color` — the line's
- *     `grep -q 'color'` would also be satisfied by the `border-color` of the
- *     optional second rule the Context mentions, and M2's words are "whose
- *     block sets `color`". Neither check pins the value, so
- *     `color: var(--accent)` and any other colour both hold.
+ *     leg's own words; beside it the source is read structurally for the
+ *     variant sitting on the element that renders the row's text — a `grep` of
+ *     the whole file would also be satisfied by the class appearing in a
+ *     comment or on some other element — and for the token that variant names
+ *     being declared in the project's one stylesheet. Neither check pins the
+ *     colour, so `--primary: #d81b60` and any other value both hold. This is
+ *     the same sentence the deleted `.todoItem.overdue label { color: … }` rule
+ *     made, asked of the design system instead of a hand-written sheet.
  *   - Nothing here grades `DueInput`, `isOverdue` or `setTodoDue` as such: they
  *     are this task's Consumes, and the whole of M1 is measured through the
  *     page — the state the typing reaches and the markup it leaves behind.
@@ -65,12 +68,15 @@ const ROOT = join(import.meta.dir, '..', '..');
 const SEED_FILE = 'state-exams/seeds/two-open-todos.json';
 const EXPECTED_FILE = 'state-exams/expected/two-todos-first-due.json';
 
-/** The stylesheet M2 speaks about, and the rule it requires of it. */
-const CSS_FILE = 'client/src/todoItem.css';
-const CSS_SELECTOR = '.todoItem.overdue label';
+/** The source M2 speaks about, and the variant it requires of it. */
+const ROW_FILE = 'client/src/TodoItem.tsx';
+const OVERDUE_VARIANT = 'group-data-[overdue=true]:text-primary';
+
+/** The one stylesheet, where the colour that variant names is declared. */
+const CSS_FILE = 'client/src/index.css';
 
 /** The Proof's `Run:` line, verbatim. */
-const RUN_LINE = `sed -n '/^\\.todoItem\\.overdue label/,/}/p' client/src/todoItem.css | grep -q 'color'`;
+const RUN_LINE = `grep -qF '${OVERDUE_VARIANT}' client/src/TodoItem.tsx`;
 
 /** The expected state, exactly as M1 spells it — row `1` has no `due` key. */
 const EXPECTED_LITERAL = [
@@ -115,22 +121,31 @@ const statusOf = (line: string): number => {
   return spawned.exitCode;
 };
 
-/** The declaration blocks of every rule in `css` whose selector is `selector`. */
-const blocksOf = (css: string, selector: string): string[] => {
-  const blocks: string[] = [];
-  for (const match of css.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
-    if ((match[1] ?? '').trim() === selector) {
-      blocks.push(match[2] ?? '');
-    }
+/**
+ * The `className` of the element in `source` whose *child* is `{todo.text}`.
+ *
+ * `{todo.text}` occurs in the row as an attribute value too — it is the
+ * checkbox's accessible name — so the occurrence wanted is the one preceded,
+ * whitespace aside, by the `>` that closes an opening tag. The element is then
+ * the nearest `<` behind that `>`, and its `className="…"` is read out of the
+ * slice between the two.
+ */
+const classesOfTextElement = (source: string): string => {
+  const at = /> *\n? *\{todo\.text\}/.exec(source)?.index ?? -1;
+  if (at < 0) {
+    throw new Error(`${ROW_FILE} renders no element whose child is {todo.text}`);
   }
-  return blocks;
+  const open = source.lastIndexOf('<', at);
+  const match = /className="([^"]*)"/.exec(source.slice(open, at + 1));
+  if (match === null) {
+    throw new Error(`the element rendering {todo.text} carries no className`);
+  }
+  return match[1] ?? '';
 };
 
-/** Whether a declaration block sets the `color` property itself. */
-const setsColor = (block: string): boolean =>
-  block
-    .split(';')
-    .some((declaration) => (declaration.split(':')[0] ?? '').trim() === 'color');
+/** Whether `css` declares the custom property `name` at all. */
+const declares = (css: string, name: string): boolean =>
+  new RegExp(`^\\s*${name}\\s*:`, 'm').test(css);
 
 // --- (a) [M1]: the expected state, exactly as the clause spells it -----------
 
@@ -152,22 +167,22 @@ test(`leg (a) [M1] ${EXPECTED_FILE} parses to exactly the M1 literal`, () => {
 
 // --- (b) [M2]: the overdue row's text is visibly marked ----------------------
 
-test('leg (b) [M2] the Proof Run line exits 0 — the .todoItem.overdue label block contains `color`', () => {
+test(`leg (b) [M2] the Proof Run line exits 0 — ${ROW_FILE} carries \`${OVERDUE_VARIANT}\``, () => {
   expect(statusOf(RUN_LINE)).toBe(0);
 });
 
-test(`leg (b) [M2] ${CSS_FILE} holds a rule whose selector is exactly \`${CSS_SELECTOR}\` and whose block sets \`color\``, () => {
-  const blocks = blocksOf(readRepoFile(CSS_FILE), CSS_SELECTOR);
-
-  expect(blocks.length).toBeGreaterThan(0);
-  expect(blocks.some(setsColor)).toBe(true);
+test(`leg (b) [M2] the element rendering the row's text carries \`${OVERDUE_VARIANT}\`, and ${CSS_FILE} declares \`--primary\``, () => {
+  expect(classesOfTextElement(readRepoFile(ROW_FILE)).split(/\s+/)).toContain(
+    OVERDUE_VARIANT,
+  );
+  expect(declares(readRepoFile(CSS_FILE), '--primary')).toBe(true);
 });
 
 // --- (a) [M1]: the state exam itself -----------------------------------------
 
 // Typing `2025-12-31` into the first row's date box stores that date on row `0`
 // and nothing else, and the mark follows it in the same page: row `0` is the
-// one open, past-due todo, so it alone is `data-overdue="true"` and `.overdue`,
+// one open, past-due todo, so it alone is `data-overdue="true"`,
 // row `1` reads `"false"` for want of a date, and the box the date was typed
 // into still shows it. The mutant drops the `due` cell the typing put there —
 // an exam that did not actually store it would not tell the two apart.
@@ -176,18 +191,19 @@ stateExam({
   entry: 'client/index.html',
   seed: SEED_FILE,
   store: () => createTodosStore(),
-  action: {type: ['input#due-0', '2025-12-31']},
+  action: {
+    type: [{role: 'textbox', name: 'Due date for buy milk'}, '2025-12-31'],
+  },
   expected: EXPECTED_FILE,
   view: [
-    {selector: '.todoItem[data-overdue="true"]', count: 1, text: 'buy milk'},
-    {selector: '.todoItem.overdue', count: 1, text: 'buy milk'},
+    {selector: '#todoList li[data-overdue="true"]', count: 1, text: 'buy milk'},
     {
-      selector: '.todoItem[data-overdue="false"]',
+      selector: '#todoList li[data-overdue="false"]',
       count: 1,
       text: 'walk the dog',
     },
-    {selector: 'input#due-0', attr: {name: 'value', value: '2025-12-31'}},
-    {selector: '.todoItem', count: 2},
+    {selector: '#due-0', attr: {name: 'value', value: '2025-12-31'}},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: [{table: 'todos', row: '0', cell: 'due', absent: true}],
 });

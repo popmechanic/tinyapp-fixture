@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react';
 
+import {Input} from '@/components/ui/input';
+
 import {setTodoDue, useStore, STORE_ID, type TodosStore} from './Store';
 import {isIsoDate} from './overdue';
 
@@ -19,8 +21,19 @@ import {isIsoDate} from './overdue';
  * about them; and because the field shows the local text rather than the cell,
  * a controlled input cannot snap back mid-word to the date it still holds.
  * Clearing the field sends `''`, which removes the cell.
+ *
+ * `todoText` is here for the name alone: two rows mean two date boxes, and
+ * `Due date for buy milk` is what tells them apart in the accessibility tree.
  */
-export const DueInput = ({rowId, due}: {rowId: string; due: string}) => {
+export const DueInput = ({
+  rowId,
+  due,
+  todoText,
+}: {
+  rowId: string;
+  due: string;
+  todoText: string;
+}) => {
   const store = useStore(STORE_ID) as TodosStore | undefined;
   const [text, setText] = useState(due);
 
@@ -39,12 +52,12 @@ export const DueInput = ({rowId, due}: {rowId: string; due: string}) => {
   };
 
   return (
-    <input
+    <Input
       type="text"
-      className="dueInput"
       id={`due-${rowId}`}
       placeholder="YYYY-MM-DD"
-      aria-label="Due date"
+      aria-label={`Due date for ${todoText}`}
+      className="w-32 shrink-0"
       size={10}
       value={text}
       onChange={handleChange}

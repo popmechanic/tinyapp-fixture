@@ -1,4 +1,3 @@
-import './todoList.css';
 import {useSortedRowIds, useTable, useValue, STORE_ID} from './Store';
 import {TodoItem} from './TodoItem';
 import {ClearCompleted} from './ClearCompleted';
@@ -35,11 +34,29 @@ export const TodoList = () => {
           `TodoList` — so the live page and the linter's static render carry
           the bar by this one line. */}
       <FilterBar />
-      <div id="todoList">
+      {/* `todoList.css` drew the empty list's "No todos yet" line with
+          `#todoList:empty::before`. A pseudo-element is not a class Tailwind
+          generates, so the line is an element now, rendered only when the
+          shown list is empty and rendered *beside* the list rather than in it:
+          `#todoList` is still exactly one element, and `#todoList li` is still
+          absent, which is what the empty-list exam reads. `empty:hidden` is
+          what keeps the box itself from showing as an empty frame above it. */}
+      <ul
+        id="todoList"
+        className="m-0 w-full list-none overflow-hidden rounded-md border border-border bg-card p-0 empty:hidden"
+      >
         {ordered.map((id) => (
           <TodoItem key={id} rowId={id} />
         ))}
-      </div>
+      </ul>
+      {ordered.length === 0 ? (
+        <p
+          id="todoListEmpty"
+          className="m-0 w-full rounded-md border border-border bg-card p-8 text-center text-muted-foreground"
+        >
+          No todos yet. Add one above!
+        </p>
+      ) : null}
       <ClearCompleted />
       {/* Renders nothing while the trash is empty, so the page carries an Undo
           button only between a delete and the press that takes it back. */}

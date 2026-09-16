@@ -48,25 +48,31 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* The operator's dark look, written once and only here: hue 270, a ground at
+   oklch 20 %, and `#d81b60` as the accent — the colour the old stylesheets
+   spelled as `--accent` and repeated in `button.css`, `filterBar.css`,
+   `info.css`, `input.css` and `loading.css`. Every one of those rules is a
+   token read now, so no `.tsx` in this project writes a colour at all. */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --hue: 270;
+    --background: oklch(20% 0.01 var(--hue));
+    --foreground: oklch(85% 0.01 var(--hue));
+    --card: oklch(25% 0.01 var(--hue));
+    --card-foreground: oklch(85% 0.01 var(--hue));
+    --popover: oklch(25% 0.01 var(--hue));
+    --popover-foreground: oklch(85% 0.01 var(--hue));
+    --primary: #d81b60;
+    --primary-foreground: oklch(98% 0 0);
+    --secondary: oklch(25% 0.01 var(--hue));
+    --secondary-foreground: oklch(85% 0.01 var(--hue));
+    --muted: oklch(25% 0.01 var(--hue));
+    --muted-foreground: oklch(60% 0.01 var(--hue));
+    --accent: oklch(30% 0.01 var(--hue));
+    --accent-foreground: oklch(85% 0.01 var(--hue));
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --border: oklch(30% 0.01 var(--hue));
+    --input: oklch(30% 0.01 var(--hue));
+    --ring: #d81b60;
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
@@ -121,10 +127,15 @@
   * {
     @apply border-border outline-ring/50;
     }
+  /* What `client/index.html`'s `<style>` block held, moved here: the page has
+     one stylesheet now, and the entry document carries no `<style>` at all. */
   body {
-    @apply bg-background text-foreground;
+    @apply m-0 bg-background p-0 text-foreground select-none;
     }
   html {
     @apply font-sans;
+    }
+  #root {
+    @apply flex min-h-screen flex-col;
     }
 }

@@ -5,12 +5,13 @@
  * case rather than the file:
  *
  *   (a) [M1] the static markup `renderStatic` paints over
- *            `state-exams/expected/two-todos-second-due.json`: exactly two
- *            `input.dueInput`, each `type="text"` with
- *            `placeholder="YYYY-MM-DD"`, `#due-0` carrying `value=""` and
- *            `#due-1` carrying `value="2025-06-30"`, and each sitting inside a
- *            `.todoItem` after that row's `label`, one to a row;
- *   (b) [M2] the state exam: typing `2025-06-30` into `input#due-1` on the page
+ *            `state-exams/expected/two-todos-second-due.json`: exactly two date
+ *            boxes, each `type="text"` with `placeholder="YYYY-MM-DD"`, `#due-0`
+ *            carrying `value=""` and `#due-1` carrying `value="2025-06-30"`, and
+ *            each sitting inside a `#todoList li` after that row's text, one to
+ *            a row;
+ *   (b) [M2] the state exam: typing `2025-06-30` into the box named
+ *            `Due date for walk the dog` on the page
  *            seeded from `state-exams/seeds/two-open-todos.json` reaches
  *            `state-exams/expected/two-todos-second-due.json`, and the page
  *            then shows the two values and the two rows.
@@ -25,15 +26,19 @@
  *     this an interaction exam that bundles at all (Global Constraints, last
  *     bullet: an interaction exam importing nothing from `client/src` fails
  *     under `bun test` with `Bundle failed` before it opens a page).
- *   - A `.todoItem` is tied to its row id through the checkbox `id="todo-N"`
- *     the component already renders, and the date box is then required to be
+ *   - A row is tied to its row id through the checkbox `id="todo-N"` the
+ *     component already renders, and the date box is then required to be
  *     `id="due-N"` for that same N. Reading the id off the markup rather than
  *     assuming the row order is what makes the `#due-0`/`#due-1` pins below
- *     pins on *those rows* and not on whichever box happens to come first.
+ *     pins on *those rows* and not on whichever box happens to come first. The
+ *     checkbox is found by `[role=checkbox]` rather than by a tag: the design
+ *     system's checkbox is a `<span>` carrying that role, and the id is on it.
  *   - Ordering is graded as leg (a) words it — the date box sits **after** that
- *     row's `label` in document order. The task's Context is tighter ("the line
- *     directly after"), but that is a spelling of the JSX rather than the
- *     clause, and this exam grades the clause.
+ *     row's text in document order. It read `label` while the row's text was a
+ *     `<label for>`; the text is a `<span>` now and the sentence is the same
+ *     one. The task's Context is tighter ("the line directly after"), but that
+ *     is a spelling of the JSX rather than the clause, and this exam grades the
+ *     clause.
  *
  * Measured at BASE (2026-09-15): `renderToStaticMarkup` emits `value=""` as a
  * real attribute for a controlled input whose value is the empty string, so
@@ -67,6 +72,12 @@ const EXPECTED = 'state-exams/expected/two-todos-second-due.json';
 /** The value each row's date box carries in that state, by row id. */
 const DUE_BY_ROW: Record<string, string> = {'0': '', '1': '2025-06-30'};
 
+/** The text each row carries in that state, by row id — what the box follows. */
+const TEXT_BY_ROW: Record<string, string> = {
+  '0': 'buy milk',
+  '1': 'walk the dog',
+};
+
 /**
  * The markup of the app over `EXPECTED`, rendered once.
  *
@@ -81,20 +92,22 @@ const markup = (): HTMLElement =>
     ),
   ));
 
-/** Every `.todoItem` of that markup, in document order. */
-const rows = (): HTMLElement[] => markup().querySelectorAll('.todoItem');
+/** Every row of that markup, in document order. */
+const rows = (): HTMLElement[] => markup().querySelectorAll('#todoList li');
 
-/** The row id a `.todoItem` carries, read off its checkbox's `id`. */
+/** The row id a row carries, read off its checkbox's `id`. */
 const rowIdOf = (row: HTMLElement): string => {
-  const checkbox = row.querySelector('input[type=checkbox]');
+  const checkbox = row.querySelector('[role=checkbox]');
   const id = checkbox?.getAttribute('id') ?? '';
   return id.startsWith('todo-') ? id.slice('todo-'.length) : id;
 };
 
 // --- (a) [M1]: the date box in the static markup -----------------------------
 
-test('leg (a) [M1] the markup over the expected state holds exactly two input.dueInput', () => {
-  expect(markup().querySelectorAll('input.dueInput').length).toBe(2);
+test('leg (a) [M1] the markup over the expected state holds exactly two date boxes', () => {
+  expect(markup().querySelectorAll('#todoList li input[type=text]').length).toBe(
+    2,
+  );
 });
 
 test('leg (a) [M1] the two rows of the markup are rows 0 and 1', () => {
@@ -102,51 +115,53 @@ test('leg (a) [M1] the two rows of the markup are rows 0 and 1', () => {
   expect(rows().map(rowIdOf)).toEqual(['0', '1']);
 });
 
-/** The `.todoItem` of the markup whose checkbox names `rowId`. */
+/** The row of the markup whose checkbox names `rowId`. */
 const rowOf = (rowId: string): HTMLElement => {
   const row = rows().find((candidate) => rowIdOf(candidate) === rowId);
   if (row === undefined) {
-    throw new Error(`no .todoItem for row ${rowId}`);
+    throw new Error(`no row for ${rowId}`);
   }
   return row;
 };
 
 for (const [rowId, due] of Object.entries(DUE_BY_ROW)) {
-  test(`leg (a) [M1] row ${rowId} holds exactly one text input, and it is input#due-${rowId}.dueInput`, () => {
+  test(`leg (a) [M1] row ${rowId} holds exactly one text input, and it is #due-${rowId}, the design system's input`, () => {
     const texts = rowOf(rowId).querySelectorAll('input[type=text]');
 
     expect(texts.length).toBe(1);
     expect(texts[0]!.getAttribute('id')).toBe(`due-${rowId}`);
-    expect(texts[0]!.classList.contains('dueInput')).toBe(true);
+    // What `.dueInput` used to say — that the box is the one the app styles —
+    // the design system says with the slot its own `Input` carries.
+    expect(texts[0]!.getAttribute('data-slot')).toBe('input');
   });
 
-  test(`leg (a) [M1] input#due-${rowId} is type=text placeheld YYYY-MM-DD`, () => {
-    const input = rowOf(rowId).querySelector(`input#due-${rowId}`);
+  test(`leg (a) [M1] #due-${rowId} is type=text placeheld YYYY-MM-DD`, () => {
+    const input = rowOf(rowId).querySelector(`#due-${rowId}`);
 
     expect(input).not.toBeNull();
     expect(input!.getAttribute('type')).toBe('text');
     expect(input!.getAttribute('placeholder')).toBe('YYYY-MM-DD');
   });
 
-  test(`leg (a) [M1] input#due-${rowId} carries value=${JSON.stringify(due)}`, () => {
-    const input = rowOf(rowId).querySelector(`input#due-${rowId}`);
+  test(`leg (a) [M1] #due-${rowId} carries value=${JSON.stringify(due)}`, () => {
+    const input = rowOf(rowId).querySelector(`#due-${rowId}`);
 
     expect(input).not.toBeNull();
     expect(input!.getAttribute('value')).toBe(due);
   });
 
-  test(`leg (a) [M1] input#due-${rowId} comes after row ${rowId}'s label`, () => {
+  test(`leg (a) [M1] #due-${rowId} comes after row ${rowId}'s text`, () => {
     const elements = rowOf(rowId).querySelectorAll('*');
-    const labelAt = elements.findIndex(
-      (element) => element.rawTagName === 'label',
+    const textAt = elements.findIndex(
+      (element) => element.textContent.trim() === TEXT_BY_ROW[rowId],
     );
-    const dueAt = elements.findIndex((element) =>
-      element.classList.contains('dueInput'),
+    const dueAt = elements.findIndex(
+      (element) => element.getAttribute('id') === `due-${rowId}`,
     );
 
-    expect(labelAt).toBeGreaterThanOrEqual(0);
+    expect(textAt).toBeGreaterThanOrEqual(0);
     expect(dueAt).toBeGreaterThanOrEqual(0);
-    expect(dueAt).toBeGreaterThan(labelAt);
+    expect(dueAt).toBeGreaterThan(textAt);
   });
 }
 
@@ -162,12 +177,14 @@ stateExam({
   entry: 'client/index.html',
   seed: 'state-exams/seeds/two-open-todos.json',
   store: () => createTodosStore(),
-  action: {type: ['input#due-1', '2025-06-30']},
+  action: {
+    type: [{role: 'textbox', name: 'Due date for walk the dog'}, '2025-06-30'],
+  },
   expected: EXPECTED,
   view: [
-    {selector: 'input#due-1', attr: {name: 'value', value: '2025-06-30'}},
-    {selector: 'input#due-0', attr: {name: 'value', value: ''}},
-    {selector: '.todoItem', count: 2},
+    {selector: '#due-1', attr: {name: 'value', value: '2025-06-30'}},
+    {selector: '#due-0', attr: {name: 'value', value: ''}},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: [{table: 'todos', row: '1', cell: 'due', absent: true}],
 });

@@ -279,8 +279,8 @@ stateExam({
   },
   expected: PROMOTED.expected,
   view: [
-    {selector: '.todoItem.completed input[type=checkbox]', checked: true},
-    {selector: '.todoItem', count: 2},
+    {selector: '#todoList li[data-completed="true"] [role=checkbox]', checked: true},
+    {selector: '#todoList li', count: 2},
   ],
   mutant: mutantOf(third.changes),
 });

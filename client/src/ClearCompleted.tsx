@@ -1,3 +1,5 @@
+import {Button} from '@/components/ui/button';
+
 import {useStore, type TodosStore, STORE_ID} from './Store';
 import {clearCompleted} from './storeData';
 
@@ -11,8 +13,13 @@ export const ClearCompleted = () => {
   };
 
   return (
-    <button id="clearCompleted" type="button" onClick={handleClearCompleted}>
+    <Button
+      id="clearCompleted"
+      variant="outline"
+      className="mt-4"
+      onClick={handleClearCompleted}
+    >
       Clear completed
-    </button>
+    </Button>
   );
 };

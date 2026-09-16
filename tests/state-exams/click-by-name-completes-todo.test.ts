@@ -6,16 +6,17 @@
 //     `state-exams/expected/two-todos-first-done.json`, shows `#todo-0` checked and `#todo-1`
 //     unchecked, and kills the mutant setting row `0`'s `completed` to `false`.
 //
-// The sibling exam `click-completes-todo.test.ts` reaches the same state through the selector
-// `.todoItem input[type=checkbox]` — a class of the app's own and a tag. This one names the
-// control the way a person would, "the checkbox called buy milk", and so it lands on row `0`
-// whatever the page is styled with: at this wave the row is
-// `<input type="checkbox" id="todo-0">` with `<label htmlFor>`, and once the shadcn Checkbox
-// takes its place the accessible name is the same and the views still read.
+// The sibling exam `click-completes-todo.test.ts` reaches the same state by naming the same
+// control the same way — role and name are how every exam on this tree reaches a control now
+// that the app's own classes are gone. This one is the first that did it: "the checkbox called
+// buy milk" lands on row `0` whatever the page is styled with, and it kept reading when the
+// row stopped being `<input type="checkbox" id="todo-0">` with a `<label htmlFor>` and became
+// shadcn's `Checkbox` — a `<span role="checkbox" aria-label="buy milk">` — because the
+// accessible name did not move.
 //
-// The views name `#todo-0` and `#todo-1` — an id and no tag, no class of the app's own — so
-// they hold on both trees: `checked` reads `data-checked="true"` on this wave's input and
-// `aria-checked="true"` on the shadcn root, which is what M4 adds to `assertView`.
+// The views name `#todo-0` and `#todo-1` — ids, no tag and no class of the app's own — so they
+// hold on both trees: `checked` reads `data-checked="true"` on the old input and
+// `aria-checked="true"` on the shadcn root, which is what M4 added to `assertView`.
 
 import {stateExam} from 'tinyapp-exam';
 
