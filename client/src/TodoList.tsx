@@ -2,6 +2,7 @@ import './todoList.css';
 import {useSortedRowIds, useTable, useValue, STORE_ID} from './Store';
 import {TodoItem} from './TodoItem';
 import {ClearCompleted} from './ClearCompleted';
+import {UndoDelete} from './UndoDelete';
 import {FilterBar} from './FilterBar';
 import {admits, filterOf} from './todoFilter';
 
@@ -32,6 +33,9 @@ export const TodoList = () => {
         ))}
       </div>
       <ClearCompleted />
+      {/* Renders nothing while the trash is empty, so the page carries an Undo
+          button only between a delete and the press that takes it back. */}
+      <UndoDelete />
     </>
   );
 };

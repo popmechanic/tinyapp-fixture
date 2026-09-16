@@ -7,16 +7,26 @@ import {
 
 import {isIsoDate} from './overdue';
 
+// The cells of a todo, written once. `todos` and `trash` are both this literal,
+// so a cell a later change adds to a todo is a cell of a trashed todo by
+// construction — a deleted row is the row it was, not a hand-picked subset of
+// it, whatever the schema grows to hold.
+const TODO_CELLS = {
+  text: {type: 'string', default: ''},
+  completed: {type: 'boolean', default: false},
+  // No default, deliberately: a cell with one is materialised into the
+  // `getContent()` of every row TinyBase holds, which would write a `due`
+  // into every seed and expected state already checked in. Without one, a
+  // todo that has no date has no `due` cell at all.
+  due: {type: 'string'},
+} as const;
+
 export const TABLES_SCHEMA = {
-  todos: {
-    text: {type: 'string', default: ''},
-    completed: {type: 'boolean', default: false},
-    // No default, deliberately: a cell with one is materialised into the
-    // `getContent()` of every row TinyBase holds, which would write a `due`
-    // into every seed and expected state already checked in. Without one, a
-    // todo that has no date has no `due` cell at all.
-    due: {type: 'string'},
-  },
+  todos: TODO_CELLS,
+  // Where the last deleted todo waits. At most one row ever sits here — that
+  // is `deleteTodo`'s contract, not the schema's: the linter's invariants are
+  // per row and cannot speak about how many rows a table holds.
+  trash: TODO_CELLS,
 } as const;
 
 // The chosen filter, and nowhere else. Deliberately no `default`: a default
@@ -52,6 +62,15 @@ export const INVARIANTS: Invariant[] = [
     predicate: (row) =>
       row.due === undefined || (typeof row.due === 'string' && isIsoDate(row.due)),
     message: 'a due date is absent or a valid YYYY-MM-DD',
+  },
+  // A trashed todo is a todo: the row `deleteTodo` copies across is the row it
+  // was, so the rule about what a completed todo means goes on holding while
+  // it waits. Appended for the same reason as the entry above.
+  {
+    table: 'trash',
+    predicate: (row) =>
+      row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
+    message: 'a completed todo in the trash has non-empty text',
   },
 ];
 
@@ -139,8 +158,39 @@ export const setTodoDue = (store: TodosStore, id: string, due: string): void => 
   }
 };
 
+/**
+ * Moves todo `id` out of the list and into the trash, whole.
+ *
+ * One transaction, so no listener ever sees the row in neither table or in
+ * both. The `delTable` comes first: the trash holds the last delete and only
+ * that one, so a second Delete replaces what was waiting rather than piling up
+ * beside it. An id the list does not hold is left alone — nothing is deleted,
+ * so nothing goes to the trash and whatever was waiting there stays.
+ */
 export const deleteTodo = (store: TodosStore, id: string): void => {
-  store.delRow('todos', id);
+  store.transaction(() => {
+    if (!store.hasRow('todos', id)) {
+      return;
+    }
+    store.delTable('trash');
+    store.setRow('trash', id, store.getRow('todos', id));
+    store.delRow('todos', id);
+  });
+};
+
+/**
+ * Puts the waiting todo back under the id it had, exactly as it was.
+ *
+ * With nothing waiting the loop body never runs, so an undo on an empty trash
+ * leaves the store untouched rather than writing an empty table into it.
+ */
+export const undoDelete = (store: TodosStore): void => {
+  store.transaction(() => {
+    store.getRowIds('trash').forEach((id) => {
+      store.setRow('todos', id, store.getRow('trash', id));
+      store.delRow('trash', id);
+    });
+  });
 };
 
 export const clearCompleted = (store: TodosStore): void => {

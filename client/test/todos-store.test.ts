@@ -100,7 +100,9 @@ test('leg (c) [M3]: setTodoCompleted ticks and unticks, deleteTodo removes the r
 
   sd.deleteTodo(store, '0');
   expect(store.hasRow('todos', '0')).toBe(false);
-  expect(store.getContent()).toEqual(EMPTY);
+  // The todo left the list, which is what this leg means. Where it went — the
+  // trash it now waits in — is Task 1's own exam to speak about.
+  expect(store.getContent()[0].todos).toBeUndefined();
 });
 
 // ---------------------------------------------------------------------------

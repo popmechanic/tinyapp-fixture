@@ -325,7 +325,7 @@ test(
   SPAWN_TIMEOUT_MS,
 );
 
-test('leg (g) [M7] done-count.test.ts pins the sorted todos cells as completed, due and text', () => {
+test('leg (g) [M7] done-count.test.ts reads the todos cells of TABLES_SCHEMA and pins no exact list of them', () => {
   // Read with every run of whitespace removed, so the pin is graded on the
   // cells it names and not on how the file happens to be wrapped or quoted.
   const packed = readFileSync(
@@ -333,12 +333,15 @@ test('leg (g) [M7] done-count.test.ts pins the sorted todos cells as completed, 
     'utf8',
   ).replace(/\s+/g, '');
 
-  expect(packed).toContain('Object.keys(TABLES_SCHEMA.todos).sort()');
-  expect(/\[['"]completed['"],['"]due['"],['"]text['"],?\]/.test(packed)).toBe(
-    true,
-  );
-  // And the cell list it replaced is gone, so the pin moved rather than grew.
+  expect(packed).toContain('Object.keys(TABLES_SCHEMA.todos)');
+  // What this leg meant: the two-cell list this task's `due` outgrew is gone,
+  // so the pin moved rather than grew. It no longer asks for the three-cell
+  // list that replaced it — the trash task loosened the pin again, to a
+  // `toContain` per cell, because a cell added concurrently makes any exact
+  // list wrong at publish. `completed` and `text` are still named either way.
   expect(/\[['"]completed['"],['"]text['"],?\]/.test(packed)).toBe(false);
+  expect(packed).toContain("toContain('completed')");
+  expect(packed).toContain("toContain('text')");
 });
 
 // --- (f) [M6] again: the state exam itself -----------------------------------
