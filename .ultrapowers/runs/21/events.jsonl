@@ -8,3 +8,4 @@
 {"kind":"engine:log","line":"setup: branch ultra/integration-run-21 at de77045e5a628bcab137a72d069db7555ffcc17f","id":"01M2MJ79P400004KRVMKZMR59C","ts":1789544081092}
 {"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"c379c829-2b03-4cbb-a8ee-0b1bfbec4662","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-21/clones/exam-1","model":"opus","id":"01M2MJ7AC30000VK079PQCXAJY","ts":1789544081795}
 {"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"e1023292-271a-445f-992a-0f88e32af6fe","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-21/clones/task-1","model":"opus","id":"01M2MJ7AC50000HQZ8KTX5Y3CA","ts":1789544081797}
+{"kind":"engine:log","line":"baseline: green on de77045e5a628bcab137a72d069db7555ffcc17f","id":"01M2MJAGSK0000ZCHSCNZ1VG2E","ts":1789544186675}
