@@ -5,6 +5,7 @@
   "workspaces": ["client", "server", "packages/*"],
   "scripts": {
     "lint:state": "bun packages/tinyapp-lint/src/cli.ts",
+    "history": "bun packages/tinyapp-history/src/cli.ts",
     "typecheck": "bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit",
     "test": "bun run typecheck && bun test"
   },
