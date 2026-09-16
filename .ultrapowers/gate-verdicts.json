@@ -1,0 +1,218 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "bf8c4f9a0392c108a4509a18b385c459169c9fc314ce06622ff6afa32104fb53",
+      "verdict": "pass",
+      "reason": "Legs (a)/(b)/(c) assert every new and every retained manifest entry one per row with enumerations complete against the BASE excerpts (nine new + fifteen retained; four + eight; two + four), (d) plus bun install --frozen-lockfile falsifies M4 for all thirteen names, (e) falsifies M5 by exit codes."
+    },
+    "2": {
+      "hash": "42521c74afcda78b012e89495de109980b1ddaf74f6108c8c85c19baa8743b0f",
+      "verdict": "pass",
+      "reason": "M1 by (a)+(b), M2 by (c)+(d), M3 by one test per component, M4 by the state exam whose expected file at BASE matches seed-plus-addTodo and whose mutant flips the one cell it pins, M5 by the two Run lines; nothing at BASE pins the opposite."
+    },
+    "3": {
+      "hash": "5c3dc41ee0a300faa2e6aeab9ee753f5c144be6b2ebdc35128df95c5733763c8",
+      "verdict": "pass",
+      "reason": "M2/M3 on a real browser with the three named controls and both rejection sentences, M4/M5 with literals that compute out over the two-span markup (readingChecked over aria-checked names exactly #a), M6 with a Tailwind and a plain-CSS entry, M7 the seeded state exam with its mutant, M8 one assertion per BASE runtime name plus the grep for the type-only name."
+    },
+    "4": {
+      "hash": "ab65b0afe581a2920b41371774dd7cc4a4398e53652efec52050453d70376dcc",
+      "verdict": "pass",
+      "reason": "M1 by the exact script string plus a frozen-lockfile install that fails if a package were added, M2 by --print-config per rule id with the deep-equal on no-restyle, M3 by exit 1 plus one assertion per rule id on the sample's JSON entry, M4 by the absence of the ignored copy's entry, M5 by the three message-text checks; green on the clone and on a lint-clean tree alike."
+    },
+    "5": {
+      "hash": "36591d083a1bda5c96553ad1e5f37e8277f0f4a9583ccea72be63de7acfd05df",
+      "verdict": "pass",
+      "reason": "Conjunct one by M1/M2/M5 (legs a, b, e), conjunct two by M3/M4 (the universal over loadContext, the click by name on row 1 reaching two-todos-one-done with the row-1 mutant killed), conjunct three by M7 (the planted stray class read as a red JSON finding naming @utility, green again once removed); M6's five Run lines and the D/R grep guard the exam set."
+    }
+  },
+  "tally": {
+    "base": "de77045e5a628bcab137a72d069db7555ffcc17f",
+    "dispatched": 8,
+    "rejected": 2,
+    "rounds": {
+      "1": {
+        "dispatched": 5,
+        "rejected": 1
+      },
+      "2": {
+        "dispatched": 2,
+        "rejected": 1
+      },
+      "3": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    },
+    "note": "Reshape after run-19 (three tasks edited bun.lock; the resolver ran to SIGTERM). Round 1: new Task 1 rejected (the retention universal 'every entry it carried at BASE' was spot-checked; now every BASE row is a literal with one assertion per row, and the resolve probe reads node_modules/<name>/package.json rather than Bun.resolveSync, which honours exports maps); Tasks 2, 4, 5 pass; Task 3 pass (its unlegged 'comma' and 'first in tree order' phrases dropped, re-read). Round 2: Task 1 rejected again on arithmetic \u2014 @types/node ^26.4.1 is a BASE entry, not a new one (nine new, fifteen retained now); Task 3 pass. Round 3: Task 1 pass. The first sitting's 7 dispatches / 3 rejections at eb28af4b are kept under history."
+  },
+  "authoring": {
+    "minutes": 171,
+    "probes": 13,
+    "routing": {
+      "branch": "width",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "the system",
+        "options": [
+          "shadcn/ui by CLI",
+          "hand-written shadcn-shaped set",
+          "Tailwind + tokens only"
+        ],
+        "recommended": "shadcn/ui by CLI",
+        "picked": "shadcn/ui by CLI"
+      },
+      {
+        "question": "mode",
+        "options": [
+          "blocking Check from run one",
+          "report-only for five runs"
+        ],
+        "recommended": "blocking Check from run one",
+        "picked": "blocking Check from run one"
+      },
+      {
+        "question": "exam selectors",
+        "options": [
+          "roles and accessible names",
+          "data-testid",
+          "keep class selectors"
+        ],
+        "recommended": "roles and accessible names",
+        "picked": "roles and accessible names"
+      },
+      {
+        "question": "the reading",
+        "options": [
+          "drift at first check + rounds to zero",
+          "reviewer residuals only",
+          "add a judge"
+        ],
+        "recommended": "drift at first check + rounds to zero",
+        "picked": "drift at first check + rounds to zero"
+      },
+      {
+        "question": "approach",
+        "options": [
+          "one plan after a local probe",
+          "two plans, exams first",
+          "skip the probe"
+        ],
+        "recommended": "one plan after a local probe",
+        "picked": "one plan after a local probe"
+      },
+      {
+        "question": "Approve this design as the spec?",
+        "options": [
+          "Approve, write the spec",
+          "Revise one section"
+        ],
+        "recommended": "Approve, write the spec",
+        "picked": "Approve, write the spec"
+      },
+      {
+        "question": "Does the spec stand as written?",
+        "options": [
+          "Approved, author it after run-17 merges",
+          "Changes first"
+        ],
+        "recommended": "Approved, author it after run-17 merges",
+        "picked": "Approved, author it after run-17 merges"
+      },
+      {
+        "question": "Linted design system execute lane",
+        "options": [
+          "Ultrapowers, launch now",
+          "Ultrapowers, after 155 and 157 merge",
+          "Hold"
+        ],
+        "recommended": "Ultrapowers, launch now",
+        "picked": "Ultrapowers, launch now"
+      },
+      {
+        "question": "Lint as Task 4 Run line now, blocking Check from the next plan?",
+        "options": [
+          "Accept: Run line now, blocking Check from the next plan",
+          "Insist on a blocking Check in this plan"
+        ],
+        "recommended": "Accept: Run line now, blocking Check from the next plan",
+        "picked": "Accept: Run line now, blocking Check from the next plan"
+      },
+      {
+        "question": "Keep bun-plugin-tailwind in the exam page and the accessible-name scheme?",
+        "options": [
+          "Keep both",
+          "Drop the Tailwind plugin from the exam page"
+        ],
+        "recommended": "Keep both",
+        "picked": "Keep both"
+      },
+      {
+        "question": "Run-18 parked on a 3,000 ms wall-clock pin in the baseline suite; how to handle?",
+        "options": [
+          "Loosen the timing pin by hand PR, then relaunch",
+          "Relaunch as-is",
+          "Relaunch with a bigger box"
+        ],
+        "recommended": "Loosen the timing pin by hand PR, then relaunch",
+        "picked": "Loosen the timing pin by hand PR, then relaunch"
+      },
+      {
+        "question": "Run-19 parked: three tasks edited bun.lock and the resolver timed out; how to relaunch?",
+        "options": [
+          "Reshape: one dependency task first, then relaunch",
+          "Engine fix first: lockfiles regenerate at the fold",
+          "Both: reshape now, file the engine rule"
+        ],
+        "recommended": "Reshape: one dependency task first, then relaunch",
+        "picked": "Reshape: one dependency task first, then relaunch"
+      }
+    ]
+  },
+  "history": [
+    {
+      "sitting": "2026-09-16 first",
+      "base": "eb28af4b5feb284797c389a10d381d835fc97d2d",
+      "tasks": {
+        "1": {
+          "hash": "5fa0dbd599b432fa802838acff4fcad5d227a31bb829517149a2eada8db7a423",
+          "verdict": "pass",
+          "reason": "Every clause has a falsifying leg: (a)+(b) for M1, (c)+(d) for M2, one render per component for M3's four rows, the seeded state exam with view and mutant for M4, the two Run lines for M5; nothing at BASE pins the opposite."
+        },
+        "2": {
+          "hash": "ac92ffa91a84124e4a0c1500d4b7de38da222de8fc4e32a1337973a19e4e9c7c",
+          "verdict": "pass",
+          "reason": "M1 by the type check plus the re-run string legs, M2/M3 by real-browser outcomes (the aria-label-only span included) and exact rejection sentences, M4 by the computed two-span cases, M5 by the exact problem/fix pair, M6 by the two bundle outputs, M7 by the seeded state exam with mutant, M8 by the grep/tsc Runs and one runtime assertion per BASE export."
+        },
+        "3": {
+          "hash": "27a9081c94c1ec1fe867ce130f178dc50245d4b3686c91b14dd63a75f2c19c1b",
+          "verdict": "pass",
+          "reason": "One assertion per package name and the exact script literal for M1, six per-id checks plus the deep-equal for M2, six per-id ruleId checks on the sample's own JSON entry for M3, the absence check on the ignored copy for M4, three fix-wording checks for M5; the exam asserts only on the sample's entry so the app's own wave-1 findings do not turn it red."
+        },
+        "4": {
+          "hash": "b238cda18545504809342a53e7f48094ac3d253be8634f118946a0a492a3b570",
+          "verdict": "pass",
+          "reason": "Conjunct 1 rides M1+M2, conjunct 2 rides M3 (a universal over loadContext with a non-empty set) and M4 (the click by name on row 1 reaches two-todos-one-done with the row-1 mutant killed), conjunct 3 rides M7 (the planted stray class is a red JSON finding naming @utility, green again in a finally); M5's fifteen ids get one test each and M6's no-D/no-R diff and the two bun test sweeps are Run lines."
+        }
+      },
+      "tally": {
+        "base": "eb28af4b5feb284797c389a10d381d835fc97d2d",
+        "dispatched": 7,
+        "rejected": 3,
+        "rounds": {
+          "1": {
+            "dispatched": 4,
+            "rejected": 3
+          },
+          "2": {
+            "dispatched": 3,
+            "rejected": 0
+          }
+        },
+        "note": "Round 1: task 1 pass; task 2 rejected (M8's leg imported Locator from types.ts, not the index \u2014 a type-only export the runtime cannot see; now a grep Run over index.ts, plus M2 restated as an outcome an aria-label-only span falsifies and the views-rule leg housed in packages/tinyapp-lint/test/views.test.ts); task 3 rejected (M1 pinned the stylish formatter whose lines never carry the path \u2014 the exam now reads `bun run lint:ui -f json`, measured: one entry per linted file, ignored files absent); task 4 rejected (the Claim's third conjunct had no clause \u2014 M7 plants a stray class and reads the red finding; M6 now pins no exam deleted or renamed via git diff --name-status). Round 2: all three pass."
+      }
+    }
+  ]
+}
