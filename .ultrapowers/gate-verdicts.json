@@ -1,0 +1,101 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "66094c0d9aeffe8092a79449cd0ed9ff7ffefc33a9115d47fe0e752844e40c4f",
+      "verdict": "pass",
+      "reason": "Every clause has a leg that falsifies it \u2014 M1's contains-match on #pin-1 is backed by leg (f)'s whole-element regexes, M3/M4 pin exact snapshots, M5 is one test per file \u2014 the seed plus pinned: true on row '1' is exactly the M1 literal, {type: 'boolean'} sorts to ['type'], and nothing at BASE pins the opposite."
+    },
+    "2": {
+      "hash": "7b5054d5488b2deca33c0dc35b7d85d7e72280b859ca98fa672fc39ef751d617",
+      "verdict": "pass",
+      "reason": "Under pinned-first-then-ascending-id ordering the seed's first checkbox is row '1' and clicking it yields exactly M1's literal, the four M3 orderings follow, each clause has a falsifying leg (M2 deep-equal, one indexOf leg per M3 row, M4 naming the absent path and walls.browser 'skipped'), and every absent file is this task's, Task 1's, or the driver's posted/1.json."
+    }
+  },
+  "tally": {
+    "base": "eb28af4b5feb284797c389a10d381d835fc97d2d",
+    "dispatched": 3,
+    "rejected": 1,
+    "rounds": {
+      "1": {
+        "dispatched": 2,
+        "pass": 1,
+        "fail": 1
+      },
+      "2": {
+        "dispatched": 1,
+        "pass": 1,
+        "fail": 0
+      }
+    }
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "1",
+      "hash": "616a3ffa49bb6975f8f06cb0b4f1ae3d16e17f0e8c725274fc925d0700c0ffb0",
+      "verdict": "fail",
+      "reason": "M1 and M6 pinned #pin-0 reading `Pin` through a view `text`, which is a contains-match that `Unpin` also satisfies; fixed by asking the page view only that #pin-1 contain Unpin and #pin-0 exist once, and pinning both whole button texts in M6 with element-spanning regexes counted through ?? []."
+    },
+    {
+      "round": 1,
+      "task": "2",
+      "hash": "7b5054d5488b2deca33c0dc35b7d85d7e72280b859ca98fa672fc39ef751d617",
+      "verdict": "pass"
+    },
+    {
+      "round": 2,
+      "task": "1",
+      "hash": "66094c0d9aeffe8092a79449cd0ed9ff7ffefc33a9115d47fe0e752844e40c4f",
+      "verdict": "pass"
+    }
+  ],
+  "authoring": {
+    "minutes": 29,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "While runs 155, 156 and 157 drain, what next?",
+        "options": [
+          "Author the handshake's fixture measurement plan",
+          "Release 0.3.31 prep",
+          "File the two findings from today",
+          "Grilling on the authoring lint"
+        ],
+        "recommended": "Author the handshake's fixture measurement plan",
+        "picked": "Author the handshake's fixture measurement plan"
+      },
+      {
+        "question": "Handshake pair: Claim and Summary",
+        "options": [
+          "Adopt both",
+          "I will edit"
+        ],
+        "recommended": "Adopt both",
+        "picked": "Adopt both"
+      },
+      {
+        "question": "Handshake pair launch timing",
+        "options": [
+          "After both 155 and 18 merge, re-pinned",
+          "Right after 155 merges, beside run-18",
+          "Hold"
+        ],
+        "recommended": "After both 155 and 18 merge, re-pinned",
+        "picked": "After both 155 and 18 merge, re-pinned"
+      },
+      {
+        "question": "File the posted-file naming collision on #812?",
+        "options": [
+          "File it on #812",
+          "Not yet"
+        ],
+        "recommended": "File it on #812",
+        "picked": "File it on #812"
+      }
+    ]
+  }
+}
