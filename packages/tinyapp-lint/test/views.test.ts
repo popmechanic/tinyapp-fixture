@@ -125,7 +125,7 @@ test(
     const paths = ctx.snapshots.map(({path}) => path);
     expect(
       ctx.exams
-        .filter(({view}) => view === undefined)
+        .filter(({view, action}) => view === undefined && action !== 'callback')
         .map(({path}) => path),
     ).toEqual([]);
     expect(

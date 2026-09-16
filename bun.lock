@@ -41,6 +41,15 @@
         "@happy-dom/global-registrator": "^20.14.0",
       },
     },
+    "packages/tinyapp-history": {
+      "name": "tinyapp-history",
+      "version": "0.1.0",
+      "dependencies": {
+        "@dolthub/doltlite": "0.50.10",
+        "tinyapp-exam": "workspace:*",
+        "tinybase": "^9.7.0",
+      },
+    },
     "packages/tinyapp-lint": {
       "name": "tinyapp-lint",
       "version": "0.1.0",
@@ -81,6 +90,8 @@
     "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20260908.1", "", {}, "sha512-cILmYEd/YtL+Hlwytc5n+QVV8F+E5doQOtc6QiBtPb51kK+5fkk909db+G8dxeUsMd2ytJgdpAt/lyciUEobcw=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
+
+    "@dolthub/doltlite": ["@dolthub/doltlite@0.50.10", "", { "dependencies": { "node-addon-api": "^8.0.0" } }, "sha512-xUWpq4Bv4y5alPgDLrpz580gkjOZqtjYG7bRZtnq7IlcV2seudX2dIKa/Nw65Q4HXbD/c7jkrNEZNwouMO9opw=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.11.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA=="],
 
@@ -326,6 +337,8 @@
 
     "nanoid": ["nanoid@3.3.18", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w=="],
 
+    "node-addon-api": ["node-addon-api@8.9.2", "", {}, "sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg=="],
+
     "node-html-parser": ["node-html-parser@9.0.4", "", { "dependencies": { "css-select": "^5.1.0", "entities": "^8.0.0" } }, "sha512-reUSrZkF1rO7hEYe5mJwtbVcQ6mB5QrViCZH6Wv+iz3er/PA9Q50gol15dMLQRDfdli4VzqPMPR24HNRFgVKFw=="],
 
     "nth-check": ["nth-check@2.1.1", "", { "dependencies": { "boolbase": "^1.0.0" } }, "sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w=="],
@@ -363,6 +376,8 @@
     "tinyapp-fixture-client": ["tinyapp-fixture-client@workspace:client"],
 
     "tinyapp-fixture-server": ["tinyapp-fixture-server@workspace:server"],
+
+    "tinyapp-history": ["tinyapp-history@workspace:packages/tinyapp-history"],
 
     "tinyapp-lint": ["tinyapp-lint@workspace:packages/tinyapp-lint"],
 
