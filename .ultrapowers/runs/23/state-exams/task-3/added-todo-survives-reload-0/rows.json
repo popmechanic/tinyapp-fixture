@@ -1,0 +1,29 @@
+{
+  "sql": "SELECT _id, store FROM \"todos\"",
+  "rows": [
+    {
+      "_id": "_",
+      "store": "[[{\"todos\":[{\"0\":[{\"text\":[\"buy milk\",\"OhqqeV-----UVhzx\",2011181022],\"completed\":[false,\"OhqqeV----0UVhzx\",3269573603]},\"\",512007684],\"1\":[{\"text\":[\"Learn TinyBase\",\"\",29831184],\"completed\":[false,\"\",3177411910]},\"\",702726968],\"2\":[{\"text\":[\"Build an app\",\"\",1149020373],\"completed\":[false,\"\",3177411910]},\"\",2495211514]},\"\",3690169512]},\"\",2529307550],[{},\"\",0]]"
+    }
+  ],
+  "content": [
+    {
+      "todos": {
+        "0": {
+          "text": "buy milk",
+          "completed": false
+        },
+        "1": {
+          "text": "Learn TinyBase",
+          "completed": false
+        },
+        "2": {
+          "text": "Build an app",
+          "completed": false
+        }
+      }
+    },
+    {}
+  ],
+  "diff": []
+}
