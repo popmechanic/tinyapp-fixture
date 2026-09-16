@@ -1,0 +1,9 @@
+[
+  {
+    "table": "todos",
+    "row": "0",
+    "cell": "text",
+    "got": "buy milk",
+    "wanted": "buy bread"
+  }
+]

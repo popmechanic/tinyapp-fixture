@@ -1,0 +1,21 @@
+{
+  "sql": "SELECT _id, store FROM \"todos\"",
+  "rows": [
+    {
+      "_id": "_",
+      "store": "[[{\"todos\":[{\"0\":[{\"text\":[\"buy milk\",\"H1\",1],\"completed\":[false,\"H2\",2]},\"\",3]},\"\",4]},\"\",5],[{},\"\",0]]"
+    }
+  ],
+  "content": [
+    {
+      "todos": {
+        "0": {
+          "text": "buy milk",
+          "completed": false
+        }
+      }
+    },
+    {}
+  ],
+  "diff": []
+}
