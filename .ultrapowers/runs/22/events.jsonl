@@ -77,3 +77,5 @@
 {"kind":"fact:state.reached","task":"2","expected":"state-exams/expected/one-open-todo.json","sha256":"727e81e1175dcd4caf1c6a80295e4cac0d8a9909754fddfdb3334ad0a64d42ac","id":"01M2NDPJ9M0000D6JRTQ29YDC9","ts":1789572892980}
 {"kind":"handshake:settled","task":"2","expected":"state-exams/expected/one-open-todo.json","id":"01M2NDPJ9M0001G0GKC6VZZ45C","ts":1789572892980}
 {"kind":"engine:log","line":"task 2 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2NDPJ9N0000CSD64SXVMC8X","ts":1789572892981}
+{"kind":"worker:end","label":"impl:3","role":"implementer","sessionId":"2f548b77-b5c1-408d-b245-2cdc6b03da5d","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":6652,"output":27673,"cacheRead":5428769,"cacheCreation":111965,"costUsd":4.559119499999999,"models":["claude-opus-5"]},"id":"01M2NDTP610000VAS6Y5RCZ05J","ts":1789573028033}
+{"kind":"transcript:slice","label":"impl:3","sessionId":"2f548b77-b5c1-408d-b245-2cdc6b03da5d","bytes":11565,"id":"01M2NDTP6G000020GJA0H8N7RJ","ts":1789573028048}
