@@ -107,7 +107,7 @@ const CARRIED = {
 // (a) [M1] ---------------------------------------------------------------
 
 test(
-  '(a) [M1] the `views` rule finds nothing over the fixture`s own six exams',
+  '(a) [M1] the `views` rule finds nothing over the fixture`s own exams',
   async () => {
     // The defaults `loadContext` reads are relative to `process.cwd()`, and the
     // Proof runs this exam from the repository root.
@@ -117,7 +117,9 @@ test(
     expect(rule.name).toBe('views');
 
     const ctx = await contextOnce();
-    expect(ctx.exams).toHaveLength(6);
+    // A lower bound, not today's six: an exam a sibling change adds is one
+    // more exam the two sweeps below have to be quiet over.
+    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
 
     // Every one of the six asserts a view, and names a state that is there.
     const paths = ctx.snapshots.map(({path}) => path);

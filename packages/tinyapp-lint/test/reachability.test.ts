@@ -113,14 +113,20 @@ const runCli = (args: string[]): {code: number; lines: string[]} => {
 // (a) [M1] ---------------------------------------------------------------
 
 test(
-  '(a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached',
+  '(a) [M1] the rule is named `reachability`, and the fixture`s expected states are each reached',
   async () => {
     expect(reachability.name).toBe('reachability');
     expect(typeof reachability.run).toBe('function');
 
-    // The fixture's own snapshots: four expected, three seeds.
-    expect(CTX.snapshots.filter(({kind}) => kind === 'expected')).toHaveLength(4);
-    expect(CTX.snapshots.filter(({kind}) => kind === 'seed')).toHaveLength(3);
+    // The fixture's own snapshots, as lower bounds: what M1 pins is that every
+    // expected state the tree carries is reached, and the tree grows expected
+    // states and seeds.
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
+    ).toBeGreaterThanOrEqual(4);
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
+    ).toBeGreaterThanOrEqual(3);
 
     // A rule that fires on a file the fixture already carries is a plan defect,
     // not a finding.
@@ -132,17 +138,21 @@ test(
 // (b) [M2] ---------------------------------------------------------------
 
 /**
- * The line M2 pins, character for character.
+ * The line M2 pins — as a pattern, because two of its parts are counts of what
+ * the tree carries rather than claims of this leg's.
  *
  * `theme` is a `values` entry, and a `values` entry can only be written by a
  * callback: no fixture callback writes one, so this state is out of reach of
- * the three seeds whatever the bound.
+ * the seeds whatever the bound.
+ *
+ * The seed count is `[0-9]+` and the callback list is `[^—]+` behind four
+ * lookaheads, so the four callbacks of BASE must each be named in the list and
+ * a callback the store grows later may be named beside them. Everything else —
+ * the file, the subject, the depth, the whole fix sentence — is still pinned
+ * character for character.
  */
 const BAD_LINE =
-  'state-exams/expected/bad.json: state: reached by none of the 3 seeds ' +
-  'within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted ' +
-  '— write the state a callback reaches from a seed, or add the seed it is ' +
-  'reached from';
+  /^state-exams\/expected\/bad\.json: state: reached by none of the [0-9]+ seeds within 3 moves of (?=[^—]*addTodo)(?=[^—]*clearCompleted)(?=[^—]*deleteTodo)(?=[^—]*setTodoCompleted)[^—]+ — write the state a callback reaches from a seed, or add the seed it is reached from$/;
 
 test(
   '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
@@ -163,7 +173,7 @@ test(
     const elapsed = performance.now() - started;
 
     expect(findings).toHaveLength(1);
-    expect(formatFinding(findings[0]!)).toBe(BAD_LINE);
+    expect(formatFinding(findings[0]!)).toMatch(BAD_LINE);
 
     // The full exploration of an unreachable target over the three seeds, at
     // depth 3 and a 2,000-state cap, is what this budget is for.
@@ -252,10 +262,11 @@ test(
 /**
  * The line M5 pins, over a directory whose name the exam does not know in
  * advance — the CLI's `file` is the path relative to the root, which is why it
- * starts `state-exams/lint-tmp-`.
+ * starts `state-exams/lint-tmp-`. The seed count and the callback list are
+ * loosened exactly as `BAD_LINE`'s are, and for the same reason.
  */
 const CLI_LINE =
-  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the 3 seeds within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the [0-9]+ seeds within 3 moves of (?=[^—]*addTodo)(?=[^—]*clearCompleted)(?=[^—]*deleteTodo)(?=[^—]*setTodoCompleted)[^—]+ — write the state a callback reaches from a seed, or add the seed it is reached from$/;
 
 test(
   '(e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line',

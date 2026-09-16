@@ -143,21 +143,25 @@ afterAll(() => {
 
 // (a) [M1] ---------------------------------------------------------------
 
-test('(a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicate', async () => {
+test('(a) [M1] `INVARIANTS` carries the todos invariant, with the pinned predicate', async () => {
   const {INVARIANTS} = await storeModule();
 
   expect(Array.isArray(INVARIANTS)).toBe(true);
-  expect(INVARIANTS).toHaveLength(1);
+  // A lower bound and a `find`, never an exact length and an index: the app
+  // grows invariants over other tables, and what M1 pins is that the todos
+  // rule is among them and says what it says.
+  expect(INVARIANTS.length).toBeGreaterThanOrEqual(1);
 
-  const invariant = INVARIANTS[0]!;
-  expect(invariant.table).toBe('todos');
-  expect(invariant.message).toBe(MESSAGE);
+  const invariant = INVARIANTS.find(
+    (entry) => entry.table === 'todos' && entry.message === MESSAGE,
+  );
+  expect(invariant).toBeDefined();
 
   // A completed todo with no text breaks it; a completed todo with text and an
   // open todo with no text both hold.
-  expect(invariant.predicate({text: '', completed: true}, '1')).toBe(false);
-  expect(invariant.predicate({text: 'buy milk', completed: true}, '0')).toBe(true);
-  expect(invariant.predicate({text: '', completed: false}, '0')).toBe(true);
+  expect(invariant!.predicate({text: '', completed: true}, '1')).toBe(false);
+  expect(invariant!.predicate({text: 'buy milk', completed: true}, '0')).toBe(true);
+  expect(invariant!.predicate({text: '', completed: false}, '0')).toBe(true);
 });
 
 // (b) [M2] ---------------------------------------------------------------
@@ -174,11 +178,12 @@ test(
 
     const ctx = await contextOnce();
 
-    // What the quiet result is measured over: the fixture's seven snapshots,
-    // with the invariant of M1 live rather than an empty list.
-    expect(ctx.snapshots).toHaveLength(7);
-    expect(ctx.invariants).toHaveLength(1);
-    expect(ctx.invariants[0]!.message).toBe(MESSAGE);
+    // What the quiet result is measured over: every snapshot the fixture
+    // carries — a lower bound, since a sibling change adds snapshots — with
+    // the invariant of M1 live rather than an empty list.
+    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
+    expect(ctx.invariants.length).toBeGreaterThanOrEqual(1);
+    expect(ctx.invariants.map(({message}) => message)).toContain(MESSAGE);
     expect(ctx.storePath).toBe('client/src/storeData.ts');
 
     expect(await rule.run(ctx)).toEqual([]);

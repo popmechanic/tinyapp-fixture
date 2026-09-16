@@ -6,11 +6,17 @@ import {
   type Row,
 } from 'tinybase/with-schemas';
 
+// The cells of a todo, written once. `trash` is where a deleted todo waits, so
+// it is a todos row copied whole — the same cells by construction, which is how
+// a cell a later change adds to a todo becomes a cell of a trashed todo too.
+const TODO_CELLS = {
+  text: {type: 'string', default: ''},
+  completed: {type: 'boolean', default: false},
+} as const;
+
 export const TABLES_SCHEMA = {
-  todos: {
-    text: {type: 'string', default: ''},
-    completed: {type: 'boolean', default: false},
-  },
+  todos: TODO_CELLS,
+  trash: TODO_CELLS,
 } as const;
 
 // What every row of a table must satisfy, whoever wrote the row: the UI, an
@@ -23,12 +29,23 @@ export type Invariant = {
   message: string;
 };
 
+// A completed todo has non-empty text. Held once, because a trashed todo is a
+// todos row copied whole and so is a todo by the same rule.
+const completedHasText = (
+  row: Record<string, string | number | boolean>,
+): boolean =>
+  row.completed !== true || (typeof row.text === 'string' && row.text !== '');
+
 export const INVARIANTS: Invariant[] = [
   {
     table: 'todos',
-    predicate: (row) =>
-      row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
+    predicate: (row) => completedHasText(row),
     message: 'a completed todo has non-empty text',
+  },
+  {
+    table: 'trash',
+    predicate: (row) => completedHasText(row),
+    message: 'a completed todo waiting in the trash has non-empty text',
   },
 ];
 
@@ -81,8 +98,8 @@ export const createTodosStore = (seed?: TodosContent): TodosStore => {
   return created;
 };
 
-// The three mutations below are the single code path shared by the UI's
-// buttons and by any headless caller (an exam, the seeded snapshot page).
+// The mutations below are the single code path shared by the UI's buttons and
+// by any headless caller (an exam, the seeded snapshot page).
 
 export const addTodo = (store: TodosStore, text: string): string | undefined => {
   const trimmed = text.trim();
@@ -99,8 +116,30 @@ export const setTodoCompleted = (
   store.setPartialRow('todos', id, {completed});
 };
 
+// Delete moves the row whole into `trash`, which only ever holds the last one
+// deleted: clearing `trash` first is what keeps at most one row waiting, and
+// doing all three writes in one transaction is what stops a listener ever
+// seeing the row in neither table or in both.
 export const deleteTodo = (store: TodosStore, id: string): void => {
-  store.delRow('todos', id);
+  store.transaction(() => {
+    if (!store.hasRow('todos', id)) {
+      return;
+    }
+    store.delTable('trash');
+    store.setRow('trash', id, store.getRow('todos', id));
+    store.delRow('todos', id);
+  });
+};
+
+// Undo puts the waiting row back exactly as it was. With nothing waiting the
+// loop body never runs, so the store is left as it was found.
+export const undoDelete = (store: TodosStore): void => {
+  store.transaction(() => {
+    store.getRowIds('trash').forEach((id) => {
+      store.setRow('todos', id, store.getRow('trash', id));
+      store.delRow('trash', id);
+    });
+  });
 };
 
 export const clearCompleted = (store: TodosStore): void => {
