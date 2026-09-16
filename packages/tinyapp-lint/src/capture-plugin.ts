@@ -25,9 +25,29 @@
 
 import {resolve} from 'node:path';
 
-/** The names `tinyapp-exam` exports at runtime, `stateExam` apart. */
+/**
+ * The names `tinyapp-exam` exports at runtime, `stateExam` apart.
+ *
+ * Every one of them, and not only the ones an exam file happens to import
+ * today: a name missing here is a name the capture child cannot link, and the
+ * child failing to link is `bun run lint:state` dying as `capture failed`
+ * rather than reporting anything.
+ *
+ * `persistenceExam` is a no-op among them rather than a second capture.
+ * The linter's rules read seeds and expected files against the schema, and a
+ * persistence exam has no seed to read — it starts from a page's own empty
+ * storage. So a file whose only top-level call is `persistenceExam(` hands
+ * nothing over and is counted as no state exam, which is what the CLI's own
+ * exam, counting the files that match `^stateExam\(`, already says it is.
+ */
 const EXAM_NO_OPS = [
   'runStateExam',
+  'persistenceExam',
+  'runPersistenceExam',
+  'contentOf',
+  'EXAM_PRELUDE',
+  'READY_TIMEOUT_MS',
+  'PERSIST_TIMEOUT_MS',
   'STATE_EXAM_TIMEOUT_MS',
   'launchBrowser',
   'withContract',

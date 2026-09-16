@@ -51,6 +51,16 @@ export type ExamOptions = {
   minify?: boolean;
   /** The same thing the other way round, for a test that reads better so. */
   unminified?: boolean;
+  /**
+   * How long a persistence exam waits for the page to report its persister
+   * loaded, `READY_TIMEOUT_MS` by default. Read by that move alone.
+   */
+  readyTimeoutMs?: number;
+  /**
+   * How long a persistence exam waits for the persister's rows to catch up with
+   * the page's store, `PERSIST_TIMEOUT_MS` by default. Read by that move alone.
+   */
+  persistTimeoutMs?: number;
 };
 
 /** One exam run's verdict, its record, and where that record was written. */
