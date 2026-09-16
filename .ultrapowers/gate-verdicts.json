@@ -1,0 +1,151 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "ef771caabdd23f8562ff78eaa0448041f6949bc250f35a2efe98ee977774899a",
+      "verdict": "pass",
+      "reason": "Every clause has a falsifying leg \u2014 M1's schema and single Initialize data repository entry via a second DatabaseSync, M2's four-message log with messageOf spelling computed as setTodoCompleted(\"0\", true), M3's null plus the unchanged four-entry log, M4/M5's exact snapshots and single-row diffs, M6's clock and breach message, M7's state exam with killed mutant, and M8's two Run: lines whose grep literal matches base package.json's --noEmit\" tail so the new step lands immediately before the exam package's last step \u2014 and the base excerpt pins nothing opposite."
+    },
+    "2": {
+      "hash": "5bf9d89385eb60fbf0f02d5240b86a4633a61e418f079394b3fb19a5a36ae6fe",
+      "verdict": "pass",
+      "reason": "Every enumerated M1 row has its leg (b\u2013d), M2's exactly one/two are pinned by length plus the recorded diff-call order in (f), M3's rendered literals compute correctly under its own format (1. c1 --setTodoCompleted(\"0\", true)--> c2 (1 change), newline-joined, plural at k=2 in (g)), M4's app-performs-the-call is the stateExam with its mutant in (a), and both named files are absent at base and created by the task."
+    },
+    "3": {
+      "hash": "211d6882a89d8357349cc890953c4909bf211036104ca5b655b66b407043cb4b",
+      "verdict": "pass",
+      "reason": "M1's three row kinds and M2's four enumerated inputs each get a leg whose expected literal follows from the stated JSON.parse/absent rule (leg d's '\"buy milk\"' -> 'buy milk', leg g's $values skip -> []), and leg (a) makes M3 falsifiable through stateExam's own hollow exam: failure, so a green exam entails the sentence at the mutantOf layer, with both named files absent at base as this task's own creations."
+    },
+    "4": {
+      "hash": "04c460f5ab31bb28f10d5fb286647d1aea37c3698b52f6358c98138ba61fc471",
+      "verdict": "pass",
+      "reason": "The literals compute under the clauses' own rules \u2014 one refused call leaves 9 log lines (7 commits + seed + init), 7 list lines with per-row diff counts [2,2,1,1,1,1,2] where transition 4 is the lone store-value filter that M5/M6 refuse, the seed/expected rows follow from the refusal committing nothing, and the exam literal is fifteen lines \u2014 and every universal (exactly three files via leg (g)'s listing, no file via leg (h)'s absent dirs, 13 re-exports via leg (o), exactly 6/1 mutants via (j)/(k)) has a falsifying leg, with M7's edit to the present views.test.ts legged by Run and grep."
+    }
+  },
+  "tally": {
+    "base": "062aebf63e8f21290e7bd7348fa60ed7d76d6332",
+    "dispatched": 8,
+    "rejected": 3,
+    "rounds": {
+      "1": {
+        "dispatched": 4,
+        "rejected": 2
+      },
+      "2": {
+        "dispatched": 3,
+        "rejected": 1
+      },
+      "3": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    },
+    "note": "Round 1: task 1 rejected (leg (c)'s session lacked setFilter for legs (e)/(f); leg (b)'s SCHEMA_SQL alternative left M1's keys unfalsified) and task 4 rejected (the list line's cell count for a values-only transition contradicted M5's 'no table cell'; 'exactly three files' had no counting leg) \u2014 both fixed, task 2's list-line format changed from cell(s) to change(s) alongside and re-read. Round 2: task 1 rejected on the reader's belief that Dolt hashes are 32-char base32 \u2014 DoltLite's are 40-hex, measured, now stated in M2. Round 3: task 1 pass."
+  },
+  "authoring": {
+    "minutes": 47,
+    "probes": 0,
+    "routing": {
+      "branch": "width",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "While run-153 folds, what should this session take up?",
+        "options": [
+          "Author #1036 and the two fixture plans",
+          "Author #1037 too",
+          "Grilling sitting on the authoring lint",
+          "Prep the 0.3.31 release notes"
+        ],
+        "recommended": "Author #1036 and the two fixture plans",
+        "picked": "Author #1036 and the two fixture plans"
+      },
+      {
+        "question": "DoltLite execute lane",
+        "options": [
+          "Ultrapowers",
+          "Subagent-Driven",
+          "Hold for the handshake discussion"
+        ],
+        "recommended": "Ultrapowers",
+        "picked": "Ultrapowers"
+      },
+      {
+        "question": "Summary as drafted",
+        "options": [
+          "Adopt as drafted",
+          "I will edit it"
+        ],
+        "recommended": "Adopt as drafted",
+        "picked": "Adopt as drafted"
+      },
+      {
+        "question": "Design calls: refuse value-only transitions, pin no hash, loosen views.test to interaction exams",
+        "options": [
+          "Keep all three",
+          "Extend the mutant vocabulary in this plan"
+        ],
+        "recommended": "Keep all three",
+        "picked": "Keep all three"
+      }
+    ]
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "1",
+      "hash": "ece68305553af6a1fe993e0ab74878a0492cb1eda0796b27497bd3dd5283dfe7",
+      "verdict": "fail",
+      "reason": "Leg (e) awaits session.setFilter('done') on a session built with {addTodo, setTodoCompleted}, so under M2's own rule that session has no setFilter; leg (b)'s 'or the exported SCHEMA_SQL literal' alternative lets M1's table/primary-key pin go unfalsified."
+    },
+    {
+      "round": 1,
+      "task": "2",
+      "hash": "b05e12051fd574276f2944ca7a7a6e84345de0e88700e21596ed86838b0c9f7d",
+      "verdict": "pass",
+      "reason": "superseded by round 2 after the list-line format changed from cell(s) to change(s)"
+    },
+    {
+      "round": 1,
+      "task": "3",
+      "hash": "211d6882a89d8357349cc890953c4909bf211036104ca5b655b66b407043cb4b",
+      "verdict": "pass",
+      "reason": "as recorded in tasks"
+    },
+    {
+      "round": 1,
+      "task": "4",
+      "hash": "61ac9872b40334b5458b63bd0bb766b7a6c216ef3e119621dd107fed87347aa1",
+      "verdict": "fail",
+      "reason": "M2 pins transition 4 (setFilter(\"done\")) at 1 cell while M5/M6 pin that the same transition changed no table cell, unsatisfiable unless 'cells' silently counts store values; M3's 'exactly three files' has no leg that counts what the temp directory holds."
+    },
+    {
+      "round": 2,
+      "task": "1",
+      "hash": "d50454d390ce40ae91c16d6b64b97156e40624afcacda1bf7e89db40019e7803",
+      "verdict": "fail",
+      "reason": "Leg (c) pins each recorded call's resolved value as a 40-hex string, but the reader held Dolt commit hashes to be 32-character base32 \u2014 DoltLite's are 40-hex, measured, so M2 now states the spelling."
+    },
+    {
+      "round": 2,
+      "task": "2",
+      "hash": "5bf9d89385eb60fbf0f02d5240b86a4633a61e418f079394b3fb19a5a36ae6fe",
+      "verdict": "pass",
+      "reason": "as recorded in tasks"
+    },
+    {
+      "round": 2,
+      "task": "4",
+      "hash": "04c460f5ab31bb28f10d5fb286647d1aea37c3698b52f6358c98138ba61fc471",
+      "verdict": "pass",
+      "reason": "as recorded in tasks"
+    },
+    {
+      "round": 3,
+      "task": "1",
+      "hash": "ef771caabdd23f8562ff78eaa0448041f6949bc250f35a2efe98ee977774899a",
+      "verdict": "pass",
+      "reason": "as recorded in tasks"
+    }
+  ]
+}
