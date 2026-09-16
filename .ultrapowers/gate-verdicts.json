@@ -1,0 +1,104 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "52106decc52556844c634cd3b604fbe0e2384451edb0428d25b5d2cf1b600cfb",
+      "verdict": "pass",
+      "reason": "Every clause has a falsifying leg (M1 the stateExam plus the expected-file parse, M3/M6/M7 one assertion per pinned row, M4/M5 snapshot-before/after for the no-op rows, M9 one test per readdir'd file, M10 the two Run lines), the literals compute as pinned (' home, urgent ,,home, ' normalizes to ['home','urgent'], the three-row table reads ['home','urgent']/2, clearing with ' , ' restores the seed with cell ids ['completed','text']), and BASE neither pins the opposite (VALUES_SCHEMA holds only filter, trash is TODO_CELLS, INVARIANTS[0] is the completed-text entry) nor lacks anything a leg names."
+    },
+    "2": {
+      "hash": "020f842ad12614c213e223cd5579b9d7302bcc8c67c99a73a586f0ecafcd8238",
+      "verdict": "pass",
+      "reason": "Leg (a) is the M1 exam verbatim with a mutant that drops the very tags cell the typing stores, leg (b) enumerates both rows with every M2 attribute and an index-guarded order check, leg (c) is the M3 Run line whose exit 0 forces the BASE pins at lines 107 and 128 of type-due-date.test.ts to be loosened; the seed plus 'home, urgent' normalizes to the pinned content with row 0 untouched and '1 tagged', TodoItem.tsx at BASE already orders checkbox, due, then the Delete button so the tags box slots between, and TagsInput.tsx and type-tags.test.ts are absent at BASE as a task that creates them requires."
+    },
+    "3": {
+      "hash": "071198c3e699d7f841ea51e6a4fd218860bbde2d8c81bb1cf97c8526beefedc6",
+      "verdict": "pass",
+      "reason": "Every clause has a falsifying leg: (a) pins the store move, the seven views, the killed mutant and both fixture literals of M1; (b) and (c) walk each M2/M3 render one assertion per row, including the alphabetical ['home','urgent','work'] against the encounter order and the empty-chip/3-button case; (d)/(e) are the two Run lines of M4; the literals compute (home and urgent make 2 chips, {urgent,work} with {home,urgent} make 3 sorted, both rows open reads '0 of 2 done', one tagged row reads '1 tagged'), and at BASE the seed, expected file and tag-filter.test.ts are absent while the present files pin nothing opposite."
+    }
+  },
+  "tally": {
+    "base": "0fac23239655e7169b11a8be97fe9a1b7142ced5",
+    "dispatched": 4,
+    "rejected": 1,
+    "rounds": {
+      "1": {
+        "dispatched": 3,
+        "pass": 2,
+        "fail": 1
+      },
+      "2": {
+        "dispatched": 1,
+        "pass": 1,
+        "fail": 0
+      }
+    }
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "1",
+      "hash": "52106decc52556844c634cd3b604fbe0e2384451edb0428d25b5d2cf1b600cfb",
+      "verdict": "pass"
+    },
+    {
+      "round": 1,
+      "task": "2",
+      "hash": "020f842ad12614c213e223cd5579b9d7302bcc8c67c99a73a586f0ecafcd8238",
+      "verdict": "pass"
+    },
+    {
+      "round": 1,
+      "task": "3",
+      "hash": "b7b35a2d0652b9fda558ee7625df2818e2e0462931d58421ef68ec7848538aea",
+      "verdict": "fail",
+      "reason": "The Claim's 'in alphabetical order' was pinned only by home-before-urgent over a seed whose tags string is already alphabetical and also insertion order, so encounter-order chips passed every leg, and no leg seeded two todos sharing a tag, so 'one chip for each tag' (dedupe) was never falsified; fixed by adding to M2 a static render over two rows tagged 'urgent,work' and 'home,urgent' whose chips must be exactly ['home', 'urgent', 'work'] in document order, with its own leg in (b)."
+    },
+    {
+      "round": 2,
+      "task": "3",
+      "hash": "071198c3e699d7f841ea51e6a4fd218860bbde2d8c81bb1cf97c8526beefedc6",
+      "verdict": "pass"
+    }
+  ],
+  "authoring": {
+    "minutes": 27,
+    "probes": 12,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Which of these do we act on now?",
+        "options": [
+          "Surviving mutant is a pre-review red",
+          "Next fixture feature plan",
+          "Reviewer-block census in the release notes",
+          "Write the analysis to #964 and #836"
+        ],
+        "recommended": "Surviving mutant is a pre-review red",
+        "picked": "Next fixture feature plan"
+      },
+      {
+        "question": "Which feature does the next fixture plan build?",
+        "options": [
+          "Tags with a tag filter",
+          "Inline edit of a todo's text",
+          "Bulk complete and bulk delete"
+        ],
+        "recommended": "Tags with a tag filter",
+        "picked": "Tags with a tag filter"
+      },
+      {
+        "question": "The tags plan on the fixture: confirm Claim and execute?",
+        "options": [
+          "Confirm and launch on fixture main 0fac2323",
+          "Confirm, but hold the launch",
+          "Edit the Claim"
+        ],
+        "recommended": "Confirm and launch on fixture main 0fac2323",
+        "picked": "Confirm and launch on fixture main 0fac2323"
+      }
+    ]
+  }
+}
