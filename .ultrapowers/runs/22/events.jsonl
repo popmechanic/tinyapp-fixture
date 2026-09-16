@@ -129,3 +129,14 @@
 {"kind":"engine:phase","phase":"Wave 3","id":"01M2NGS7CR0000CKJ1F99G4EMZ","ts":1789576125848}
 {"kind":"driver:wave-adopted","wave":3,"tasks":["5"],"headSha":"79e77fa28ae8cc0d54c2cf6897fadcdad467e8a4","why":"end","applied":{"5":"base"},"id":"01M2NH5N0G0000P9C7V5HBRND1","ts":1789576533008}
 {"kind":"driver:integrated-clean","wave":3,"removed":0,"id":"01M2NH5N2B0000436CCT689NSP","ts":1789576533067}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":3,"id":"01M2NH5TK40000W4JK1181GHE6","ts":1789576538724}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":3,"id":"01M2NH5W9S0000J9NMVG4NRETZ","ts":1789576540473}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- client/src/storeData.ts server packages/tinyapp-history state-exams README.md","exit":0,"minor":false,"wave":3,"id":"01M2NH5W9Z0000VCA93W2T2A13","ts":1789576540479}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2NH5WEY0000G7XYBCCST1XK","ts":1789576540638}
+{"kind":"driver:stage","stage":"finalize","id":"01M2NH5WHW0000654511KB0JVX","ts":1789576540732}
+{"kind":"driver:stage","stage":"gate","id":"01M2NH5WKQ0000D2RPA97VH8V3","ts":1789576540791}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2NH5WQ800006GNAGWKJY27D","ts":1789576540904}
+{"kind":"driver:stage","stage":"approve","id":"01M2NH5WQ800019KZFKY2NQESM","ts":1789576540904}
+{"kind":"driver:approved","stamp":"run-22","integrationBranch":"ultra/integration-run-22","id":"01M2NH5WSP0000007GPE6J4F8H","ts":1789576540982}
+{"kind":"run:open","runId":"run-22","base":"486ab07278aed9caec7900c84c7637f3b5e7a4b1","source":"fleet/publish-fold.mjs","id":"01M2NH5ZBM00009113C793GHWN","ts":1789576543604}
+{"kind":"driver:publish-fold","run":"22","attempt":"1","base":"486ab07278aed9caec7900c84c7637f3b5e7a4b1","tip":"486ab07278aed9caec7900c84c7637f3b5e7a4b1","candidate":"79e77fa28ae8cc0d54c2cf6897fadcdad467e8a4","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2NH5ZT300008ME5KSYBGMA6","ts":1789576544067}

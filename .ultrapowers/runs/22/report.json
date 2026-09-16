@@ -1,0 +1,605 @@
+{
+  "integrationBranch": "ultra/integration-run-22",
+  "baseSha": "486ab07278aed9caec7900c84c7637f3b5e7a4b1",
+  "waves": [
+    [
+      "1"
+    ],
+    [
+      "2",
+      "3",
+      "4"
+    ],
+    [
+      "5"
+    ]
+  ],
+  "dependencyEdges": [
+    "2 -> 5 (interface)",
+    "1 -> 2 (interface)",
+    "1 -> 3 (interface)",
+    "1 -> 4 (interface)",
+    "1 -> 5 (interface)",
+    "3 -> 5 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "4b3b728602af7fe0c1b114489b3881749de7f43f",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-22/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "",
+      "tier": "opus",
+      "review": "lean",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789572289368,
+      "stateExams": [],
+      "findings": []
+    },
+    {
+      "task": "4",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "f57f56f68d63b5fdcf378f3655bc23d1efdd9602",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-22/patches/task-4.patch",
+      "reviewVerdict": "clean",
+      "notes": "concern: plan-defect: leg (c) reads \"its stdout parses to an array with exactly one entry whose `filePath` ends with `lint-ui-tmp-<rand>/Bad.tsx`\". Measured on this tree the array has 26 entries \u2014 ESLint's JSON formatter emits one entry per linted file, most with zero messages \u2014 so the sentence can only mean exactly one *matching* entry, which is what I verified. An exam that asserts the array's own length is 1 is red for any config; the task's own Context (\"prints one array, one entry per linted file\") supports the matching-entry reading, so I resolved it that way rather than changing anything. Flagged only so a red exam on that assertion is read as the wording, not the config.",
+      "tier": "opus",
+      "review": "lean",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789572763465,
+      "stateExams": [],
+      "findings": []
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "4009e9bc7989b0f82787ce2c650cdfb5a7549380",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-22/patches/task-2.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789572892981,
+      "stateExams": [
+        {
+          "exam": "design-system-installed",
+          "store_ms": 6.033231000000001,
+          "render_ms": 965.74758,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "4872c092dd29a8e865814b8b4b693ad8d6b8c5e1",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-22/patches/task-3.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789573330326,
+      "stateExams": [
+        {
+          "exam": "click-by-name-completes-todo",
+          "store_ms": 617.857448,
+          "render_ms": 200.34252100000003,
+          "render": "ran",
+          "action_ms": 98.85866600000008,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "5",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "adb591fc139e79affc70e947d32b75693041179f",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-22/patches/task-5.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "concern: plan-defect: the task Context asserts that `<Checkbox id=\"todo-0\" />` puts the id on the element carrying `role=\"checkbox\"`. It does not \u2014 base-ui's `CheckboxRoot` routes `id` to the hidden native input (`const rootId = nativeButton ? controlId : id;`), so views naming `#todo-0` would have read the `aria-hidden` input instead of the root. Taken as written, M4's `#todo-1` checked / `#todo-0` unchecked and M5's `role=\"checkbox\"` on `#todo-*` would both have been unreachable.; concern: plan-defect: the task Context describes `bun run lint:ui` at BASE as producing \"7 baseline findings\". The measured count at BASE on this clone is 8. Nothing in the acceptance clauses depends on the number \u2014 M2 and M7 are about exit codes \u2014 but the figure should not be trusted as a landmark by a later reader.; concern: The Proof's `Test:`/guard file `tests/state-exams/styled-page.test.ts` is a peer's and is absent from this tree, so M4, M5 and M7 are verified here by throwaway scripts that reproduce each clause's own words rather than by the peer's assertions. The scripts were deleted; only their results are reported above. If the peer's file words any clause more narrowly than the clause does, that difference is unmeasured from here.; concern: `tests/state-exams/pin-todo.test.ts` is required to migrate (it clicked `.todoItem` markup and asserted on the app's own classes) but is not named in FILES; the edit was taken and is recorded as an amendment rather than left as a red, because leaving it would have failed the `bun test tests/state-exams` Run line.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789576125813,
+      "stateExams": [
+        {
+          "exam": "buy-milk",
+          "store_ms": 1.4080050000047777,
+          "render_ms": 1093.8422080000018,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "clear-completed",
+          "store_ms": 4.028185000001031,
+          "render_ms": 1109.388644999999,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "click-by-name-completes-todo",
+          "store_ms": 1034.3475219999964,
+          "render_ms": 213.5378090000013,
+          "render": "ran",
+          "action_ms": 137.83429800000158,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "click-completes-todo",
+          "store_ms": 1098.0583179999994,
+          "render_ms": 213.1574219999984,
+          "render": "ran",
+          "action_ms": 157.90537500000028,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "completed-past-due-not-overdue",
+          "store_ms": 1146.206764,
+          "render_ms": 267.6892190000001,
+          "render": "ran",
+          "action_ms": 157.89718500000004,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "delete-to-trash",
+          "store_ms": 1132.6850899999845,
+          "render_ms": 269.76759399997536,
+          "render": "ran",
+          "action_ms": 167.8529409999901,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "derived-complete-first-todo",
+          "store_ms": 1.4122309999947902,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "derived-exam",
+          "store_ms": 0.5784679999997024,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "design-system-installed",
+          "store_ms": 0.7384489999967627,
+          "render_ms": 1081.2860349999974,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "done-count",
+          "store_ms": 6.022683000000001,
+          "render_ms": 973.231272,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "due-date-marks-overdue",
+          "store_ms": 1013.247589999999,
+          "render_ms": 185.80678599998646,
+          "render": "ran",
+          "action_ms": 140.01685500000895,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "empty-todo-refused",
+          "store_ms": 0.9426559999992605,
+          "render_ms": 990.9031669999968,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "enter-submits-todo",
+          "store_ms": 1229.628991999998,
+          "render_ms": 186.42618200001016,
+          "render": "ran",
+          "action_ms": 270.55088900000555,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "filter-bar",
+          "store_ms": 1039.5943450000013,
+          "render_ms": 227.04180300000007,
+          "render": "ran",
+          "action_ms": 136.7243950000011,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "filter-done",
+          "store_ms": 1099.6639870000072,
+          "render_ms": 229.79818900002283,
+          "render": "ran",
+          "action_ms": 154.68610300001455,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "mutant-from-diff",
+          "store_ms": 1.0894919999991544,
+          "render_ms": 1076.2808519999962,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "pin-todo",
+          "store_ms": 1024.0503279999975,
+          "render_ms": 212.93759499999578,
+          "render": "ran",
+          "action_ms": 167.1636340000041,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "session-transitions",
+          "store_ms": 1.3014260000054492,
+          "render_ms": 1041.7779819999996,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "set-filter",
+          "store_ms": 0.7462990000058198,
+          "render_ms": 1135.3807570000063,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "set-todo-due",
+          "store_ms": 1.4129620000021532,
+          "render_ms": 1094.3413029999938,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "state-exam",
+          "store_ms": 0.5101469999999608,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "store-history",
+          "store_ms": 13.295912000001408,
+          "render_ms": 1002.5822389999958,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "styled-page",
+          "store_ms": 1064.370213999995,
+          "render_ms": 222.6354779999965,
+          "render": "ran",
+          "action_ms": 136.98152500000288,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "type-due-date",
+          "store_ms": 1029.4616160000005,
+          "render_ms": 221.50307299999986,
+          "render": "ran",
+          "action_ms": 145.07323500000348,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "undo-delete",
+          "store_ms": 1134.8636440000118,
+          "render_ms": 167.78032799999346,
+          "render": "ran",
+          "action_ms": 244.68110400000296,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": " action and an entry is the same red [1.90ms]\n(pass) leg (e) [M5]: the mutant move is unchanged \u2014 a green click spec still kills its mutant [0.22ms]\n(pass) leg (f) [M6]: the two re-aimed test files pass, and neither names the endpoint or its stub [5346.65ms]\n(pass) leg (g) [M1] [M7]: a click on the fixture completes the todo, read through the page store, under the ceiling [2309.57ms]\n(pass) leg (g) [M7]: forced unminified, the url is over the ceiling and the exam says so rather than hanging [254.92ms]\n(pass) leg (g) [M7]: `open` refuses a data: url over the ceiling within 15 s, naming it [96.59ms]\n\npackages/tinyapp-lint/test/references.test.ts:\n(pass) (a) [M1] the rule is named `references` and says nothing about the fixture [212.02ms]\n(pass) (b) [M2] the dangling `owner` is one finding, formatted exactly as pinned [0.50ms]\n(pass) (c) [M3] a resolvable reference, and a row without the cell, are both silent [0.28ms]\n(pass) (d) [M4] a snapshot without the referenced table names the missing row [0.15ms]\n(pass) (e) [M5] the fixture store module, and `lint:state` over one seeded violation [176.79ms]\n\npackages/tinyapp-lint/test/reachability.test.ts:\n(pass) (a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached [1306.20ms]\n(pass) (b) [M2] an unreachable expected state is one finding, on the pinned line [3596.96ms]\n(pass) (c) [M3] a state equal to a seed is reached in zero moves [0.17ms]\n(pass) (d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract [0.76ms]\n$ bun packages/tinyapp-lint/src/cli.ts --expected \"/home/exedev/target/.claude/ultrapowers/run-run-22/clones/integration/state-exams/lint-tmp-X0JfpK/expected\" --exams \"/home/exedev/target/.claude/ultrapowers/run-run-22/clones/integration/state-exams/lint-tmp-X0JfpK/exams\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [3892.21ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1821.10ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [205.95ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.37ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [15.42ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-f32Qqz\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [369.13ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [232.39ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.43ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.46ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [210.96ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.28ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.26ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1223.76ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [281.45ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [3.38ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.30ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.74ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1338.49ms]\n\n 539 pass\n 0 fail\n 1713 expect() calls\nRan 539 tests across 45 files. [399.34s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 20 snapshots and 21 exams in 1526 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- client/src/storeData.ts server packages/tinyapp-history state-exams README.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 20 snapshots and 23 exams in 1692 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- client/src/storeData.ts server packages/tinyapp-history state-exams README.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 20 snapshots and 24 exams in 1718 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- client/src/storeData.ts server packages/tinyapp-history state-exams README.md",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 146335,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1413.46ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [107.32ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.30ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [7.63ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-gyE4eU\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [211.38ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [111.94ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.41ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.38ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [105.79ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.39ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.47ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1076.86ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [192.68ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.51ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.10ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [2.94ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.14ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1441.62ms]\n\n 402 pass\n 0 fail\n 1324 expect() calls\nRan 402 tests across 40 files. [143.44s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "3f39d9b7f97a317a4b3b72da4c9acb05b3388e86",
+      "branches": [
+        "1"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "4fa714b7ca099fd46be33aaf8392935299b5baf2",
+      "branches": [
+        "4",
+        "2",
+        "3"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 3,
+      "status": "MERGED",
+      "headSha": "79e77fa28ae8cc0d54c2cf6897fadcdad467e8a4",
+      "branches": [
+        "5"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-22/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-22/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.645,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-22/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-22/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 1.413,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 3,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-22/frontier/wave-3/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-22/frontier/wave-3/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 2.538,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 5,
+    "tasks_planned": 5,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 4: plan-defect: leg (c) reads \"its stdout parses to an array with exactly one entry whose `filePath` ends with `lint-ui-tmp-<rand>/Bad.tsx`\". Measured on this tree the array has 26 entries \u2014 ESLint's JSON formatter emits one entry per linted file, most with zero messages \u2014 so the sentence can only mean exactly one *matching* entry, which is what I verified. An exam that asserts the array's own length is 1 is red for any config; the task's own Context (\"prints one array, one entry per linted file\") supports the matching-entry reading, so I resolved it that way rather than changing anything. Flagged only so a red exam on that assertion is read as the wording, not the config.",
+    "task 2: amendment (clause): The Context's install recipe \u2014 \"in `client/`, `bunx --bun shadcn@latest init -d --yes` writes `components.json` \u2026 and a 130-line `src/index.css`\" \u2014 read as needing two of its own later products in place before it will run. I wrote the tsconfig `paths` alias and a one-line stub `client/src/index.css` containing `@import \"tailwindcss\";` first, then ran init, which overwrote the stub with its own 129-line sheet. The end state is the CLI's own output, unedited. \u2014 On this tree init refused twice at preflight: \"No Tailwind CSS configuration found at .../client\" (shadcn detects Tailwind v4 by finding a stylesheet that imports it, and at BASE `client/src/index.css` did not exist) and \"Could not find valid path aliases or package imports for init\" (at BASE `client/tsconfig.json` had no `paths`). Neither refusal is reachable by re-running the command as the Context spells it; the sequencing is the only way to get the CLI to write the vendor files rather than hand-vendoring them, which the Context forbids.",
+    "task 2: amendment (clause): The Context says the CLI \"reformats the manifests and, on the probe, downgraded `@types/node`\", so `git checkout -- package.json client/package.json bun.lock` puts back whatever it rewrote. I ran no such checkout. \u2014 The CLI touched none of them here \u2014 `git status` after both CLI invocations showed only the new vendor files and my three edits. The checkout would have been a no-op, and `bun install --frozen-lockfile` exits 0 without it. Noting it so a later session does not read the missing checkout as a skipped step.",
+    "task 2: every mutant killed (design-system-installed) \u2014 no reviewer was dispatched (reviewOnStateExams off)",
+    "task 3: examiner: (e) [M5] \u2014 `assertView`'s two spellings guarded in `packages/tinyapp-lint/test/views.test.ts` \u2014 The leg's only home is `packages/tinyapp-lint/test/views.test.ts`, which the Proof lists under `Guard:` and not under `Test:`, and the examiner writes only the `Test:` paths. This is a placement note, not a reading I dispute: the clause is encodable and the implementer owes it in that guard file under a comment naming this task. Leg (d) already pins M4's `aria-checked`/`data-checked` behaviour with full-string equality in `render-move.test.ts`, so the clause is not unexamined \u2014 only its guard-file half is outside my writable set.",
+    "task 3: every mutant killed (click-by-name-completes-todo) \u2014 no reviewer was dispatched (reviewOnStateExams off)",
+    "task 5: plan-defect: the task Context asserts that `<Checkbox id=\"todo-0\" />` puts the id on the element carrying `role=\"checkbox\"`. It does not \u2014 base-ui's `CheckboxRoot` routes `id` to the hidden native input (`const rootId = nativeButton ? controlId : id;`), so views naming `#todo-0` would have read the `aria-hidden` input instead of the root. Taken as written, M4's `#todo-1` checked / `#todo-0` unchecked and M5's `role=\"checkbox\"` on `#todo-*` would both have been unreachable.",
+    "task 5: plan-defect: the task Context describes `bun run lint:ui` at BASE as producing \"7 baseline findings\". The measured count at BASE on this clone is 8. Nothing in the acceptance clauses depends on the number \u2014 M2 and M7 are about exit codes \u2014 but the figure should not be trusted as a landmark by a later reader.",
+    "task 5: The Proof's `Test:`/guard file `tests/state-exams/styled-page.test.ts` is a peer's and is absent from this tree, so M4, M5 and M7 are verified here by throwaway scripts that reproduce each clause's own words rather than by the peer's assertions. The scripts were deleted; only their results are reported above. If the peer's file words any clause more narrowly than the clause does, that difference is unmeasured from here.",
+    "task 5: `tests/state-exams/pin-todo.test.ts` is required to migrate (it clicked `.todoItem` markup and asserted on the app's own classes) but is not named in FILES; the edit was taken and is recorded as an amendment rather than left as a red, because leaving it would have failed the `bun test tests/state-exams` Run line.",
+    "task 5: amendment (files): Deleted the ten hand-written stylesheets under `client/src` \u2014 `button.css`, `filterBar.css`, `info.css`, `input.css`, `loading.css`, `title.css`, `todoInput.css`, `todoItem.css`, `todoList.css`, `topBar.css`. None is named in FILES (only `client/src/index.css` is). \u2014 M1 requires that the only `.css` under `client/src` recursively is `client/src/index.css`, so the clause cannot be met without deleting files FILES does not name. Each deletion is paired with the component edit that replaces its rules with Tailwind utilities and shadcn variants.",
+    "task 5: amendment (files): Deleted `client/src/Button.tsx` and `client/src/Input.tsx`, neither of which is named in FILES. \u2014 Both are the fixture's own hand-rolled controls whose only styling was `./button.css` and `./input.css`. With those stylesheets gone the imports dangle, and their hand-written class names (`primary`, and the input's own) are exactly what `shadcn/no-unknown-classes` flags, so leaving the files in place makes `bun run lint:ui` red and M2 unreachable. The vendored `@/components/ui/button` and `@/components/ui/input` replace them at every call site; `bun run typecheck` and all three test suites are green with them gone.",
+    "task 5: amendment (files): Edited `tests/state-exams/pin-todo.test.ts`, which is not named in FILES: its action became `{click: {role: 'button', name: 'Pin walk the dog'}}`, its views moved off `.todoItem` onto `#todoList li` and `[role=checkbox]`, and leg (f)'s two verbatim `<button ...>Pin</button>` regexes were loosened to `/<button[^>]*id=\"pin-1\"[^>]*>Unpin<\\/button>/` and the `pin-0` twin so they follow the shadcn markup rather than pin a class list. \u2014 The file is one of the 23 exams `loadContext()` reads and one of the 24 files `bun test tests/state-exams` runs, so M3's locator/selector sweep and M6's green suite both cover it. Left unmigrated it would fail on `act: no element matches .todoItem \u2026` and would put a `.todoItem` selector in M3's sweep.",
+    "task 5: amendment (clause): Read the task Context's sentence about giving shadcn's `Checkbox` an `id` otherwise than as written: rows pass `render={<span id={`todo-${rowId}`} />}` instead of `id={`todo-${rowId}`}`. \u2014 Empirically, and per base-ui's `CheckboxRoot` source (`const rootId = nativeButton ? controlId : id;`), a plain `id` lands on the visually-hidden `<input type=\"checkbox\" aria-hidden=\"true\">`, not on the `role=\"checkbox\"` root. M4 reads `#todo-1` checked / `#todo-0` unchecked and M5 requires `role=\"checkbox\"` and `aria-label` on `#todo-0`/`#todo-1`; the `render` prop is the only way to put the id on the element that carries all three.",
+    "task 5: every mutant killed (buy-milk, clear-completed, click-by-name-completes-todo, click-completes-todo, completed-past-due-not-overdue, delete-to-trash, derived-complete-first-todo, derived-exam, design-system-installed, done-count, due-date-marks-overdue, empty-todo-refused, enter-submits-todo, filter-bar, filter-done, mutant-from-diff, pin-todo, session-transitions, set-filter, set-todo-due, state-exam, store-history, styled-page, type-due-date, undo-delete) \u2014 no reviewer was dispatched (reviewOnStateExams off)"
+  ],
+  "amendments": [
+    {
+      "task": "2",
+      "amends": "clause",
+      "what": "The Context's install recipe \u2014 \"in `client/`, `bunx --bun shadcn@latest init -d --yes` writes `components.json` \u2026 and a 130-line `src/index.css`\" \u2014 read as needing two of its own later products in place before it will run. I wrote the tsconfig `paths` alias and a one-line stub `client/src/index.css` containing `@import \"tailwindcss\";` first, then ran init, which overwrote the stub with its own 129-line sheet. The end state is the CLI's own output, unedited.",
+      "why": "On this tree init refused twice at preflight: \"No Tailwind CSS configuration found at .../client\" (shadcn detects Tailwind v4 by finding a stylesheet that imports it, and at BASE `client/src/index.css` did not exist) and \"Could not find valid path aliases or package imports for init\" (at BASE `client/tsconfig.json` had no `paths`). Neither refusal is reachable by re-running the command as the Context spells it; the sequencing is the only way to get the CLI to write the vendor files rather than hand-vendoring them, which the Context forbids."
+    },
+    {
+      "task": "2",
+      "amends": "clause",
+      "what": "The Context says the CLI \"reformats the manifests and, on the probe, downgraded `@types/node`\", so `git checkout -- package.json client/package.json bun.lock` puts back whatever it rewrote. I ran no such checkout.",
+      "why": "The CLI touched none of them here \u2014 `git status` after both CLI invocations showed only the new vendor files and my three edits. The checkout would have been a no-op, and `bun install --frozen-lockfile` exits 0 without it. Noting it so a later session does not read the missing checkout as a skipped step."
+    },
+    {
+      "task": "5",
+      "amends": "files",
+      "what": "Deleted the ten hand-written stylesheets under `client/src` \u2014 `button.css`, `filterBar.css`, `info.css`, `input.css`, `loading.css`, `title.css`, `todoInput.css`, `todoItem.css`, `todoList.css`, `topBar.css`. None is named in FILES (only `client/src/index.css` is).",
+      "why": "M1 requires that the only `.css` under `client/src` recursively is `client/src/index.css`, so the clause cannot be met without deleting files FILES does not name. Each deletion is paired with the component edit that replaces its rules with Tailwind utilities and shadcn variants."
+    },
+    {
+      "task": "5",
+      "amends": "files",
+      "what": "Deleted `client/src/Button.tsx` and `client/src/Input.tsx`, neither of which is named in FILES.",
+      "why": "Both are the fixture's own hand-rolled controls whose only styling was `./button.css` and `./input.css`. With those stylesheets gone the imports dangle, and their hand-written class names (`primary`, and the input's own) are exactly what `shadcn/no-unknown-classes` flags, so leaving the files in place makes `bun run lint:ui` red and M2 unreachable. The vendored `@/components/ui/button` and `@/components/ui/input` replace them at every call site; `bun run typecheck` and all three test suites are green with them gone."
+    },
+    {
+      "task": "5",
+      "amends": "files",
+      "what": "Edited `tests/state-exams/pin-todo.test.ts`, which is not named in FILES: its action became `{click: {role: 'button', name: 'Pin walk the dog'}}`, its views moved off `.todoItem` onto `#todoList li` and `[role=checkbox]`, and leg (f)'s two verbatim `<button ...>Pin</button>` regexes were loosened to `/<button[^>]*id=\"pin-1\"[^>]*>Unpin<\\/button>/` and the `pin-0` twin so they follow the shadcn markup rather than pin a class list.",
+      "why": "The file is one of the 23 exams `loadContext()` reads and one of the 24 files `bun test tests/state-exams` runs, so M3's locator/selector sweep and M6's green suite both cover it. Left unmigrated it would fail on `act: no element matches .todoItem \u2026` and would put a `.todoItem` selector in M3's sweep."
+    },
+    {
+      "task": "5",
+      "amends": "clause",
+      "what": "Read the task Context's sentence about giving shadcn's `Checkbox` an `id` otherwise than as written: rows pass `render={<span id={`todo-${rowId}`} />}` instead of `id={`todo-${rowId}`}`.",
+      "why": "Empirically, and per base-ui's `CheckboxRoot` source (`const rootId = nativeButton ? controlId : id;`), a plain `id` lands on the visually-hidden `<input type=\"checkbox\" aria-hidden=\"true\">`, not on the `role=\"checkbox\"` root. M4 reads `#todo-1` checked / `#todo-0` unchecked and M5 requires `role=\"checkbox\"` and `aria-label` on `#todo-0`/`#todo-1`; the `render` prop is the only way to put the id on the element that carries all three."
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}

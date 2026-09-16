@@ -1,0 +1,56 @@
+{
+  "mode": "gate",
+  "stamp": "run-22",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-22/report.json",
+  "branch": "ultra/integration-run-22",
+  "gateCheck": {
+    "verdict": "PASS",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "acks": [],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 0,
+  "suite": {
+    "passed": true,
+    "unattributed": [],
+    "output": " action and an entry is the same red [1.90ms]\n(pass) leg (e) [M5]: the mutant move is unchanged \u2014 a green click spec still kills its mutant [0.22ms]\n(pass) leg (f) [M6]: the two re-aimed test files pass, and neither names the endpoint or its stub [5346.65ms]\n(pass) leg (g) [M1] [M7]: a click on the fixture completes the todo, read through the page store, under the ceiling [2309.57ms]\n(pass) leg (g) [M7]: forced unminified, the url is over the ceiling and the exam says so rather than hanging [254.92ms]\n(pass) leg (g) [M7]: `open` refuses a data: url over the ceiling within 15 s, naming it [96.59ms]\n\npackages/tinyapp-lint/test/references.test.ts:\n(pass) (a) [M1] the rule is named `references` and says nothing about the fixture [212.02ms]\n(pass) (b) [M2] the dangling `owner` is one finding, formatted exactly as pinned [0.50ms]\n(pass) (c) [M3] a resolvable reference, and a row without the cell, are both silent [0.28ms]\n(pass) (d) [M4] a snapshot without the referenced table names the missing row [0.15ms]\n(pass) (e) [M5] the fixture store module, and `lint:state` over one seeded violation [176.79ms]\n\npackages/tinyapp-lint/test/reachability.test.ts:\n(pass) (a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached [1306.20ms]\n(pass) (b) [M2] an unreachable expected state is one finding, on the pinned line [3596.96ms]\n(pass) (c) [M3] a state equal to a seed is reached in zero moves [0.17ms]\n(pass) (d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract [0.76ms]\n$ bun packages/tinyapp-lint/src/cli.ts --expected \"/home/exedev/target/.claude/ultrapowers/run-run-22/clones/integration/state-exams/lint-tmp-X0JfpK/expected\" --exams \"/home/exedev/target/.claude/ultrapowers/run-run-22/clones/integration/state-exams/lint-tmp-X0JfpK/exams\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [3892.21ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1821.10ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [205.95ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.37ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [15.42ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-f32Qqz\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [369.13ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [232.39ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.43ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.46ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [210.96ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.28ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.26ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1223.76ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [281.45ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [3.38ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.30ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.74ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1338.49ms]\n\n 539 pass\n 0 fail\n 1713 expect() calls\nRan 539 tests across 45 files. [399.34s]\n"
+  },
+  "verdict": "PASS"
+}
