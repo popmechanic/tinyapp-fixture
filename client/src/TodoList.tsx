@@ -2,6 +2,7 @@ import './todoList.css';
 import {useSortedRowIds, STORE_ID} from './Store';
 import {TodoItem} from './TodoItem';
 import {ClearCompleted} from './ClearCompleted';
+import {UndoDelete} from './UndoDelete';
 
 export const TodoList = () => {
   const todoIds = useSortedRowIds(
@@ -21,6 +22,7 @@ export const TodoList = () => {
         ))}
       </div>
       <ClearCompleted />
+      <UndoDelete />
     </>
   );
 };
