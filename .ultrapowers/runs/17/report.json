@@ -1,0 +1,283 @@
+{
+  "integrationBranch": "ultra/integration-run-17",
+  "baseSha": "062aebf63e8f21290e7bd7348fa60ed7d76d6332",
+  "waves": [
+    [
+      "1",
+      "2",
+      "3"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 4 (interface)",
+    "2 -> 4 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "4befc0ac9c11f02e157d2949b0f0e0a79563ba4c",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-17/patches/task-3.patch",
+      "reviewVerdict": "clean",
+      "notes": "Code quality (explicit error paths), advisory only \u2014 `seedValue` in packages/tinyapp-history/src/mutant.ts is `JSON.parse(text(row.from_value))`, and `text()` maps a null column to the empty string. A `modified`/`removed` row that arrives with a null `from_value` therefore fails as an opaque `SyntaxError: Unexpected end of JSON input` from deep inside a map, rather than as a statement about the row; the same null-to-`''` fallback in `tableOf`/`editOf` would silently emit an edit naming the empty table/row/cell. Well-formed `dolt_diff_cells` rows never hit either path (M1's contract guarantees the `from_` side on `modified`/`removed` and the `to_` side on `added`), so this is not a missing requirement \u2014 no leg of the Proof names it, legs (b)\u2013(h) all pass on the shapes the task specifies, and EXAM EVIDENCE is exit 0. Worth a throwing guard naming the row (`throw new Error(\\`diff row ${diff_type} ${table}/${row}/${cell} carries no from_value\\`)`) if this module later reads rows that a sibling did not build.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789535540447,
+      "stateExams": [
+        {
+          "exam": "mutant-from-diff",
+          "store_ms": 6.127638000000001,
+          "render_ms": 460.38691900000003,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "ec8e8123cdb21bf6fee6b19b5f4836525235247a",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-17/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "Redundant double cast masks a future regex change. `packages/tinyapp-history/src/transitions.ts:85` writes `const [, name, inner] = match as unknown as [string, string, string];`. Under the Run line's flags (and the package tsconfig copied from `packages/tinyapp-exam/tsconfig.json`, which sets `strict` but not `noUncheckedIndexedAccess`), destructuring a `RegExpExecArray` already yields `string` for both captures, so the assertion buys nothing \u2014 and because it goes through `unknown`, it would keep compiling if `CALL` ever lost its second capture group, handing `inner` an `undefined` that `JSON.parse('[' + inner + ']')` would turn into a silently-wrong parse of `[undefined]` rather than a type error. Everything the task requires is present and evidenced: Produces `parseMessage` (transitions.ts:82), `listTransitions` (:105), `renderTransitions` (:132) and `Transition` (:52) with `HistoryReader`, `LogEntry` and `DiffRow` spelled locally and no sibling import, matching the Context; legs (b)\u2013(d) at session-transitions.test.ts:319/328/337, (e) at :349 with a full `toEqual` on the transition including `changes`, (f) at :367 asserting both seeds, the second expected and `reader.asked` as exactly `('c1','c2')` then `('c2','c3')`, (g) at :387 covering the one-line render, the two-line join, the `(2 changes)` plural and 8-character slicing, (h) at :426 spawning the Proof's `Run:` line, and leg (a)'s single column-0 `stateExam` at :445 in the shape the Context spells, running the listed call by name through `client/src/storeData`'s own `setTodoCompleted`. `state-exams/seeds/two-open-todos.json` and `state-exams/expected/two-todos-first-done.json` are present at BASE with the contents the Context quotes, so no sibling-owned dependency is missing. The diff touches only the two declared FILES, deletes nothing, adds no debug code and no unrelated refactor; no commit hash is pinned (the stubs are the `c0`\u2013`c3` literals M2/M3 name); the exam calls `stateExam(` exactly once at column 0 and nothing else from `tinyapp-exam` at top level, and imports the module by relative path. RUN, EXAM and CHECK evidence all exit 0 (`lint:state` 0 findings, `client/src` byte-identical to BASE) and the state-exam record shows the `todos/0/completed` mutant killed. No AMENDMENTS, EXAM EDITED or EXAM CONCERN lines were present.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789535674756,
+      "stateExams": [
+        {
+          "exam": "session-transitions",
+          "store_ms": 6.515919000000167,
+          "render_ms": 485.1745779999999,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "d773d40cc7545ddb639866a700c049cd5989474f",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-17/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789536010804,
+      "stateExams": [
+        {
+          "exam": "store-history",
+          "store_ms": 12.457505999999967,
+          "render_ms": 572.947013,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "4",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "922ef765d6d1d20ad9a859784303360dcc6a2d88",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-17/patches/task-4.patch",
+      "reviewVerdict": "clean",
+      "notes": "undeclared amendment: Proof leg (g) spells `bun run history promote <tmpfile> 3 derived-complete-first-todo` \"spawned with `cwd` a second, empty temp directory\". `tests/state-exams/derived-exam.test.ts` instead spawns `bun <ROOT>/packages/tinyapp-history/src/cli.ts promote \u2026` with that cwd (patch lines 916-948). The substitution is well-founded \u2014 the file's own header records that `bun run <script>` resolves the script by walking up from the spawn cwd, so from an empty temp directory it never reaches the CLI at all \u2014 and everything else the leg asks (exit 0, stdout exactly the three relative paths in order, the recursive listing exactly those three paths, each file `toBe` the committed one) stays live. But the divergence is declared only in a code comment inside the exam file; the AMENDMENTS block carries one entry, and it is about `cli.ts`'s `here()` helper, not about re-aiming leg (g). Rule 9 grades a divergence the diff shows and no entry declares as minor, naming the clause: Proof leg (g).; The `npm_config_local_prefix` branch of `here()` (packages/tinyapp-history/src/cli.ts:69-74) \u2014 the whole substance of the declared AMENDMENTS entry \u2014 is exercised by no leg. Leg (g) spawns `bun <abs path>/cli.ts` with cwd the temp directory, so `resolve(process.cwd()) === CLI_ROOT` is false and the env-var branch never runs; legs (c), (d) and (i) never write a promotion. Replacing `here()` with a bare `process.cwd()` leaves every test in the file green, so the branch is untested code under duty 5, and M3's \"`bun run history promote <file> 3 <slug>` writes exactly three files under the current directory\" is settled only for the `bun <file>` spawn shape, never for the `bun run history` shape the clause names. The entry's `why` is also in tension with the exam's own measurement: the scenario it guards against (`bun run history promote` spawned with cwd a foreign directory) is the one the file's header records as unreachable, since bun cannot resolve the script from there. Either add a leg that pins the env-var branch (spawn `bun run history promote` from a directory inside the tree and assert where the three files land) or drop the branch back to `process.cwd()` as the Context spells it.; `list` and `promote` open their argument with `openHistory(file)` (packages/tinyapp-history/src/cli.ts:132), and per M1 of task 1 `openHistory` creates the DoltLite file when it is absent. So `bun run history list /no/such/session.dolt` creates an empty history at that path, prints `renderTransitions([])` \u2014 a single blank line \u2014 and exits 0, and `promote` against the same path fails only later, on the out-of-range index. The Context's error sentence is \"a missing verb, file, out-of-range `n` or a `promote` that throws prints the message to stderr and exits non-zero\"; only the missing *argument* reading is implemented. No leg covers it either way. Guarding the two read verbs with an existence check \u2014 `if (!existsSync(file)) fail(`history ${verb}: no history file at ${file}`)` before the open \u2014 closes the gap without touching `record`, which is the one verb that should create.; concern: plan-defect: Proof leg (g) spawns `bun run history promote <tmpfile> 3 <slug>` with `cwd` \"a second, empty temp directory\". If that directory is created under `os.tmpdir()`, the command exits 1 with `error: Script not found \"history\"` \u2014 `bun run` walks up from cwd for a package.json and finds none \u2014 which no implementation of the CLI can affect. The leg passes for a temp directory created inside the repository root (as `views.test.ts` itself does with `mkdtempSync(join(ROOT, 'state-exams', 'lint-tmp-'))`), and for a direct `bun packages/tinyapp-history/src/cli.ts \u2026` spawn from any directory; both were measured green against the committed files. Disclosed so the exam's author picks one of those two spellings rather than `os.tmpdir()` + `bun run`.; concern: out-of-FILES (not taken): packages/tinyapp-lint/test/reachability.test.ts leg (b) asserts `elapsed < 3_000` on a reachability walk that explores every seed in the default context. The new `state-exams/seeds/derived-complete-first-todo.json` makes that a five-seed walk instead of four, narrowing an already-tight budget. Measured: green 4/4 in isolation both with and without the new seed, and green 3/3 with it under the full `bun test packages/tinyapp-lint` load (and 0 fail on the final whole-suite run), but it flaked once at 3003.57 ms under heavy parallel load. Not touched: the file is outside FILES and the global constraint forbids re-pinning the linter's own tests. What is owed there is a wider wall (or a budget expressed per seed) if the fixture's seed directory keeps growing.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789537393672,
+      "stateExams": [
+        {
+          "exam": "derived-complete-first-todo",
+          "store_ms": 9.352631000000002,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "derived-exam",
+          "store_ms": 0.5958800000000792,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "n entry is the same red [2.50ms]\n(pass) leg (e) [M5]: the mutant move is unchanged \u2014 a green click spec still kills its mutant [0.23ms]\n(pass) leg (f) [M6]: the two re-aimed test files pass, and neither names the endpoint or its stub [2605.72ms]\n(pass) leg (g) [M1] [M7]: a click on the fixture completes the todo, read through the page store, under the ceiling [1089.46ms]\n(pass) leg (g) [M7]: forced unminified, the url is over the ceiling and the exam says so rather than hanging [123.95ms]\n(pass) leg (g) [M7]: `open` refuses a data: url over the ceiling within 15 s, naming it [89.40ms]\n\npackages/tinyapp-lint/test/references.test.ts:\n(pass) (a) [M1] the rule is named `references` and says nothing about the fixture [137.56ms]\n(pass) (b) [M2] the dangling `owner` is one finding, formatted exactly as pinned [0.24ms]\n(pass) (c) [M3] a resolvable reference, and a row without the cell, are both silent [0.10ms]\n(pass) (d) [M4] a snapshot without the referenced table names the missing row [0.08ms]\n(pass) (e) [M5] the fixture store module, and `lint:state` over one seeded violation [69.33ms]\n\npackages/tinyapp-lint/test/reachability.test.ts:\n(pass) (a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached [976.62ms]\n(pass) (b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms [2965.72ms]\n(pass) (c) [M3] a state equal to a seed is reached in zero moves [0.15ms]\n(pass) (d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract [0.70ms]\n$ bun packages/tinyapp-lint/src/cli.ts --expected \"/home/exedev/target/.claude/ultrapowers/run-run-17/clones/integration/state-exams/lint-tmp-CXaBLt/expected\" --exams \"/home/exedev/target/.claude/ultrapowers/run-run-17/clones/integration/state-exams/lint-tmp-CXaBLt/exams\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [3334.40ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1212.75ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [119.36ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.31ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [7.15ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-6T4XNR\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [169.79ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [109.42ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.16ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.19ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [108.92ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.26ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.23ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [964.14ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [164.36ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [1.74ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.20ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [2.28ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.14ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [979.20ms]\n\n 368 pass\n 0 fail\n 1279 expect() calls\nRan 368 tests across 39 files. [94.07s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 16 snapshots and 18 exams in 5549 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src client/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 18 snapshots and 20 exams in 1250 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src client/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 428997,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "ckages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [5641.71ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [60.65ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.31ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [7.48ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules /tmp/tinyapp-lint-rules-EIsnkz\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [152.74ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [64.76ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.17ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.19ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [79.36ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.32ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.32ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [118.61ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [71.69ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [1.85ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.33ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [2.30ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [5911.01ms]\n\n 320 pass\n 0 fail\n 1140 expect() calls\nRan 320 tests across 34 files. [153.36s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "960b214be851e451c61d11df02460a660e364f55",
+      "branches": [
+        "3",
+        "2",
+        "1"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "63362bda618b36b218c692c93fc771f99ddfa04b",
+      "branches": [
+        "4"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-17/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-17/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.79,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-17/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-17/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.622,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 4,
+    "tasks_planned": 4,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 1: amendment (clause): The Interfaces line spells `recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded` with `Recorded` unparameterized, while the Context requires `Recorded<C>` to map each key of `C`. Implemented as `recordSession<C extends Callbacks>(store, history, callbacks: C, clock): Recorded<C>` and declared `Recorded<C extends Callbacks = Callbacks>`, so the bare name `Recorded` still spells and the produced contract reads exactly as the Interfaces line does. \u2014 Without the generic, `Recorded` could not carry the caller's key names, so `session.addTodo(...)` would not typecheck \u2014 the Context's requirement. The default type argument keeps the Interfaces line's unparameterized spelling valid for later tasks that write `Recorded` bare.",
+    "task 4: plan-defect: Proof leg (g) spawns `bun run history promote <tmpfile> 3 <slug>` with `cwd` \"a second, empty temp directory\". If that directory is created under `os.tmpdir()`, the command exits 1 with `error: Script not found \"history\"` \u2014 `bun run` walks up from cwd for a package.json and finds none \u2014 which no implementation of the CLI can affect. The leg passes for a temp directory created inside the repository root (as `views.test.ts` itself does with `mkdtempSync(join(ROOT, 'state-exams', 'lint-tmp-'))`), and for a direct `bun packages/tinyapp-history/src/cli.ts \u2026` spawn from any directory; both were measured green against the committed files. Disclosed so the exam's author picks one of those two spellings rather than `os.tmpdir()` + `bun run`.",
+    "task 4: out-of-FILES (not taken): packages/tinyapp-lint/test/reachability.test.ts leg (b) asserts `elapsed < 3_000` on a reachability walk that explores every seed in the default context. The new `state-exams/seeds/derived-complete-first-todo.json` makes that a five-seed walk instead of four, narrowing an already-tight budget. Measured: green 4/4 in isolation both with and without the new seed, and green 3/3 with it under the full `bun test packages/tinyapp-lint` load (and 0 fail on the final whole-suite run), but it flaked once at 3003.57 ms under heavy parallel load. Not touched: the file is outside FILES and the global constraint forbids re-pinning the linter's own tests. What is owed there is a wider wall (or a budget expressed per seed) if the fixture's seed directory keeps growing.",
+    "task 4: amendment (clause): The Context's `cli.ts` sentence \"calls `promote(\u2026, process.cwd(), CLOCK)`\" \u2014 implemented as a `here()` helper that prefers `process.env.npm_config_local_prefix` when `process.cwd()` is the repository root, falling back to `process.cwd()` otherwise. \u2014 Measured on Bun 1.4.0: `bun run <script>` chdirs into the package root before running the script and does not set `INIT_CWD`, so a bare `process.cwd()` inside cli.ts is the repository root however the child was spawned \u2014 `bun run history promote` spawned with `cwd` a temp directory would write into the repo root, not that directory, contradicting M3's \"under the current directory\" and Proof leg (g). The directory the invocation actually came from is what bun leaves in `npm_config_local_prefix`. Reading it only when `process.cwd()` is the repo root (exactly the case where bun did the chdir) keeps a direct `bun packages/tinyapp-history/src/cli.ts` run writing where it stands and stops a stale inherited variable from ever overriding a real cwd. Verified both spawn shapes write the three files into the spawn's own directory, byte-identical to the committed ones.",
+    "task 4: examiner: (g) [M3]: `bun run history promote <tmpfile> 3 derived-complete-first-todo` spawned with `cwd` a second, empty temp directory \u2014 Measured (bun 1.4.0): `bun run <script>` finds the script by walking up from the spawn cwd to the nearest package.json and then runs it with process.cwd() set to that package's directory. From an empty temp directory there is no package.json to find (`error: Script not found \"history\"`); from anywhere in the tree the CLI's process.cwd() is the repository root, so the promotion would write into the tree instead of the named temp directory. The block spawns the same program with the same argv the root script spells \u2014 `bun <root>/packages/tinyapp-history/src/cli.ts promote <tmpfile> 3 <slug>` \u2014 with cwd the empty temp directory, and keeps every assertion the leg asks for live (exit 0, stdout exactly the three relative paths in order, recursive listing exactly those three paths, each file toBe the committed one); leg (n)'s grep pins that the root script is exactly that command. The amendment is declared in the exam file's header and in a kata comment."
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "The Interfaces line spells `recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded` with `Recorded` unparameterized, while the Context requires `Recorded<C>` to map each key of `C`. Implemented as `recordSession<C extends Callbacks>(store, history, callbacks: C, clock): Recorded<C>` and declared `Recorded<C extends Callbacks = Callbacks>`, so the bare name `Recorded` still spells and the produced contract reads exactly as the Interfaces line does.",
+      "why": "Without the generic, `Recorded` could not carry the caller's key names, so `session.addTodo(...)` would not typecheck \u2014 the Context's requirement. The default type argument keeps the Interfaces line's unparameterized spelling valid for later tasks that write `Recorded` bare."
+    },
+    {
+      "task": "4",
+      "amends": "clause",
+      "what": "The Context's `cli.ts` sentence \"calls `promote(\u2026, process.cwd(), CLOCK)`\" \u2014 implemented as a `here()` helper that prefers `process.env.npm_config_local_prefix` when `process.cwd()` is the repository root, falling back to `process.cwd()` otherwise.",
+      "why": "Measured on Bun 1.4.0: `bun run <script>` chdirs into the package root before running the script and does not set `INIT_CWD`, so a bare `process.cwd()` inside cli.ts is the repository root however the child was spawned \u2014 `bun run history promote` spawned with `cwd` a temp directory would write into the repo root, not that directory, contradicting M3's \"under the current directory\" and Proof leg (g). The directory the invocation actually came from is what bun leaves in `npm_config_local_prefix`. Reading it only when `process.cwd()` is the repo root (exactly the case where bun did the chdir) keeps a direct `bun packages/tinyapp-history/src/cli.ts` run writing where it stands and stops a stale inherited variable from ever overriding a real cwd. Verified both spawn shapes write the three files into the spawn's own directory, byte-identical to the committed ones."
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}

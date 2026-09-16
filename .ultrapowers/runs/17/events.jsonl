@@ -84,3 +84,16 @@
 {"kind":"worker:end","label":"review:4:1","role":"reviewer","sessionId":"2332d19d-11c8-4f33-a9c6-b1f6217556ec","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":8043,"output":11638,"cacheRead":223625,"cacheCreation":56420,"costUsd":1.0071775,"models":["claude-opus-5"]},"id":"01M2MBV6ZZ0000NJK83KKKT688","ts":1789537393663}
 {"kind":"transcript:slice","label":"review:4:1","sessionId":"2332d19d-11c8-4f33-a9c6-b1f6217556ec","bytes":10039,"id":"01M2MBV70600009VSDA1V1T38C","ts":1789537393670}
 {"kind":"engine:phase","phase":"Wave 2","id":"01M2MBV72W0000H2BCYGTBMK6Y","ts":1789537393756}
+{"kind":"driver:wave-adopted","wave":2,"tasks":["4"],"headSha":"63362bda618b36b218c692c93fc771f99ddfa04b","why":"end","applied":{"4":"base"},"id":"01M2MBY8A200001KR4JE46QNVK","ts":1789537493314}
+{"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2MBY8AH0000JM9KA5GKEAMW","ts":1789537493329}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2MBYD6V0000ZP0G3KPM9F8P","ts":1789537498331}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":2,"id":"01M2MBYEEX0000F2GZNCA2DQ8F","ts":1789537499613}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src client/src","exit":0,"minor":false,"wave":2,"id":"01M2MBYEF20000488WJP80P4YT","ts":1789537499618}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2MBYEJ60000VSGQKB3TF8D2","ts":1789537499718}
+{"kind":"driver:stage","stage":"finalize","id":"01M2MBYEJV0000QKN30DWJGH3T","ts":1789537499739}
+{"kind":"driver:stage","stage":"gate","id":"01M2MBYEKW0000KJY3QDB07HMS","ts":1789537499772}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2MBYEPG00001RHCF0G9GT9E","ts":1789537499856}
+{"kind":"driver:stage","stage":"approve","id":"01M2MBYEPG0001FMP3QTTK3ETB","ts":1789537499856}
+{"kind":"driver:approved","stamp":"run-17","integrationBranch":"ultra/integration-run-17","id":"01M2MBYEQT0000YN8QAHJYQ0PX","ts":1789537499898}
+{"kind":"run:open","runId":"run-17","base":"062aebf63e8f21290e7bd7348fa60ed7d76d6332","source":"fleet/publish-fold.mjs","id":"01M2MBYFG30000G5NP2ZP6000M","ts":1789537500675}
+{"kind":"driver:publish-fold","run":"17","attempt":"1","base":"062aebf63e8f21290e7bd7348fa60ed7d76d6332","tip":"062aebf63e8f21290e7bd7348fa60ed7d76d6332","candidate":"63362bda618b36b218c692c93fc771f99ddfa04b","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2MBYFTS00004GATN2K3PKCM","ts":1789537501017}
