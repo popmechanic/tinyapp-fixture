@@ -1,0 +1,11 @@
+{
+  "killed": false,
+  "path": "todos/0",
+  "edits": [
+    {
+      "table": "todos",
+      "row": "0",
+      "absent": true
+    }
+  ]
+}
