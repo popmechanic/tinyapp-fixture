@@ -1,0 +1,145 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "5fa0dbd599b432fa802838acff4fcad5d227a31bb829517149a2eada8db7a423",
+      "verdict": "pass",
+      "reason": "Every clause has a falsifying leg: (a)+(b) for M1, (c)+(d) for M2, one render per component for M3's four rows, the seeded state exam with view and mutant for M4, the two Run lines for M5; nothing at BASE pins the opposite."
+    },
+    "2": {
+      "hash": "ac92ffa91a84124e4a0c1500d4b7de38da222de8fc4e32a1337973a19e4e9c7c",
+      "verdict": "pass",
+      "reason": "M1 by the type check plus the re-run string legs, M2/M3 by real-browser outcomes (the aria-label-only span included) and exact rejection sentences, M4 by the computed two-span cases, M5 by the exact problem/fix pair, M6 by the two bundle outputs, M7 by the seeded state exam with mutant, M8 by the grep/tsc Runs and one runtime assertion per BASE export."
+    },
+    "3": {
+      "hash": "27a9081c94c1ec1fe867ce130f178dc50245d4b3686c91b14dd63a75f2c19c1b",
+      "verdict": "pass",
+      "reason": "One assertion per package name and the exact script literal for M1, six per-id checks plus the deep-equal for M2, six per-id ruleId checks on the sample's own JSON entry for M3, the absence check on the ignored copy for M4, three fix-wording checks for M5; the exam asserts only on the sample's entry so the app's own wave-1 findings do not turn it red."
+    },
+    "4": {
+      "hash": "b238cda18545504809342a53e7f48094ac3d253be8634f118946a0a492a3b570",
+      "verdict": "pass",
+      "reason": "Conjunct 1 rides M1+M2, conjunct 2 rides M3 (a universal over loadContext with a non-empty set) and M4 (the click by name on row 1 reaches two-todos-one-done with the row-1 mutant killed), conjunct 3 rides M7 (the planted stray class is a red JSON finding naming @utility, green again in a finally); M5's fifteen ids get one test each and M6's no-D/no-R diff and the two bun test sweeps are Run lines."
+    }
+  },
+  "tally": {
+    "base": "eb28af4b5feb284797c389a10d381d835fc97d2d",
+    "dispatched": 7,
+    "rejected": 3,
+    "rounds": {
+      "1": {
+        "dispatched": 4,
+        "rejected": 3
+      },
+      "2": {
+        "dispatched": 3,
+        "rejected": 0
+      }
+    },
+    "note": "Round 1: task 1 pass; task 2 rejected (M8's leg imported Locator from types.ts, not the index \u2014 a type-only export the runtime cannot see; now a grep Run over index.ts, plus M2 restated as an outcome an aria-label-only span falsifies and the views-rule leg housed in packages/tinyapp-lint/test/views.test.ts); task 3 rejected (M1 pinned the stylish formatter whose lines never carry the path \u2014 the exam now reads `bun run lint:ui -f json`, measured: one entry per linted file, ignored files absent); task 4 rejected (the Claim's third conjunct had no clause \u2014 M7 plants a stray class and reads the red finding; M6 now pins no exam deleted or renamed via git diff --name-status). Round 2: all three pass."
+  },
+  "authoring": {
+    "minutes": 112,
+    "probes": 13,
+    "routing": {
+      "branch": "width",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "the system",
+        "options": [
+          "shadcn/ui by CLI",
+          "hand-written shadcn-shaped set",
+          "Tailwind + tokens only"
+        ],
+        "recommended": "shadcn/ui by CLI",
+        "picked": "shadcn/ui by CLI"
+      },
+      {
+        "question": "mode",
+        "options": [
+          "blocking Check from run one",
+          "report-only for five runs"
+        ],
+        "recommended": "blocking Check from run one",
+        "picked": "blocking Check from run one"
+      },
+      {
+        "question": "exam selectors",
+        "options": [
+          "roles and accessible names",
+          "data-testid",
+          "keep class selectors"
+        ],
+        "recommended": "roles and accessible names",
+        "picked": "roles and accessible names"
+      },
+      {
+        "question": "the reading",
+        "options": [
+          "drift at first check + rounds to zero",
+          "reviewer residuals only",
+          "add a judge"
+        ],
+        "recommended": "drift at first check + rounds to zero",
+        "picked": "drift at first check + rounds to zero"
+      },
+      {
+        "question": "approach",
+        "options": [
+          "one plan after a local probe",
+          "two plans, exams first",
+          "skip the probe"
+        ],
+        "recommended": "one plan after a local probe",
+        "picked": "one plan after a local probe"
+      },
+      {
+        "question": "Approve this design as the spec?",
+        "options": [
+          "Approve, write the spec",
+          "Revise one section"
+        ],
+        "recommended": "Approve, write the spec",
+        "picked": "Approve, write the spec"
+      },
+      {
+        "question": "Does the spec stand as written?",
+        "options": [
+          "Approved, author it after run-17 merges",
+          "Changes first"
+        ],
+        "recommended": "Approved, author it after run-17 merges",
+        "picked": "Approved, author it after run-17 merges"
+      },
+      {
+        "question": "Linted design system execute lane",
+        "options": [
+          "Ultrapowers, launch now",
+          "Ultrapowers, after 155 and 157 merge",
+          "Hold"
+        ],
+        "recommended": "Ultrapowers, launch now",
+        "picked": "Ultrapowers, launch now"
+      },
+      {
+        "question": "Lint as Task 4 Run line now, blocking Check from the next plan?",
+        "options": [
+          "Accept: Run line now, blocking Check from the next plan",
+          "Insist on a blocking Check in this plan"
+        ],
+        "recommended": "Accept: Run line now, blocking Check from the next plan",
+        "picked": "Accept: Run line now, blocking Check from the next plan"
+      },
+      {
+        "question": "Keep bun-plugin-tailwind in the exam page and the accessible-name scheme?",
+        "options": [
+          "Keep both",
+          "Drop the Tailwind plugin from the exam page"
+        ],
+        "recommended": "Keep both",
+        "picked": "Keep both"
+      }
+    ]
+  }
+}
