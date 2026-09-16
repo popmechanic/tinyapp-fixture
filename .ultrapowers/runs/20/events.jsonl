@@ -8,3 +8,7 @@
 {"kind":"engine:log","line":"setup: branch ultra/integration-run-20 at de77045e5a628bcab137a72d069db7555ffcc17f","id":"01M2MHK22W0000P3S74N901HSG","ts":1789543417948}
 {"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"a378aeed-04f3-42e4-8bc4-673a59c19dc1","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-20/clones/exam-1","model":"opus","id":"01M2MHK2TB0000VZA8Z90HH7GZ","ts":1789543418699}
 {"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"04d946cf-c84f-4c05-9dcc-ecc4cd3d1fb3","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-20/clones/task-1","model":"opus","id":"01M2MHK2TF0000SWBD210Z94H2","ts":1789543418703}
+{"kind":"engine:log","line":"baseline: green on de77045e5a628bcab137a72d069db7555ffcc17f","id":"01M2MHP8VY0000BAWNS45AJWG3","ts":1789543523198}
+{"kind":"worker:end","label":"impl:1","role":"implementer","sessionId":"04d946cf-c84f-4c05-9dcc-ecc4cd3d1fb3","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":6535,"output":7482,"cacheRead":880126,"cacheCreation":24271,"costUsd":0.9024979999999998,"models":["claude-opus-5"]},"id":"01M2MHPN7T0000WAV7BJCTWWZX","ts":1789543535866}
+{"kind":"transcript:slice","label":"impl:1","sessionId":"04d946cf-c84f-4c05-9dcc-ecc4cd3d1fb3","bytes":11538,"id":"01M2MHPN810000Y0WHDBRMKDTF","ts":1789543535873}
+{"kind":"driver:attention","task":"1","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2MHPR1S0000YPSJSV60CZ8N","ts":1789543538745}
