@@ -1,0 +1,13 @@
+{"kind":"run:open","runId":"run-15","base":"","source":"fleet/run-main.mjs","id":"01M2KS28PS0000RTE44YNH28H5","ts":1789517701849}
+{"kind":"driver:stage","stage":"kata","detail":"record /home/exedev/plans/run-15.kata.json → https://kata.int.exe.xyz","id":"01M2KS28PS0001PK2HEYSH0ZAT","ts":1789517701849}
+{"kind":"driver:stage","stage":"tiers","detail":"2 null tier slot(s) stamped mostCapable (uniform driver fill; per-task tier is the intent document's slot, #243)","id":"01M2KS28PT0000NM777J9YZW0W","ts":1789517701850}
+{"kind":"driver:stage","stage":"provision","detail":"BASE 10a4f79b6609fa6d4e782bfcf736ba97a60e251f; 2 task clone(s) + integration","id":"01M2KS29FT00006G7G7C1GFEW2","ts":1789517702650}
+{"kind":"driver:auth","authMethod":"oauth_token","apiKeySource":null,"subscriptionType":null,"id":"01M2KS29RW0000WMZBJXNACHB5","ts":1789517702940}
+{"kind":"driver:stage","stage":"engine","detail":"waves 1/1, width bound 1, patch input armed","id":"01M2KS29RW00013ZV2BAEFSDMD","ts":1789517702940}
+{"kind":"engine:phase","phase":"Setup","id":"01M2KS29S20000V5Y657JGD1KW","ts":1789517702946}
+{"kind":"driver:reuse","reason":"the reuse fold of ultra/evidence/run-14 did not produce a head","tasks":[],"id":"01M2KS2A4H00000XV1Y08CBRAN","ts":1789517703313}
+{"kind":"engine:log","line":"reuse refused: the reuse fold of ultra/evidence/run-14 did not produce a head","id":"01M2KS2A4H0001VFAY26GCPEWB","ts":1789517703313}
+{"kind":"engine:log","line":"setup: branch ultra/integration-run-15 at 10a4f79b6609fa6d4e782bfcf736ba97a60e251f","id":"01M2KS2AQ50000P94XB57CV81R","ts":1789517703909}
+{"kind":"kata:write-failed","what":"claim","uid":"01M2KP4Y0ZKARPDX4AZ0N175D8","detail":"kata: POST /api/v1/projects/33/issues/01M2KP4Y0ZKARPDX4AZ0N175D8/actions/claim answered 409: {\"status\":409,\"error\":{\"code\":\"already_claimed\",\"message\":\"issue is already claimed by engine:run-14\",\"hint\":\"choose another issue, or omit if_unowned only for a deliberate retry\",\"data\":{\"current_owner\":\"engine:run-14\"}}}","id":"01M2KS2BD800001M33ZA8BMGS9","ts":1789517704616}
+{"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"29ff710b-6fbb-4325-9f5a-a11e77441d69","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-15/clones/exam-1","model":"opus","id":"01M2KS2BD90000DWRCVWJ9NXTY","ts":1789517704617}
+{"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"96ab8319-bb8f-4f55-8d30-cd718ab52015","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-15/clones/task-1","model":"opus","id":"01M2KS2BDC0000X9TKPR2WZM4M","ts":1789517704620}
