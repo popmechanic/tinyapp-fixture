@@ -1,0 +1,12 @@
+{
+  "name": "tinyapp-history",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@dolthub/doltlite": "0.50.10",
+    "tinybase": "^9.7.0",
+    "tinyapp-exam": "workspace:*"
+  }
+}
