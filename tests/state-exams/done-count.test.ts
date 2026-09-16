@@ -146,10 +146,11 @@ test('leg (n) [M3] state-exams/expected/two-todos-one-done.json parses to exactl
 
 // --- M4: the count added no store state --------------------------------------
 
-test('leg (o) [M4] TABLES_SCHEMA still has exactly the table todos with exactly the cells completed and text', () => {
+test('leg (o) [M4] TABLES_SCHEMA still has exactly the table todos with exactly the cells completed, due and text', () => {
   expect(Object.keys(TABLES_SCHEMA)).toEqual(['todos']);
   expect(Object.keys(TABLES_SCHEMA.todos).sort()).toEqual([
     'completed',
+    'due',
     'text',
   ]);
 });

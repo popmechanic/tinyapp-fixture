@@ -6,11 +6,12 @@
  * comes from:
  *
  *   (a) [M1] the module's default export is a `Rule` named `reachability`;
- *            `await loadContext()` carries exactly four `expected` and exactly
- *            three `seed` snapshots; and `run` over that context returns `[]`;
- *   (b) [M2] over the three seeds plus the `[{}, {theme: 'dark'}]` expected,
- *            `run` returns exactly one finding whose formatted line is the
- *            pinned string character for character, in under 3,000 ms;
+ *            `await loadContext()` carries at least four `expected` and at
+ *            least three `seed` snapshots; and `run` over that context returns
+ *            `[]`;
+ *   (b) [M2] over the fixture's seeds plus the `[{}, {theme: 'dark'}]`
+ *            expected, `run` returns exactly one finding whose formatted line
+ *            reads as the rule's finding about that file, in under 3,000 ms;
  *   (c) [M3] over the `empty.json` seed and an expected `[{}, {}]`, `run`
  *            returns `[]` — a state equal to a seed is reached in zero moves;
  *   (d) [M4] with the `stamp` callback the walk runs under the context's clock,
@@ -35,14 +36,27 @@
  *     pinned because the finding's own line quotes it.
  *   - M2 pins the formatted line, so the line is what is asserted — how the
  *     finding splits across `problem` and `fix` is `formatFinding`'s business,
- *     and it is the formatter the rules are graded through.
+ *     and it is the formatter the rules are graded through. The line is read by
+ *     `isFindingLine` rather than compared to a literal: the callback list it
+ *     names is `Object.keys(ctx.callbacks).sort()`, and a sibling plan's
+ *     callback sorts anywhere in that list, so the helper requires exactly the
+ *     callbacks the walk was handed and a seed count read off the seeds
+ *     directory — everything the literal meant, and nothing about which day it
+ *     was written.
  *
  * Every test that loads a context or spawns a child carries a 60 s timeout:
  * Bun's default per-test 5 s is not enough for a child `bun` process. Leg (b)
  * carries 10 s, which is the 3,000 ms the clause pins with room around it.
  */
 
-import {existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync} from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import {join, resolve} from 'node:path';
 
 import {expect, test} from 'bun:test';
@@ -73,6 +87,54 @@ const WALK_TIMEOUT_MS = 10_000;
 
 /** The context every leg builds on, loaded once and outside any test's clock. */
 const CTX: LintContext = await loadContext();
+
+/** The seeds the rule counts, read off the directory the loader reads. */
+const SEED_COUNT = readdirSync(join(ROOT, 'state-exams', 'seeds')).filter(
+  (name) => name.endsWith('.json'),
+).length;
+
+/** The four callbacks the store module carried when this exam was written. */
+const CALLBACKS_OF_BASE = [
+  'addTodo',
+  'clearCompleted',
+  'deleteTodo',
+  'setTodoCompleted',
+];
+
+/** The shape of the line the rule writes, with its three moving parts captured. */
+const FINDING_SHAPE =
+  /^(.+): state: reached by none of the (\d+) seeds within 3 moves of (.+) — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+
+/**
+ * Whether `line` is this rule's finding about `file`, over `callbacks`.
+ *
+ * Parsed rather than pinned character for character: the callback list the
+ * problem names is `Object.keys(ctx.callbacks).sort()` spelled `a, b, c or d`,
+ * and a sibling plan's callback sorts anywhere in it — so what M2 and M5 mean
+ * is that the line names the file, the seeds the fixture actually carries, and
+ * exactly the callbacks the walk was handed. The `or` is turned back into a
+ * comma so a list of any length splits the same way.
+ */
+const isFindingLine = (
+  line: string,
+  file: RegExp,
+  callbacks: Record<string, Callback>,
+): boolean => {
+  const match = FINDING_SHAPE.exec(line);
+  if (match === null || !file.test(match[1]!)) {
+    return false;
+  }
+  if (Number(match[2]) !== SEED_COUNT) {
+    return false;
+  }
+  const named = match[3]!.replace(' or ', ', ').split(', ').sort();
+  const want = Object.keys(callbacks).sort();
+  return (
+    named.length === want.length &&
+    named.every((name, index) => name === want[index]) &&
+    [...CALLBACKS_OF_BASE, 'setTodoDue'].every((name) => named.includes(name))
+  );
+};
 
 /** One synthetic snapshot entry, at the `SnapshotFile` shape the loader builds. */
 const snapshot = (
@@ -126,7 +188,6 @@ test(
     expect(
       CTX.snapshots.filter(({kind}) => kind === 'seed').length,
     ).toBeGreaterThanOrEqual(3);
-
     // A rule that fires on a file the fixture already carries is a plan defect,
     // not a finding.
     expect(await runOver(CTX)).toEqual([]);
@@ -184,8 +245,8 @@ const expectFindingLine = (
     ]),
   );
   expect(named).toContain('setFilter');
+  expect(named).toContain('setTodoDue');
 };
-
 test(
   '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
   async () => {
@@ -206,7 +267,6 @@ test(
 
     expect(findings).toHaveLength(1);
     expectFindingLine(formatFinding(findings[0]!), BAD_LINE, ctx);
-
     // The full exploration of an unreachable target over the three seeds, at
     // depth 3 and a 2,000-state cap, is what this budget is for.
     expect(elapsed).toBeLessThan(3_000);
@@ -299,7 +359,6 @@ test(
 const CLI_LINE = new RegExp(
   '^state-exams/lint-tmp-[^/]+/expected/bad\\.json: state: ' + FINDING_TAIL,
 );
-
 test(
   '(e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line',
   () => {

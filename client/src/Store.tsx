@@ -8,6 +8,7 @@ import {
   deleteTodo,
   readSeed,
   setTodoCompleted,
+  setTodoDue,
   type Schemas,
   type TodoRow,
   type TodosStore,
@@ -33,7 +34,7 @@ const {
   useValue,
 } = UiReact as UiReact.WithSchemas<Schemas>;
 
-export {STORE_ID, addTodo, deleteTodo, setTodoCompleted};
+export {STORE_ID, addTodo, deleteTodo, setTodoCompleted, setTodoDue};
 export type {TodoRow, TodosStore};
 export {
   useAddRowCallback,

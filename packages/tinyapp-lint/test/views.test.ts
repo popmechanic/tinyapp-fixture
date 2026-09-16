@@ -117,8 +117,10 @@ test(
     expect(rule.name).toBe('views');
 
     const ctx = await contextOnce();
+    // At least the six of M1: a later task's state exam is one more file under
+    // `tests/state-exams/`, and what this leg means is that every exam there
+    // is — six or more — asserts a view over a state that exists.
     expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
-
     // Every one of the six asserts a view, and names a state that is there.
     const paths = ctx.snapshots.map(({path}) => path);
     expect(
