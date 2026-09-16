@@ -33,3 +33,10 @@
 {"kind":"worker:end","label":"review:1:1","role":"reviewer","sessionId":"fe1d30ef-32de-4cc3-bf8d-fa893a43d7b0","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":10950,"output":8583,"cacheRead":222951,"cacheCreation":44953,"costUsd":0.8303305000000001,"models":["claude-opus-5"]},"id":"01M2KRCPKX0000B0YJ5TYVSR1Y","ts":1789516995197}
 {"kind":"transcript:slice","label":"review:1:1","sessionId":"fe1d30ef-32de-4cc3-bf8d-fa893a43d7b0","bytes":9351,"id":"01M2KRCPM40000MB08RKMN3GRE","ts":1789516995204}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2KRCPPE0000HGEVX87Q7VQJ","ts":1789516995278}
+{"kind":"driver:wave-adopted","wave":1,"tasks":["1"],"headSha":"2e49b6158bdc4174bbcb0c1a79e128c1e8588a4d","why":"released","released":["2"],"applied":{"1":"base"},"id":"01M2KRDVZ300000B2CSMV13C3S","ts":1789517033443}
+{"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2KRDW04000082RPVH0SHEBZ","ts":1789517033476}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":1,"id":"01M2KRDZNZ0000EZ9AVVPPXJ72","ts":1789517037247}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":1,"id":"01M2KRE0PX00009QSWFCZ7ERPH","ts":1789517038301}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src","exit":0,"minor":false,"wave":1,"id":"01M2KRE0Q50000D4SE2K48BZ1T","ts":1789517038309}
+{"kind":"worker:start","label":"exam:2","role":"examiner","sessionId":"34fe9e5f-0c7d-4235-9c2f-08e1575510f1","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-14/clones/exam-2","model":"opus","id":"01M2KRE15000008BJKQR4ZAVCQ","ts":1789517038752}
+{"kind":"worker:start","label":"impl:2","role":"implementer","sessionId":"67200572-8f5d-442a-b176-48efc688ed79","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-14/clones/task-2","model":"opus","id":"01M2KRE1530000BNQ65WM1EB1J","ts":1789517038755}
