@@ -1,0 +1,241 @@
+{
+  "integrationBranch": "ultra/integration-run-21",
+  "baseSha": "de77045e5a628bcab137a72d069db7555ffcc17f",
+  "waves": [
+    [
+      "1"
+    ],
+    [
+      "2"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "9c1c71d8c825a4a7df7b6461dbdada26b3f71dfe",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-21/patches/task-1.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789544632165,
+      "stateExams": [
+        {
+          "exam": "delete-to-trash",
+          "store_ms": 484.7482130000001,
+          "render_ms": 140.53225599999996,
+          "render": "ran",
+          "action_ms": 67.99090000000001,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "done-count",
+          "store_ms": 13.875284,
+          "render_ms": 547.298841,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "pin-todo",
+          "store_ms": 558.533185,
+          "render_ms": 150.45482300000003,
+          "render": "ran",
+          "action_ms": 85.05792000000002,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "undo-delete",
+          "store_ms": 529.9141410000001,
+          "render_ms": 133.30874400000005,
+          "render": "ran",
+          "action_ms": 126.70330799999999,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "a344a6b71d0d11a2851e81debe194b9c122a5ab7",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-21/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "INTERFACES lists `TABLES_SCHEMA` among this task's Consumes, but no symbol named `TABLES_SCHEMA` appears anywhere in the diff: `tests/exams/run_21/state-exams/pinned-first.test.ts` imports only `renderStatic`, `* as sd` (used for `createTodosStore` and `pinTodo`) and the `TodosContent`/`TodosStore` types, and `client/src/TodoList.tsx` consumes the schema only indirectly, by reading `table[id]?.pinned === true`. The consumption is real but structural \u2014 the `pinned` cell exists only because Task 1 added it to `TABLES_SCHEMA`, and Task 1's own exam leg (b) is what pins that schema shape. None of this task's clauses M1\u2013M4 or Proof legs (a)\u2013(g) names `TABLES_SCHEMA`, so adding a by-name reference here would be an assertion no leg asks for; the defect, such as it is, lives in the task's Interfaces list rather than in the diff. Advisory only \u2014 nothing to change in this tree.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789545212600,
+      "stateExams": [
+        {
+          "exam": "absent-probe",
+          "store_ms": 0,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": false,
+          "contract": "ok"
+        },
+        {
+          "exam": "pinned-first",
+          "store_ms": 566.3699230000001,
+          "render_ms": 150.3658529999999,
+          "render": "ran",
+          "action_ms": 93.69296200000002,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "tate\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [3534.78ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1436.15ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [125.25ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.22ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [7.24ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-j85swu\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [190.40ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [111.42ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.33ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.37ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [111.71ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.24ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.21ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1055.05ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [131.55ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.02ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.84ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [2.44ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1390.66ms]\n\ntests/exams/run_21/state-exams/pinned-first.test.ts:\n(skip) the handshake pair > state exam: pinned-first\n(skip) the handshake pair > leg (a) [M1] two-todos-second-pinned-done.json holds exactly the state of M1\n(skip) the handshake pair > leg (a) [M1] the exam\u2019s seed is the posted file, and this file names no other seed\n(skip) the handshake pair > leg (b) [M2] the posted state is deep-equal to Task 1\u2019s expected file\n(skip) the handshake pair > leg (c) [M3] over the pinned state, todo-1 is painted before todo-0\n(skip) the handshake pair > leg (d) [M3] over the two-open content, todo-0 is painted before todo-1\n(skip) the handshake pair > leg (e) [M3] with both rows pinned, todo-0 is painted before todo-1\n(skip) the handshake pair > leg (f) [M3] after pinTodo of row 0, todo-0 is still painted before todo-1\n(skip) the handshake pair > leg (g) [M4] a state exam seeded from an absent posted file is red naming it, with no page opened\n\n9 tests skipped:\n(skip) the handshake pair > state exam: pinned-first\n(skip) the handshake pair > leg (a) [M1] two-todos-second-pinned-done.json holds exactly the state of M1\n(skip) the handshake pair > leg (a) [M1] the exam\u2019s seed is the posted file, and this file names no other seed\n(skip) the handshake pair > leg (b) [M2] the posted state is deep-equal to Task 1\u2019s expected file\n(skip) the handshake pair > leg (c) [M3] over the pinned state, todo-1 is painted before todo-0\n(skip) the handshake pair > leg (d) [M3] over the two-open content, todo-0 is painted before todo-1\n(skip) the handshake pair > leg (e) [M3] with both rows pinned, todo-0 is painted before todo-1\n(skip) the handshake pair > leg (f) [M3] after pinTodo of row 0, todo-0 is still painted before todo-1\n(skip) the handshake pair > leg (g) [M4] a state exam seeded from an absent posted file is red naming it, with no page opened\n\n 402 pass\n 9 skip\n 0 fail\n 1325 expect() calls\nRan 411 tests across 41 files. [135.06s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 19 snapshots and 21 exams in 1319 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src server state-exams/seeds",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 20 snapshots and 21 exams in 1443 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src server state-exams/seeds",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 107050,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [1162.09ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [137.29ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.32ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [6.65ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-7H2F8t\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [216.84ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [109.62ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.35ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.47ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [118.77ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.34ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.35ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1019.68ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [156.37ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [1.69ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.47ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [2.30ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.13ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [1048.26ms]\n\n 368 pass\n 0 fail\n 1278 expect() calls\nRan 368 tests across 39 files. [100.09s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "410bf977bdd760692866bcd55ff8b4627c06e3cd",
+      "branches": [
+        "1"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "04c453fac2a5b4a3a2068bb1cb14baf9423ccaa3",
+      "branches": [
+        "2"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-21/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-21/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.508,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-21/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-21/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.348,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 2,
+    "tasks_planned": 2,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 1: amendment (files): packages/tinyapp-lint/test/{lint-cli,invariants,reachability,views}.test.ts \u2014 left unmodified \u2014 These four were in Files only so that a count or list pin one of them turned out to carry would be mine to loosen. None did: all four read their counts and lists off the tree with readdirSync, and they run 23 pass / 0 fail unchanged with the new cell, the fourteenth expected file and the new button on the row. Touching them to no purpose would have been the larger footprint.",
+    "task 1: every mutant killed (delete-to-trash, done-count, pin-todo, undo-delete) \u2014 no reviewer was dispatched (reviewOnStateExams off)"
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "files",
+      "what": "packages/tinyapp-lint/test/{lint-cli,invariants,reachability,views}.test.ts \u2014 left unmodified",
+      "why": "These four were in Files only so that a count or list pin one of them turned out to carry would be mine to loosen. None did: all four read their counts and lists off the tree with readdirSync, and they run 23 pass / 0 fail unchanged with the new cell, the fourteenth expected file and the new button on the row. Touching them to no purpose would have been the larger footprint."
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
