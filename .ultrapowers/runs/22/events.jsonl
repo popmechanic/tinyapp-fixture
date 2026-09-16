@@ -127,3 +127,5 @@
 {"kind":"handshake:settled","task":"5","expected":"state-exams/expected/two-todos-one-done.json","id":"01M2NGS7BJ0000F4KQ2DZFCC5D","ts":1789576125810}
 {"kind":"engine:log","line":"task 5 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2NGS7BM00006C0NS530N49T","ts":1789576125812}
 {"kind":"engine:phase","phase":"Wave 3","id":"01M2NGS7CR0000CKJ1F99G4EMZ","ts":1789576125848}
+{"kind":"driver:wave-adopted","wave":3,"tasks":["5"],"headSha":"79e77fa28ae8cc0d54c2cf6897fadcdad467e8a4","why":"end","applied":{"5":"base"},"id":"01M2NH5N0G0000P9C7V5HBRND1","ts":1789576533008}
+{"kind":"driver:integrated-clean","wave":3,"removed":0,"id":"01M2NH5N2B0000436CCT689NSP","ts":1789576533067}
