@@ -116,3 +116,4 @@
 {"kind":"driver:exam-handoff","task":"5","paths":["tests/state-exams/styled-page.test.ts"],"id":"01M2NG722A00002B2FAMTKK0KK","ts":1789575530570}
 {"kind":"driver:proof-run","task":"5","cmd":"bun run lint:ui","exit":0,"iter":0,"id":"01M2NG72YA0000257PCH5FZFGV","ts":1789575531466}
 {"kind":"driver:proof-run","task":"5","cmd":"test \"$(ls client/src/*.css)\" = client/src/index.css","exit":0,"iter":0,"id":"01M2NG72YH0000SVSTT7X4VM1Z","ts":1789575531473}
+{"kind":"driver:proof-run","task":"5","cmd":"bun test tests/state-exams","exit":0,"iter":0,"id":"01M2NGHY2Y00002V0XS7Z36CY6","ts":1789575886942}
