@@ -11,3 +11,4 @@
 {"kind":"worker:end","label":"exam:1","role":"examiner","sessionId":"c9d3407d-597c-4ab2-9763-bac4e825e676","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"reason":null,"meter":{"input":5024,"output":24998,"cacheRead":1764650,"cacheCreation":98776,"costUsd":2.5201550000000004,"models":["claude-opus-5"]},"id":"01M2P8HDYS0000FWTPD20D08JA","ts":1789601036249}
 {"kind":"transcript:slice","label":"exam:1","sessionId":"c9d3407d-597c-4ab2-9763-bac4e825e676","bytes":11769,"id":"01M2P8HDZ40000FJCJCN4SC3C6","ts":1789601036260}
 {"kind":"driver:attention","task":"1","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2P8HGK80000X0NY3WZ7GNCX","ts":1789601038952}
+{"kind":"engine:log","line":"baseline: green on 0fac23239655e7169b11a8be97fe9a1b7142ced5","id":"01M2P91SQT0000Y1BHYX8QWATY","ts":1789601572602}
