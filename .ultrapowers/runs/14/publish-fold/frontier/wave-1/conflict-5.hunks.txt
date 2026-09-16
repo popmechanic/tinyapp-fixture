@@ -1,0 +1,350 @@
+HUNK h1 lines 182-205
+--- context (read-only)
+    kind: 'seed' | 'expected',
+    content: Snapshot,
+  ): SnapshotFile => ({path, kind, content});
+  
+  /** `reachability.run` over `ctx`, as a promise whatever `run` does with it. */
+  const runOver = (ctx: LintContext): Promise<Finding[]> =>
+    Promise.resolve().then(() => reachability.run(ctx));
+  
+  /**
+   * `bun run lint:state <args>` from the repository root.
+   *
+   * A non-zero exit puts the child's stderr on this process's, so a red leg reads
+   * as whatever the CLI said rather than as a bare exit code.
+   */
+  const runCli = (args: string[]): {code: number; lines: string[]} => {
+    const child = Bun.spawnSync(['bun', 'run', 'lint:state', ...args], {
+      cwd: ROOT,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    });
+    const code = child.exitCode;
+    if (code !== 0) {
+      console.error(child.stderr.toString());
+    }
+    return {
+      code,
+      lines: child.stdout
+        .toString()
+        .split('\n')
+        .map((line) => line.replace(/\r$/, '')),
+    };
+  };
+  
+  // (a) [M1] ---------------------------------------------------------------
+  
+  test(
+    '(a) [M1] the rule is named `reachability`, and the fixture`s expected states are each reached',
+    async () => {
+      expect(reachability.name).toBe('reachability');
+      expect(typeof reachability.run).toBe('function');
+--- conflict
+<<<<<<< begin added both
+
+======= begin added frontier
+    // The fixture's own snapshots, as floors: four expected and three seeds are
+    // what BASE carries, and sibling work adds more of both.
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
+    ).toBeGreaterThanOrEqual(4);
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
+    ).toBeGreaterThanOrEqual(3);
+======= begin added run-14
+    // The fixture's own snapshots, as lower bounds: what M1 pins is that every
+    // expected state the tree carries is reached, and the tree grows expected
+    // states and seeds.
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
+    ).toBeGreaterThanOrEqual(4);
+    expect(
+      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
+    ).toBeGreaterThanOrEqual(3);
+======= begin deleted frontier
+
+>>>>>>> end conflict
+--- context (read-only)
+      // A rule that fires on a file the fixture already carries is a plan defect,
+      // not a finding.
+      expect(await runOver(CTX)).toEqual([]);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (b) [M2] ---------------------------------------------------------------
+  
+  /**
+
+HUNK h2 lines 216-288
+--- context (read-only)
+      // A rule that fires on a file the fixture already carries is a plan defect,
+      // not a finding.
+      expect(await runOver(CTX)).toEqual([]);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (b) [M2] ---------------------------------------------------------------
+  
+  /**
+--- conflict
+<<<<<<< begin added run-14
+ * The line M2 pins — as a pattern, because two of its parts are counts of what
+ * the tree carries rather than claims of this leg's.
+======= begin added frontier
+ * The tail every reachability line ends in, with the two things sibling work
+ * moves — the seed count and the callback list — left as capture groups.
+ *
+ * `theme` is a `values` entry no callback of the fixture writes (`setFilter`
+ * writes `filter`, and only the three names it knows), so this state is out of
+ * reach of the seeds whatever the bound.
+ */
+const FINDING_TAIL =
+  'reached by none of the (\\d+) seeds within 3 moves of (.+) — write the ' +
+  'state a callback reaches from a seed, or add the seed it is reached from$';
+
+/** The line M2 pins, over the file the finding quotes. */
+const BAD_LINE = new RegExp(
+  '^state-exams/expected/bad\\.json: state: ' + FINDING_TAIL,
+);
+
+/** `a, b, c or d` read back as the list it was written from. */
+const listOf = (text: string): string[] => text.replace(' or ', ', ').split(', ');
+
+/**
+ * One finding line against `pattern`: the two counts it quotes are the
+ * context's own, and the callbacks it names are the context's own, sorted.
+ */
+const expectFindingLine = (
+  line: string,
+  pattern: RegExp,
+  ctx: LintContext,
+): void => {
+  const match = pattern.exec(line);
+  expect(match).not.toBeNull();
+
+  expect(Number(match![1])).toBe(
+    ctx.snapshots.filter(({kind}) => kind === 'seed').length,
+  );
+
+  const named = listOf(match![2]!);
+  expect(named).toEqual([...named].sort());
+  expect(named).toEqual(Object.keys(ctx.callbacks).sort());
+  expect(named).toEqual(
+    expect.arrayContaining([
+      'addTodo',
+      'clearCompleted',
+      'deleteTodo',
+      'setTodoCompleted',
+    ]),
+  );
+  expect(named).toContain('setFilter');
+  expect(named).toContain('setTodoDue');
+};
+======= begin deleted frontier
+ *
+ * `theme` is a `values` entry, and a `values` entry can only be written by a
+ * callback: no fixture callback writes one, so this state is out of reach of
+======= begin added run-14
+ * the seeds whatever the bound.
+ *
+ * The seed count is `[0-9]+` and the callback list is `[^—]+` behind four
+ * lookaheads, so the four callbacks of BASE must each be named in the list and
+ * a callback the store grows later may be named beside them. Everything else —
+ * the file, the subject, the depth, the whole fix sentence — is still pinned
+ * character for character.
+======= begin deleted frontier
+ */
+const BAD_LINE =
+======= begin added run-14
+  /^state-exams\/expected\/bad\.json: state: reached by none of the [0-9]+ seeds within 3 moves of (?=[^—]*addTodo)(?=[^—]*clearCompleted)(?=[^—]*deleteTodo)(?=[^—]*setTodoCompleted)[^—]+ — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+======= begin deleted frontier
+
+>>>>>>> end conflict
+--- context (read-only)
+  test(
+    '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
+    async () => {
+      const ctx: LintContext = {
+        ...CTX,
+        snapshots: [
+          ...CTX.snapshots.filter(({kind}) => kind === 'seed'),
+          snapshot('state-exams/expected/bad.json', 'expected', [
+            {},
+            {theme: 'dark'},
+          ]),
+        ],
+      };
+  
+      const started = performance.now();
+      const findings = await runOver(ctx);
+      const elapsed = performance.now() - started;
+  
+      expect(findings).toHaveLength(1);
+
+HUNK h3 lines 308-314
+--- context (read-only)
+  test(
+    '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
+    async () => {
+      const ctx: LintContext = {
+        ...CTX,
+        snapshots: [
+          ...CTX.snapshots.filter(({kind}) => kind === 'seed'),
+          snapshot('state-exams/expected/bad.json', 'expected', [
+            {},
+            {theme: 'dark'},
+          ]),
+        ],
+      };
+  
+      const started = performance.now();
+      const findings = await runOver(ctx);
+      const elapsed = performance.now() - started;
+  
+      expect(findings).toHaveLength(1);
+--- conflict
+<<<<<<< begin added run-14
+    expect(formatFinding(findings[0]!)).toMatch(BAD_LINE);
+======= begin added frontier
+    expectFindingLine(formatFinding(findings[0]!), BAD_LINE, ctx);
+======= begin deleted frontier
+
+>>>>>>> end conflict
+--- context (read-only)
+      // The full exploration of an unreachable target over the three seeds, at
+      // depth 3 and a 2,000-state cap, is what this budget is for.
+      expect(elapsed).toBeLessThan(3_000);
+    },
+    WALK_TIMEOUT_MS,
+  );
+  
+  // (c) [M3] ---------------------------------------------------------------
+  
+  test(
+    '(c) [M3] a state equal to a seed is reached in zero moves',
+    async () => {
+      const ctx: LintContext = {
+        ...CTX,
+        snapshots: [
+          snapshot('state-exams/seeds/empty.json', 'seed', [{}, {}]),
+          snapshot('state-exams/expected/still-empty.json', 'expected', [{}, {}]),
+        ],
+      };
+  
+      expect(await runOver(ctx)).toEqual([]);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (d) [M4] ---------------------------------------------------------------
+  
+  /** `Date.parse('2026-01-01T00:00:00Z')` — the instant the context's clock names. */
+  const CLOCK_INSTANT = 1_767_225_600_000;
+  
+  /** The prefix M4 pins on the error the breach propagates. */
+  const BREACH_PREFIX = 'contract breach: https://example.invalid/';
+  
+  test(
+    '(d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract',
+    async () => {
+      // The stamped value is the clock instant, not a bare number.
+      expect(Date.parse(CTX.clock)).toBe(CLOCK_INSTANT);
+  
+      const seed = snapshot('state-exams/seeds/empty.json', 'seed', [{}, {}]);
+
+HUNK h4 lines 405-415
+--- context (read-only)
+          seed,
+          snapshot('state-exams/expected/stamped.json', 'expected', [
+            {},
+            {t: CLOCK_INSTANT},
+          ]),
+        ],
+      };
+  
+      expect(await runOver(stamped)).toEqual([]);
+  
+      // A callback that dials is not a lint finding but a breach of the exam's
+      // contract, and `run` lets it propagate.
+      const dial: Callback = () => {
+        fetch('https://example.invalid/');
+      };
+      const dialling: LintContext = {...stamped, callbacks: {dial}};
+  
+      const outcome = await runOver(dialling).then(
+        (findings) => ({rejected: false, message: '', findings}),
+        (error: unknown) => ({
+          rejected: true,
+          message: String((error as {message?: unknown})?.message ?? error),
+          findings: [] as Finding[],
+        }),
+      );
+  
+      expect(outcome).toMatchObject({rejected: true});
+      expect(outcome.message.slice(0, BREACH_PREFIX.length)).toBe(BREACH_PREFIX);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (e) [M5] ---------------------------------------------------------------
+  
+  /**
+   * The line M5 pins, over a directory whose name the exam does not know in
+   * advance — the CLI's `file` is the path relative to the root, which is why it
+   * starts `state-exams/lint-tmp-`. The seed count and the callback list are
+   * loosened exactly as `BAD_LINE`'s are, and for the same reason.
+   */
+--- conflict
+<<<<<<< begin added frontier
+const CLI_LINE = new RegExp(
+  '^state-exams/lint-tmp-[^/]+/expected/bad\\.json: state: ' + FINDING_TAIL,
+);
+======= begin deleted frontier
+const CLI_LINE =
+======= begin added run-14
+  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the [0-9]+ seeds within 3 moves of (?=[^—]*addTodo)(?=[^—]*clearCompleted)(?=[^—]*deleteTodo)(?=[^—]*setTodoCompleted)[^—]+ — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+======= begin deleted frontier
+
+>>>>>>> end conflict
+--- context (read-only)
+  test(
+    '(e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line',
+    () => {
+      // Beside the seeds, which the loader reads only when pointed at them: the
+      // fixture's own three seeds stay the seeds of this run.
+      const dir = mkdtempSync(join(ROOT, 'state-exams', 'lint-tmp-'));
+      try {
+        const expectedDir = join(dir, 'expected');
+        const examsDir = join(dir, 'exams');
+        mkdirSync(expectedDir);
+        mkdirSync(examsDir);
+        writeFileSync(join(expectedDir, 'bad.json'), '[{}, {"theme": "dark"}]\n');
+  
+        const run = runCli([
+          '--',
+          '--expected',
+          expectedDir,
+          '--exams',
+          examsDir,
+        ]);
+  
+        expect(run.code).toBe(1);
+  
+        // Contains, never "exactly these lines": the other rules share this
+        // stdout, and `[{}, {"theme": "dark"}]` has no `todos` row for them to
+        // speak about.
+        const matched = run.lines.filter((line) => CLI_LINE.test(line));
+        expect(matched).toHaveLength(1);
+        expectFindingLine(matched[0]!, CLI_LINE, CTX);
+      } finally {
+        rmSync(dir, {recursive: true, force: true});
+      }
+  
+      expect(existsSync(dir)).toBe(false);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  

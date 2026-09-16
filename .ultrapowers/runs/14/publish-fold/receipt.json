@@ -1,0 +1,17 @@
+{
+  "engineHead": "8827ce64ea2eea618bd0905cc344023b1a2772c2",
+  "attempts": {
+    "1": {
+      "tip": "10a4f79b6609fa6d4e782bfcf736ba97a60e251f",
+      "candidate": "8827ce64ea2eea618bd0905cc344023b1a2772c2",
+      "disposition": "conflict parked",
+      "reason": "resolver dispatch threw on client/src/TodoList.tsx: spawn E2BIG",
+      "path": "client/src/TodoList.tsx",
+      "pathsJoined": 7,
+      "resolversDispatched": 0,
+      "suite": "none",
+      "checks": [],
+      "checkRetries": 0
+    }
+  }
+}

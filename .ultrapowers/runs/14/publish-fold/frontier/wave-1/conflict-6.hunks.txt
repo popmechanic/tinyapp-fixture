@@ -1,0 +1,96 @@
+HUNK h1 lines 120-131
+--- context (read-only)
+    return [...(await rule.run(await contextOver(...exams)))];
+  };
+  
+  /** The one spec run-7 parked on: the bare selector, asserted `checked`. */
+  const RUN_7: ExamSpec = {
+    path: 'tests/state-exams/run-7.test.ts',
+    seed: 'state-exams/seeds/two-open-todos.json',
+    expected: 'state-exams/expected/two-todos-one-done.json',
+    view: [
+      {selector: '.todoItem input[type=checkbox]', checked: true},
+      {selector: '.todoItem', count: 2},
+    ],
+    action: [{click: '.todoItem input[type=checkbox]'}],
+  };
+  
+  /** The line M2 and M6 both pin, character for character. */
+  const RUN_7_LINE =
+    'tests/state-exams/run-7.test.ts: ' +
+    'view .todoItem input[type=checkbox] over state-exams/expected/two-todos-one-done.json: ' +
+    'a match is not checked — name the narrower selector: #todo-1';
+  
+  /** The `seed` and `action` M3–M5 leave open. See this file's header. */
+  const CARRIED = {
+    seed: 'state-exams/seeds/two-open-todos.json',
+    action: [] as ExamSpec['action'],
+  };
+  
+  // (a) [M1] ---------------------------------------------------------------
+  
+  test(
+    '(a) [M1] the `views` rule finds nothing over the fixture`s own exams',
+    async () => {
+      // The defaults `loadContext` reads are relative to `process.cwd()`, and the
+      // Proof runs this exam from the repository root.
+      expect(resolve(process.cwd())).toBe(ROOT);
+  
+      const rule = await ruleOnce();
+      expect(rule.name).toBe('views');
+  
+      const ctx = await contextOnce();
+--- conflict
+<<<<<<< begin added run-14
+    // A lower bound, not today's six: an exam a sibling change adds is one
+    // more exam the two sweeps below have to be quiet over.
+    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
+======= begin added frontier
+    // At least the six of M1: a later task's state exam is one more file under
+    // `tests/state-exams/`, and what this leg means is that every exam there
+    // is — six or more — asserts a view over a state that exists.
+    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
+======= begin deleted frontier
+
+>>>>>>> end conflict
+--- context (read-only)
+      // Every one of the six asserts a view, and names a state that is there.
+      const paths = ctx.snapshots.map(({path}) => path);
+      expect(
+        ctx.exams
+          .filter(({view}) => view === undefined)
+          .map(({path}) => path),
+      ).toEqual([]);
+      expect(
+        ctx.exams
+          .filter(({expected}) => !paths.includes(expected))
+          .map(({path, expected}) => `${path} -> ${expected}`),
+      ).toEqual([]);
+  
+      expect(await rule.run(ctx)).toEqual([]);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (b) [M2] ---------------------------------------------------------------
+  
+  test(
+    '(b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1`',
+    async () => {
+      const findings = await findingsOver(RUN_7);
+  
+      expect(findings).toHaveLength(1);
+      expect(formatFinding(findings[0]!)).toBe(RUN_7_LINE);
+    },
+    SPAWN_TIMEOUT_MS,
+  );
+  
+  // (c) [M3] ---------------------------------------------------------------
+  
+  test(
+    '(c) [M3] the `count: 1` spec is one finding reading `found 2`',
+    async () => {
+      const findings = await findingsOver({
+        ...CARRIED,
+        path: 'tests/state-exams/count.test.ts',
+        expected: 'state-exams/expected/two-todos-one-done.json',

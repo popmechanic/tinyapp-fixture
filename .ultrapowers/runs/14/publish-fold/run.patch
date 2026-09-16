@@ -1,0 +1,1130 @@
+diff --git a/client/src/TodoList.tsx b/client/src/TodoList.tsx
+index afdad559cc0403945926087cb5b05b341d33b250..8e78fa844c36d66f66bb20ec8af5610a1d2beeaa 100644
+--- a/client/src/TodoList.tsx
++++ b/client/src/TodoList.tsx
+@@ -2,6 +2,7 @@ import './todoList.css';
+ import {useSortedRowIds, STORE_ID} from './Store';
+ import {TodoItem} from './TodoItem';
+ import {ClearCompleted} from './ClearCompleted';
++import {UndoDelete} from './UndoDelete';
+ 
+ export const TodoList = () => {
+   const todoIds = useSortedRowIds(
+@@ -21,6 +22,7 @@ export const TodoList = () => {
+         ))}
+       </div>
+       <ClearCompleted />
++      <UndoDelete />
+     </>
+   );
+ };
+diff --git a/client/src/UndoDelete.tsx b/client/src/UndoDelete.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..c936bea0d254a023f6111ba5cf75692d84944d77
+--- /dev/null
++++ b/client/src/UndoDelete.tsx
+@@ -0,0 +1,28 @@
++import {useStore, useTable, type TodosStore, STORE_ID} from './Store';
++import {undoDelete} from './storeData';
++
++export const UndoDelete = () => {
++  const store = useStore(STORE_ID) as TodosStore | undefined;
++  const trash = useTable('trash', STORE_ID);
++
++  const handleUndoDelete = () => {
++    if (store) {
++      undoDelete(store);
++    }
++  };
++
++  // The button exists only while a deleted todo waits: `undoDelete` empties
++  // `trash` in the same transaction that puts the row back, so the press that
++  // restores the todo is also what takes the button away.
++  if (Object.keys(trash).length === 0) {
++    return null;
++  }
++
++  // `type` before `id`, unlike `ClearCompleted`: React emits attributes in JSX
++  // order, and this is the order the markup the task quotes is written in.
++  return (
++    <button type="button" id="undoDelete" onClick={handleUndoDelete}>
++      Undo
++    </button>
++  );
++};
+diff --git a/client/src/storeData.ts b/client/src/storeData.ts
+index 4e30598a023bd9d1f35291e71d79dfdde6ac0c5b..1c16f117d7eaf03dca735a6c0b150d1dddb81f36 100644
+--- a/client/src/storeData.ts
++++ b/client/src/storeData.ts
+@@ -6,11 +6,17 @@ import {
+   type Row,
+ } from 'tinybase/with-schemas';
+ 
++// The cells of a todo, written once. `trash` is where a deleted todo waits, so
++// it is a todos row copied whole — the same cells by construction, which is how
++// a cell a later change adds to a todo becomes a cell of a trashed todo too.
++const TODO_CELLS = {
++  text: {type: 'string', default: ''},
++  completed: {type: 'boolean', default: false},
++} as const;
++
+ export const TABLES_SCHEMA = {
+-  todos: {
+-    text: {type: 'string', default: ''},
+-    completed: {type: 'boolean', default: false},
+-  },
++  todos: TODO_CELLS,
++  trash: TODO_CELLS,
+ } as const;
+ 
+ // What every row of a table must satisfy, whoever wrote the row: the UI, an
+@@ -23,13 +29,24 @@ export type Invariant = {
+   message: string;
+ };
+ 
++// A completed todo has non-empty text. Held once, because a trashed todo is a
++// todos row copied whole and so is a todo by the same rule.
++const completedHasText = (
++  row: Record<string, string | number | boolean>,
++): boolean =>
++  row.completed !== true || (typeof row.text === 'string' && row.text !== '');
++
+ export const INVARIANTS: Invariant[] = [
+   {
+     table: 'todos',
+-    predicate: (row) =>
+-      row.completed !== true || (typeof row.text === 'string' && row.text !== ''),
++    predicate: (row) => completedHasText(row),
+     message: 'a completed todo has non-empty text',
+   },
++  {
++    table: 'trash',
++    predicate: (row) => completedHasText(row),
++    message: 'a completed todo waiting in the trash has non-empty text',
++  },
+ ];
+ 
+ export type TodoRow = Row<typeof TABLES_SCHEMA, 'todos'>;
+@@ -81,8 +98,8 @@ export const createTodosStore = (seed?: TodosContent): TodosStore => {
+   return created;
+ };
+ 
+-// The three mutations below are the single code path shared by the UI's
+-// buttons and by any headless caller (an exam, the seeded snapshot page).
++// The mutations below are the single code path shared by the UI's buttons and
++// by any headless caller (an exam, the seeded snapshot page).
+ 
+ export const addTodo = (store: TodosStore, text: string): string | undefined => {
+   const trimmed = text.trim();
+@@ -99,8 +116,30 @@ export const setTodoCompleted = (
+   store.setPartialRow('todos', id, {completed});
+ };
+ 
++// Delete moves the row whole into `trash`, which only ever holds the last one
++// deleted: clearing `trash` first is what keeps at most one row waiting, and
++// doing all three writes in one transaction is what stops a listener ever
++// seeing the row in neither table or in both.
+ export const deleteTodo = (store: TodosStore, id: string): void => {
+-  store.delRow('todos', id);
++  store.transaction(() => {
++    if (!store.hasRow('todos', id)) {
++      return;
++    }
++    store.delTable('trash');
++    store.setRow('trash', id, store.getRow('todos', id));
++    store.delRow('todos', id);
++  });
++};
++
++// Undo puts the waiting row back exactly as it was. With nothing waiting the
++// loop body never runs, so the store is left as it was found.
++export const undoDelete = (store: TodosStore): void => {
++  store.transaction(() => {
++    store.getRowIds('trash').forEach((id) => {
++      store.setRow('todos', id, store.getRow('trash', id));
++      store.delRow('trash', id);
++    });
++  });
+ };
+ 
+ export const clearCompleted = (store: TodosStore): void => {
+diff --git a/client/test/todos-store.test.ts b/client/test/todos-store.test.ts
+index 4bbc33dae1576fcd08e0592a670385ab946c1a01..843cd6f15907d546ac413123241fe88a6099113a 100644
+--- a/client/test/todos-store.test.ts
++++ b/client/test/todos-store.test.ts
+@@ -100,7 +100,9 @@ test('leg (c) [M3]: setTodoCompleted ticks and unticks, deleteTodo removes the r
+ 
+   sd.deleteTodo(store, '0');
+   expect(store.hasRow('todos', '0')).toBe(false);
+-  expect(store.getContent()).toEqual(EMPTY);
++  // The todo left the list, which is what this leg meant; where the deleted
++  // row waits afterwards is `trash`'s business and not this leg's.
++  expect(store.getContent()[0].todos).toBeUndefined();
+ });
+ 
+ // ---------------------------------------------------------------------------
+diff --git a/packages/tinyapp-lint/test/invariants.test.ts b/packages/tinyapp-lint/test/invariants.test.ts
+index 2adfd0048c6ec1d598d3d05e5a29004521a23628..8c1d9e02eb1bed9f70aaa0c64a364830f198d2b7 100644
+--- a/packages/tinyapp-lint/test/invariants.test.ts
++++ b/packages/tinyapp-lint/test/invariants.test.ts
+@@ -143,21 +143,25 @@ afterAll(() => {
+ 
+ // (a) [M1] ---------------------------------------------------------------
+ 
+-test('(a) [M1] `INVARIANTS` is the one todos invariant, with the pinned predicate', async () => {
++test('(a) [M1] `INVARIANTS` carries the todos invariant, with the pinned predicate', async () => {
+   const {INVARIANTS} = await storeModule();
+ 
+   expect(Array.isArray(INVARIANTS)).toBe(true);
+-  expect(INVARIANTS).toHaveLength(1);
++  // A lower bound and a `find`, never an exact length and an index: the app
++  // grows invariants over other tables, and what M1 pins is that the todos
++  // rule is among them and says what it says.
++  expect(INVARIANTS.length).toBeGreaterThanOrEqual(1);
+ 
+-  const invariant = INVARIANTS[0]!;
+-  expect(invariant.table).toBe('todos');
+-  expect(invariant.message).toBe(MESSAGE);
++  const invariant = INVARIANTS.find(
++    (entry) => entry.table === 'todos' && entry.message === MESSAGE,
++  );
++  expect(invariant).toBeDefined();
+ 
+   // A completed todo with no text breaks it; a completed todo with text and an
+   // open todo with no text both hold.
+-  expect(invariant.predicate({text: '', completed: true}, '1')).toBe(false);
+-  expect(invariant.predicate({text: 'buy milk', completed: true}, '0')).toBe(true);
+-  expect(invariant.predicate({text: '', completed: false}, '0')).toBe(true);
++  expect(invariant!.predicate({text: '', completed: true}, '1')).toBe(false);
++  expect(invariant!.predicate({text: 'buy milk', completed: true}, '0')).toBe(true);
++  expect(invariant!.predicate({text: '', completed: false}, '0')).toBe(true);
+ });
+ 
+ // (b) [M2] ---------------------------------------------------------------
+@@ -174,11 +178,12 @@ test(
+ 
+     const ctx = await contextOnce();
+ 
+-    // What the quiet result is measured over: the fixture's seven snapshots,
+-    // with the invariant of M1 live rather than an empty list.
+-    expect(ctx.snapshots).toHaveLength(7);
+-    expect(ctx.invariants).toHaveLength(1);
+-    expect(ctx.invariants[0]!.message).toBe(MESSAGE);
++    // What the quiet result is measured over: every snapshot the fixture
++    // carries — a lower bound, since a sibling change adds snapshots — with
++    // the invariant of M1 live rather than an empty list.
++    expect(ctx.snapshots.length).toBeGreaterThanOrEqual(7);
++    expect(ctx.invariants.length).toBeGreaterThanOrEqual(1);
++    expect(ctx.invariants.map(({message}) => message)).toContain(MESSAGE);
+     expect(ctx.storePath).toBe('client/src/storeData.ts');
+ 
+     expect(await rule.run(ctx)).toEqual([]);
+diff --git a/packages/tinyapp-lint/test/lint-cli.test.ts b/packages/tinyapp-lint/test/lint-cli.test.ts
+index 884f3b17ba6f939789c132eac59bfe81f2c2788b..38ac355ff5d765861c07d397331352d51493d1e7 100644
+--- a/packages/tinyapp-lint/test/lint-cli.test.ts
++++ b/packages/tinyapp-lint/test/lint-cli.test.ts
+@@ -34,7 +34,13 @@
+  * enough for a child `bun` process.
+  */
+ 
+-import {mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
++import {
++  mkdtempSync,
++  readFileSync,
++  readdirSync,
++  rmSync,
++  writeFileSync,
++} from 'node:fs';
+ import {tmpdir} from 'node:os';
+ import {join, resolve} from 'node:path';
+ 
+@@ -145,8 +151,11 @@ test(
+ 
+     expect(run.code).toBe(0);
+ 
++    // The counts are `[0-9]+`, never today's 7 and 6: what M1 pins is that the
++    // run is quiet over whatever the tree carries, and the tree grows
++    // snapshots and exams.
+     const summary =
+-      /^lint:state: 0 findings over 7 snapshots and 6 exams in [0-9]+ ms$/;
++      /^lint:state: 0 findings over [0-9]+ snapshots and [0-9]+ exams in [0-9]+ ms$/;
+     expect(run.lines.filter((line) => summary.test(line))).toHaveLength(1);
+   },
+   SPAWN_TIMEOUT_MS,
+@@ -164,23 +173,32 @@ test(
+     const ctx = await contextOnce();
+ 
+     // Every store export that is a function of arity >= 1 whose name does not
+-    // start with `create` or `read` — exactly these four.
+-    expect(Object.keys(ctx.callbacks).sort()).toEqual([
+-      'addTodo',
+-      'clearCompleted',
+-      'deleteTodo',
+-      'setTodoCompleted',
+-    ]);
+-
++    // start with `create` or `read` — these four are among them. `toContain`
++    // and not the whole list: the store grows callbacks as the app does.
++    const callbacks = Object.keys(ctx.callbacks).sort();
++    expect(callbacks).toContain('addTodo');
++    expect(callbacks).toContain('clearCompleted');
++    expect(callbacks).toContain('deleteTodo');
++    expect(callbacks).toContain('setTodoCompleted');
++
++    // The snapshot list is read off the tree rather than written down here, so
++    // a file a sibling change adds is covered by the per-index content check
++    // below instead of failing this list.
++    const jsonNames = (dir: string): string[] =>
++      readdirSync(join(ROOT, dir))
++        .filter((name) => name.endsWith('.json'))
++        .sort();
+     const snapshots: {path: string; kind: 'seed' | 'expected'}[] = [
+-      {path: 'state-exams/expected/one-open-todo.json', kind: 'expected'},
+-      {path: 'state-exams/expected/still-empty.json', kind: 'expected'},
+-      {path: 'state-exams/expected/two-todos-first-done.json', kind: 'expected'},
+-      {path: 'state-exams/expected/two-todos-one-done.json', kind: 'expected'},
+-      {path: 'state-exams/seeds/empty.json', kind: 'seed'},
+-      {path: 'state-exams/seeds/two-open-todos.json', kind: 'seed'},
+-      {path: 'state-exams/seeds/two-todos-one-done.json', kind: 'seed'},
++      ...jsonNames('state-exams/expected').map((name) => ({
++        path: `state-exams/expected/${name}`,
++        kind: 'expected' as const,
++      })),
++      ...jsonNames('state-exams/seeds').map((name) => ({
++        path: `state-exams/seeds/${name}`,
++        kind: 'seed' as const,
++      })),
+     ];
++    expect(snapshots.length).toBeGreaterThanOrEqual(7);
+     expect(
+       ctx.snapshots.map(({path, kind}) => ({path, kind})),
+     ).toEqual(snapshots);
+@@ -205,21 +223,23 @@ test(
+ // (c) [M3] ---------------------------------------------------------------
+ 
+ test(
+-  '(c) [M3] the six exam specs, in path order, and the pinned click entry',
++  '(c) [M3] the exam specs, in path order, and the pinned click entry',
+   async () => {
+     const ctx = await contextOnce();
+ 
+     // One per file under `tests/state-exams/` except `interaction-evidence`,
+-    // which registers only stubbed tests and calls no `stateExam`.
+-    expect(ctx.exams.map(({path}) => path)).toEqual([
+-      'tests/state-exams/buy-milk.test.ts',
+-      'tests/state-exams/clear-completed.test.ts',
+-      'tests/state-exams/click-completes-todo.test.ts',
+-      'tests/state-exams/done-count.test.ts',
+-      'tests/state-exams/empty-todo-refused.test.ts',
+-      'tests/state-exams/enter-submits-todo.test.ts',
+-    ]);
+-    expect(ctx.exams).toHaveLength(6);
++    // which registers only stubbed tests and calls no `stateExam`. Read off
++    // the tree, with a lower bound, so an exam a sibling change adds is
++    // expected here rather than a failure.
++    const examPaths = readdirSync(join(ROOT, 'tests/state-exams'))
++      .filter(
++        (name) =>
++          name.endsWith('.test.ts') && name !== 'interaction-evidence.test.ts',
++      )
++      .sort()
++      .map((name) => `tests/state-exams/${name}`);
++    expect(examPaths.length).toBeGreaterThanOrEqual(6);
++    expect(ctx.exams.map(({path}) => path)).toEqual(examPaths);
+ 
+     const click = ctx.exams.find(
+       ({path}) => path === 'tests/state-exams/click-completes-todo.test.ts',
+@@ -323,8 +343,9 @@ test(
+ 
+     const specs = await captureExams('tests/state-exams');
+ 
+-    // The child did the importing, so the specs came back all the same.
+-    expect(specs).toHaveLength(6);
++    // The child did the importing, so the specs came back all the same. A
++    // lower bound, since an exam a sibling change adds is one more spec.
++    expect(specs.length).toBeGreaterThanOrEqual(6);
+ 
+     expect(examsOfCache()).toEqual(before);
+   },
+diff --git a/packages/tinyapp-lint/test/reachability.test.ts b/packages/tinyapp-lint/test/reachability.test.ts
+index 520ec8df2e3628a1c8e6e24bd05a31b735998542..47089d1f71208015e0f3fcaf1e9e2e73a9ca5fc2 100644
+--- a/packages/tinyapp-lint/test/reachability.test.ts
++++ b/packages/tinyapp-lint/test/reachability.test.ts
+@@ -113,14 +113,20 @@ const runCli = (args: string[]): {code: number; lines: string[]} => {
+ // (a) [M1] ---------------------------------------------------------------
+ 
+ test(
+-  '(a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached',
++  '(a) [M1] the rule is named `reachability`, and the fixture`s expected states are each reached',
+   async () => {
+     expect(reachability.name).toBe('reachability');
+     expect(typeof reachability.run).toBe('function');
+ 
+-    // The fixture's own snapshots: four expected, three seeds.
+-    expect(CTX.snapshots.filter(({kind}) => kind === 'expected')).toHaveLength(4);
+-    expect(CTX.snapshots.filter(({kind}) => kind === 'seed')).toHaveLength(3);
++    // The fixture's own snapshots, as lower bounds: what M1 pins is that every
++    // expected state the tree carries is reached, and the tree grows expected
++    // states and seeds.
++    expect(
++      CTX.snapshots.filter(({kind}) => kind === 'expected').length,
++    ).toBeGreaterThanOrEqual(4);
++    expect(
++      CTX.snapshots.filter(({kind}) => kind === 'seed').length,
++    ).toBeGreaterThanOrEqual(3);
+ 
+     // A rule that fires on a file the fixture already carries is a plan defect,
+     // not a finding.
+@@ -132,17 +138,21 @@ test(
+ // (b) [M2] ---------------------------------------------------------------
+ 
+ /**
+- * The line M2 pins, character for character.
++ * The line M2 pins — as a pattern, because two of its parts are counts of what
++ * the tree carries rather than claims of this leg's.
+  *
+  * `theme` is a `values` entry, and a `values` entry can only be written by a
+  * callback: no fixture callback writes one, so this state is out of reach of
+- * the three seeds whatever the bound.
++ * the seeds whatever the bound.
++ *
++ * The seed count is `[0-9]+` and the callback list is `[^—]+` behind four
++ * lookaheads, so the four callbacks of BASE must each be named in the list and
++ * a callback the store grows later may be named beside them. Everything else —
++ * the file, the subject, the depth, the whole fix sentence — is still pinned
++ * character for character.
+  */
+ const BAD_LINE =
+-  'state-exams/expected/bad.json: state: reached by none of the 3 seeds ' +
+-  'within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted ' +
+-  '— write the state a callback reaches from a seed, or add the seed it is ' +
+-  'reached from';
++  /^state-exams\/expected\/bad\.json: state: reached by none of the [0-9]+ seeds within 3 moves of (?=[^—]*addTodo)(?=[^—]*clearCompleted)(?=[^—]*deleteTodo)(?=[^—]*setTodoCompleted)[^—]+ — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+ 
+ test(
+   '(b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms',
+@@ -163,7 +173,7 @@ test(
+     const elapsed = performance.now() - started;
+ 
+     expect(findings).toHaveLength(1);
+-    expect(formatFinding(findings[0]!)).toBe(BAD_LINE);
++    expect(formatFinding(findings[0]!)).toMatch(BAD_LINE);
+ 
+     // The full exploration of an unreachable target over the three seeds, at
+     // depth 3 and a 2,000-state cap, is what this budget is for.
+@@ -252,10 +262,11 @@ test(
+ /**
+  * The line M5 pins, over a directory whose name the exam does not know in
+  * advance — the CLI's `file` is the path relative to the root, which is why it
+- * starts `state-exams/lint-tmp-`.
++ * starts `state-exams/lint-tmp-`. The seed count and the callback list are
++ * loosened exactly as `BAD_LINE`'s are, and for the same reason.
+  */
+ const CLI_LINE =
+-  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the 3 seeds within 3 moves of addTodo, clearCompleted, deleteTodo or setTodoCompleted — write the state a callback reaches from a seed, or add the seed it is reached from$/;
++  /^state-exams\/lint-tmp-[^/]+\/expected\/bad\.json: state: reached by none of the [0-9]+ seeds within 3 moves of (?=[^—]*addTodo)(?=[^—]*clearCompleted)(?=[^—]*deleteTodo)(?=[^—]*setTodoCompleted)[^—]+ — write the state a callback reaches from a seed, or add the seed it is reached from$/;
+ 
+ test(
+   '(e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line',
+diff --git a/packages/tinyapp-lint/test/views.test.ts b/packages/tinyapp-lint/test/views.test.ts
+index 85f3a54ad5a757432523b8978c0d7362f3e3f4ab..56d4e6526a58a183fd163c92af0d55474ebd12e1 100644
+--- a/packages/tinyapp-lint/test/views.test.ts
++++ b/packages/tinyapp-lint/test/views.test.ts
+@@ -107,7 +107,7 @@ const CARRIED = {
+ // (a) [M1] ---------------------------------------------------------------
+ 
+ test(
+-  '(a) [M1] the `views` rule finds nothing over the fixture`s own six exams',
++  '(a) [M1] the `views` rule finds nothing over the fixture`s own exams',
+   async () => {
+     // The defaults `loadContext` reads are relative to `process.cwd()`, and the
+     // Proof runs this exam from the repository root.
+@@ -117,7 +117,9 @@ test(
+     expect(rule.name).toBe('views');
+ 
+     const ctx = await contextOnce();
+-    expect(ctx.exams).toHaveLength(6);
++    // A lower bound, not today's six: an exam a sibling change adds is one
++    // more exam the two sweeps below have to be quiet over.
++    expect(ctx.exams.length).toBeGreaterThanOrEqual(6);
+ 
+     // Every one of the six asserts a view, and names a state that is there.
+     const paths = ctx.snapshots.map(({path}) => path);
+diff --git a/state-exams/expected/second-delete-replaces-trash.json b/state-exams/expected/second-delete-replaces-trash.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..336310b122eb08eb5b73a973069e92b36b5c1a11
+--- /dev/null
++++ b/state-exams/expected/second-delete-replaces-trash.json
+@@ -0,0 +1 @@
++[{"trash": {"1": {"text": "walk the dog", "completed": false}}}, {}]
+diff --git a/state-exams/expected/two-open-todos-first-trashed.json b/state-exams/expected/two-open-todos-first-trashed.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..651f85e491abb7bec4938cf4e2eea2726acce28c
+--- /dev/null
++++ b/state-exams/expected/two-open-todos-first-trashed.json
+@@ -0,0 +1 @@
++[{"todos": {"1": {"text": "walk the dog", "completed": false}}, "trash": {"0": {"text": "buy milk", "completed": false}}}, {}]
+diff --git a/state-exams/expected/two-open-todos-restored.json b/state-exams/expected/two-open-todos-restored.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..679db0076108c1913ee439882412f484f8e8a4fa
+--- /dev/null
++++ b/state-exams/expected/two-open-todos-restored.json
+@@ -0,0 +1 @@
++[{"todos": {"0": {"text": "buy milk", "completed": false}, "1": {"text": "walk the dog", "completed": false}}}, {}]
+diff --git a/tests/smoke.test.ts b/tests/smoke.test.ts
+index b052fce34cc345d485c48e0d50826459acfc0aa3..04f0c4d7aeedf51b1f1509afc51a6273f1167574 100644
+--- a/tests/smoke.test.ts
++++ b/tests/smoke.test.ts
+@@ -3,7 +3,10 @@ import { createTodosStore, TABLES_SCHEMA } from "../client/src/storeData";
+ 
+ test("the scaffold's store is green at BASE: schema and default content", () => {
+   const store = createTodosStore();
+-  expect(Object.keys(TABLES_SCHEMA)).toEqual(["todos"]);
++  // `toContain`, never an exact list: the schema grows a table (and a todo
++  // grows a cell) as the app does, and what this asserts is that `todos` is
++  // one of them.
++  expect(Object.keys(TABLES_SCHEMA)).toContain("todos");
+   expect(store.getRowCount("todos")).toBe(2);
+   expect(store.getCell("todos", "1", "completed")).toBe(false);
+ });
+diff --git a/tests/state-exams/delete-to-trash.test.ts b/tests/state-exams/delete-to-trash.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8e8494f6e20401486f9372d9c4e6b2e7a66cbd47
+--- /dev/null
++++ b/tests/state-exams/delete-to-trash.test.ts
+@@ -0,0 +1,403 @@
++/**
++ * The exam for Task 1 — "The trash table — Delete moves the whole row there,
++ * Undo moves it back".
++ *
++ * One `stateExam` call carries leg (a) [M1] — the whole state exam of this
++ * file, as `tests/state-exams/clear-completed.test.ts` shows — and legs (b)–(k)
++ * sit beside it as ordinary `bun:test` blocks.
++ *
++ * Two habits run through every assertion below, and both are the Global Check's:
++ *
++ *  - A state is compared against the *parsed* seed or expected file, never
++ *    against a content literal spelled in here. A literal row like
++ *    `{text: 'buy milk', completed: false}` pins the key set of a todos row,
++ *    and a sibling run is adding a cell to that schema concurrently; the same
++ *    assertion stated relatively — store against file, trash row against the
++ *    todos row it was copied from — says what the clause says and survives the
++ *    fold.
++ *  - Where a clause says what the file itself must hold ("exactly the M2
++ *    literal"), the exam pins what is not a row's cell set: which tables are in
++ *    `content[0]`, which row ids each holds, and the cells the clause names by
++ *    value, read one cell at a time.
++ *
++ * The three `state-exams/expected/*.json` files this task creates are the
++ * implementation's, not the exam's: at BASE their absence is part of the
++ * absent implementation and the read names the missing path.
++ */
++
++import {readdirSync, readFileSync} from 'node:fs';
++import {join} from 'node:path';
++
++import {expect, test} from 'bun:test';
++import {stateExam} from 'tinyapp-exam';
++
++import {
++  clearCompleted,
++  createTodosStore,
++  deleteTodo,
++  INVARIANTS,
++  TABLES_SCHEMA,
++  undoDelete,
++  type TodosContent,
++} from '../../client/src/storeData';
++
++// --- the shapes and the readers ---------------------------------------------
++
++type Cell = string | number | boolean;
++type Tables = Record<string, Record<string, Record<string, Cell>>>;
++type Values = Record<string, Cell>;
++
++/** Exactly TinyBase's `getContent()` shape, which is also every file's shape. */
++type Content = [Tables, Values];
++
++/** This file sits two directories below the repository root, `bun test`'s cwd. */
++const ROOT = join(import.meta.dir, '..', '..');
++
++const readJson = (...parts: string[]): Content =>
++  JSON.parse(readFileSync(join(ROOT, ...parts), 'utf8')) as Content;
++
++const readText = (...parts: string[]): string =>
++  readFileSync(join(ROOT, ...parts), 'utf8');
++
++/** Runs one Proof `Run:` line from the repository root and returns its status. */
++const runLine = (line: string): number | null =>
++  Bun.spawnSync({
++    cmd: ['bash', '-c', line],
++    cwd: ROOT,
++    stdout: 'ignore',
++    stderr: 'ignore',
++  }).exitCode;
++
++const snapshot = (store: {getContent: () => unknown}): Content =>
++  JSON.parse(JSON.stringify(store.getContent())) as Content;
++
++const seeded = (content: Content) =>
++  createTodosStore(content as unknown as TodosContent);
++
++/** The seed M1–M5 are all stated over. */
++const twoOpenTodos = (): Content =>
++  readJson('state-exams', 'seeds', 'two-open-todos.json');
++
++/**
++ * A `bun test` of another file is a browser, a bundle and a lint child away
++ * from bun's 5 s default.
++ */
++const CHILD_TIMEOUT_MS = 300_000;
++
++// --- leg (a) [M1] -----------------------------------------------------------
++
++// Clicking the first `.todoItem`'s `button` — its Delete, a `<button>` with no
++// id inside the row, and `TodoList` renders rows ascending by row id so the
++// first match is row `0` — moves that row out of the list and into `trash`.
++// The view is the page M1 leaves: one row left, `walk the dog`, unticked. The
++// mutant drops the trash row from the expected state; an exam that never looked
++// at `trash` would not have noticed.
++stateExam({
++  clock: '2026-01-01T00:00:00Z',
++  entry: 'client/index.html',
++  seed: 'state-exams/seeds/two-open-todos.json',
++  store: () => createTodosStore(),
++  action: {click: '.todoItem button'},
++  expected: 'state-exams/expected/two-open-todos-first-trashed.json',
++  view: [
++    {selector: '.todoItem', count: 1, text: 'walk the dog'},
++    {selector: '.todoItem input[type=checkbox]', unchecked: true},
++  ],
++  mutant: [{table: 'trash', row: '0', absent: true}],
++});
++
++// The half of M1 a state exam cannot spell: `todos` lacks `'0'`, and `trash`
++// holds `'0'` with *every* cell the todos row held — the row copied whole,
++// which is asserted against the seed's own row rather than against a list of
++// cells, so a schema that grows a cell does not make this leg lie.
++test('leg (a) [M1]: the delete leaves todos without `0` and trash holding that whole row', () => {
++  const seed = twoOpenTodos();
++  const store = seeded(seed);
++
++  deleteTodo(store, '0');
++  const content = snapshot(store);
++
++  expect(content).toEqual(
++    readJson('state-exams', 'expected', 'two-open-todos-first-trashed.json'),
++  );
++
++  expect(Object.keys(content[0]).sort()).toEqual(['todos', 'trash']);
++  expect(Object.keys(content[0].todos!)).toEqual(['1']);
++  expect(Object.keys(content[0].trash!)).toEqual(['0']);
++  expect(content[0].trash!['0']).toEqual(seed[0].todos!['0']!);
++  expect(content[0].todos!['1']).toEqual(seed[0].todos!['1']!);
++});
++
++// The expected state M1 names, as the file must parse: the table `todos` holding
++// only `'1'` (`walk the dog`, open) beside the table `trash` holding only `'0'`
++// (`buy milk`, open).
++test('leg (a) [M1]: two-open-todos-first-trashed.json holds the state M1 names', () => {
++  const parsed = readJson(
++    'state-exams',
++    'expected',
++    'two-open-todos-first-trashed.json',
++  );
++
++  expect(Object.keys(parsed[0]).sort()).toEqual(['todos', 'trash']);
++  expect(Object.keys(parsed[0].todos!)).toEqual(['1']);
++  expect(parsed[0].todos!['1']!.text).toBe('walk the dog');
++  expect(parsed[0].todos!['1']!.completed).toBe(false);
++  expect(Object.keys(parsed[0].trash!)).toEqual(['0']);
++  expect(parsed[0].trash!['0']!.text).toBe('buy milk');
++  expect(parsed[0].trash!['0']!.completed).toBe(false);
++
++  // The file is what the seeded page reaches: the same state, round-tripped.
++  expect(snapshot(seeded(parsed))).toEqual(parsed);
++});
++
++// --- leg (b) [M2] -----------------------------------------------------------
++
++// A second delete replaces the waiting row rather than joining it, and `todos`
++// is gone from the content because it has no rows left.
++test('leg (b) [M2]: deleting `0` then `1` leaves only the second row waiting in trash', () => {
++  const seed = twoOpenTodos();
++  const store = seeded(seed);
++
++  deleteTodo(store, '0');
++  deleteTodo(store, '1');
++  const content = snapshot(store);
++
++  expect(content).toEqual(
++    readJson('state-exams', 'expected', 'second-delete-replaces-trash.json'),
++  );
++
++  expect(Object.keys(content[0])).toEqual(['trash']);
++  expect(Object.keys(content[0].trash!)).toEqual(['1']);
++  expect(content[0].trash!['1']).toEqual(seed[0].todos!['1']!);
++});
++
++// The M2 literal, as the file must parse: the one table `trash`, the one row
++// `'1'`, `walk the dog` and open — and no `todos` table at all.
++test('leg (b) [M2]: second-delete-replaces-trash.json holds the state M2 names', () => {
++  const parsed = readJson(
++    'state-exams',
++    'expected',
++    'second-delete-replaces-trash.json',
++  );
++
++  expect(Object.keys(parsed[0])).toEqual(['trash']);
++  expect(parsed[0].todos).toBeUndefined();
++  expect(Object.keys(parsed[0].trash!)).toEqual(['1']);
++  expect(parsed[0].trash!['1']!.text).toBe('walk the dog');
++  expect(parsed[0].trash!['1']!.completed).toBe(false);
++
++  expect(snapshot(seeded(parsed))).toEqual(parsed);
++});
++
++// --- leg (c) [M3] -----------------------------------------------------------
++
++// An undo puts the row back exactly as it was: the content is the seed's again,
++// and nothing of `trash` is left behind.
++test('leg (c) [M3]: an undo after a delete restores the seed content, with no trash table', () => {
++  const seed = twoOpenTodos();
++  const store = seeded(seed);
++
++  deleteTodo(store, '0');
++  undoDelete(store);
++  const content = snapshot(store);
++
++  expect(content).toEqual(seed);
++  expect(content).toEqual(
++    readJson('state-exams', 'expected', 'two-open-todos-restored.json'),
++  );
++  expect(Object.keys(content[0])).not.toContain('trash');
++  expect(content[0].trash).toBeUndefined();
++});
++
++// The restored state is that seed content, which is what the file must hold.
++test('leg (c) [M3]: two-open-todos-restored.json is the two-open seed content', () => {
++  const parsed = readJson(
++    'state-exams',
++    'expected',
++    'two-open-todos-restored.json',
++  );
++
++  expect(parsed).toEqual(twoOpenTodos());
++  expect(Object.keys(parsed[0])).not.toContain('trash');
++});
++
++// --- leg (d) [M4] -----------------------------------------------------------
++
++// An undo with nothing waiting does nothing at all.
++test('leg (d) [M4]: undoDelete with an empty trash leaves the content deep-equal to before', () => {
++  const store = seeded(twoOpenTodos());
++
++  const before = snapshot(store);
++  undoDelete(store);
++  const after = snapshot(store);
++
++  expect(after).toEqual(before);
++});
++
++// --- leg (e) [M5] -----------------------------------------------------------
++
++// A delete of an id the list does not hold moves nothing — in particular it
++// does not empty the trash, and it does not write a row of defaults.
++test('leg (e) [M5]: deleteTodo of an id todos does not hold leaves the content deep-equal to before', () => {
++  const store = seeded(twoOpenTodos());
++
++  const before = snapshot(store);
++  deleteTodo(store, '9');
++  const after = snapshot(store);
++
++  expect(after).toEqual(before);
++});
++
++// --- leg (f) [M6] -----------------------------------------------------------
++
++// Clear completed fills no trash: only a single Delete is undoable.
++test('leg (f) [M6]: clearCompleted reaches one-open-todo.json and leaves no trash table', () => {
++  const store = seeded(readJson('state-exams', 'seeds', 'two-todos-one-done.json'));
++
++  clearCompleted(store);
++  const content = snapshot(store);
++
++  expect(content).toEqual(readJson('state-exams', 'expected', 'one-open-todo.json'));
++  expect(Object.keys(content[0])).not.toContain('trash');
++  expect(content[0].trash).toBeUndefined();
++});
++
++// --- legs (g)–(i) [M7] ------------------------------------------------------
++
++/** The one `INVARIANTS` entry M7 is about, or `undefined` when there is none. */
++const trashInvariants = () => INVARIANTS.filter((entry) => entry.table === 'trash');
++
++// The trash table is the todos table's schema, whatever cells that grows to —
++// asserted as the one against the other, never as a list of cell names.
++test('leg (g) [M7]: TABLES_SCHEMA.trash is TABLES_SCHEMA.todos, and one INVARIANTS entry is the trash one', () => {
++  expect(TABLES_SCHEMA.trash).toEqual(TABLES_SCHEMA.todos);
++  expect(trashInvariants()).toHaveLength(1);
++});
++
++// A trashed todo is a todos row copied whole, so the rule that holds of a todo
++// holds of it: text-carrying rows pass.
++test('leg (h) [M7]: the trash invariant holds for {text: `buy milk`, completed: false}', () => {
++  const entry = trashInvariants()[0]!;
++
++  expect(entry.predicate({text: 'buy milk', completed: false}, '0')).toBe(true);
++});
++
++// And a completed row with no text fails it, exactly as it does in `todos`.
++test('leg (i) [M7]: the trash invariant fails for {text: ``, completed: true}', () => {
++  const entry = trashInvariants()[0]!;
++
++  expect(entry.predicate({text: '', completed: true}, '0')).toBe(false);
++});
++
++// --- leg (j) [M8] -----------------------------------------------------------
++
++/** Every `.json` file under a snapshot directory, in name order. */
++const jsonFiles = (dir: string): string[] =>
++  readdirSync(join(ROOT, 'state-exams', dir))
++    .filter((name) => name.endsWith('.json'))
++    .sort()
++    .map((name) => `state-exams/${dir}/${name}`);
++
++// Every seed and every expected state loads through `createTodosStore` to
++// itself. The round trip is what says the empty `trash` table appears in none
++// of them: a table with no rows is absent from `getContent()`, so a file that
++// carried `"trash": {}` would come back without it and fail here.
++//
++// The two maps are keyed by path so the failing file names itself in the diff.
++test('leg (j) [M8]: every seed and expected file round-trips through createTodosStore', () => {
++  const files = [...jsonFiles('seeds'), ...jsonFiles('expected')];
++
++  // The three seeds and four expected states of BASE, plus this task's three.
++  expect(files.length).toBeGreaterThanOrEqual(10);
++  expect(files).toContain('state-exams/seeds/two-open-todos.json');
++  expect(files).toContain(
++    'state-exams/expected/two-open-todos-first-trashed.json',
++  );
++  expect(files).toContain(
++    'state-exams/expected/second-delete-replaces-trash.json',
++  );
++  expect(files).toContain('state-exams/expected/two-open-todos-restored.json');
++
++  const wanted: Record<string, Content> = {};
++  const loaded: Record<string, Content> = {};
++  files.forEach((path) => {
++    const parsed = readJson(...path.split('/'));
++    wanted[path] = parsed;
++    loaded[path] = snapshot(seeded(parsed));
++  });
++
++  expect(loaded).toEqual(wanted);
++});
++
++// --- leg (k) [M9] -----------------------------------------------------------
++
++// The eight `Run:` lines, each run verbatim from the repository root, so "exits
++// 0" is asserted as the Proof spells it.
++
++test(
++  'leg (k) [M9] Run: `bun test packages/tinyapp-lint` exits 0',
++  () => {
++    expect(runLine('bun test packages/tinyapp-lint')).toBe(0);
++  },
++  CHILD_TIMEOUT_MS,
++);
++
++test('leg (k) [M9] Run: reachability.test.ts carries no `deleteTodo or setTodoCompleted` line', () => {
++  expect(
++    runLine(
++      `test "$(grep -c 'deleteTodo or setTodoCompleted' packages/tinyapp-lint/test/reachability.test.ts)" -eq 0`,
++    ),
++  ).toBe(0);
++});
++
++test(
++  'leg (k) [M9] Run: `bun test tests/smoke.test.ts` exits 0',
++  () => {
++    expect(runLine('bun test tests/smoke.test.ts')).toBe(0);
++  },
++  CHILD_TIMEOUT_MS,
++);
++
++test(
++  'leg (k) [M9] Run: `bun test tests/state-exams/done-count.test.ts` exits 0',
++  () => {
++    expect(runLine('bun test tests/state-exams/done-count.test.ts')).toBe(0);
++  },
++  CHILD_TIMEOUT_MS,
++);
++
++test(
++  'leg (k) [M9] Run: `bun test client/test/todos-store.test.ts` exits 0',
++  () => {
++    expect(runLine('bun test client/test/todos-store.test.ts')).toBe(0);
++  },
++  CHILD_TIMEOUT_MS,
++);
++
++test('leg (k) [M9] Run: the three greps over the loosened pins each exit 0', () => {
++  expect(runLine(`grep -q 'toContain("todos")' tests/smoke.test.ts`)).toBe(0);
++  expect(
++    runLine(`grep -q "toContain('todos')" tests/state-exams/done-count.test.ts`),
++  ).toBe(0);
++  expect(
++    runLine(
++      String.raw`grep -q "getContent()\[0\].todos).toBeUndefined()" client/test/todos-store.test.ts`,
++    ),
++  ).toBe(0);
++});
++
++// "In place of the exact list", and never a new exact list: the two schema pins
++// keep the `toContain` and no longer pin the table list, and leg (o) of
++// `done-count` asks only that `completed` and `text` are among the cells. A
++// file carrying both the new `toContain` and the old `toEqual` would pass the
++// greps above while still going red the moment a sibling adds a cell.
++test('leg (k) [M9]: neither schema pin still spells the exact table list', () => {
++  const smoke = readText('tests', 'smoke.test.ts');
++  const doneCount = readText('tests', 'state-exams', 'done-count.test.ts');
++
++  expect(smoke).not.toContain('toEqual(["todos"])');
++  expect(doneCount).not.toContain("toEqual(['todos'])");
++
++  expect(doneCount).toContain("toContain('completed')");
++  expect(doneCount).toContain("toContain('text')");
++});
+diff --git a/tests/state-exams/done-count.test.ts b/tests/state-exams/done-count.test.ts
+index c4f5077de13a6a9bd44f902929883a42fac113ff..fa7e572c334b06ba24edd808a0a771f2994b8906 100644
+--- a/tests/state-exams/done-count.test.ts
++++ b/tests/state-exams/done-count.test.ts
+@@ -146,12 +146,13 @@ test('leg (n) [M3] state-exams/expected/two-todos-one-done.json parses to exactl
+ 
+ // --- M4: the count added no store state --------------------------------------
+ 
+-test('leg (o) [M4] TABLES_SCHEMA still has exactly the table todos with exactly the cells completed and text', () => {
+-  expect(Object.keys(TABLES_SCHEMA)).toEqual(['todos']);
+-  expect(Object.keys(TABLES_SCHEMA.todos).sort()).toEqual([
+-    'completed',
+-    'text',
+-  ]);
++test('leg (o) [M4] TABLES_SCHEMA still carries the table todos with the cells completed and text', () => {
++  // `toContain` and not an exact list, in both assertions: the count adds no
++  // store state, which is what this leg is for, and a table or a cell the app
++  // grows elsewhere is not the count's doing either.
++  expect(Object.keys(TABLES_SCHEMA)).toContain('todos');
++  expect(Object.keys(TABLES_SCHEMA.todos)).toContain('completed');
++  expect(Object.keys(TABLES_SCHEMA.todos)).toContain('text');
+ });
+ 
+ // --- M5 (and M1/M3 end to end): leg (p), the state exam itself ---------------
+diff --git a/tests/state-exams/undo-delete.test.ts b/tests/state-exams/undo-delete.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..7db09c49108885a690169a41887a95f7b3ca8405
+--- /dev/null
++++ b/tests/state-exams/undo-delete.test.ts
+@@ -0,0 +1,202 @@
++/**
++ * The exam for Task 2 — "The Undo button — shown only while a deleted todo
++ * waits, gone once pressed".
++ *
++ * Leg (a) [M1] is the one `stateExam` of this file, in the shape the Proof
++ * spells: the two-open seed, the two clicks, the restored expected state, the
++ * two view entries and the mutant that drops row `'0'`. Legs (b)–(h) sit beside
++ * it as ordinary `bun:test` blocks — the two static renders of M2 and M3, and
++ * the five `Run:` lines of M4 executed verbatim so that "exits 0" is asserted
++ * as the Proof spells it.
++ *
++ * One habit runs through every assertion below, and it is the Global Check's: a
++ * state is compared against a *parsed* seed or expected file, never against a
++ * content literal spelled in here. A literal row like `{text: 'buy milk',
++ * completed: false}` pins the key set of a todos row, and a sibling run is
++ * adding a cell to that schema on this same base; the same assertion stated
++ * relatively — the restored file against the seed file it must equal — says
++ * what the clause says and survives the fold. Where a clause names a value
++ * ("`buy milk`", "no `trash` key"), that value is read one cell at a time,
++ * which pins what the clause pins and not a row's cell set.
++ *
++ * For the same reason the two contents M2 and M3 are stated over are read from
++ * the two files that already hold exactly them — `two-open-todos-first-trashed`
++ * is the M2 content and the `two-open-todos` seed is the M3 content — each with
++ * a guard beside it naming what the clause requires of that content, so a file
++ * that drifted from the clause fails here saying so rather than quietly
++ * rendering something else.
++ */
++
++import {readFileSync} from 'node:fs';
++import {join} from 'node:path';
++
++import {expect, test} from 'bun:test';
++import {stateExam} from 'tinyapp-exam';
++
++import {renderStatic} from '../../client/src/StaticPage';
++import {createTodosStore, type TodosContent} from '../../client/src/storeData';
++
++// --- the shapes and the readers ---------------------------------------------
++
++type Cell = string | number | boolean;
++type Tables = Record<string, Record<string, Record<string, Cell>>>;
++type Values = Record<string, Cell>;
++
++/** Exactly TinyBase's `getContent()` shape, which is also every file's shape. */
++type Content = [Tables, Values];
++
++/** This file sits two directories below the repository root, `bun test`'s cwd. */
++const ROOT = join(import.meta.dir, '..', '..');
++
++const readJson = (...parts: string[]): Content =>
++  JSON.parse(readFileSync(join(ROOT, ...parts), 'utf8')) as Content;
++
++/** Runs one Proof `Run:` line from the repository root and returns its status. */
++const runLine = (line: string): number | null =>
++  Bun.spawnSync({
++    cmd: ['bash', '-c', line],
++    cwd: ROOT,
++    stdout: 'ignore',
++    stderr: 'ignore',
++  }).exitCode;
++
++/** The seed of M1, and the content M3 is stated over: two open todos, no trash. */
++const twoOpenTodos = (): Content =>
++  readJson('state-exams', 'seeds', 'two-open-todos.json');
++
++/** The content of M2: `walk the dog` in `todos`, `buy milk` waiting in `trash`. */
++const oneWaitingInTrash = (): Content =>
++  readJson('state-exams', 'expected', 'two-open-todos-first-trashed.json');
++
++/** The restored state M1 names, as the file the exam compares against holds it. */
++const restored = (): Content =>
++  readJson('state-exams', 'expected', 'two-open-todos-restored.json');
++
++const render = (content: Content): string =>
++  renderStatic(content as unknown as TodosContent);
++
++// --- leg (a) [M1]: the two clicks on the page -------------------------------
++
++// Clicking the first `.todoItem`'s `button` — its Delete, a `<button>` with no
++// id inside the row, and `TodoList` renders rows ascending by row id so the
++// first match is row `0` — moves that row into `trash` and raises the Undo
++// button; clicking `#undoDelete` puts it back. The page the second click lands
++// on is the page the first click left, so `#undoDelete` has to have appeared by
++// then or there is nothing to click.
++//
++// The state reached is the seed's own content again, which is what the restored
++// expected file holds. The view is the page M1 names: exactly two rows, and no
++// Undo button left once the waiting row has gone home. The mutant drops row
++// `'0'` from that expected state — an exam that never looked at the restored
++// row would not have noticed.
++stateExam({
++  clock: '2026-01-01T00:00:00Z',
++  entry: 'client/index.html',
++  seed: 'state-exams/seeds/two-open-todos.json',
++  store: () => createTodosStore(),
++  action: [{click: '.todoItem button'}, {click: '#undoDelete'}],
++  expected: 'state-exams/expected/two-open-todos-restored.json',
++  view: [
++    {selector: '#undoDelete', absent: true},
++    {selector: '.todoItem', count: 2},
++  ],
++  mutant: [{table: 'todos', row: '0', absent: true}],
++});
++
++// The other half of leg (a) [M1]: the expected file the exam above compares
++// against is the seed content itself — the same tables, the same row ids, the
++// same cells — and carries no `trash` key. A restored file that differed from
++// the seed in any cell, id or table fails the first assertion naming the
++// difference; the reads after it name the values M1 names, one at a time.
++test('leg (a) [M1]: two-open-todos-restored.json is the seed content of M1, with no trash key', () => {
++  const parsed = restored();
++  const seed = twoOpenTodos();
++
++  expect(parsed).toEqual(seed);
++
++  expect(Object.keys(parsed[0])).toContain('todos');
++  expect(Object.keys(parsed[0])).not.toContain('trash');
++  expect(parsed[0].trash).toBeUndefined();
++
++  expect(Object.keys(parsed[0].todos!).sort()).toEqual(['0', '1']);
++  expect(parsed[0].todos!['0']!.text).toBe('buy milk');
++  expect(parsed[0].todos!['0']!.completed).toBe(false);
++  expect(parsed[0].todos!['1']!.text).toBe('walk the dog');
++  expect(parsed[0].todos!['1']!.completed).toBe(false);
++
++  expect(parsed[1]).toEqual(seed[1]);
++});
++
++// --- leg (b) [M2]: the static render while a row waits ----------------------
++
++// The content M2 is stated over, as the file that holds it must parse: the row
++// `walk the dog` left in `todos`, the row `buy milk` waiting in `trash`.
++test('leg (b) [M2]: the content M2 renders over holds one row in todos and one waiting in trash', () => {
++  const content = oneWaitingInTrash();
++
++  expect(Object.keys(content[0]).sort()).toEqual(['todos', 'trash']);
++  expect(Object.keys(content[0].todos!)).toEqual(['1']);
++  expect(content[0].todos!['1']!.text).toBe('walk the dog');
++  expect(content[0].todos!['1']!.completed).toBe(false);
++  expect(Object.keys(content[0].trash!)).toEqual(['0']);
++  expect(content[0].trash!['0']!.text).toBe('buy milk');
++  expect(content[0].trash!['0']!.completed).toBe(false);
++});
++
++// With a row waiting the page carries the Undo button exactly once, and it is a
++// `<button>` whose text is `Undo` — the two regexes M2 names, over the markup
++// `renderStatic` returns.
++test('leg (b) [M2]: renderStatic with a row waiting carries `id="undoDelete"` once, on a <button> reading Undo', () => {
++  const html = render(oneWaitingInTrash());
++
++  // `?? []` so a page with no Undo button at all fails saying it found none,
++  // rather than saying `null` has no length.
++  expect((html.match(/id="undoDelete"/g) ?? []).length).toBe(1);
++  expect(html).toMatch(/<button[^>]*id="undoDelete"[^>]*>Undo<\/button>/);
++});
++
++// --- leg (c) [M3]: the static render with nothing waiting -------------------
++
++// The same render over the two-open-todos content — the seed of M1, which has no
++// `trash` table at all — carries no `undoDelete` anywhere in it: not the id, not
++// the word, not a disabled button kept in the markup.
++test('leg (c) [M3]: renderStatic over the two-open-todos content carries no undoDelete at all', () => {
++  const content = twoOpenTodos();
++
++  expect(Object.keys(content[0])).not.toContain('trash');
++  expect(content[0].trash).toBeUndefined();
++
++  expect(render(content)).not.toContain('undoDelete');
++});
++
++// --- legs (d)-(h) [M4]: the five `Run:` lines, verbatim ---------------------
++
++// Each line is run from the repository root exactly as the Proof spells it, so
++// "exits 0" is asserted as `grep -q` decides it: a missing file, a component
++// that is not exported, one that never calls the callback, never reads the
++// provided store or never reads the `trash` table, and a list that does not
++// mount it, each exit non-zero and fail the leg they belong to.
++
++test("leg (d) [M4] Run: `grep -q 'export const UndoDelete' client/src/UndoDelete.tsx` exits 0", () => {
++  expect(
++    runLine(`grep -q 'export const UndoDelete' client/src/UndoDelete.tsx`),
++  ).toBe(0);
++});
++
++test("leg (e) [M4] Run: `grep -q 'undoDelete(' client/src/UndoDelete.tsx` exits 0", () => {
++  expect(runLine(`grep -q 'undoDelete(' client/src/UndoDelete.tsx`)).toBe(0);
++});
++
++test("leg (f) [M4] Run: `grep -q 'useStore(STORE_ID)' client/src/UndoDelete.tsx` exits 0", () => {
++  expect(runLine(`grep -q 'useStore(STORE_ID)' client/src/UndoDelete.tsx`)).toBe(
++    0,
++  );
++});
++
++test(`leg (g) [M4] Run: \`grep -q "useTable('trash'" client/src/UndoDelete.tsx\` exits 0`, () => {
++  expect(runLine(`grep -q "useTable('trash'" client/src/UndoDelete.tsx`)).toBe(0);
++});
++
++test("leg (h) [M4] Run: `grep -q '<UndoDelete />' client/src/TodoList.tsx` exits 0", () => {
++  expect(runLine(`grep -q '<UndoDelete />' client/src/TodoList.tsx`)).toBe(0);
++});

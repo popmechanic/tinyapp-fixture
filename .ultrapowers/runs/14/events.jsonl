@@ -60,3 +60,17 @@
 {"kind":"worker:end","label":"review:2:1","role":"reviewer","sessionId":"48df93a1-9bbb-42c6-8d1a-94e323b6a215","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":6465,"output":11731,"cacheRead":484839,"cacheCreation":33679,"costUsd":0.9048094999999999,"models":["claude-opus-5"]},"id":"01M2KRTX6M00006XECZCG9F4XF","ts":1789517460692}
 {"kind":"transcript:slice","label":"review:2:1","sessionId":"48df93a1-9bbb-42c6-8d1a-94e323b6a215","bytes":11610,"id":"01M2KRTX6T000096RSD3355EP4","ts":1789517460698}
 {"kind":"engine:phase","phase":"Wave 2","id":"01M2KRTX9R0000K9SHZ6JP3N5K","ts":1789517460792}
+{"kind":"driver:wave-adopted","wave":2,"tasks":["2"],"headSha":"8827ce64ea2eea618bd0905cc344023b1a2772c2","why":"end","applied":{"2":"base"},"id":"01M2KRW4WZ0000RFXTKYNKBW2M","ts":1789517501343}
+{"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2KRW4XN0000SAFDK1QQRXW4","ts":1789517501365}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2KRW8HY0000EK7B8JS4ZKHQ","ts":1789517505086}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":2,"id":"01M2KRW9HC0000VYSS5TYNNYPV","ts":1789517506092}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src","exit":0,"minor":false,"wave":2,"id":"01M2KRW9HK0000845275B296Y8","ts":1789517506099}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2KRW9P9000033T2XE66HXZA","ts":1789517506249}
+{"kind":"driver:stage","stage":"finalize","id":"01M2KRW9QN0000NV90E3YCTE98","ts":1789517506293}
+{"kind":"driver:stage","stage":"gate","id":"01M2KRW9SC0000Z5RQ9REAJRGJ","ts":1789517506348}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2KRW9WY0000MER3TE4Y6A42","ts":1789517506462}
+{"kind":"driver:stage","stage":"approve","id":"01M2KRW9WY0001ZZC12EPFS5QW","ts":1789517506462}
+{"kind":"driver:approved","stamp":"run-14","integrationBranch":"ultra/integration-run-14","id":"01M2KRW9YH0000NG1VV7JX9QS7","ts":1789517506513}
+{"kind":"run:open","runId":"run-14","base":"f24d4059a76fa6c58a38a26ca2b60d4cd59fe336","source":"fleet/publish-fold.mjs","id":"01M2KRWAV40000P38B85PDAJB6","ts":1789517507428}
+{"kind":"worker:start","label":"resolve:publish-fold:1:1:1","role":"resolver","sessionId":"21fe94b3-60ff-4d04-ac52-fb6a5b2d6953","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-14/clones/integration","model":null,"id":"01M2KRWEFS0000N6MKRH46G66W","ts":1789517511161}
+{"kind":"driver:publish-fold","run":"14","attempt":"1","base":"f24d4059a76fa6c58a38a26ca2b60d4cd59fe336","tip":"10a4f79b6609fa6d4e782bfcf736ba97a60e251f","candidate":"8827ce64ea2eea618bd0905cc344023b1a2772c2","reason":"resolver dispatch threw on client/src/TodoList.tsx: spawn E2BIG","pathsJoined":7,"pathsConflicted":7,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"conflict parked","checks":[],"checkRetries":0,"id":"01M2KRWEGB0000QVCR68FES3EA","ts":1789517511179}
