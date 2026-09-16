@@ -33,6 +33,9 @@
 }
 
 .todoItem input.dueInput {
+  /* `input[type='text']` in input.css is 100% wide for the add form; a full-width
+     date box here pushes Delete outside #todoList's overflow-hidden box. */
+  width: auto;
   flex-shrink: 0;
   font: inherit;
   color: var(--fg);
