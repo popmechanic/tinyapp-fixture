@@ -1,0 +1,61 @@
+{
+  "mode": "gate",
+  "stamp": "run-15",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-15/report.json",
+  "branch": "ultra/integration-run-15",
+  "gateCheck": {
+    "verdict": "BLOCKED",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": false,
+        "detail": "merge-sha guard unavailable \u2014 result lacks waveMerges[last].headSha (budget-exhausted or SKIPPED-only run); inspect and redirect/re-run"
+      },
+      {
+        "name": "head-match",
+        "ok": false,
+        "detail": "skipped \u2014 no recorded merge headSha to compare"
+      },
+      {
+        "name": "git-verified",
+        "ok": false,
+        "detail": "gitVerified is not true \u2014 the completeness critic could not confirm it reviewed the recorded merge HEAD; the review is unverified"
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": false,
+        "detail": "failed/blocked tasks left declared deliverables unproduced: [{\"task\": \"1\", \"files\": [\"client/src/storeData.ts\", \"client/test/todos-store.test.ts\", \"packages/tinyapp-lint/test/invariants.test.ts\", \"packages/tinyapp-lint/test/lint-cli.test.ts\", \"packages/tinyapp-lint/test/reachability.test.ts\", \"packages/tinyapp-lint/test/views.test.ts\", \"state-exams/expected/second-delete-replaces-trash.json\", \"state-exams/expected/two-open-todos-first-trashed.json\", \"state-exams/expected/two-open-todos-restored.json\", \"tests/smoke.test.ts\", \"tests/state-exams/delete-to-trash.test.ts\", \"tests/state-exams/done-count.test.ts\"]}, {\"task\": \"2\", \"files\": [\"client/src/TodoList.tsx\", \"client/src/UndoDelete.tsx\", \"tests/state-exams/undo-delete.test.ts\"]}]"
+      }
+    ],
+    "acks": [
+      {
+        "type": "coverage",
+        "detail": "green suite but 0/2 tasks merged \u2014 a passing suite over an incomplete merge is a false-green"
+      }
+    ],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 1,
+  "suite": {
+    "passed": false,
+    "unattributed": [],
+    "output": "not run \u2014 no wave merged"
+  },
+  "verdict": "BLOCKED"
+}

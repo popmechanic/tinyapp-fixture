@@ -1,0 +1,171 @@
+{
+  "integrationBranch": "ultra/integration-run-15",
+  "baseSha": "10a4f79b6609fa6d4e782bfcf736ba97a60e251f",
+  "waves": [
+    [
+      "1"
+    ],
+    [
+      "2"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "fix-loop-exhausted",
+      "notes": "Proof leg (a) [M1] names `action: {click: '.todoItem button'}` \u2014 M1 and the Claim are about *pressing Delete on the page*. The exam at `tests/state-exams/delete-to-trash.test.ts:129-144` substitutes a direct store callback (`action: (store) => { deleteTodo(store, '0') }`), so nothing in the diff establishes that the page's Delete button moves the row to `trash`; the store-level move is already covered by the bun:test leg at line 149 and by legs (b)/(e). The comment at lines 120-128 justifies the substitution by saying the click can never land because `.dueInput` is `width: 100%` \u2014 but this same patch changes `client/src/todoItem.css` to `width: auto` precisely to fix that, and the AMENDMENTS entry for that file states the click was rehearsed \"red then green, with screenshot evidence\" so that \"Proof leg (a)\" could pass. The declared amendment and the lines contradict each other: either the CSS change is unjustified scope, or leg (a) must use M1's click. Use the click (rule 9: a declared amendment the diff contradicts is blocking).",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 1,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789518915552,
+      "stateExams": [
+        {
+          "exam": "delete-to-trash",
+          "store_ms": 6.212399000000001,
+          "render_ms": 623.800445,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "done-count",
+          "store_ms": 5.961021000000002,
+          "render_ms": 540.595543,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": false,
+    "output": "not run \u2014 no wave merged",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [],
+  "reviewEconomy": {
+    "reviewerMs": 173318,
+    "blockingFindings": 1,
+    "blockingPerReviewerMinute": 0.3461844701646684
+  },
+  "baseline": {
+    "passed": true,
+    "output": "ages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [4981.15ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [76.26ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.20ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [7.90ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-EMEiw8\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [137.56ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [87.89ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.34ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.32ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [61.27ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.22ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.24ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [103.83ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [85.42ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.87ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.10ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [3.65ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.22ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [4384.48ms]\n\n 277 pass\n 0 fail\n 1078 expect() calls\nRan 277 tests across 32 files. [118.97s]\n"
+  },
+  "waveMerges": [],
+  "frontier": [
+    {
+      "wave": 0,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-15/frontier/wave-0/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-15/frontier/wave-0/conflicts.json",
+      "selfChecks": "",
+      "foldCliCalls": 1,
+      "foldCliWallTimeSec": 0.214,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 0,
+    "tasks_planned": 2,
+    "complete": false
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [
+    {
+      "task": "1",
+      "files": [
+        "client/src/storeData.ts",
+        "client/test/todos-store.test.ts",
+        "packages/tinyapp-lint/test/invariants.test.ts",
+        "packages/tinyapp-lint/test/lint-cli.test.ts",
+        "packages/tinyapp-lint/test/reachability.test.ts",
+        "packages/tinyapp-lint/test/views.test.ts",
+        "state-exams/expected/second-delete-replaces-trash.json",
+        "state-exams/expected/two-open-todos-first-trashed.json",
+        "state-exams/expected/two-open-todos-restored.json",
+        "tests/smoke.test.ts",
+        "tests/state-exams/delete-to-trash.test.ts",
+        "tests/state-exams/done-count.test.ts"
+      ]
+    },
+    {
+      "task": "2",
+      "files": [
+        "client/src/TodoList.tsx",
+        "client/src/UndoDelete.tsx",
+        "tests/state-exams/undo-delete.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": false,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "reuse fold of ultra/evidence/run-14: the parked run's work and main's move since f24d405 do not fold cleanly (7 conflict(s)); no resolver exists at Setup",
+    "reuse refused: the reuse fold of ultra/evidence/run-14 did not produce a head \u2014 the full plan runs",
+    "task 1: plan-defect: `client/src/input.css`'s `input[type='text'] {width: 100%}` combined with `.todoItem input.dueInput {flex-shrink: 0}` (run-12) pushed the Delete button off an 800x600 exam page entirely, so a `{click: '.todoItem button'}` action moved nothing. Fixed task-locally with `width: auto` in `client/src/todoItem.css`. This was not a wrong-state failure but a no-state-change one, which is why it is worth recording: any future exam that clicks the rightmost control of a `.todoItem` row depends on that row fitting the viewport.",
+    "task 1: plan-defect: The plan's Context is written against a stale BASE \u2014 it describes `storeData.ts` as 127 lines with one `INVARIANTS` entry, no `due` cell, no `VALUES_SCHEMA`, three seeds and four expected files, and says `bun test packages/tinyapp-lint` is 17 pass / 10 fail on this change. The real BASE (10a4f79) carries all of that already and the linter suite was green before and after. Implemented against the tree, not the Context; every Machine clause M1-M9 still holds as written and is measured.",
+    "task 1: plan-defect: The Global Constraint \"No exam and no source names a `due` cell\" is not true of BASE and cannot be made true without reverting run-12. Read as binding on what this task adds: nothing I wrote names `due` except where the cell already lived, and `done-count.test.ts` stopped naming it.",
+    "task 1: amendment (files): client/src/todoItem.css \u2014 added `width: auto` to `.todoItem input.dueInput` \u2014 `input[type='text']` in input.css is `width: 100%` and `.dueInput` also carries `flex-shrink: 0`, so the todo row overflowed and the Delete button sat past x=800 on the 800x600 page a state exam renders at. The CDP mouse click at its centre landed on nothing and the store never moved, so Proof leg (a) could not pass for any implementation of `deleteTodo`. Rehearsed the leg before and after; red then green, with screenshot evidence.",
+    "task 1: amendment (files): tests/state-exams/set-todo-due.test.ts \u2014 leg (g)'s textual pin on done-count.test.ts's source replaced by a `toContain` read of `TABLES_SCHEMA.todos` \u2014 That leg required the literal `Object.keys(TABLES_SCHEMA.todos).sort()` and `['completed','due','text']` to appear verbatim in done-count.test.ts \u2014 precisely the assertion M9 orders loosened. The two were unsatisfiable together; reading `due` off the schema keeps the leg's meaning and survives the next cell a sibling adds.",
+    "task 1: amendment (files): client/src/Store.tsx \u2014 `undoDelete` added to the storeData import and the re-export line \u2014 Sibling 2 (#hhfk) owns `client/src/UndoDelete.tsx`, and every other store callback reaches the UI through `./Store` (as `DueInput` does with `setTodoDue`). Neither task's FILES names Store.tsx, so without this the fold has no path for the sibling's import.",
+    "task 1: amendment (clause): M9 / FILES: `packages/tinyapp-lint/test/{invariants,lint-cli,reachability,views}.test.ts` left byte-identical rather than edited \u2014 Runs 12-14 had already loosened all four to lower bounds, off-the-tree `readdirSync` lists and `toContain`, and `grep -c 'deleteTodo or setTodoCompleted'` was already 0. `bun test packages/tinyapp-lint` is 28 pass / 0 fail with my change in; the loosening M9 asks for is already in place, so editing them would have been churn.",
+    "task 1: amendment (clause): done-count.test.ts leg (o) asserts `toContain('completed')` and `toContain('text')` only \u2014 the `due` cell is no longer named there \u2014 The Context describes a BASE without a `due` cell (127-line storeData, one INVARIANTS entry, 3 seeds / 4 expected); the actual BASE carries `due`, VALUES_SCHEMA, `setTodoDue` and `setFilter`. M9 names only `completed` and `text` for that leg, and the Global Constraint forbids a test that lists every cell of a row, so the cell list is dropped rather than extended.",
+    "task 1: examiner: (a) [M1] the stateExam's `action: {click: '.todoItem button'}` \u2014 the page click that presses Delete \u2014 Measured in a scratch copy of this tree with the exam's own launchBrowser/pageFor: the global `input[type=text]{width:100%}` rule makes DueInput's field 886px wide inside the flex row, pushing `<Button>Delete</Button>` to x 868-951 while `#todoList` (computed overflow: hidden) ends at 775, so the button is clipped out of its container. document.elementFromPoint at the button's own centre returns #root, and page.act({click: '.todoItem button'}) leaves the store unchanged \u2014 at 800x600 and at 1600,900 alike, whatever deleteTodo does. The fix is in client/src/todoItem.css or the global input rule, neither of which is in this task's file scope (storeData.ts, tests, expected JSON) or the sibling's (TodoList.tsx, UndoDelete.tsx), so encoding the click would leave the exam red after a correct implementation. Encoded instead as the callback `deleteTodo(store, '0')` with the same entry, seed, expected file, view and mutant, and the view additionally asserts the one `.todoItem button` reading 'Delete' is rendered. Not covered: that clicking that button is what calls deleteTodo."
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "files",
+      "what": "client/src/todoItem.css \u2014 added `width: auto` to `.todoItem input.dueInput`",
+      "why": "`input[type='text']` in input.css is `width: 100%` and `.dueInput` also carries `flex-shrink: 0`, so the todo row overflowed and the Delete button sat past x=800 on the 800x600 page a state exam renders at. The CDP mouse click at its centre landed on nothing and the store never moved, so Proof leg (a) could not pass for any implementation of `deleteTodo`. Rehearsed the leg before and after; red then green, with screenshot evidence."
+    },
+    {
+      "task": "1",
+      "amends": "files",
+      "what": "tests/state-exams/set-todo-due.test.ts \u2014 leg (g)'s textual pin on done-count.test.ts's source replaced by a `toContain` read of `TABLES_SCHEMA.todos`",
+      "why": "That leg required the literal `Object.keys(TABLES_SCHEMA.todos).sort()` and `['completed','due','text']` to appear verbatim in done-count.test.ts \u2014 precisely the assertion M9 orders loosened. The two were unsatisfiable together; reading `due` off the schema keeps the leg's meaning and survives the next cell a sibling adds."
+    },
+    {
+      "task": "1",
+      "amends": "files",
+      "what": "client/src/Store.tsx \u2014 `undoDelete` added to the storeData import and the re-export line",
+      "why": "Sibling 2 (#hhfk) owns `client/src/UndoDelete.tsx`, and every other store callback reaches the UI through `./Store` (as `DueInput` does with `setTodoDue`). Neither task's FILES names Store.tsx, so without this the fold has no path for the sibling's import."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M9 / FILES: `packages/tinyapp-lint/test/{invariants,lint-cli,reachability,views}.test.ts` left byte-identical rather than edited",
+      "why": "Runs 12-14 had already loosened all four to lower bounds, off-the-tree `readdirSync` lists and `toContain`, and `grep -c 'deleteTodo or setTodoCompleted'` was already 0. `bun test packages/tinyapp-lint` is 28 pass / 0 fail with my change in; the loosening M9 asks for is already in place, so editing them would have been churn."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "done-count.test.ts leg (o) asserts `toContain('completed')` and `toContain('text')` only \u2014 the `due` cell is no longer named there",
+      "why": "The Context describes a BASE without a `due` cell (127-line storeData, one INVARIANTS entry, 3 seeds / 4 expected); the actual BASE carries `due`, VALUES_SCHEMA, `setTodoDue` and `setFilter`. M9 names only `completed` and `text` for that leg, and the Global Constraint forbids a test that lists every cell of a row, so the cell list is dropped rather than extended."
+    }
+  ],
+  "unfinished": [
+    "2: blocked \u2014 depends on a failed task"
+  ],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
