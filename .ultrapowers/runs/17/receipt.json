@@ -1,0 +1,537 @@
+{
+  "ok": true,
+  "stamp": "run-17",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-17"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "4 task(s) in 2 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The history writer \u2014 the store's content committed to a DoltLite file on every recorded callback",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "bun.lock",
+          "package.json",
+          "packages/tinyapp-history/package.json",
+          "packages/tinyapp-history/src/history.ts",
+          "packages/tinyapp-history/tsconfig.json"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`openHistory(path: string): History`",
+            "`recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded`",
+            "`messageOf(name: string, args: Cell[]): string`",
+            "`History`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The transition lister \u2014 a session's steps as candidate exams, numbered for the pick",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-history/src/transitions.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`listTransitions(history: HistoryReader): Transition[]`",
+            "`parseMessage(message: string): {name: string; args: Cell[]} | null`",
+            "`renderTransitions(transitions: Transition[]): string`",
+            "`Transition`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The mutant from a diff \u2014 every changed cell put back the way the seed had it",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-history/src/mutant.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "none"
+          ],
+          "produces": [
+            "`mutantOf(rows: DiffRow[]): MutantEdit[]`",
+            "`editOf(row: DiffRow): MutantEdit`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "The promotion \u2014 the fixture's session recorded, one transition picked, its exam written and green",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "package.json",
+          "packages/tinyapp-history/src/cli.ts",
+          "packages/tinyapp-history/src/index.ts",
+          "packages/tinyapp-history/src/promote.ts",
+          "packages/tinyapp-history/src/session.ts",
+          "packages/tinyapp-lint/test/views.test.ts",
+          "state-exams/expected/derived-complete-first-todo.json",
+          "state-exams/seeds/derived-complete-first-todo.json",
+          "tests/state-exams/derived-complete-first-todo.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`openHistory(path: string): History`",
+            "`recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded`",
+            "`listTransitions(history: HistoryReader): Transition[]`",
+            "`renderTransitions(transitions: Transition[]): string`",
+            "`mutantOf(rows: DiffRow[]): MutantEdit[]`"
+          ],
+          "produces": [
+            "`promote(history: History, transition: Transition, slug: string, root: string, clock: string): Promoted`",
+            "`recordFixtureSession(path: string): Promise<History>`",
+            "`SESSION`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "3",
+        "to": "4",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1",
+        "2",
+        "3"
+      ],
+      [
+        "4"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The history writer \u2014 the store's content committed to a DoltLite file on every recorded callback",
+          "files": [
+            "bun.lock",
+            "package.json",
+            "packages/tinyapp-history/package.json",
+            "packages/tinyapp-history/src/history.ts",
+            "packages/tinyapp-history/tsconfig.json",
+            "tests/state-exams/store-history.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`openHistory(path: string): History`",
+              "`recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded`",
+              "`messageOf(name: string, args: Cell[]): string`",
+              "`History`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "bun.lock",
+            "package.json",
+            "packages/tinyapp-history/package.json",
+            "packages/tinyapp-history/src/history.ts",
+            "packages/tinyapp-history/tsconfig.json"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/store-history.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/store-history.test.ts",
+          "proofRuns": [
+            "bunx tsc -p packages/tinyapp-history --noEmit",
+            "grep -q 'bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\"' package.json"
+          ],
+          "proofGuards": [
+            "tests/state-exams/store-history.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "bun.lock",
+              "package.json",
+              "packages/tinyapp-history/package.json",
+              "packages/tinyapp-history/src/history.ts",
+              "packages/tinyapp-history/tsconfig.json",
+              "tests/state-exams/store-history.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/store-history.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/store-history.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/store-history.test.ts": "tests/state-exams/store-history.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/store-history.test.ts"
+            ],
+            "siblingOwned": [
+              "packages/tinyapp-history/src/mutant.ts",
+              "packages/tinyapp-history/src/transitions.ts",
+              "tests/state-exams/mutant-from-diff.test.ts",
+              "tests/state-exams/session-transitions.test.ts"
+            ],
+            "produces": [
+              "`openHistory(path: string): History`",
+              "`recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded`",
+              "`messageOf(name: string, args: Cell[]): string`",
+              "`History`"
+            ],
+            "consumes": []
+          }
+        },
+        {
+          "id": "2",
+          "title": "The transition lister \u2014 a session's steps as candidate exams, numbered for the pick",
+          "files": [
+            "packages/tinyapp-history/src/transitions.ts",
+            "tests/state-exams/session-transitions.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`listTransitions(history: HistoryReader): Transition[]`",
+              "`parseMessage(message: string): {name: string; args: Cell[]} | null`",
+              "`renderTransitions(transitions: Transition[]): string`",
+              "`Transition`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-history/src/transitions.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/session-transitions.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/session-transitions.test.ts",
+          "proofRuns": [
+            "bunx tsc --noEmit --strict --skipLibCheck --types bun --module esnext --moduleResolution bundler --target es2022 packages/tinyapp-history/src/transitions.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/session-transitions.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-history/src/transitions.ts",
+              "tests/state-exams/session-transitions.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/session-transitions.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/session-transitions.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/session-transitions.test.ts": "tests/state-exams/session-transitions.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/session-transitions.test.ts"
+            ],
+            "siblingOwned": [
+              "bun.lock",
+              "package.json",
+              "packages/tinyapp-history/package.json",
+              "packages/tinyapp-history/src/history.ts",
+              "packages/tinyapp-history/src/mutant.ts",
+              "packages/tinyapp-history/tsconfig.json",
+              "tests/state-exams/mutant-from-diff.test.ts",
+              "tests/state-exams/store-history.test.ts"
+            ],
+            "produces": [
+              "`listTransitions(history: HistoryReader): Transition[]`",
+              "`parseMessage(message: string): {name: string; args: Cell[]} | null`",
+              "`renderTransitions(transitions: Transition[]): string`",
+              "`Transition`"
+            ],
+            "consumes": []
+          }
+        },
+        {
+          "id": "3",
+          "title": "The mutant from a diff \u2014 every changed cell put back the way the seed had it",
+          "files": [
+            "packages/tinyapp-history/src/mutant.ts",
+            "tests/state-exams/mutant-from-diff.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "none"
+            ],
+            "produces": [
+              "`mutantOf(rows: DiffRow[]): MutantEdit[]`",
+              "`editOf(row: DiffRow): MutantEdit`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-history/src/mutant.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/mutant-from-diff.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/mutant-from-diff.test.ts",
+          "proofRuns": [
+            "bunx tsc --noEmit --strict --skipLibCheck --types bun --module esnext --moduleResolution bundler --target es2022 packages/tinyapp-history/src/mutant.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/mutant-from-diff.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-history/src/mutant.ts",
+              "tests/state-exams/mutant-from-diff.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/mutant-from-diff.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/mutant-from-diff.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/mutant-from-diff.test.ts": "tests/state-exams/mutant-from-diff.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/mutant-from-diff.test.ts"
+            ],
+            "siblingOwned": [
+              "bun.lock",
+              "package.json",
+              "packages/tinyapp-history/package.json",
+              "packages/tinyapp-history/src/history.ts",
+              "packages/tinyapp-history/src/transitions.ts",
+              "packages/tinyapp-history/tsconfig.json",
+              "tests/state-exams/session-transitions.test.ts",
+              "tests/state-exams/store-history.test.ts"
+            ],
+            "produces": [
+              "`mutantOf(rows: DiffRow[]): MutantEdit[]`",
+              "`editOf(row: DiffRow): MutantEdit`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "4",
+          "title": "The promotion \u2014 the fixture's session recorded, one transition picked, its exam written and green",
+          "files": [
+            "package.json",
+            "packages/tinyapp-history/src/cli.ts",
+            "packages/tinyapp-history/src/index.ts",
+            "packages/tinyapp-history/src/promote.ts",
+            "packages/tinyapp-history/src/session.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/derived-complete-first-todo.json",
+            "state-exams/seeds/derived-complete-first-todo.json",
+            "tests/state-exams/derived-complete-first-todo.test.ts",
+            "tests/state-exams/derived-exam.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`openHistory(path: string): History`",
+              "`recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded`",
+              "`listTransitions(history: HistoryReader): Transition[]`",
+              "`renderTransitions(transitions: Transition[]): string`",
+              "`mutantOf(rows: DiffRow[]): MutantEdit[]`"
+            ],
+            "produces": [
+              "`promote(history: History, transition: Transition, slug: string, root: string, clock: string): Promoted`",
+              "`recordFixtureSession(path: string): Promise<History>`",
+              "`SESSION`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "package.json",
+            "packages/tinyapp-history/src/cli.ts",
+            "packages/tinyapp-history/src/index.ts",
+            "packages/tinyapp-history/src/promote.ts",
+            "packages/tinyapp-history/src/session.ts",
+            "packages/tinyapp-lint/test/views.test.ts",
+            "state-exams/expected/derived-complete-first-todo.json",
+            "state-exams/seeds/derived-complete-first-todo.json",
+            "tests/state-exams/derived-complete-first-todo.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/derived-exam.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/derived-exam.test.ts",
+          "proofRuns": [
+            "bun test tests/state-exams/derived-complete-first-todo.test.ts",
+            "bun test packages/tinyapp-lint/test/views.test.ts",
+            "grep -q \"view === undefined && action !== 'callback'\" packages/tinyapp-lint/test/views.test.ts",
+            "grep -q '\"history\": \"bun packages/tinyapp-history/src/cli.ts\"' package.json"
+          ],
+          "proofGuards": [
+            "tests/state-exams/derived-exam.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "package.json",
+              "packages/tinyapp-history/src/cli.ts",
+              "packages/tinyapp-history/src/index.ts",
+              "packages/tinyapp-history/src/promote.ts",
+              "packages/tinyapp-history/src/session.ts",
+              "packages/tinyapp-lint/test/views.test.ts",
+              "state-exams/expected/derived-complete-first-todo.json",
+              "state-exams/seeds/derived-complete-first-todo.json",
+              "tests/state-exams/derived-complete-first-todo.test.ts",
+              "tests/state-exams/derived-exam.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/derived-exam.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/derived-exam.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/derived-exam.test.ts": "tests/state-exams/derived-exam.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/derived-exam.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`promote(history: History, transition: Transition, slug: string, root: string, clock: string): Promoted`",
+              "`recordFixtureSession(path: string): Promise<History>`",
+              "`SESSION`"
+            ],
+            "consumes": [
+              "`openHistory(path: string): History`",
+              "`recordSession(store: ExamStore, history: History, callbacks: Callbacks, clock: string): Recorded`",
+              "`listTransitions(history: HistoryReader): Transition[]`",
+              "`renderTransitions(transitions: Transition[]): string`",
+              "`mutantOf(rows: DiffRow[]): MutantEdit[]`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "3 parallel tasks",
+      "The promotion \u2014 the fixture's session recorded, one tra\u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- DoltLite is a file the exam opens, never a second truth (popmechanic/ultrapowers#764, boundary (3)): the app's store module `client/src/storeData.ts` gains no callback, no cell and no default, `client/src` is byte-identical to BASE, and the history package reads a store through `getContent()` and writes nothing into it. A callback added to the store module is a finding: the linter walks every exported function of that module as a move.\n- The oracle stays the comparison (popmechanic/ultrapowers#998, rule 4): a derived exam is a `stateExam` whose expected file was read back from a commit and whose mutant was read off a diff; no expected state and no mutant of a derived exam is typed by a person.\n- No commit hash is pinned anywhere \u2014 not in a test, not in a snapshot, not in a Context. Measured 2026-09-15 (`@dolthub/doltlite` 0.50.10, Bun 1.4.2): two recordings of the same session under the same `--date` yield different hashes, because the file's root commit `Initialize data repository` carries the file's creation time and every descendant hashes over it. A hash is read from the log and used in the same process; what is pinned is messages, counts and the content `at()` reads back.\n- Every file under `tests/state-exams/` calls `stateExam(` exactly once, at column 0, and calls nothing else exported by `tinyapp-exam` at its top level: `lint:state` reads every exam file in a child process with every export of `tinyapp-exam` but `stateExam` replaced by a no-op and every `bun:test` name too, so a top-level `diffContent(\u2026)` from `tinyapp-exam` returns `undefined` there and a file with no column-0 `stateExam(` is not counted by `packages/tinyapp-lint/test/lint-cli.test.ts`. Top-level calls into `packages/tinyapp-history` are fine: only the exam file's own imports are rewritten.\n- The linter's own tests under `packages/tinyapp-lint/test/` are loosened only by containment, never re-pinned to a new literal; a re-pinned count or list is a finding.\n- The exam files of this plan import the history package by relative path \u2014 `../../packages/tinyapp-history/src/<module>` from `tests/state-exams/` \u2014 never by the bare name `tinyapp-history`, which is linked into `node_modules` only by a `bun install` that has seen the new package.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src client/src",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-17/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-17/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-17/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-17/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile"
+}
