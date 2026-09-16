@@ -1,3 +1,4 @@
+import './index.css';
 import {getUniqueId} from 'tinybase';
 import ReactDOM from 'react-dom/client';
 import {App} from './App';

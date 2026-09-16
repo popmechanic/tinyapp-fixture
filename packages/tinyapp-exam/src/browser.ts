@@ -24,9 +24,9 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
 import {REFLECT_CHECKED} from './render-move';
-import type {Action} from './types';
+import type {Action, Locator} from './types';
 
-export type {Action} from './types';
+export type {Action, Locator} from './types';
 
 /** Where the fleet image keeps its headless shell. */
 const DEFAULT_BINARY = '/headless-shell/headless-shell';
@@ -56,7 +56,7 @@ const DATA_URL_CEILING = 2_097_152;
 
 /** One open page: act on it, read from it, photograph it, close it. */
 export interface Page {
-  /** Performs one action, rejecting when its selector matches nothing. */
+  /** Performs one action, rejecting when its locator matches nothing. */
   act(action: Action): Promise<void>;
   /** The JSON value of `expression` evaluated in the page. */
   evaluate(expression: string): Promise<unknown>;
@@ -278,40 +278,135 @@ const devtoolsUrl = async (stream: ReadableStream<Uint8Array>): Promise<string> 
   ]);
 };
 
-/** The nodeId of `selector`, or a rejection naming it. */
-const nodeFor = async (
-  connection: Connection,
-  sessionId: string,
-  selector: string,
-): Promise<number> => {
+/**
+ * How the DOM domain is told which element is meant.
+ *
+ * `DOM.getBoxModel`, `DOM.focus` and `DOM.resolveNode` each take a `nodeId` or
+ * a `backendNodeId` in the same slot, so the two resolvers below — the selector
+ * one and the accessibility one — hand back a parameter object and every call
+ * after them spreads it, rather than each one knowing which kind of id it got.
+ */
+type NodeRef = {nodeId: number} | {backendNodeId: number};
+
+/** How a locator reads in `act`'s rejection. */
+const spellLocator = (locator: Locator): string =>
+  typeof locator === 'string'
+    ? locator
+    : `role=${locator.role} name=${JSON.stringify(locator.name)}`;
+
+/** The document's root nodeId — the scope every query below starts from. */
+const rootOf = async (connection: Connection, sessionId: string): Promise<number> => {
   const document = (await connection.send('DOM.getDocument', {}, sessionId)) as {
     root?: {nodeId?: number};
   };
-  const found = (await connection.send(
-    'DOM.querySelector',
-    {nodeId: document.root?.nodeId ?? 0, selector},
-    sessionId,
-  )) as {nodeId?: number};
-  if (found.nodeId === undefined || found.nodeId === 0) {
-    throw new Error(`act: no element matches ${selector}`);
-  }
-  return found.nodeId;
+  return document.root?.nodeId ?? 0;
 };
 
-/** The centre of a node's content box: `content` is x1 y1 x2 y2 x3 y3 x4 y4. */
+/**
+ * The first element `locator` names, or a rejection spelling it.
+ *
+ * A string goes to `DOM.querySelector`. A `{role, name}` goes to
+ * `Accessibility.queryAXTree`, which answers the nodes whose computed role and
+ * computed *accessible name* are both what was asked for, in tree order — so
+ * "the first match" means the same thing for both forms. The accessible name is
+ * the browser's own computation and nothing a selector can reach: a `<label
+ * for>` names its input, an `aria-label` names anything at all, and a bare
+ * `placeholder` names a text input.
+ *
+ * `Accessibility.enable` is idempotent and cheap, and the domain is off until
+ * something asks for it, so it is enabled here rather than at `open`: a page
+ * that only ever acts on selectors never turns the tree on.
+ */
+const nodeFor = async (
+  connection: Connection,
+  sessionId: string,
+  locator: Locator,
+): Promise<NodeRef> => {
+  if (typeof locator === 'string') {
+    const found = (await connection.send(
+      'DOM.querySelector',
+      {nodeId: await rootOf(connection, sessionId), selector: locator},
+      sessionId,
+    )) as {nodeId?: number};
+    if (found.nodeId === undefined || found.nodeId === 0) {
+      throw new Error(`act: no element matches ${spellLocator(locator)}`);
+    }
+    return {nodeId: found.nodeId};
+  }
+
+  await connection.send('Accessibility.enable', {}, sessionId);
+  const found = (await connection.send(
+    'Accessibility.queryAXTree',
+    {
+      nodeId: await rootOf(connection, sessionId),
+      role: locator.role,
+      accessibleName: locator.name,
+    },
+    sessionId,
+  )) as {nodes?: {backendDOMNodeId?: number}[]};
+  const backendNodeId = (found.nodes ?? []).find(
+    (node) => node.backendDOMNodeId !== undefined && node.backendDOMNodeId !== 0,
+  )?.backendDOMNodeId;
+  if (backendNodeId === undefined) {
+    throw new Error(`act: no element matches ${spellLocator(locator)}`);
+  }
+  return {backendNodeId};
+};
+
+/**
+ * The centre of a node's content box, or `null` when it has no area.
+ *
+ * `content` is the quad x1 y1 x2 y2 x3 y3 x4 y4. An unstyled `<span
+ * role="checkbox">` has a content box of zero width and height, and a mouse
+ * event dispatched at the centre of that box lands on whatever is painted
+ * underneath — `<body>`, not the span. So a degenerate box is reported as one
+ * rather than clicked at, and `act` takes the other path for it.
+ */
 const centreOf = async (
   connection: Connection,
   sessionId: string,
-  nodeId: number,
-): Promise<{x: number; y: number}> => {
-  const box = (await connection.send('DOM.getBoxModel', {nodeId}, sessionId)) as {
-    model?: {content?: number[]};
-  };
+  node: NodeRef,
+): Promise<{x: number; y: number} | null> => {
+  const box = (await connection
+    .send('DOM.getBoxModel', {...node}, sessionId)
+    .catch(() => ({}))) as {model?: {content?: number[]}};
   const content = box.model?.content ?? [];
-  if (content.length < 6) {
-    throw new Error('act: element has no box');
+  if (content.length < 8) {
+    return null;
+  }
+  const xs = [content[0]!, content[2]!, content[4]!, content[6]!];
+  const ys = [content[1]!, content[3]!, content[5]!, content[7]!];
+  if (Math.max(...xs) - Math.min(...xs) === 0 || Math.max(...ys) - Math.min(...ys) === 0) {
+    return null;
   }
   return {x: (content[0]! + content[4]!) / 2, y: (content[1]! + content[5]!) / 2};
+};
+
+/**
+ * Calls `click()` on the element itself, in the page.
+ *
+ * The fallback for an element with no box to aim at: `DOM.resolveNode` turns
+ * the id into a `Runtime` handle and `Runtime.callFunctionOn` invokes the
+ * element's own method, which dispatches a trusted-enough `click` event through
+ * the same listeners a mouse would have reached.
+ */
+const clickInPage = async (
+  connection: Connection,
+  sessionId: string,
+  node: NodeRef,
+): Promise<void> => {
+  const resolved = (await connection.send('DOM.resolveNode', {...node}, sessionId)) as {
+    object?: {objectId?: string};
+  };
+  const objectId = resolved.object?.objectId;
+  if (objectId === undefined) {
+    throw new Error('act: element cannot be reached in the page');
+  }
+  await connection.send(
+    'Runtime.callFunctionOn',
+    {objectId, functionDeclaration: 'function () { this.click() }'},
+    sessionId,
+  );
 };
 
 /** Builds the `Page` facade over one attached target. */
@@ -352,8 +447,13 @@ const pageOn = (
     act: async (action: Action): Promise<void> => {
       live();
       if ('click' in action) {
-        const nodeId = await nodeFor(connection, sessionId, action.click);
-        const {x, y} = await centreOf(connection, sessionId, nodeId);
+        const node = await nodeFor(connection, sessionId, action.click);
+        const centre = await centreOf(connection, sessionId, node);
+        if (centre === null) {
+          await clickInPage(connection, sessionId, node);
+          return;
+        }
+        const {x, y} = centre;
         for (const type of ['mousePressed', 'mouseReleased'] as const) {
           await connection.send(
             'Input.dispatchMouseEvent',
@@ -364,9 +464,9 @@ const pageOn = (
         return;
       }
 
-      const [selector, argument] = 'type' in action ? action.type : action.key;
-      const nodeId = await nodeFor(connection, sessionId, selector);
-      await connection.send('DOM.focus', {nodeId}, sessionId);
+      const [locator, argument] = 'type' in action ? action.type : action.key;
+      const node = await nodeFor(connection, sessionId, locator);
+      await connection.send('DOM.focus', {...node}, sessionId);
 
       if ('type' in action) {
         await connection.send('Input.insertText', {text: argument}, sessionId);

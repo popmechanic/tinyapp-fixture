@@ -6,6 +6,24 @@
  * and nothing deeper.
  */
 
+// The vocabulary first, and from `./types` only: `Locator` and `Action` are
+// re-exported by `./browser` as well, and a name re-exported from two modules
+// here would be a name exported twice.
+export {actionsOf, isCallbackAction, VALUES_TABLE} from './types';
+export type {
+  Cell,
+  Difference,
+  ExamRecord,
+  ExamStore,
+  Locator,
+  MutantEdit,
+  Snapshot,
+  StateExamSpec,
+  Tables,
+  Values,
+  View,
+} from './types';
+
 export {runStateExam, stateExam, STATE_EXAM_TIMEOUT_MS} from './state-exam';
 export type {ExamOptions, ExamOutcome} from './state-exam';
 
@@ -31,17 +49,3 @@ export {
 export type {RenderResult} from './render-move';
 export {applyMutant, mutantPath} from './mutant';
 export {evidenceDir, examStem, writeEvidence} from './evidence';
-
-export {actionsOf, isCallbackAction, VALUES_TABLE} from './types';
-export type {
-  Cell,
-  Difference,
-  ExamRecord,
-  ExamStore,
-  MutantEdit,
-  Snapshot,
-  StateExamSpec,
-  Tables,
-  Values,
-  View,
-} from './types';

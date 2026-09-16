@@ -40,11 +40,12 @@
 // for exactly that, so the suite is green on a laptop without Chromium and full on the fleet.
 
 import {afterAll, expect, test} from 'bun:test';
-import {existsSync, readFileSync} from 'node:fs';
+import {existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {resolve} from 'node:path';
+import {basename, join, resolve} from 'node:path';
 
-import {launchBrowser} from '../src/browser';
+import {launchBrowser, type Page} from '../src/browser';
+import {actionsOf, type Action} from '../src/types';
 
 // ---------------------------------------------------------------- fixtures
 
@@ -450,3 +451,341 @@ test('leg (e) [M5]: the sealed package exports launchBrowser and everything it e
     expect(typeof helper[name]).toBe('function');
   }
 });
+
+// =====================================================================================
+// Exam for task 3 — "The exam finds a control by role and name — and reads a shadcn page",
+// legs (a), (b), (c) and (h).
+//
+// M1. `packages/tinyapp-exam/src/types.ts` exports a `Locator` type admitting a string and
+//     `{role: string, name: string}`, and `Action` admits `{click: Locator}`,
+//     `{type: [Locator, string]}` and `{key: [Locator, string]}` — `actionsOf` returns
+//     `[{click: {role: 'checkbox', name: 'x'}}]` for that single action — and a string locator
+//     behaves exactly as at BASE.
+// M2. `page.act` with a `{role, name}` locator finds the control by its role and its
+//     *accessible name* as the browser computes it — a name no CSS selector can express — and
+//     acts on it as on a selector match: on a page holding
+//     `<input type="checkbox" id="c0"><label for="c0">buy milk</label>`,
+//     `<input aria-label="New todo">` and `<span role="checkbox" aria-checked="false"
+//     aria-label="walk the dog" onclick="window.__hit='walk'"></span>`,
+//     `act({click: {role: 'checkbox', name: 'buy milk'}})` leaves
+//     `document.getElementById('c0').checked` `true`,
+//     `act({type: [{role: 'textbox', name: 'New todo'}, 'buy milk']})` leaves that input's
+//     `value` `buy milk`, and `act({click: {role: 'checkbox', name: 'walk the dog'}})` — the
+//     span, named only by `aria-label` — leaves `window.__hit` `walk`.
+// M3. A locator no node matches rejects with the message
+//     `act: no element matches role=checkbox name="Nope"` for `{role: 'checkbox', name: 'Nope'}`;
+//     a string locator matching nothing still rejects with `act: no element matches <selector>`.
+// M8. `packages/tinyapp-exam/src/index.ts` names `Locator` in its type export from `./types`,
+//     and `tinyapp-exam` still exports every runtime name it exported at BASE.
+//
+// Legs (b) and (c) want a real Chromium and are gated on the same `BROWSER` constant the legs
+// above are: with none on the machine the file has already printed the line naming both paths
+// it looked at, and these two return without asserting. The page they open is a `data:` URL
+// built from an inline string, dialling nothing.
+
+// ------------------------------------------------------------------ fixtures
+
+/**
+ * The page M2 spells, verbatim, with one addition: `window.__hit` is initialised, so a click
+ * that never reached the span reads as `none` rather than as `undefined`.
+ *
+ * Three controls, and not one of them is reachable by the name a person would use through a
+ * CSS selector: `buy milk` is on a `<label for>` beside the checkbox, `New todo` is an
+ * `aria-label`, and `walk the dog` is an `aria-label` on a `<span role="checkbox">` — which a
+ * `<label>` cannot name at all, and whose content box has zero area.
+ */
+const NAMED_HTML = `<!doctype html><html><head><meta charset="utf-8"><title>named</title></head><body>
+<script>window.__hit = 'none';</script>
+<input type="checkbox" id="c0"><label for="c0">buy milk</label>
+<input aria-label="New todo">
+<span role="checkbox" aria-checked="false" aria-label="walk the dog" onclick="window.__hit='walk'"></span>
+</body></html>`;
+
+/** The `aria-label`led input's value, read in the page — it carries no id to read it by. */
+const NEW_TODO_VALUE = 'document.querySelector(\'[aria-label="New todo"]\').value';
+
+/**
+ * Performs one action on `page`.
+ *
+ * The cast is the only way the object locator can be written down before M1 widens `Action`:
+ * at BASE `Action` admits a string and nothing else, so the literal below would not compile —
+ * and the action itself is untouched, which is the point. It is the locator M2 names, handed
+ * to the `act` M2 names, and nothing is substituted for it.
+ */
+const actOn = (page: Page, action: unknown): Promise<void> => page.act(action as Action);
+
+/**
+ * The TypeScript M1's first clause is, compiled rather than asserted at runtime.
+ *
+ * `packages/tinyapp-exam/tsconfig.json` includes only `src`, so neither `bun test` nor the
+ * Proof's `bunx tsc -p` line ever reads a test file — a type-level claim written here would
+ * assert nothing. This text is written into a directory under the repository root and compiled
+ * on its own instead. The two `@ts-expect-error` lines are what keep the claim two-sided: a
+ * `Locator` that admitted everything fails this leg exactly as one that admitted nothing.
+ */
+const LOCATOR_CHECK = `import type {Action, Locator} from '../packages/tinyapp-exam/src/types';
+import type {Locator as LocatorViaIndex} from '../packages/tinyapp-exam/src/index';
+
+// A locator is a string…
+const selector: Locator = '.todoItem input[type=checkbox]';
+// …or a role and an accessible name.
+const named: Locator = {role: 'checkbox', name: 'buy milk'};
+// …and the package's entry point names the very same type [M8].
+const viaIndex: LocatorViaIndex = {role: 'checkbox', name: 'buy milk'};
+
+// @ts-expect-error a locator is not a half-spelled name
+const missingName: Locator = {role: 'checkbox'};
+// @ts-expect-error nor anything that is not a string
+const notAString: Locator = 42;
+
+// Every action form admits either locator.
+const clickNamed: Action = {click: named};
+const typeNamed: Action = {type: [named, 'buy milk']};
+const keyNamed: Action = {key: [named, 'Enter']};
+const clickSelector: Action = {click: selector};
+const typeSelector: Action = {type: [selector, 'buy milk']};
+const keySelector: Action = {key: [selector, 'Enter']};
+
+export {
+  selector,
+  named,
+  viaIndex,
+  missingName,
+  notAString,
+  clickNamed,
+  typeNamed,
+  keyNamed,
+  clickSelector,
+  typeSelector,
+  keySelector,
+};
+`;
+
+/** Every runtime name `packages/tinyapp-exam/src/index.ts` exported at BASE, and its `typeof`. */
+const BASE_RUNTIME_EXPORTS: Record<string, string> = {
+  runStateExam: 'function',
+  stateExam: 'function',
+  STATE_EXAM_TIMEOUT_MS: 'number',
+  launchBrowser: 'function',
+  withContract: 'function',
+  browserStoreMove: 'function',
+  diffContent: 'function',
+  renderDiff: 'function',
+  storeMove: 'function',
+  READ_CONTENT: 'string',
+  assertView: 'function',
+  bundleOf: 'function',
+  pageFor: 'function',
+  renderHtml: 'function',
+  renderMove: 'function',
+  REFLECT_CHECKED: 'string',
+  applyMutant: 'function',
+  mutantPath: 'function',
+  evidenceDir: 'function',
+  examStem: 'function',
+  writeEvidence: 'function',
+  actionsOf: 'function',
+  isCallbackAction: 'function',
+  VALUES_TABLE: 'string',
+};
+
+/** Every type `index.ts`'s `export type {…} from './types'` block named at BASE. */
+const BASE_TYPE_EXPORTS = [
+  'Cell',
+  'Difference',
+  'ExamRecord',
+  'ExamStore',
+  'MutantEdit',
+  'Snapshot',
+  'StateExamSpec',
+  'Tables',
+  'Values',
+  'View',
+];
+
+/** Runs `argv` from the repository root and hands back its code and everything it printed. */
+const runFromRoot = (argv: string[]): {code: number; output: string} => {
+  const ran = Bun.spawnSync(argv, {cwd: repoRoot});
+  const decoder = new TextDecoder();
+  return {
+    code: ran.exitCode,
+    output: `${decoder.decode(ran.stdout)}${decoder.decode(ran.stderr)}`,
+  };
+};
+
+// ------------------------------------------------------------------ (a) [M1]
+
+test(
+  'task 3, leg (a) [M1]: a Locator-typed value accepts a string and {role, name}, every Action form admits both, and actionsOf carries the object action through',
+  () => {
+    // M1 names `types.ts` as the module that exports it.
+    const typesSource = readFileSync(
+      resolve(repoRoot, 'packages/tinyapp-exam/src/types.ts'),
+      'utf8',
+    );
+    expect(typesSource.includes('export type Locator')).toBe(true);
+
+    // The admission is a type-level claim, so it is compiled rather than asserted.
+    const dir = mkdtempSync(join(repoRoot, 'tinyapp-exam-locator-'));
+    try {
+      writeFileSync(join(dir, 'check.ts'), LOCATOR_CHECK, 'utf8');
+      const compiled = runFromRoot([
+        'bunx',
+        'tsc',
+        '--noEmit',
+        '--strict',
+        '--target',
+        'ES2022',
+        '--module',
+        'ESNext',
+        '--moduleResolution',
+        'bundler',
+        '--skipLibCheck',
+        '--types',
+        'bun',
+        `${basename(dir)}/check.ts`,
+      ]);
+      // tsc prints nothing at all when it is happy, so the output is the message.
+      expect(compiled.output.trim()).toBe('');
+      expect(compiled.code).toBe(0);
+    } finally {
+      rmSync(dir, {recursive: true, force: true});
+    }
+
+    // The object action survives `actionsOf` unchanged — one action in, a list of exactly
+    // that one action out, the locator still the object it was written as.
+    expect(actionsOf({click: {role: 'checkbox', name: 'x'}} as unknown as Action)).toEqual([
+      {click: {role: 'checkbox', name: 'x'}},
+    ]);
+
+    // And the string form is exactly what it was: `actionsOf` here, and `act` in task 1's
+    // leg (c) above, which this task re-runs unchanged.
+    expect(actionsOf({click: '#c'} as Action)).toEqual([{click: '#c'}]);
+    expect(actionsOf([{click: '#c'}, {type: ['#i', 'buy milk']}] as Action[])).toEqual([
+      {click: '#c'},
+      {type: ['#i', 'buy milk']},
+    ]);
+  },
+  120000,
+);
+
+// ------------------------------------------------------------------ (b) [M2]
+
+test(
+  'task 3, leg (b) [M2]: a role and an accessible name find the labelled checkbox, the aria-labelled input and the aria-labelled span',
+  async () => {
+    if (!BROWSER) return;
+
+    const browser = await launch();
+    try {
+      const page = await browser.open({html: NAMED_HTML, clock: CLOCK});
+
+      // Nothing has happened yet: the box is clear and the span has not been hit.
+      expect(await page.evaluate("document.getElementById('c0').checked")).toBe(false);
+      expect(await page.evaluate('window.__hit')).toBe('none');
+      expect(await page.evaluate(NEW_TODO_VALUE)).toBe('');
+
+      // The checkbox named by its `<label for>` — a name no CSS selector can express.
+      await actOn(page, {click: {role: 'checkbox', name: 'buy milk'}});
+      expect(await page.evaluate("document.getElementById('c0').checked")).toBe(true);
+
+      // The input named only by `aria-label`, typed into: the object locator focuses it
+      // exactly as a selector would have.
+      await actOn(page, {type: [{role: 'textbox', name: 'New todo'}, 'buy milk']});
+      expect(await page.evaluate(NEW_TODO_VALUE)).toBe('buy milk');
+
+      // The span: `role="checkbox"` and an `aria-label`, labelable by nothing, and a content
+      // box of zero area — acted on all the same, and its own handler is what records it.
+      await actOn(page, {click: {role: 'checkbox', name: 'walk the dog'}});
+      expect(await page.evaluate('window.__hit')).toBe('walk');
+
+      await page.close();
+    } finally {
+      await closeBrowser(browser);
+    }
+  },
+  120000,
+);
+
+// ------------------------------------------------------------------ (c) [M3]
+
+test(
+  'task 3, leg (c) [M3]: a role and name matching nothing rejects spelling both, and a selector matching nothing rejects exactly as at BASE',
+  async () => {
+    if (!BROWSER) return;
+
+    const browser = await launch();
+    try {
+      const page = await browser.open({html: NAMED_HTML, clock: CLOCK});
+
+      // The new message spells the object as `role=<role> name="<name>"`.
+      expect(await rejection(() => actOn(page, {click: {role: 'checkbox', name: 'Nope'}}))).toBe(
+        'act: no element matches role=checkbox name="Nope"',
+      );
+
+      // A role that matches nothing is the same rejection, whatever the name.
+      expect(
+        await rejection(() => actOn(page, {type: [{role: 'slider', name: 'buy milk'}, 'x']})),
+      ).toBe('act: no element matches role=slider name="buy milk"');
+
+      // And the string form's sentence is byte-identical to the one task 1's leg (c) pinned.
+      expect(await rejection(() => page.act({click: '#nope'}))).toBe(
+        'act: no element matches #nope',
+      );
+
+      await page.close();
+    } finally {
+      await closeBrowser(browser);
+    }
+  },
+  120000,
+);
+
+// ------------------------------------------------------------------ (h) [M8]
+
+test(
+  'task 3, leg (h) [M8]: index.ts names Locator in its ./types type export, still exports every runtime name it had at BASE, and the three Run: lines exit 0',
+  async () => {
+    const indexSource = readFileSync(
+      resolve(repoRoot, 'packages/tinyapp-exam/src/index.ts'),
+      'utf8',
+    );
+
+    // Exactly one `export type {…} from './types'` block — `./types` and `./browser` both
+    // re-export `Action`, and only one block may name any given type — and `Locator` is in it,
+    // beside every type that block named at BASE.
+    const blocks = [...indexSource.matchAll(/export type \{([^}]*)\} from '\.\/types'/g)];
+    expect(blocks.length).toBe(1);
+    const exportedTypes = blocks[0]![1]!
+      .split(',')
+      .map((name) => name.trim())
+      .filter((name) => name !== '');
+    expect(exportedTypes).toContain('Locator');
+    for (const name of BASE_TYPE_EXPORTS) {
+      expect(exportedTypes).toContain(name);
+    }
+
+    // Imported by a computed specifier, so what is read is the runtime resolution the
+    // workspace link makes — the same one `tests/state-exams/*` rely on.
+    const specifier: string = 'tinyapp-exam';
+    const exam = (await import(specifier)) as Record<string, unknown>;
+    // One assertion per name, each carrying the name so a missing export says which.
+    for (const [name, kind] of Object.entries(BASE_RUNTIME_EXPORTS)) {
+      expect([name, typeof exam[name]]).toEqual([name, kind]);
+    }
+
+    // The Proof's three `Run:` lines, run from the repository root.
+    for (const argv of [
+      ['bunx', 'tsc', '-p', 'packages/tinyapp-exam', '--noEmit'],
+      ['bun', 'install', '--frozen-lockfile'],
+      ['grep', '-q', 'Locator', 'packages/tinyapp-exam/src/index.ts'],
+    ]) {
+      const ran = runFromRoot(argv);
+      if (ran.code !== 0) {
+        console.log(`${argv.join(' ')} exited ${ran.code}:\n${ran.output}`);
+      }
+      expect([argv.join(' '), ran.code]).toEqual([argv.join(' '), 0]);
+    }
+  },
+  120000,
+);
