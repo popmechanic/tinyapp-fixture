@@ -117,3 +117,5 @@
 {"kind":"driver:proof-run","task":"5","cmd":"bun run lint:ui","exit":0,"iter":0,"id":"01M2NG72YA0000257PCH5FZFGV","ts":1789575531466}
 {"kind":"driver:proof-run","task":"5","cmd":"test \"$(ls client/src/*.css)\" = client/src/index.css","exit":0,"iter":0,"id":"01M2NG72YH0000SVSTT7X4VM1Z","ts":1789575531473}
 {"kind":"driver:proof-run","task":"5","cmd":"bun test tests/state-exams","exit":0,"iter":0,"id":"01M2NGHY2Y00002V0XS7Z36CY6","ts":1789575886942}
+{"kind":"driver:proof-run","task":"5","cmd":"bun test packages/tinyapp-lint packages/tinyapp-exam","exit":0,"iter":0,"id":"01M2NGJX1200002PFPZ4XG2AXT","ts":1789575918626}
+{"kind":"driver:proof-run","task":"5","cmd":"test \"$(git diff --name-status $ULTRA_BASE -- tests/state-exams | grep -c -E '^[DR]')\" -eq 0","exit":0,"iter":0,"id":"01M2NGJX1D0000CRNK05KW9Q9C","ts":1789575918637}
