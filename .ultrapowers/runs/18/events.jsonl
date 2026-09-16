@@ -15,3 +15,4 @@
 {"kind":"engine:log","line":"baseline: RED on eb28af4b5feb284797c389a10d381d835fc97d2d","id":"01M2MDSPCE00009ZKND9F4XD2Y","ts":1789539441038}
 {"kind":"worker:end","label":"impl:3","role":"implementer","sessionId":"1ff20bf1-6938-4480-af5b-27ecd5239a67","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":5983,"output":11095,"cacheRead":900452,"cacheCreation":26177,"costUsd":1.0192860000000001,"models":["claude-opus-5"]},"id":"01M2MDTKJW00008CEGS6MPNK8Z","ts":1789539470940}
 {"kind":"transcript:slice","label":"impl:3","sessionId":"1ff20bf1-6938-4480-af5b-27ecd5239a67","bytes":11091,"id":"01M2MDTKK5000048PN59Z0XPJ0","ts":1789539470949}
+{"kind":"driver:attention","task":"3","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2MDTY7900005CMF6G0AAJA6","ts":1789539481833}
