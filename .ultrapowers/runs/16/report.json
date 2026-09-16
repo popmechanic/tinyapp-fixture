@@ -1,0 +1,226 @@
+{
+  "integrationBranch": "ultra/integration-run-16",
+  "baseSha": "e0762d4f3b1f550cce0a1a8e78f9eaea68b7d5ac",
+  "waves": [
+    [
+      "1"
+    ],
+    [
+      "2"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 2 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "417a34bd921e734b39c277709d0afaae367bccaa",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-16/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "GLOBAL CONSTRAINT \"No exam and no source names a `due` cell\" cannot hold on this tree, and the diff is right to ignore it. BASE `client/src/storeData.ts` already carries `due: {type: 'string'}` (merged by the earlier due-date run, commits #12/#14), together with the `due` invariant, `setTodoDue`, `tests/state-exams/set-todo-due.test.ts` and the linter leg `[M5] the due-date invariant is on todos`. The patch does not introduce the cell: it moves the existing `due` line, unchanged and with its comment, into the shared `TODO_CELLS` literal (patch lines 13-21), which is exactly what the task's Context orders (\"Write the todo cells once and use that one literal for both tables ... so a cell a later change adds to a todo is a cell of a trashed todo by construction\") and what the third global constraint (trash row copied whole) requires. The new exam `tests/state-exams/delete-to-trash.test.ts` names no `due` cell at all. Removing `due` to satisfy the constraint literally would redden the sibling-owned due-date exam and the linter suite. The constraint carries no `Check:`, so this is recorded as minor and blocks nothing; nothing inside this task's FILES should change for it \u2014 the plan text is what is stale.; plan-defect: M1, M2 and M6 spell whole-content literals (`[{...}, {}]`), so the exam legs that transcribe them \u2014 `tests/state-exams/delete-to-trash.test.ts` legs (b), (c), (f) and the round-trip of leg (j) \u2014 assert the store's values slot is exactly `{}`. GLOBAL CONSTRAINT 1 forbids \"a test that lists ... every value\", because a sibling run adds a values schema on this same base; if that schema declares any value with a `default`, TinyBase materialises it into `getContent()[1]` and every one of those `toEqual`s, plus the three new one-line expected JSON files, goes red at the publish fold. The submission is faithful to the clauses it was given (and to the BASE exams, which pin content the same way), and the current `filter` value is deliberately default-less, so the hazard is latent rather than live \u2014 which is why this is minor and its fix does not belong inside this task's FILES: narrowing the legs to `content[0]` would contradict M1/M2/M6 as written. Flagged for the operator to settle at the fold; if the sibling values schema lands with a default, the cheapest repair is to compare `content[0]` in legs (b)/(c)/(f) and in the leg (j) round-trip, leaving the M1 state exam (whose `expected` file the exam runner compares) as the one whole-content pin.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789520121004,
+      "stateExams": [
+        {
+          "exam": "delete-to-trash",
+          "store_ms": 595.929316,
+          "render_ms": 179.80041200000005,
+          "render": "ran",
+          "action_ms": 93.96247299999999,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "done-count",
+          "store_ms": 13.787296000000005,
+          "render_ms": 505.59355300000004,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    },
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "495782d14c58d6192ede69aed8a5b62affa28ff5",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-16/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "Global constraint (prose, no `Check:` behind it): \"No exam and no source names a `due` cell.\" The new exam's header comment in `tests/state-exams/undo-delete.test.ts` contains the literal string `due` in a backticked cell name \u2014 \"...row or the store's values, and no `due` cell is named anywhere in it...\". The sentence is self-negating and creates no dependency on the cell, so nothing in the behaviour is wrong; but a mechanical grep for `due` over the exam set \u2014 which is how the constraint is worded \u2014 would flag this file. Reword the comment to avoid the cell name, e.g. \"...and it names no cell a sibling run is adding concurrently\". Everything else checks out: FILES footprint is exactly the three declared paths with no deletions and nothing sibling-owned; M1 leg (a) is the Proof's `stateExam` block verbatim plus the expected-file `toEqual` on the M1 seed literal (mutant todos/0 killed per the state-exam record); M2 leg (b) and M3 leg (c) assert the static render's observable markup, and leg (c) would go red if `UndoDelete` were unmounted; M4 legs (d)\u2013(h) spawn the five `Run:` lines verbatim (RUN EVIDENCE exit 0 on each); Consumes `undoDelete(store: TodosStore): void` is imported from `./storeData` and called as named, Produces `UndoDelete` is exported and mounted directly after `<ClearCompleted />` as the Context directs; the component mirrors `ClearCompleted.tsx`'s shape with both hooks called before the `null` early return, so hook order is stable; the content literals in the exam are the plan's own M1/M2/M3 literals and pin no schema key set, cell list or value list, and they are green on this already-folded tree (which carries both the `due` cell \u2014 defaultless, so unmaterialised \u2014 and `VALUES_SCHEMA`), so global constraint 1 holds.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789520658568,
+      "stateExams": [
+        {
+          "exam": "undo-delete",
+          "store_ms": 734.499818,
+          "render_ms": 161.9890220000001,
+          "render": "ran",
+          "action_ms": 210.154722,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "an entry is the same red [1.39ms]\n(pass) leg (e) [M5]: the mutant move is unchanged \u2014 a green click spec still kills its mutant [0.14ms]\n(pass) leg (f) [M6]: the two re-aimed test files pass, and neither names the endpoint or its stub [2816.95ms]\n(pass) leg (g) [M1] [M7]: a click on the fixture completes the todo, read through the page store, under the ceiling [1181.58ms]\n(pass) leg (g) [M7]: forced unminified, the url is over the ceiling and the exam says so rather than hanging [150.90ms]\n(pass) leg (g) [M7]: `open` refuses a data: url over the ceiling within 15 s, naming it [116.22ms]\n\npackages/tinyapp-lint/test/references.test.ts:\n(pass) (a) [M1] the rule is named `references` and says nothing about the fixture [80.57ms]\n(pass) (b) [M2] the dangling `owner` is one finding, formatted exactly as pinned [0.23ms]\n(pass) (c) [M3] a resolvable reference, and a row without the cell, are both silent [0.09ms]\n(pass) (d) [M4] a snapshot without the referenced table names the missing row [0.06ms]\n(pass) (e) [M5] the fixture store module, and `lint:state` over one seeded violation [73.39ms]\n\npackages/tinyapp-lint/test/reachability.test.ts:\n(pass) (a) [M1] the rule is named `reachability`, and the fixture`s four expected states are each reached [4844.24ms]\n(pass) (b) [M2] an unreachable expected state is one finding, on the pinned line, in under 3,000 ms [2078.62ms]\n(pass) (c) [M3] a state equal to a seed is reached in zero moves [0.21ms]\n(pass) (d) [M4] the walk runs under the context`s clock, and a callback that dials breaches the contract [0.68ms]\n$ bun packages/tinyapp-lint/src/cli.ts --expected \"/home/exedev/target/.claude/ultrapowers/run-run-16/clones/integration/state-exams/lint-tmp-Gu7uau/expected\" --exams \"/home/exedev/target/.claude/ultrapowers/run-run-16/clones/integration/state-exams/lint-tmp-Gu7uau/exams\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `lint:state` over a seeded unreachable state exits 1 and prints the pinned line [2157.84ms]\n\npackages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [4615.30ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [56.78ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.39ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [6.32ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-atk7ud\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [165.92ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [80.14ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.32ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.41ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [65.76ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.21ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.21ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [87.23ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [104.18ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.55ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.88ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [3.09ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.13ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [4719.37ms]\n\n 320 pass\n 0 fail\n 1140 expect() calls\nRan 320 tests across 34 files. [144.13s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 16 snapshots and 14 exams in 5219 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 16 snapshots and 15 exams in 4963 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- packages/tinyapp-exam packages/tinyapp-lint/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 268626,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "ckages/tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [4986.66ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [57.59ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.15ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [6.81ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules /tmp/tinyapp-lint-rules-FILahg\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [113.57ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [49.75ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.17ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.20ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [50.13ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.47ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.45ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [119.27ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [72.63ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [1.79ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [1.32ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [2.16ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.16ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [5421.41ms]\n\n 277 pass\n 0 fail\n 1078 expect() calls\nRan 277 tests across 32 files. [121.22s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "1c3d54bb37ac32283fc46852fd2f44b43814b5ba",
+      "branches": [
+        "1"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "8494032cc8004c6009eb237c76625f1244624155",
+      "branches": [
+        "2"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 0,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-16/frontier/wave-0/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-16/frontier/wave-0/conflicts.json",
+      "selfChecks": "",
+      "foldCliCalls": 1,
+      "foldCliWallTimeSec": 0.35,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-16/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-16/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.647,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-16/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-16/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.35200000000000004,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 2,
+    "tasks_planned": 2,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "reuse fold of ultra/evidence/run-14: the parked run's work and main's move since f24d405 do not fold cleanly (7 conflict(s)); no resolver exists at Setup",
+    "reuse refused: the reuse fold of ultra/evidence/run-14 did not produce a head \u2014 the full plan runs",
+    "task 1: amendment (sim): tests/state-exams/set-todo-due.test.ts leg (g) \u2014 re-aimed the meta-pin on done-count.test.ts: it required the exact cell list ['completed','due','text'] and asserted the two-cell list it replaced was gone. It now asserts done-count still reads Object.keys(TABLES_SCHEMA.todos), that the outgrown two-cell list is still absent, and that 'completed' and 'text' are each named via toContain \u2014 no exact list of its own. \u2014 M9 orders done-count leg (o) to become toContain per cell and 'never a new exact list', which makes that leg red by construction. It is a BASE exam file outside FILES that the plan's Context did not know about (the Context describes a BASE with no `due` cell at all), so it was left red by the plan rather than deliberately frozen. Leaving it red would have put the tree's own suite at 276 pass / 1 fail.",
+    "task 1: amendment (files): tests/state-exams/set-todo-due.test.ts \u2014 edited, though it is outside FILES. \u2014 Same leg as above; no path inside FILES can satisfy both it and M9."
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "sim",
+      "what": "tests/state-exams/set-todo-due.test.ts leg (g) \u2014 re-aimed the meta-pin on done-count.test.ts: it required the exact cell list ['completed','due','text'] and asserted the two-cell list it replaced was gone. It now asserts done-count still reads Object.keys(TABLES_SCHEMA.todos), that the outgrown two-cell list is still absent, and that 'completed' and 'text' are each named via toContain \u2014 no exact list of its own.",
+      "why": "M9 orders done-count leg (o) to become toContain per cell and 'never a new exact list', which makes that leg red by construction. It is a BASE exam file outside FILES that the plan's Context did not know about (the Context describes a BASE with no `due` cell at all), so it was left red by the plan rather than deliberately frozen. Leaving it red would have put the tree's own suite at 276 pass / 1 fail."
+    },
+    {
+      "task": "1",
+      "amends": "files",
+      "what": "tests/state-exams/set-todo-due.test.ts \u2014 edited, though it is outside FILES.",
+      "why": "Same leg as above; no path inside FILES can satisfy both it and M9."
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
