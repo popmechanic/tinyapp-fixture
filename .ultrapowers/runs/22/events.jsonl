@@ -106,3 +106,4 @@
 {"kind":"worker:end","label":"exam:5","role":"examiner","sessionId":"3b3e1c33-df22-4ddd-9a3d-d9c39d359e2d","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":5328,"output":46212,"cacheRead":4715628,"cacheCreation":117156,"costUsd":4.711314,"models":["claude-opus-5"]},"id":"01M2NF6ZY2000041YJR1XMM3PB","ts":1789574479810}
 {"kind":"transcript:slice","label":"exam:5","sessionId":"3b3e1c33-df22-4ddd-9a3d-d9c39d359e2d","bytes":11528,"id":"01M2NF6ZYP0000AQG73S6JQBY8","ts":1789574479830}
 {"kind":"driver:attention","task":"5","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2NF74T40000ENWDJ6XPBFHX","ts":1789574484804}
+{"kind":"driver:attention","task":"5","attention":"ok","msg":"session ended without hand-off","actor":"","id":"01M2NFMWJH0000RJBGNEPVSTW3","ts":1789574935121}
