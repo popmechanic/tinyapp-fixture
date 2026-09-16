@@ -380,12 +380,14 @@ test(
     expect(html).toContain('<script type="module">');
     expect(html).not.toContain('src="/src/index.tsx"');
 
-    // The inlined module is the real bundle of `client/src/index.tsx`, not a placeholder.
+    // The inlined module is the real bundle of `client/src/index.tsx`, not a
+    // placeholder: its size, and the render it produces below, are the evidence.
+    // No literal is pinned in it — Bun 1.4.2's bundler minifies `createRoot`
+    // away, and that pin parked fleet run-20 (popmechanic/ultrapowers#1051).
     const modules = parse(html).querySelectorAll('script[type=module]');
     expect(modules.length).toBe(1);
     const bundle = textOf(modules[0]!);
     expect(bundle.length).toBeGreaterThan(100000);
-    expect(bundle).toContain('createRoot');
 
     // And the page's own picture and markup are what the move reports.
     expect(result.render).toBe('ran');
