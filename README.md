@@ -46,3 +46,23 @@ Each run leaves its evidence beside the task: the store diff, in
 page the action happened in, in `dom.html`; and a screenshot of that same page,
 in `screenshot.png` — along with `mutant.json`, `contract.json` and
 `walls.json`.
+
+A `persistenceExam` asks the other question: not what the app does, but what it
+keeps. It opens the page with nothing behind it — no seed, and
+`window.__TINYAPP_EXAM__` raised, which is how the app knows to hand out its
+store, its database and its persister — served from the machine's own loopback
+origin, because storage belongs to an origin and a `data:` page has none. It
+does something, waits for the save to land in the persister's own table,
+reloads the page, and reads the state back twice over: from the store the
+reloaded page renders from, and from the row the persister wrote. Every request
+the page makes beyond that origin is refused in the browser before it leaves,
+and a page that opens a `WebSocket` is a red exam that says so.
+
+Its evidence is the six files above and two more: the rows it read back, in
+`rows.json`, with the statement, the state they parse to and their difference
+from the expected one; and the page as it stood before the reload, in
+`dom-before.html`, beside the `dom.html` from after it. `walls.json` carries two
+more walls as well — `persist_ms`, from the last action to the save landing,
+and `reload_ms`, from the reload to the page reporting itself loaded again.
+Both are reported and neither is bounded: how long a save takes is what the
+record is for, not something an exam should be red about.

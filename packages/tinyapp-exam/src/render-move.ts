@@ -9,9 +9,10 @@
  * has no page to build and records `skipped` — never a pass.
  */
 
-import {readFileSync} from 'node:fs';
+import {readFileSync, statSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
 
+import type {BunPlugin} from 'bun';
 import tailwind from 'bun-plugin-tailwind';
 import {parse, TextNode, type HTMLElement} from 'node-html-parser';
 
@@ -65,10 +66,15 @@ const fill = (element: HTMLElement, raw: string): void => {
  * script carrying `js`: the renderer is handed raw HTML with no origin, so any
  * relative `src` would be a fetch that never resolves. The seed goes first in
  * `<head>` so `window.__TINYAPP_SEED__` is set before the module runs.
+ *
+ * A `parts` with no `seed` writes no seed script at all, and the document then
+ * carries no `__TINYAPP_SEED__` anywhere: that is the unseeded page the
+ * persistence move serves, which must start from its own storage and not from a
+ * state handed to it.
  */
 export const renderHtml = (
   entryHtml: string,
-  parts: {js: string; css: string; seed: Snapshot},
+  parts: {js: string; css: string; seed?: Snapshot},
 ): string => {
   const root = parse(entryHtml, PARSE);
   const head = root.querySelector('head') ?? root.querySelector('html') ?? root;
@@ -88,11 +94,13 @@ export const renderHtml = (
   fill(inline, inlineable(parts.js));
   fill(append(head, 'style'), parts.css);
 
-  head.insertAdjacentHTML('afterbegin', '<script></script>');
-  fill(
-    head.querySelector('script')!,
-    inlineable(`window.__TINYAPP_SEED__ = ${JSON.stringify(parts.seed)};`),
-  );
+  if (parts.seed !== undefined) {
+    head.insertAdjacentHTML('afterbegin', '<script></script>');
+    fill(
+      head.querySelector('script')!,
+      inlineable(`window.__TINYAPP_SEED__ = ${JSON.stringify(parts.seed)};`),
+    );
+  }
 
   return root.toString();
 };
@@ -204,6 +212,122 @@ export const REFLECT_CHECKED =
   'f();new MutationObserver(f).observe(document.documentElement,' +
   '{subtree:true,childList:true,attributes:true})})()';
 
+/** One `paths` entry of a tsconfig, split at its `*` and resolved against it. */
+type PathRule = {prefix: string; suffix: string; base: string; targets: string[]};
+
+/** What a bare specifier may be on disk, in the order the bundler would try. */
+const SUFFIXES = [
+  '',
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.json',
+  '/index.ts',
+  '/index.tsx',
+  '/index.js',
+];
+
+/** The `paths` of the nearest `tsconfig.json` at or above `dir`, or none. */
+const pathRulesFor = (dir: string): PathRule[] => {
+  for (let at = dir; ; at = dirname(at)) {
+    const file = resolve(at, 'tsconfig.json');
+    let text: string;
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch {
+      if (dirname(at) === at) {
+        return [];
+      }
+      continue;
+    }
+
+    let options: {baseUrl?: string; paths?: Record<string, string[]>};
+    try {
+      options = (JSON.parse(text) as {compilerOptions?: typeof options}).compilerOptions ?? {};
+    } catch {
+      return [];
+    }
+
+    // The nearest tsconfig is the one that governs, paths or no paths — the
+    // search stops here either way, as `tsc`'s own does.
+    const base = resolve(at, options.baseUrl ?? '.');
+    return Object.entries(options.paths ?? {})
+      .map(([pattern, targets]) => {
+        const star = pattern.indexOf('*');
+        return {
+          prefix: star === -1 ? pattern : pattern.slice(0, star),
+          suffix: star === -1 ? '' : pattern.slice(star + 1),
+          base,
+          targets,
+        };
+      })
+      .filter((rule) => rule.prefix !== '');
+  }
+};
+
+/** The file `specifier` names through `rules`, or `null` for no rule and no file. */
+const throughPaths = (specifier: string, rules: PathRule[]): string | null => {
+  for (const rule of rules) {
+    if (!specifier.startsWith(rule.prefix) || !specifier.endsWith(rule.suffix)) {
+      continue;
+    }
+    const star = specifier.slice(rule.prefix.length, specifier.length - rule.suffix.length);
+    for (const target of rule.targets) {
+      const path = resolve(rule.base, target.replace('*', star));
+      for (const suffix of SUFFIXES) {
+        try {
+          if (statSync(path + suffix).isFile()) {
+            return path + suffix;
+          }
+        } catch {
+          // Not a file here; the next spelling, then the next target.
+        }
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * The entry project's `paths` map, applied by hand.
+ *
+ * Bun's bundler reads a tsconfig `paths` map from the process's working
+ * directory alone: under `bun test` a build of `client/src/index.tsx` never sees
+ * `client/tsconfig.json`, and the design system's own spelling —
+ * `@/components/ui/button` — comes out `Could not resolve`, though the identical
+ * build succeeds under `bun run`, where the runtime's tsconfig search applies.
+ * A `paths` map at the repository root cures the build and breaks the suite: a
+ * root `tsconfig.json` makes every `tsc` spawned with files on its command line
+ * print `TS5112`, and the exams that read `tsc`'s output assert it is empty.
+ *
+ * So the move carries the map itself — the nearest `tsconfig.json` above the
+ * entry, the one `tsc` and Vite both obey, answered from an `onResolve` narrowed
+ * to that map's own prefixes. Every other specifier is Bun's to resolve, and a
+ * prefix with no file behind it falls through to Bun's error as before.
+ */
+const pathsPlugin = (entryDir: string): BunPlugin | null => {
+  const rules = pathRulesFor(entryDir);
+  if (rules.length === 0) {
+    return null;
+  }
+
+  const filter = new RegExp(
+    `^(${rules.map((rule) => rule.prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`,
+  );
+  return {
+    name: 'tinyapp-tsconfig-paths',
+    setup(build) {
+      build.onResolve({filter}, (args) => {
+        const found = throughPaths(args.path, rules);
+        return found === null ? undefined : {path: found};
+      });
+    },
+  };
+};
+
 /**
  * Bundles the module the entry names, resolved against the entry's directory —
  * `/src/index.tsx` in `client/index.html` is `client/src/index.tsx`, not a path
@@ -247,8 +371,10 @@ export const bundleOf = async (
   }
 
   const production = opts.minify ?? true;
+  const entrypoint = resolve(dirname(entryPath), src.replace(/^\/+/, ''));
+  const paths = pathsPlugin(dirname(entrypoint));
   const built = await Bun.build({
-    entrypoints: [resolve(dirname(entryPath), src.replace(/^\/+/, ''))],
+    entrypoints: [entrypoint],
     target: 'browser',
     minify: production,
     // Bun's bundler does not run Tailwind: a stylesheet saying
@@ -257,7 +383,7 @@ export const bundleOf = async (
     // is what compiles it, and a page whose `.flex` never got generated is a
     // page the exam photographs unstyled. A plain stylesheet passes through it
     // unchanged, so the plugin costs the non-Tailwind entry nothing.
-    plugins: [tailwind],
+    plugins: paths === null ? [tailwind] : [tailwind, paths],
     define: {
       'process.env.NODE_ENV': production ? '"production"' : '"development"',
     },

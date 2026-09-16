@@ -17,6 +17,7 @@ export type {
   ExamStore,
   Locator,
   MutantEdit,
+  PersistenceExamSpec,
   Snapshot,
   StateExamSpec,
   Tables,
@@ -26,6 +27,15 @@ export type {
 
 export {runStateExam, stateExam, STATE_EXAM_TIMEOUT_MS} from './state-exam';
 export type {ExamOptions, ExamOutcome} from './state-exam';
+
+export {
+  contentOf,
+  persistenceExam,
+  runPersistenceExam,
+  EXAM_PRELUDE,
+  PERSIST_TIMEOUT_MS,
+  READY_TIMEOUT_MS,
+} from './persistence-move';
 
 export {launchBrowser} from './browser';
 export type {Action, Browser, Page} from './browser';

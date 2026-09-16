@@ -62,6 +62,11 @@ const writeJson = (dir: string, name: string, value: unknown): string => {
  * `store-diff.json`, `mutant.json`, `contract.json` and `walls.json` are always
  * written; `dom.html` and `screenshot.png` only when the record carries them,
  * so a record from a run whose render was skipped leaves exactly four files.
+ *
+ * `rows.json` and `dom-before.html` follow the same rule, and only a
+ * persistence exam's record carries them: the rows its persister wrote, and the
+ * document as it stood before the reload that the rest of the evidence is on the
+ * far side of.
  */
 export const writeEvidence = (dir: string, record: ExamRecord): string[] => {
   mkdirSync(dir, {recursive: true});
@@ -73,6 +78,13 @@ export const writeEvidence = (dir: string, record: ExamRecord): string[] => {
     writeJson(dir, 'walls.json', record.walls),
   ];
 
+  if (record.rows !== undefined) {
+    names.push(writeJson(dir, 'rows.json', record.rows));
+  }
+  if (record.domBefore !== undefined) {
+    writeFileSync(join(dir, 'dom-before.html'), record.domBefore, 'utf-8');
+    names.push('dom-before.html');
+  }
   if (record.dom !== undefined) {
     writeFileSync(join(dir, 'dom.html'), record.dom, 'utf-8');
     names.push('dom.html');

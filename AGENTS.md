@@ -32,6 +32,14 @@ initial in-memory data does not overwrite persisted data during startup.
   `window.__TINYAPP_STORE__` so an exam can read the store; a normal page sets
   no such handle. The seeded page is the one that starts neither the persister
   nor the synchronizer.
+- An unseeded page opened with `window.__TINYAPP_EXAM__` set to `true` is the
+  ordinary app, handed over: it exposes `window.__TINYAPP_STORE__` (the store it
+  renders from), `window.__TINYAPP_DB__` (the SQLite database it opened) and
+  `window.__TINYAPP_PERSISTER__` (its persister, and only once that persister
+  has finished loading — its presence is how an exam knows the page has read
+  back what it persisted), and it starts no synchronizer and dials no socket.
+  Without the flag the page is exactly what it was, and a seeded page is
+  unchanged by the flag.
 - `client/src/App.tsx` contains the main application UI.
 - `client/src/config.tsx` contains synchronization configuration.
 - `server/index.tsx` contains the synchronization server.

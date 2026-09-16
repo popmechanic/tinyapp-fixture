@@ -10,11 +10,16 @@
  * cannot hand a child extra pipes, so the port form is the one available, and a
  * port of `0` keeps two exams running side by side from colliding.
  *
- * Nothing the page asks for leaves the machine. `Network.setBlockedURLs` with
- * `["*"]` is installed on the session before the first navigation, and the page
- * itself arrives as a `data:` URL, so the only socket in the exam is the
- * loopback one to the process we spawned. `client/index.html` links Google
- * Fonts; with every request blocked the page falls back to the platform
+ * Nothing the page asks for leaves the machine, in either of the two forms a
+ * page arrives in. `open` hands the browser a `data:` URL and installs
+ * `Network.setBlockedURLs` with `["*"]` on the session before the first
+ * navigation, so the only socket in the exam is the loopback one to the process
+ * we spawned. `openUrl` serves the page from a loopback origin instead — a
+ * persistence exam needs storage, which a `data:` page has none of — and a
+ * blanket block would refuse the page's own document, so every request is paused
+ * through the `Fetch` domain and judged one at a time: continued when it is to
+ * that origin, failed in the browser otherwise. `client/index.html` links Google
+ * Fonts; with those requests refused the page falls back to the platform
  * sans-serif, and that fallback — identical on every machine, dialling nothing —
  * is the deterministic choice, not a loss.
  */
@@ -43,6 +48,9 @@ const CALL_TIMEOUT_MS = 30_000;
 /** How long `close()` waits for a polite `Browser.close` before it kills. */
 const EXIT_GRACE_MS = 2_000;
 
+/** How long `reload()` waits for the new document's load event before it goes on. */
+const RELOAD_LOAD_GRACE_MS = 10_000;
+
 /**
  * The longest `data:` URL Chromium will navigate to, in characters.
  *
@@ -64,6 +72,15 @@ export interface Page {
   snapshot(): Promise<{dom: string; screenshot: Uint8Array}>;
   /** Detaches from the target and closes it. */
   close(): Promise<void>;
+  /**
+   * Reloads this same tab and resolves once the new document has loaded.
+   *
+   * Optional, so a stand-in `Page` is one without it. It resolves on the load
+   * event rather than on the protocol call, because a caller polling the page
+   * for a handle the app sets would otherwise read the outgoing document's
+   * globals and call the reload finished before it began.
+   */
+  reload?(): Promise<void>;
 }
 
 /** One running browser process. */
@@ -75,6 +92,22 @@ export interface Browser {
    * `data:` URL it would need is over the browser's ceiling.
    */
   open(opts: {html: string; clock: string}): Promise<Page>;
+  /**
+   * Opens `url` in a page whose clock is pinned to `clock`, which runs `prelude`
+   * on every new document of it, and every request of which is refused in the
+   * browser unless it is to `origin`.
+   *
+   * Optional, so a stand-in `Browser` is one without it. It resolves as soon as
+   * the navigation is under way rather than on a load event: the page it is
+   * meant for redirects on its first document, and the caller is polling the
+   * page for its own signal of readiness anyway.
+   */
+  openUrl?(opts: {
+    url: string;
+    origin: string;
+    clock: string;
+    prelude?: string;
+  }): Promise<Page>;
   /** Ends the process and removes its user data directory. */
   close(): Promise<void>;
 }
@@ -98,6 +131,19 @@ type Connection = {
   ): Promise<Record<string, unknown>>;
   /** Resolves with the first `method` event on `sessionId`, armed when called. */
   once(method: string, sessionId: string): Promise<Record<string, unknown>>;
+  /**
+   * Calls `handler` for every `method` event on `sessionId`, until the
+   * connection closes.
+   *
+   * `once` cannot stand in for it: a request interceptor has to answer every
+   * paused request, not the first one, and a one-shot listener re-armed from
+   * inside its own handler drops whatever arrived in between.
+   */
+  on(
+    method: string,
+    sessionId: string,
+    handler: (params: Record<string, unknown>) => void,
+  ): void;
   close(): void;
 };
 
@@ -158,6 +204,7 @@ const connect = async (url: string): Promise<Connection> => {
     {resolve: (value: Record<string, unknown>) => void; reject: (error: Error) => void}
   >();
   const waiters = new Map<string, ((params: Record<string, unknown>) => void)[]>();
+  const listeners = new Map<string, ((params: Record<string, unknown>) => void)[]>();
   let closed: Error | null = null;
   let nextId = 1;
 
@@ -184,6 +231,9 @@ const connect = async (url: string): Promise<Connection> => {
       waiter(message.params ?? {});
     }
     waiters.delete(key);
+    for (const listener of listeners.get(key) ?? []) {
+      listener(message.params ?? {});
+    }
   });
 
   const give = (reason: string) => {
@@ -228,6 +278,10 @@ const connect = async (url: string): Promise<Connection> => {
         const key = `${sessionId} ${method}`;
         waiters.set(key, [...(waiters.get(key) ?? []), resolve]);
       }),
+    on: (method, sessionId, handler) => {
+      const key = `${sessionId} ${method}`;
+      listeners.set(key, [...(listeners.get(key) ?? []), handler]);
+    },
     close: () => socket.close(),
   };
 };
@@ -514,6 +568,17 @@ const pageOn = (
       };
     },
 
+    reload: async (): Promise<void> => {
+      live();
+      // Armed before the call: the load of the new document can beat a listener
+      // registered after `Page.reload` returns, and `Page.reload` returns as
+      // soon as the reload is under way. The cap is there because a page that
+      // never fires a load event must cost a second, not the exam.
+      const loaded = connection.once('Page.loadEventFired', sessionId);
+      await connection.send('Page.reload', {}, sessionId);
+      await Promise.race([loaded, after(RELOAD_LOAD_GRACE_MS)]);
+    },
+
     close: async (): Promise<void> => {
       if (!open) {
         return;
@@ -623,6 +688,55 @@ export const launchBrowser = async (opts?: {
       const page = pageOn(connection, sessionId, targetId);
       await page.evaluate(SETTLE);
       return page;
+    },
+
+    openUrl: async ({url, origin, clock, prelude}): Promise<Page> => {
+      const source = [clockPin(clock), prelude ?? '']
+        .filter((part) => part !== '')
+        .join(';\n');
+
+      const created = (await connection.send('Target.createTarget', {
+        url: 'about:blank',
+      })) as {targetId?: string};
+      const targetId = created.targetId ?? '';
+      const attached = (await connection.send('Target.attachToTarget', {
+        targetId,
+        flatten: true,
+      })) as {sessionId?: string};
+      const sessionId = attached.sessionId ?? '';
+
+      // A page served from an origin cannot have its every request blocked the
+      // way a `data:` page can — its own document is a request. So each one is
+      // paused and judged instead: continued when it is to `origin`, and failed
+      // in the browser otherwise, before a byte of it leaves the machine.
+      await connection.send('Fetch.enable', {patterns: [{urlPattern: '*'}]}, sessionId);
+      const allowed = `${origin}/`;
+      connection.on('Fetch.requestPaused', sessionId, (params) => {
+        const {requestId, request} = params as {
+          requestId?: string;
+          request?: {url?: string};
+        };
+        const pass = (request?.url ?? '').startsWith(allowed);
+        void connection
+          .send(
+            pass ? 'Fetch.continueRequest' : 'Fetch.failRequest',
+            pass
+              ? {requestId}
+              : {requestId, errorReason: 'BlockedByClient'},
+            sessionId,
+          )
+          .catch(() => {});
+      });
+
+      await connection.send('Page.enable', {}, sessionId);
+      await connection.send(
+        'Page.addScriptToEvaluateOnNewDocument',
+        {source},
+        sessionId,
+      );
+      await connection.send('Page.navigate', {url}, sessionId);
+
+      return pageOn(connection, sessionId, targetId);
     },
 
     close: async (): Promise<void> => {

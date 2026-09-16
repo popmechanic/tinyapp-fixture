@@ -88,12 +88,21 @@ export type TodosContent = Content<Schemas>;
 
 export const STORE_ID = 'todos';
 
+// The handles a page hands *out*, declared beside the store they belong to.
+// (The two a harness sets *into* a page — `__TINYAPP_SEED__` and
+// `__TINYAPP_EXAM__` — are declared in `vite-env.d.ts`.)
+//
 // The seeded page hands its store back the way it was handed its seed: on
 // `window`, under a name the exam knows. A normal page leaves no such handle,
-// so the two are told apart by its absence and not by its contents.
+// so the two are told apart by its absence and not by its contents. A page
+// flying the exam flag hands over the same handle unseeded, plus the SQLite
+// database it opened and — once it has loaded what it persisted — its
+// persister; `Store.tsx` is what writes those two.
 declare global {
   interface Window {
     __TINYAPP_STORE__?: TodosStore;
+    __TINYAPP_DB__?: unknown;
+    __TINYAPP_PERSISTER__?: unknown;
   }
 }
 
@@ -122,9 +131,10 @@ export const createTodosStore = (seed?: TodosContent): TodosStore => {
       {},
     ]);
   const created: TodosStore = seed === undefined ? store : store.setContent(seed);
-  // Only a seeded store is exposed; creating an unseeded one on a page that
-  // once held a seed clears the handle rather than leaving a stale one.
-  exposeStore(seed === undefined ? undefined : created);
+  // A seeded store is exposed as it always was, flag or no flag; an unseeded
+  // one only under the exam flag. Creating an unexposed store on a page that
+  // once held one clears the handle rather than leaving a stale one.
+  exposeStore(seed === undefined && !readExamFlag() ? undefined : created);
   return created;
 };
 
@@ -242,3 +252,15 @@ export const setFilter = (store: TodosStore, filter: string): void => {
 // a browser (or without a seed) there is simply none.
 export const readSeed = (): TodosContent | undefined =>
   typeof window === 'undefined' ? undefined : window.__TINYAPP_SEED__;
+
+/**
+ * Whether this page was opened by an exam, which is the one thing that makes it
+ * hand its own innards over.
+ *
+ * Read exactly like `readSeed`, and as narrowly: only the literal `true` raises
+ * the flag, so a page that happens to carry the name under some other value is
+ * the normal page it was. Outside a browser there is no flag at all — the
+ * linter imports this module under Bun, where `window` is undefined.
+ */
+export const readExamFlag = (): boolean =>
+  typeof window === 'undefined' ? false : window.__TINYAPP_EXAM__ === true;

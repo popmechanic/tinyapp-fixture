@@ -101,6 +101,34 @@ export type StateExamSpec<S extends ExamStore = ExamStore> = {
 };
 
 /**
+ * One persistence exam: a page opened unseeded from a loopback origin, an
+ * interaction, and the state the examiner expects to find still there once the
+ * page has been reloaded.
+ *
+ * There is no `seed` and no `store`, because neither has anywhere to go: the
+ * page starts from whatever its own storage holds, which is nothing, and the
+ * state is read back out of the page's store and out of the rows its persister
+ * wrote. The action is an interaction for the same reason — a callback runs in
+ * this process, and nothing this process does to a store of its own is saved by
+ * the page's persister.
+ *
+ * `assets` maps a url path to a file path, resolved against `process.cwd()` the
+ * way `expected` is; every other path at the origin answers the page itself.
+ * `table` is the persister's JSON-mode table, the one row of which carries the
+ * stamped content.
+ */
+export type PersistenceExamSpec = {
+  clock: string;
+  entry: string;
+  assets?: Record<string, string>;
+  action: Action | Action[];
+  expected: string;
+  table: string;
+  view?: View | View[];
+  mutant: MutantEdit[];
+};
+
+/**
  * What one exam run records.
  *
  * `walls.action_ms` is the interaction's own wall, `null` when the action was a
@@ -108,6 +136,11 @@ export type StateExamSpec<S extends ExamStore = ExamStore> = {
  * page was opened at all. `contract.pinned_in_page` says which contract held the
  * action: `true` when it ran in a page whose clock the driver pinned and whose
  * every request the driver blocked, `false` when `withContract` held it here.
+ *
+ * The four persistence keys — `walls.persist_ms`, `walls.reload_ms`, `rows` and
+ * `domBefore` — are optional, so a record from any other move still is one:
+ * only a page that was saved and reloaded has a save to time, rows of its own
+ * to read, or a document from before the reload to show.
  */
 export type ExamRecord = {
   walls: {
@@ -115,12 +148,16 @@ export type ExamRecord = {
     render_ms: number | null;
     action_ms: number | null;
     mutant_ms: number;
+    persist_ms?: number;
+    reload_ms?: number;
     render: 'ran' | 'skipped';
     browser: 'ran' | 'skipped';
   };
   mutant: {killed: boolean; path: string; edits: MutantEdit[]};
   contract: {clock: string; breach: string | null; pinned_in_page: boolean};
   storeDiff: Difference[];
+  rows?: {sql: string; rows: unknown[]; content: Snapshot; diff: Difference[]};
+  domBefore?: string;
   dom?: string;
   screenshot?: Uint8Array;
 };
