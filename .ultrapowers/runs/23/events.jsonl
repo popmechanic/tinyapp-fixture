@@ -11,3 +11,6 @@
 {"kind":"worker:start","label":"exam:1","role":"examiner","sessionId":"adf91c56-50cd-41cf-87b5-deb175d4c1c2","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-23/clones/exam-1","model":"opus","id":"01M2NSZMFA0000AWZY5TR63SAV","ts":1789585773034}
 {"kind":"worker:start","label":"impl:1","role":"implementer","sessionId":"b06bec92-cb82-4ae4-acf8-2aa10d3c82c6","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-23/clones/task-1","model":"opus","id":"01M2NSZMFD00001FAHNTW85TSQ","ts":1789585773037}
 {"kind":"engine:log","line":"baseline: green on 7d578da59ff3311cc6a83c61f64bfaad62bfa17b","id":"01M2NTCGWV0000S762X6RD8D4G","ts":1789586195355}
+{"kind":"worker:end","label":"impl:1","role":"implementer","sessionId":"b06bec92-cb82-4ae4-acf8-2aa10d3c82c6","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"meter":{"input":6086,"output":30070,"cacheRead":4233670,"cacheCreation":77566,"costUsd":3.6746749999999997,"models":["claude-opus-5"]},"id":"01M2NTW0NM00003KCJ00ABDRT9","ts":1789586703028}
+{"kind":"transcript:slice","label":"impl:1","sessionId":"b06bec92-cb82-4ae4-acf8-2aa10d3c82c6","bytes":11590,"id":"01M2NTW0P50000H36WPBN5FN10","ts":1789586703045}
+{"kind":"driver:attention","task":"1","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2NTW0WG000078KAARZA668Z","ts":1789586703248}
