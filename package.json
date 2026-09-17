@@ -11,7 +11,7 @@
     "lint:state": "bun packages/tinyapp-lint/src/cli.ts",
     "lint:ui": "node node_modules/eslint/bin/eslint.js client/src",
     "history": "bun packages/tinyapp-history/src/cli.ts",
-    "typecheck": "bun run build:facets && bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit",
+    "typecheck": "bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit",
     "test": "bun run typecheck && bun test",
     "build:facets": "bun run --cwd server build:facets",
     "postinstall": "bun run build:facets"
