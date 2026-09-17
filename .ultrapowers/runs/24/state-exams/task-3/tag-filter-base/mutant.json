@@ -1,0 +1,12 @@
+{
+  "killed": false,
+  "path": "todos/1/tags",
+  "edits": [
+    {
+      "table": "todos",
+      "row": "1",
+      "cell": "tags",
+      "value": "home"
+    }
+  ]
+}
