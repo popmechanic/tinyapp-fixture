@@ -15,6 +15,8 @@
  *   /exam/fork?from=<facet>&to=<facet> a fresh facet seeded from another's content
  *   /exam/reload?f=<facet>             abort and restart the facet on the current code, state kept
  *   /exam/discard?f=<facet>            delete the facet and its database
+ *   /exam/events                       a WebSocket the harness opens; every module transition is sent on it
+ *   /exam/transition                   POST from a module object (through SELF): one finished transaction
  *
  * A facet name is `<module>` or `<module>@<label>`: the part before `@` picks
  * the code, the whole name picks the database. So `todos@probe-7` is a fork of
@@ -28,6 +30,8 @@ export {Facet};
 
 type Env = {
   APP: DurableObjectNamespace<AppRoot>;
+  /** The worker itself, handed to module objects so they can report to the root. */
+  SELF: Fetcher;
   /** The module objects, one named Durable Object per `<instance>/<module>[@label]`. */
   MODULES: DurableObjectNamespace<Facet>;
   LOADER: WorkerLoader;
@@ -80,7 +84,7 @@ export class AppRoot extends DurableObject<Env> {
       compatibilityDate: '2026-09-01',
       mainModule: 'facet.js',
       modules: {'facet.js': facet.code},
-      env: {TINYAPP_EXAM: this.#examOn() ? '1' : ''},
+      env: {TINYAPP_EXAM: this.#examOn() ? '1' : '', SELF: this.env.SELF},
       globalOutbound: null,
     }));
   }
@@ -99,6 +103,10 @@ export class AppRoot extends DurableObject<Env> {
     return this.env.MODULES.getByName(`${APP_INSTANCE}/${name}`) as unknown as Fetcher;
   }
 
+  /** The harness socket sends nothing the root reads; a message is ignored. */
+  webSocketMessage(): void {}
+  webSocketClose(): void {}
+
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname.startsWith('/sync/')) {
@@ -106,20 +114,49 @@ export class AppRoot extends DurableObject<Env> {
       if (FACETS[moduleOf(name)] === undefined) {
         return new Response(`no such module: ${moduleOf(name)}`, {status: 404});
       }
-      return upgraded(request, await this.#facet(name).fetch(request));
+      const forwarded = new Request(request);
+      forwarded.headers.set('x-tinyapp-module', name);
+      return upgraded(request, await this.#facet(name).fetch(forwarded));
     }
     if (url.pathname.startsWith('/exam/')) {
       if (!this.#examOn()) {
         return new Response('not found', {status: 404});
       }
-      return this.#exam(url.pathname.slice('/exam/'.length), url);
+      return this.#exam(url.pathname.slice('/exam/'.length), url, request);
     }
     return new Response('tinyapp-fixture root', {status: 200});
   }
 
-  async #exam(verb: string, url: URL): Promise<Response> {
+  /** A module's transition, fanned out to every harness socket. */
+  #transition(body: string): void {
+    for (const ws of this.ctx.getWebSockets('events')) {
+      try {
+        ws.send(body);
+      } catch {
+        // A closed harness socket is dropped by the runtime on its own.
+      }
+    }
+  }
+
+  async #exam(verb: string, url: URL, request: Request): Promise<Response> {
     const f = url.searchParams.get('f') ?? '';
     switch (verb) {
+      case 'events': {
+        if (request.headers.get('upgrade')?.toLowerCase() !== 'websocket') {
+          return new Response('upgrade required', {status: 426});
+        }
+        const [client, server] = Object.values(new WebSocketPair()) as [WebSocket, WebSocket];
+        this.ctx.acceptWebSocket(server, ['events']);
+        return new Response(null, {status: 101, webSocket: client});
+      }
+      case 'transition': {
+        if (request.method !== 'POST') {
+          return new Response('POST', {status: 405});
+        }
+        const body = await request.text();
+        this.#transition(body);
+        return new Response('ok');
+      }
       case 'content':
       case 'rows':
         return this.#facet(f).fetch(new Request(`http://facet/exam/${verb}`));

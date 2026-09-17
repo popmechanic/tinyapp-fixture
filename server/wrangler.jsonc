@@ -18,5 +18,8 @@
     // celld deploy refuses (0.5.0), so it is done by wrangler, once.
     { "tag": "v1", "new_sqlite_classes": ["AppRoot", "Facet"] }
   ],
-  "worker_loaders": [{ "binding": "LOADER" }]
+  "worker_loaders": [{ "binding": "LOADER" }],
+  // The worker bound to itself: a module object reports each finished
+  // transaction to the root through it in exam mode (root → harness → history).
+  "services": [{ "binding": "SELF", "service": "tinyapp-fixture-server" }]
 }

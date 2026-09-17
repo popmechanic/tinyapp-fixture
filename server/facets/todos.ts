@@ -17,13 +17,35 @@ import type {Persister, Persists} from 'tinybase/persisters';
 import {createDurableObjectSqlStoragePersister} from 'tinybase/persisters/persister-durable-object-sql-storage';
 import {WsServerDurableObject} from 'tinybase/synchronizers/synchronizer-ws-server-durable-object';
 
-type FacetEnv = {TINYAPP_EXAM?: string};
+type FacetEnv = {
+  TINYAPP_EXAM?: string;
+  /** The worker itself; how a module reaches its root in exam mode. */
+  SELF?: Fetcher;
+};
 
 export class Facet extends WsServerDurableObject<FacetEnv> {
   #persister?: Persister<Persists.MergeableStoreOnly>;
+  /** This module's name under its root, learnt from the first forwarded request. */
+  #name = '';
+  /** One per finished transaction since this object woke; the harness orders by it. */
+  #seq = 0;
 
   createPersister() {
     const store = createMergeableStore();
+    // The recorder: every finished transaction — a client's, a sync's, a
+    // seed's — is reported to the root, which hands it to the harness. Only
+    // under the exam flag; a production module reports nothing.
+    if (this.env.TINYAPP_EXAM === '1' && this.env.SELF !== undefined) {
+      store.addDidFinishTransactionListener(() => {
+        const seq = ++this.#seq;
+        const body = JSON.stringify({module: this.#name, seq, content: store.getContent(), at: Date.now()});
+        void this.env.SELF!.fetch('http://root/exam/transition', {
+          method: 'POST',
+          headers: {'content-type': 'application/json'},
+          body,
+        }).catch(() => undefined);
+      });
+    }
     // Fragmented: each table's rows as SQLite rows of their own, so the exam's
     // `rows` read compares the app's tables, not one JSON blob of the store.
     this.#persister = createDurableObjectSqlStoragePersister(
@@ -36,6 +58,10 @@ export class Facet extends WsServerDurableObject<FacetEnv> {
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
+    const named = request.headers.get('x-tinyapp-module');
+    if (named !== null && named !== '') {
+      this.#name = named;
+    }
     if (url.pathname.startsWith('/exam/')) {
       if (this.env.TINYAPP_EXAM !== '1') {
         return new Response('exam surface is off', {status: 404});
