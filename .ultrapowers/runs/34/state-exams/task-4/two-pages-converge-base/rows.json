@@ -1,0 +1,57 @@
+{
+  "tinybase_tables": [
+    {
+      "type": "t",
+      "table_id": "todos",
+      "row_id": "1",
+      "cell_id": null,
+      "value_data": "[{\"text\":[\"Learn TinyBase\",\"\",29831184],\"completed\":[false,\"\",3177411910]}]",
+      "timestamp": "",
+      "hash": 702726968
+    },
+    {
+      "type": "t",
+      "table_id": "todos",
+      "row_id": "2",
+      "cell_id": null,
+      "value_data": "[{\"text\":[\"Build an app\",\"\",1149020373],\"completed\":[false,\"\",3177411910]}]",
+      "timestamp": "",
+      "hash": 2495211514
+    },
+    {
+      "type": "t",
+      "table_id": null,
+      "row_id": null,
+      "cell_id": null,
+      "value_data": "[0]",
+      "timestamp": "",
+      "hash": 2227577561
+    },
+    {
+      "type": "t",
+      "table_id": "todos",
+      "row_id": null,
+      "cell_id": null,
+      "value_data": "[0]",
+      "timestamp": "",
+      "hash": 4121849734
+    },
+    {
+      "type": "t",
+      "table_id": "todos",
+      "row_id": "0",
+      "cell_id": null,
+      "value_data": "[{\"text\":[\"buy milk\",\"OhqqeV-----M3tTx\",4056537641],\"completed\":[false,\"OhqqeV----0M3tTx\",1016968036]}]",
+      "timestamp": "",
+      "hash": 1762205437
+    }
+  ],
+  "tinybase_values": [
+    {
+      "value_id": null,
+      "value_data": "[0]",
+      "timestamp": "",
+      "hash": 0
+    }
+  ]
+}
