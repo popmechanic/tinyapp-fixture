@@ -151,7 +151,8 @@ const StoreLinks = ({
 
 const SyncLink = ({store}: {store: TodosStore}) => {
   useCreateSynchronizer(store, async (store) => {
-    const serverPathId = location.pathname;
+    // The module this store belongs to — the root maps it to the todos facet.
+    const serverPathId = '/sync/todos';
     const synchronizer = await createWsSynchronizer(
       store,
       // `WebSocketTypes` is `WebSocket | ws.WebSocket`; pulling

@@ -1,13 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2020",
-    "lib": ["ES2020"],
-    "types": ["@cloudflare/workers-types"],
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": [
+      "ES2022"
+    ],
+    "types": [
+      "@cloudflare/workers-types",
+      "bun"
+    ],
     "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["index.ts"]
+  "include": [
+    "index.ts",
+    "facets/*.ts",
+    "generated/*.ts",
+    "build-facets.ts",
+    "probe/*.ts"
+  ]
 }

@@ -4,9 +4,9 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
-    "start": "wrangler dev"
+    "build:facets": "bun build-facets.ts",
+    "dev": "bun build-facets.ts && cp .dev.vars.exam .dev.vars && celld dev . --clean",
+    "deploy": "bun build-facets.ts && wrangler deploy"
   },
   "dependencies": {
     "tinybase": "^9.7.0"

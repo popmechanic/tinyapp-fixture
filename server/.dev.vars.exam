@@ -1,0 +1,3 @@
+# Copied to .dev.vars by `bun run dev`: the root serves its exam surface only
+# under this flag, and a production deploy never carries it.
+TINYAPP_EXAM=1
