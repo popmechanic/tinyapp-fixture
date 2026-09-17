@@ -129,6 +129,68 @@ export type PersistenceExamSpec = {
 };
 
 /**
+ * One convergence exam: a server, a page, the module the page syncs through,
+ * an interaction, and the state the examiner expects every replica to reach.
+ *
+ * There is no `seed` and no `table`. The state comes from nowhere but the
+ * action: three pages and one module object all start empty, one page acts, and
+ * the question is whether the other two and the object arrive at the same
+ * place. `server` is the server directory `startCelld` copies — the runtime is
+ * the exam's, started and stopped by it — and `module` is the facet the pages
+ * dial at `/sync/<module>` and the one whose transitions are kept.
+ *
+ * `assets` is the persistence move's map of url path to file path, and
+ * `syncTimeoutMs`/`convergeTimeoutMs` bound the two waits that make the claim:
+ * how long B has to agree with A, and how long a page opened afterwards has to
+ * catch up with both.
+ */
+export type ConvergenceExamSpec = {
+  clock: string;
+  server: string;
+  entry: string;
+  assets?: Record<string, string>;
+  module: string;
+  action: Action | Action[];
+  expected: string;
+  view?: View | View[];
+  mutant: MutantEdit[];
+  syncTimeoutMs?: number;
+  convergeTimeoutMs?: number;
+};
+
+/**
+ * What a convergence run leaves on the record: the four readings it judges, the
+ * object's own rows, every transition of the session and the two walls.
+ *
+ * `stores.a` is page A's content read straight after the action — the reading
+ * the other three are compared against — and `stores.object` is what the module
+ * object itself answers, which is the one reading no page could have faked.
+ * `runtime` names the port and the copy the exam ran on, both gone by the time
+ * a reader sees them, which is how a reader checks they were let go.
+ */
+export type ConvergenceRecord = {
+  module: string;
+  stores: {a: Snapshot; b: Snapshot; c: Snapshot; object: Snapshot};
+  rows: Record<string, unknown[]>;
+  transitions: SessionTransition[];
+  walls: {sync_ms: number; converge_ms: number};
+  runtime: {port: number; dir: string};
+};
+
+/**
+ * One finished transaction of a module object, as the root reports it.
+ *
+ * Spelled here rather than imported from `./surface` so that a record's type
+ * costs nothing at runtime; `surface.ts` owns the socket that delivers them.
+ */
+export type SessionTransition = {
+  module: string;
+  seq: number;
+  content: Snapshot;
+  at: number;
+};
+
+/**
  * What one exam run records.
  *
  * `walls.action_ms` is the interaction's own wall, `null` when the action was a
@@ -141,6 +203,10 @@ export type PersistenceExamSpec = {
  * `domBefore` — are optional, so a record from any other move still is one:
  * only a page that was saved and reloaded has a save to time, rows of its own
  * to read, or a document from before the reload to show.
+ *
+ * `convergence` is the same rule once more: only a run that opened three pages
+ * onto one module object has three stores to compare or a session of
+ * transitions to show.
  */
 export type ExamRecord = {
   walls: {
@@ -157,6 +223,7 @@ export type ExamRecord = {
   contract: {clock: string; breach: string | null; pinned_in_page: boolean};
   storeDiff: Difference[];
   rows?: {sql: string; rows: unknown[]; content: Snapshot; diff: Difference[]};
+  convergence?: ConvergenceRecord;
   domBefore?: string;
   dom?: string;
   screenshot?: Uint8Array;

@@ -95,7 +95,12 @@ export interface Browser {
   /**
    * Opens `url` in a page whose clock is pinned to `clock`, which runs `prelude`
    * on every new document of it, and every request of which is refused in the
-   * browser unless it is to `origin`.
+   * browser unless it is to `origin` or to an origin `allow` lists.
+   *
+   * `allow` is how a page reaches a *second* loopback origin — the runtime a
+   * convergence exam syncs through — without the block being lifted: each entry
+   * is judged by the same rule `origin` is, so an origin not named is refused
+   * exactly as the whole world outside is.
    *
    * Optional, so a stand-in `Browser` is one without it. It resolves as soon as
    * the navigation is under way rather than on a load event: the page it is
@@ -107,6 +112,7 @@ export interface Browser {
     origin: string;
     clock: string;
     prelude?: string;
+    allow?: string[];
   }): Promise<Page>;
   /** Ends the process and removes its user data directory. */
   close(): Promise<void>;
@@ -690,7 +696,7 @@ export const launchBrowser = async (opts?: {
       return page;
     },
 
-    openUrl: async ({url, origin, clock, prelude}): Promise<Page> => {
+    openUrl: async ({url, origin, clock, prelude, allow}): Promise<Page> => {
       const source = [clockPin(clock), prelude ?? '']
         .filter((part) => part !== '')
         .join(';\n');
@@ -707,16 +713,18 @@ export const launchBrowser = async (opts?: {
 
       // A page served from an origin cannot have its every request blocked the
       // way a `data:` page can — its own document is a request. So each one is
-      // paused and judged instead: continued when it is to `origin`, and failed
-      // in the browser otherwise, before a byte of it leaves the machine.
+      // paused and judged instead: continued when it is to `origin` or to one
+      // of `allow`'s origins, and failed in the browser otherwise, before a byte
+      // of it leaves the machine.
       await connection.send('Fetch.enable', {patterns: [{urlPattern: '*'}]}, sessionId);
-      const allowed = `${origin}/`;
+      const allowed = [origin, ...(allow ?? [])].map((each) => `${each}/`);
       connection.on('Fetch.requestPaused', sessionId, (params) => {
         const {requestId, request} = params as {
           requestId?: string;
           request?: {url?: string};
         };
-        const pass = (request?.url ?? '').startsWith(allowed);
+        const target = request?.url ?? '';
+        const pass = allowed.some((prefix) => target.startsWith(prefix));
         void connection
           .send(
             pass ? 'Fetch.continueRequest' : 'Fetch.failRequest',

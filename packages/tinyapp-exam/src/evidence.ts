@@ -67,18 +67,41 @@ const writeJson = (dir: string, name: string, value: unknown): string => {
  * persistence exam's record carries them: the rows its persister wrote, and the
  * document as it stood before the reload that the rest of the evidence is on the
  * far side of.
+ *
+ * A convergence record brings three more — `stores.json`, `rows.json` and
+ * `transitions.json` — and widens `walls.json`, which then carries `sync_ms`,
+ * `converge_ms` and the session's transition count beside the walls every
+ * record has. `rows.json` is that record's rows rather than a persister's: the
+ * two moves never share a record, so the one name serves both readings.
  */
 export const writeEvidence = (dir: string, record: ExamRecord): string[] => {
   mkdirSync(dir, {recursive: true});
+
+  const converged = record.convergence;
+  const walls =
+    converged === undefined
+      ? record.walls
+      : {
+          ...record.walls,
+          ...converged.walls,
+          transitions: converged.transitions.length,
+        };
 
   const names = [
     writeJson(dir, 'store-diff.json', record.storeDiff),
     writeJson(dir, 'mutant.json', record.mutant),
     writeJson(dir, 'contract.json', record.contract),
-    writeJson(dir, 'walls.json', record.walls),
+    writeJson(dir, 'walls.json', walls),
   ];
 
-  if (record.rows !== undefined) {
+  if (converged !== undefined) {
+    names.push(
+      writeJson(dir, 'stores.json', converged.stores),
+      writeJson(dir, 'rows.json', converged.rows),
+      writeJson(dir, 'transitions.json', converged.transitions),
+    );
+  }
+  if (record.rows !== undefined && converged === undefined) {
     names.push(writeJson(dir, 'rows.json', record.rows));
   }
   if (record.domBefore !== undefined) {

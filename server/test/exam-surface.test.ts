@@ -3,15 +3,20 @@
 // `.dev.vars`, so every `/exam/*` verb answers 404 there while `/sync/<module>`
 // serves. Two celld instances, one per case, each on its own ports.
 import {afterAll, beforeAll, expect, test} from 'bun:test';
+import {join} from 'node:path';
 
-import {startCelld, type Celld} from './celld';
+import {startCelld, type Celld} from 'tinyapp-exam';
+
 import {runCase} from './child';
+
+/** This server, the one the exam helper copies. */
+const SERVER = join(import.meta.dir, '..');
 
 const VERBS = ['content?f=todos', 'rows?f=todos', 'fork?from=todos&to=todos@x', 'reload?f=todos', 'discard?f=todos@x', 'events', 'transition'];
 
 let off: Celld;
 beforeAll(async () => {
-  off = await startCelld({exam: false});
+  off = await startCelld({serverDir: SERVER, exam: false});
 }, 90_000);
 afterAll(async () => {
   await off?.stop();
@@ -35,7 +40,7 @@ test('flag off: two clients still converge through the module object', async () 
 }, 30_000);
 
 test('flag on: the same verb answers 200', async () => {
-  const on = await startCelld({exam: true});
+  const on = await startCelld({serverDir: SERVER, exam: true});
   try {
     const r = await fetch(`${on.url}/exam/content?f=todos`);
     expect(r.status).toBe(200);

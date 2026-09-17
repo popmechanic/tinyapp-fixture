@@ -12,12 +12,15 @@
 export {actionsOf, isCallbackAction, VALUES_TABLE} from './types';
 export type {
   Cell,
+  ConvergenceExamSpec,
+  ConvergenceRecord,
   Difference,
   ExamRecord,
   ExamStore,
   Locator,
   MutantEdit,
   PersistenceExamSpec,
+  SessionTransition,
   Snapshot,
   StateExamSpec,
   Tables,
@@ -36,6 +39,13 @@ export {
   PERSIST_TIMEOUT_MS,
   READY_TIMEOUT_MS,
 } from './persistence-move';
+
+export {
+  convergenceExam,
+  runConvergenceExam,
+  CONVERGE_TIMEOUT_MS,
+  SYNC_TIMEOUT_MS,
+} from './convergence-move';
 
 export {launchBrowser} from './browser';
 export type {Action, Browser, Page} from './browser';
@@ -59,3 +69,10 @@ export {
 export type {RenderResult} from './render-move';
 export {applyMutant, mutantPath} from './mutant';
 export {evidenceDir, examStem, writeEvidence} from './evidence';
+
+// The verification host: one `celld dev` on a disposable copy of a server, and
+// a client for the root's exam surface over it.
+export {startCelld} from './celld';
+export type {Celld, CelldOptions, CelldSpawn} from './celld';
+export {examSurface} from './surface';
+export type {Events, ExamSurface, Transition} from './surface';
