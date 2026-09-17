@@ -81,3 +81,7 @@
 {"kind":"driver:check-run","task":"2","cmd":"git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/config.ts client/src/index.css client/src/components packages/tinyapp-exam packages/tinyapp-lint/src packages/tinyapp-history package.json client/package.json server/package.json bun.lock","exit":0,"minor":false,"iter":0,"id":"01M2PJBVV40000F8DQV42YE9BW","ts":1789611339620}
 {"kind":"engine:log","line":"task 2 proof-red after the pre-review repair round","id":"01M2PJBVY90000TV47NSDPZD20","ts":1789611339721}
 {"kind":"engine:phase","phase":"Wave 2","id":"01M2PJBVYB0000NP006FGXAQT0","ts":1789611339723}
+{"kind":"driver:wave-adopted","wave":2,"tasks":["3"],"headSha":"f3597cb3e24de8c77177c62b15c4a4116cd83692","why":"end","applied":{"3":"base"},"id":"01M2PKYWVY0000A7DFMD34YNKB","ts":1789613011838}
+{"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2PKYX1P0000Y12QET8QJE8K","ts":1789613012022}
+{"kind":"driver:integrated-check","cmd":"bun run lint:ui","exit":0,"minor":false,"wave":2,"id":"01M2PKYXQH0000AR1VSG9GBPY4","ts":1789613012721}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2PKZ3CR00006Q8MVH1SN1PD","ts":1789613018520}
