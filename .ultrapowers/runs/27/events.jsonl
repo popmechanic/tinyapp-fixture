@@ -49,3 +49,8 @@
 {"kind":"driver:proof-run","task":"1","cmd":"set -o pipefail; bun test tests/state-exams/undo-delete.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 4)} END {exit !ok}'","exit":0,"iter":0,"id":"01M2PSQ54P000024YRDYX7S782","ts":1789619049622}
 {"kind":"driver:proof-run","task":"1","cmd":"! git diff --name-status $ULTRA_BASE | grep -vE '^M[[:space:]]+tests/state-exams/[a-z0-9-]+\\.test\\.ts$|^[AMD][[:space:]]+\\.ultrapowers/'","exit":0,"iter":0,"id":"01M2PSQ54W00008SV0T9GQA3V8","ts":1789619049628}
 {"kind":"driver:check-run","task":"1","cmd":"bun run lint:ui","exit":0,"minor":false,"iter":0,"id":"01M2PSQ5S80000KW692VMBXW1N","ts":1789619050280}
+{"kind":"driver:check-run","task":"1","cmd":"bun run typecheck","exit":0,"minor":false,"iter":0,"id":"01M2PSQC3Q00005B56NWZH4CTF","ts":1789619056759}
+{"kind":"driver:check-run","task":"1","cmd":"bun run lint:state","exit":0,"minor":false,"iter":0,"id":"01M2PSQR1A0000Z7ZR3564P3C1","ts":1789619068970}
+{"kind":"driver:check-run","task":"1","cmd":"git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock","exit":0,"minor":false,"iter":0,"id":"01M2PSQR1G0000QTWRKYTKR55F","ts":1789619068976}
+{"kind":"driver:suite-runs","task":"1","count":0,"slices":1,"id":"01M2PSQR5G0000533232FNP6QK","ts":1789619069104}
+{"kind":"engine:log","line":"task 1 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2PSQR5H0000YVMJGHSBQ4FV","ts":1789619069105}
