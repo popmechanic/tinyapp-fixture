@@ -1,0 +1,139 @@
+{
+  "integrationBranch": "ultra/integration-run-32",
+  "baseSha": "e3b1d490e54d6a1ff0a205ffcbc05a7f755b50bb",
+  "setupSha": null,
+  "waves": [
+    [
+      "1",
+      "2"
+    ],
+    [
+      "3"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 3 (interface)",
+    "2 -> 4 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "status": "failed",
+      "reviewVerdict": "agent-error",
+      "notes": "AGENT_NULL: implementer agent returned null (terminal Overloaded or skipped)",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proofFixes": 0,
+      "landedAt": 1789631550569,
+      "stateExams": [],
+      "findings": []
+    },
+    {
+      "task": "2",
+      "status": "failed",
+      "reviewVerdict": "agent-error",
+      "notes": "AGENT_NULL: implementer agent returned null (terminal Overloaded or skipped)",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proofFixes": 0,
+      "landedAt": 1789631552721,
+      "stateExams": [],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": false,
+    "output": "not run \u2014 no wave merged",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [],
+  "reviewEconomy": {
+    "reviewerMs": 3922,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "yapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [11639.20ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [216.70ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.35ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [13.05ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-IFty1m\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [350.43ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [233.82ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.36ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.44ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [208.19ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.62ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.58ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1753.71ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [297.61ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.96ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.15ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.20ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [12733.35ms]\n\n 651 pass\n 0 fail\n 1971 expect() calls\nRan 651 tests across 56 files. [177.10s]\n"
+  },
+  "waveMerges": [],
+  "frontier": [],
+  "coverage": {
+    "tasks_merged": 0,
+    "tasks_planned": 4,
+    "complete": false
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [
+    {
+      "task": "1",
+      "files": [
+        "packages/tinyapp-exam/src/celld.ts",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/surface.ts",
+        "packages/tinyapp-exam/test/celld.test.ts",
+        "server/test/celld.ts",
+        "server/test/exam-surface.test.ts",
+        "server/test/recorder.test.ts"
+      ]
+    },
+    {
+      "task": "2",
+      "files": [
+        "AGENTS.md",
+        "client/src/Store.tsx",
+        "client/src/config.ts",
+        "client/src/storeData.ts",
+        "client/src/vite-env.d.ts",
+        "client/test/sync-origin.test.ts"
+      ]
+    },
+    {
+      "task": "3",
+      "files": [
+        "packages/tinyapp-exam/src/browser.ts",
+        "packages/tinyapp-exam/src/convergence-move.ts",
+        "packages/tinyapp-exam/src/evidence.ts",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/types.ts",
+        "packages/tinyapp-exam/test/convergence-move.test.ts",
+        "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+        "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+      ]
+    },
+    {
+      "task": "4",
+      "files": [
+        "AGENTS.md",
+        "README.md",
+        "tests/state-exams/two-pages-converge.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": false,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 2: infra-retry: review:2:1 attempt 1 returned null (status 429) \u2014 re-dispatched once after 60000 ms",
+    "task 1: infra-death (AGENT_NULL: implementer agent returned null (terminal Overloaded or skipped)) \u2014 parked for one retry when a slot frees (no immediate retry into the live storm)",
+    "task 2: infra-retry: review:2:1 attempt 2 returned null (status 429) \u2014 no third attempt; fail-closed",
+    "task 2: infra-death (AGENT_NULL: reviewer agent returned null (terminal Overloaded or skipped)) \u2014 parked for one retry when a slot frees (no immediate retry into the live storm)",
+    "task 1: slot-free retry after infra-death failed \u2014 AGENT_NULL: implementer agent returned null (terminal Overloaded or skipped)",
+    "task 2: slot-free retry after infra-death failed \u2014 AGENT_NULL: implementer agent returned null (terminal Overloaded or skipped)"
+  ],
+  "amendments": [],
+  "unfinished": [
+    "3: blocked \u2014 depends on a failed task",
+    "4: blocked \u2014 depends on a failed task"
+  ],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
