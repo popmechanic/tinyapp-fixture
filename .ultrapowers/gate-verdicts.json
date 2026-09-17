@@ -1,0 +1,59 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "0048bf729046ad03c065afc1b4e269fa5d2a00ce2c797f9a241d3d0ecfe88e39",
+      "verdict": "pass",
+      "reason": "Every literal computes under the tags rule (home, urgent -> home,urgent; home, urgent, work -> home,urgent,work; empty removes the cell so content returns exactly to the seed), the mutant dropping row 1's tags differs from the pinned expected, each row of the universal has its own leg, the no-change-until-Enter and clearing negations each have a leg naming the still-unchanged cell and the absent cell, and at BASE TagsInput.tsx and type-tags.test.ts are correctly named as created while TodoItem.tsx already places DueInput before the Delete button and the due-date exam's three text-input-count tests are exactly what M4/leg (d) loosens."
+    }
+  },
+  "tally": {
+    "base": "d1f17d41318d687b35216a84594bdce6d72f3db1",
+    "dispatched": 1,
+    "rejected": 0,
+    "rounds": 1,
+    "round1": {
+      "dispatched": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "1",
+      "hash": "0048bf729046ad03c065afc1b4e269fa5d2a00ce2c797f9a241d3d0ecfe88e39",
+      "verdict": "pass",
+      "reader": "gate-reader-tagsbox-r1-t1"
+    }
+  ],
+  "authoring": {
+    "minutes": 10,
+    "probes": 7,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "What do we do with fixture PR #24?",
+        "options": [
+          "Merge it, re-run the row editor as its own plan",
+          "Close it, re-run all three later",
+          "Leave it open for now"
+        ],
+        "recommended": "Merge it, re-run the row editor as its own plan",
+        "picked": "Merge it, re-run the row editor as its own plan"
+      },
+      {
+        "question": "Confirm the tags box plan and launch on the fixture?",
+        "options": [
+          "Confirm and launch at --cpu 3 --memory 6GB",
+          "Confirm, hold the launch",
+          "Edit the Claim"
+        ],
+        "recommended": "Confirm and launch at --cpu 3 --memory 6GB",
+        "picked": "Confirm and launch at --cpu 3 --memory 6GB"
+      }
+    ]
+  }
+}
