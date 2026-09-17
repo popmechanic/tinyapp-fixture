@@ -66,3 +66,23 @@ more walls as well — `persist_ms`, from the last action to the save landing,
 and `reload_ms`, from the reload to the page reporting itself loaded again.
 Both are reported and neither is bounded: how long a save takes is what the
 record is for, not something an exam should be red about.
+
+A convergence exam asks the question no single page can answer: whether the
+replicas agree. It provides its own runtime — it starts a `celld dev` on a copy
+of this repository's server, opens two pages onto the module it names, acts in
+the first, and waits for the second to say what the first says; then it reads
+the module object's own content and rows, and opens a third page that has to
+reach the same state from nothing. Nothing about those pages is in exam mode but
+where they sync to: they are told `window.__TINYAPP_SYNC__` and nothing else,
+and every request to anywhere but the page's own loopback origin and the
+runtime's is failed in the browser. Its evidence carries `walls.json` with
+`sync_ms` and `converge_ms`, and `transitions.json`, the session's transitions in
+the object's own numbering. On the fleet image both binaries are already there;
+on a laptop the two things to provide are `CELLD_BIN`, naming the celld binary,
+and `TINYAPP_BROWSER`, naming the browser, e.g.
+
+```sh
+CELLD_BIN=/usr/local/bin/celld \
+  TINYAPP_BROWSER="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  bun test tests/state-exams/two-pages-converge.test.ts
+```
