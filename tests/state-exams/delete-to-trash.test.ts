@@ -2,13 +2,18 @@
  * The exam for Task 1 — "The trash table — Delete moves the whole row there,
  * Undo moves it back".
  *
- * A file's whole state exam is the single `stateExam({…})` in it, as
- * `clear-completed.test.ts` shows, so leg (a) is that one call and every other
- * leg is an ordinary `bun:test` block beside it: the two store-move edges of
- * M2 and M3 (b, c), the two no-op edges of M4 and M5 (d, e), Clear completed
- * filling no trash (f), the schema and the invariant of M7 (g–i), the round
- * trip of every checked-in state of M8 (j), and each `Run:` line of M9 executed
- * verbatim so that "exits 0" is asserted as the Proof spells it (k).
+ * A file's whole state exam is the single `stateExam({…})` in it, as the
+ * clear-completed exam shows, so leg (a) is that one call and every other leg
+ * is an ordinary `bun:test` block beside it: the two store-move edges of M2 and
+ * M3 (b, c), the two no-op edges of M4 and M5 (d, e), Clear completed filling
+ * no trash (f), the schema and the invariant of M7 (g–i), and the round trip of
+ * every checked-in state of M8 (j).
+ *
+ * Leg (k) [M9] ran eight lines: five whole test files of other provers — the
+ * linter's package, the smoke test, the done-count exam, the store's own tests —
+ * and three text pins on those same test files. All eight are gone: one claim,
+ * one prover. Each of those files proves its own claim, and the fold's suite
+ * runs every one of them once, which is where a regression in them surfaces.
  *
  * The store module is reached through one namespace import, the form
  * `client/test/todos-store.test.ts` already uses. A named import of
@@ -33,8 +38,8 @@ import {stateExam} from 'tinyapp-exam';
 import * as sd from '../../client/src/storeData';
 import type {TodosContent} from '../../client/src/storeData';
 
-// This file sits two directories below the repository root, which is also
-// `bun test`'s cwd — the `Run:` lines and the fixture reads are anchored there.
+// This file sits two directories below the repository root, which is also the
+// test runner's cwd — the fixture reads are anchored there.
 const ROOT = join(import.meta.dir, '..', '..');
 
 const readJson = (...parts: string[]): TodosContent =>
@@ -247,97 +252,3 @@ for (const kind of ['seeds', 'expected'] as const) {
     });
   }
 }
-
-// --- Leg (k) [M9]: the eight `Run:` lines, run verbatim ----------------------
-
-/** One Proof `Run:` line, run from the repository root as the driver runs it. */
-const expectExit0 = (line: string): void => {
-  const run = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const tail = `${run.stdout.toString()}${run.stderr.toString()}`
-    .trim()
-    .split('\n')
-    .slice(-15)
-    .join('\n');
-
-  expect(run.exitCode === 0 ? 'exit 0' : `exit ${run.exitCode}\n${tail}`).toBe(
-    'exit 0',
-  );
-};
-
-/** Long enough for the `Run:` lines that are themselves whole test suites. */
-const RUN_LINE_TIMEOUT_MS = 300_000;
-
-test(
-  'leg (k) [M9] the Run line `bun test packages/tinyapp-lint` exits 0',
-  () => {
-    expectExit0('bun test packages/tinyapp-lint');
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line counting `deleteTodo or setTodoCompleted` in reachability.test.ts exits 0',
-  () => {
-    expectExit0(
-      `test "$(grep -c 'deleteTodo or setTodoCompleted' packages/tinyapp-lint/test/reachability.test.ts)" -eq 0`,
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line `bun test tests/smoke.test.ts` exits 0',
-  () => {
-    expectExit0('bun test tests/smoke.test.ts');
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line `bun test tests/state-exams/done-count.test.ts` exits 0',
-  () => {
-    expectExit0('bun test tests/state-exams/done-count.test.ts');
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line `bun test client/test/todos-store.test.ts` exits 0',
-  () => {
-    expectExit0('bun test client/test/todos-store.test.ts');
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line `grep -q \'toContain("todos")\' tests/smoke.test.ts` exits 0',
-  () => {
-    expectExit0(`grep -q 'toContain("todos")' tests/smoke.test.ts`);
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line `grep -q "toContain(\'todos\')" tests/state-exams/done-count.test.ts` exits 0',
-  () => {
-    expectExit0(
-      `grep -q "toContain('todos')" tests/state-exams/done-count.test.ts`,
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M9] the Run line grepping `getContent()[0].todos).toBeUndefined()` in client/test/todos-store.test.ts exits 0',
-  () => {
-    expectExit0(
-      String.raw`grep -q "getContent()\[0\].todos).toBeUndefined()" client/test/todos-store.test.ts`,
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);

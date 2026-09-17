@@ -8,7 +8,7 @@
  * temp path: the file the writer creates (b), the log a recorded session leaves
  * (c), the refused call that leaves none (d), the snapshots read back (e), the
  * diffs between them (f), the two halves of the contract (g, h), the message
- * spelling (i) and the two `Run:` lines (j).
+ * spelling (i) and the root typecheck script's own order (j).
  *
  * Four readings this file makes, written down because the Proof leaves them to
  * the reader:
@@ -16,8 +16,8 @@
  *   - Leg (b) asks for a *second* `DatabaseSync` on the same path, so that leg
  *     — and only that leg — loads `@dolthub/doltlite` by bare name, with
  *     `await import`. The history package itself is imported by relative path,
- *     since a bare `tinyapp-history` is linked into `node_modules` only by a
- *     `bun install` that has seen the new package; loading DoltLite inside the
+ *     since a bare `tinyapp-history` is linked into `node_modules` only by an
+ *     install that has seen the new package; loading DoltLite inside the
  *     leg keeps the history module the one thing this file's load depends on,
  *     so a run before the implementation exists names that module and nothing
  *     else.
@@ -33,7 +33,7 @@
  *     row into the `cells` shape — `dolt_diff_cells` says nothing about it.
  */
 
-import {existsSync, mkdtempSync} from 'node:fs';
+import {existsSync, mkdtempSync, readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
@@ -59,7 +59,7 @@ import {
 // needs it, which is the only place this exam opens DoltLite for itself.
 import type {DatabaseSync} from '@dolthub/doltlite';
 
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
 
 /** The clock every exam of this file runs under. */
@@ -73,9 +73,6 @@ const HASH = /^[0-9a-f]{40}$/;
 
 /** A history's own tests are quick, but a native open on a cold image is not. */
 const HISTORY_TIMEOUT_MS = 30_000;
-
-/** A `tsc` over a package needs more than bun's default per-test 5 s. */
-const SPAWN_TIMEOUT_MS = 180_000;
 
 /** A path no file sits at yet, in a directory of this run's own. */
 const freshPath = (): string =>
@@ -97,21 +94,6 @@ const recorded = () => {
     CLOCK,
   );
   return {history, session};
-};
-
-/** Runs one Proof `Run:` line from the repository root and returns its status. */
-const runLine = (line: string): number => {
-  const child = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  if (child.exitCode !== 0) {
-    console.error(child.stdout.toString());
-    console.error(child.stderr.toString());
-  }
-  return child.exitCode;
 };
 
 /** The `name` and `pk` of each column a `PRAGMA table_info` row reports. */
@@ -387,29 +369,26 @@ test('leg (i) [M2] messageOf spells the call as the name and its JSON arguments'
 
 // --- M8: the package is typechecked by the suite -----------------------------
 
-// Leg (j) [M8], the first `Run:` line.
-test(
-  'leg (j) [M8] the Run line `bunx tsc -p packages/tinyapp-history --noEmit` exits 0',
-  () => {
-    expect(runLine('bunx tsc -p packages/tinyapp-history --noEmit')).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
+// Leg (j) [M8]: the root `typecheck` script carries the new step immediately
+// before the exam package's, which stays last. The whole claim is the order of
+// the last two steps, so it is read off the parsed script rather than pinned as
+// a line of text; the project-wide typecheck itself is the driver's own check,
+// and running it from inside an exam would prove it a second time.
+test('leg (j) [M8] the root typecheck script runs packages/tinyapp-history immediately before packages/tinyapp-exam, last', () => {
+  const {scripts} = JSON.parse(
+    readFileSync(join(ROOT, 'package.json'), 'utf8'),
+  ) as {scripts: Record<string, string>};
 
-// Leg (j) [M8], the second `Run:` line: the root script carries the new step
-// immediately before the exam package's, which stays last — the trailing quote
-// in the pattern is what pins that the script ends there.
-test(
-  'leg (j) [M8] the root typecheck script carries the new step immediately before the exam package`s',
-  () => {
-    expect(
-      runLine(
-        `grep -q 'bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit"' package.json`,
-      ),
-    ).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
+  const packages = scripts.typecheck!
+    .split('&&')
+    .map((step) => /packages\/[a-z-]+/.exec(step)?.[0])
+    .filter((name): name is string => name !== undefined);
+
+  expect(packages.slice(-2)).toEqual([
+    'packages/tinyapp-history',
+    'packages/tinyapp-exam',
+  ]);
+});
 
 // --- M7: recording changes nothing about where the store goes ----------------
 

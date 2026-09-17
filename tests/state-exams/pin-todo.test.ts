@@ -2,14 +2,17 @@
  * The exam for Task 1 — "The pinned cell and the Pin button — a click reaches
  * the pinned state, and that state is what this task posts".
  *
- * A file's whole state exam is the single `stateExam({…})` in it, as
- * `tests/state-exams/delete-to-trash.test.ts` shows, so leg (a) is that one
- * call and every other leg is an ordinary `bun:test` block beside it: the
- * expected file's own content (a), the schema of the new cell (b), the two
- * directions of `pinTodo` (c), its two no-op edges (d), the round trip of every
- * checked-in state (e), the static render of the pinned row and of its two
- * buttons (f), and each of the three `Run:` lines (g–i), spawned as the Proof
- * spells them so that "exits 0" is asserted the way the driver asserts it.
+ * A file's whole state exam is the single `stateExam({…})` in it, as the
+ * delete-to-trash exam shows, so leg (a) is that one call and every other leg
+ * is an ordinary `bun:test` block beside it: the expected file's own content
+ * (a), the schema of the new cell (b), the two directions of `pinTodo` (c), its
+ * two no-op edges (d), the round trip of every checked-in state (e), the static
+ * render of the pinned row and of its two buttons (f), and the ignore rule the
+ * posted states depend on (g), read here out of `.gitignore` itself.
+ *
+ * Legs (h) and (i) ran two other exam files and the linter's four test files as
+ * children. Both are gone: one claim, one prover — those files prove their own
+ * claims, and the fold's suite runs them once.
  *
  * Three readings this file makes, written down because they are choices:
  *
@@ -19,9 +22,9 @@
  *     one red for the whole file; this way each leg is its own red and says
  *     which part of the contract is missing.
  *   - Every fixture read happens inside a test body, never at module level: the
- *     linter's capture child imports this file with `stateExam` and `bun:test`
- *     stubbed out, so a module-level `readFileSync` of the expected file this
- *     task has yet to create would make `bun run lint:state` fail as `capture
+ *     state linter's capture child imports this file with `stateExam` and
+ *     `bun:test` stubbed out, so a module-level `readFileSync` of the expected
+ *     file this task has yet to create would make `lint:state` fail as `capture
  *     failed` rather than as the finding it is. The one module-level read is
  *     `readdirSync` of the two snapshot directories, which both exist at BASE,
  *     and it is there so that leg (e)'s failing file is the failing test's name.
@@ -48,8 +51,8 @@ import {renderStatic} from '../../client/src/StaticPage';
 import * as sd from '../../client/src/storeData';
 import type {TodosContent} from '../../client/src/storeData';
 
-// This file sits two directories below the repository root, which is also
-// `bun test`'s cwd — the `Run:` lines and the fixture reads are anchored there.
+// This file sits two directories below the repository root, which is also the
+// test runner's cwd — the fixture reads are anchored there.
 const ROOT = join(import.meta.dir, '..', '..');
 
 const readJson = (...parts: string[]): TodosContent =>
@@ -90,9 +93,6 @@ const TWO_TODOS_SECOND_PINNED: TodosContent = [
 
 /** The expected file leg (a)'s exam compares against, and M1 pins the content of. */
 const EXPECTED_PATH = 'state-exams/expected/two-todos-second-pinned.json';
-
-/** A child `bun test` over a whole suite needs far more than bun's 5 s. */
-const RUN_LINE_TIMEOUT_MS = 600_000;
 
 // --- Leg (a) [M1]: the one state exam of the file ----------------------------
 
@@ -269,51 +269,12 @@ test('leg (f) [M6] the Pin button follows Delete inside a row', () => {
   expect(html.slice(rowStart, firstPin)).toContain('>Delete<');
 });
 
-// --- Legs (g)–(i) [M7]: the three `Run:` lines, run verbatim -----------------
+// --- Leg (g) [M7]: the ignore rule the posted states depend on ---------------
 
-/** One Proof `Run:` line, run from the repository root as the driver runs it. */
-const expectExit0 = (line: string): void => {
-  const run = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const tail = `${run.stdout.toString()}${run.stderr.toString()}`
-    .trim()
-    .split('\n')
-    .slice(-15)
-    .join('\n');
+// The `Run:` line was `grep -qx 'state-exams/posted/' .gitignore`; `-x` is a
+// whole-line match, so the predicate here is one line equal to that string.
+test("leg (g) [M7] .gitignore carries the whole line `state-exams/posted/`", () => {
+  const lines = readFileSync(join(ROOT, '.gitignore'), 'utf8').split('\n');
 
-  expect(run.exitCode === 0 ? 'exit 0' : `exit ${run.exitCode}\n${tail}`).toBe(
-    'exit 0',
-  );
-};
-
-test(
-  "leg (g) [M7] the Run line `grep -qx 'state-exams/posted/' .gitignore` exits 0",
-  () => {
-    expectExit0(`grep -qx 'state-exams/posted/' .gitignore`);
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (h) [M7] the Run line `bun test tests/state-exams/delete-to-trash.test.ts tests/state-exams/undo-delete.test.ts` exits 0',
-  () => {
-    expectExit0(
-      'bun test tests/state-exams/delete-to-trash.test.ts tests/state-exams/undo-delete.test.ts',
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  "leg (i) [M7] the Run line `bun test` over the linter's four test files exits 0",
-  () => {
-    expectExit0(
-      'bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts',
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
+  expect(lines.includes('state-exams/posted/')).toBe(true);
+});

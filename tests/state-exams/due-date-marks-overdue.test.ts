@@ -24,20 +24,20 @@
  *            expected, the four view entries and the mutant exactly as the leg
  *            spells them — and the expected file parsing to exactly the M1
  *            literal.
- *   (b) [M2] the Proof's `Run:` line exits 0: the row's text carries the
- *            overdue variant that paints it.
+ *   (b) [M2] the source predicate holds: the row's text carries the overdue
+ *            variant that paints it.
  *
  * Three readings this file makes, written down because they are choices:
  *
  *   - `createTodosStore` is imported statically from `client/src/storeData`
  *     and named as `store: () => createTodosStore()` beside `entry`, as the
  *     Global Constraints' last bullet requires: measured 2026-09-15, an
- *     interaction exam importing nothing from `client/src` fails under
- *     `bun test` with `Bundle failed` before it opens a page.
- *   - Leg (b) is graded twice, because the `Run:` line and the clause it stands
- *     for are not quite the same sentence. The line is run verbatim through
- *     `bash -c` from the repository root and asserted to exit 0, which is the
- *     leg's own words; beside it the source is read structurally for the
+ *     interaction exam importing nothing from `client/src` fails under the test
+ *     runner with `Bundle failed` before it opens a page.
+ *   - Leg (b) is graded twice, because the flat predicate and the clause it
+ *     stands for are not quite the same sentence. The predicate is asserted
+ *     over the whole file read in this process, which is the leg's own words;
+ *     beside it the source is read structurally for the
  *     variant sitting on the element that renders the row's text — a `grep` of
  *     the whole file would also be satisfied by the class appearing in a
  *     comment or on some other element — and for the token that variant names
@@ -61,7 +61,7 @@ import {stateExam} from 'tinyapp-exam';
 
 import {createTodosStore, type TodosContent} from '../../client/src/storeData';
 
-/** This file sits two directories below the repository root, `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
 
 /** The seed the typing happens on, and the state it must reach. */
@@ -74,9 +74,6 @@ const OVERDUE_VARIANT = 'group-data-[overdue=true]:text-primary';
 
 /** The one stylesheet, where the colour that variant names is declared. */
 const CSS_FILE = 'client/src/index.css';
-
-/** The Proof's `Run:` line, verbatim. */
-const RUN_LINE = `grep -qF '${OVERDUE_VARIANT}' client/src/TodoItem.tsx`;
 
 /** The expected state, exactly as M1 spells it — row `1` has no `due` key. */
 const EXPECTED_LITERAL = [
@@ -103,22 +100,6 @@ const readRepoFile = (relative: string): string => {
     );
   }
   return readFileSync(path, 'utf8');
-};
-
-/** One `Run:` line, run from the repository root: its status and its output. */
-const statusOf = (line: string): number => {
-  const spawned = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  if (spawned.exitCode !== 0) {
-    console.log(
-      `$ ${line}\n${spawned.stdout.toString()}${spawned.stderr.toString()}`,
-    );
-  }
-  return spawned.exitCode;
 };
 
 /**
@@ -167,8 +148,8 @@ test(`leg (a) [M1] ${EXPECTED_FILE} parses to exactly the M1 literal`, () => {
 
 // --- (b) [M2]: the overdue row's text is visibly marked ----------------------
 
-test(`leg (b) [M2] the Proof Run line exits 0 — ${ROW_FILE} carries \`${OVERDUE_VARIANT}\``, () => {
-  expect(statusOf(RUN_LINE)).toBe(0);
+test(`leg (b) [M2] ${ROW_FILE} carries \`${OVERDUE_VARIANT}\``, () => {
+  expect(readRepoFile(ROW_FILE)).toContain(OVERDUE_VARIANT);
 });
 
 test(`leg (b) [M2] the element rendering the row's text carries \`${OVERDUE_VARIANT}\`, and ${CSS_FILE} declares \`--primary\``, () => {

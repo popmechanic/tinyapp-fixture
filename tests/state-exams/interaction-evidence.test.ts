@@ -1,28 +1,35 @@
 /**
  * The exam for Task 1 — "Two exams whose action is the interaction".
  *
- * It never imports the two exam files it grades. Each is run as its own child
- * `bun test <file>` process from the repository root, with `ULTRA_RUN_DIR`
- * pointed at a fresh `mkdtemp` directory and with `ULTRA_TASK` and
- * `ULTRA_EXAM_PASS` removed from the child's environment, so the helper's
- * `evidenceDir` rule (`packages/tinyapp-exam/src/evidence.ts`) lands the record
- * at `<dir>/state-exams/task-none/<stem>-none` — and the evidence is then read
- * back off disk.
+ * It never imports the two exam files it grades. Their text is read, and the
+ * specs they declare are run here through `runStateExam` — the very function
+ * their `stateExam({…})` registration calls — with `ULTRA_RUN_DIR` pointed at a
+ * fresh `mkdtemp` directory, with `ULTRA_TASK` and `ULTRA_EXAM_PASS` taken out
+ * of the environment handed to it, and with `main` set to the exam file each
+ * spec belongs to, so the helper's `evidenceDir` rule
+ * (`packages/tinyapp-exam/src/evidence.ts`) lands the record at
+ * `<dir>/state-exams/task-none/<stem>-none`, and the evidence is read back off
+ * disk from there.
  *
- * One child per exam file: a single `bun test` that bundles the entry twice can
- * fail the second exam with `Bundle failed`, so each `Run:` line is its own
- * process. The runs are memoised, so leg (a) and leg (c) share the one click
- * run and leg (b) and leg (c) the one Enter run.
+ * One claim, one prover: this file's claim is the evidence an interaction
+ * leaves, and it measures that itself, in this process. It used to run each exam
+ * file as its own child test process and grade the child's exit status; those
+ * two legs are gone, because each of those exams proves itself and the fold's
+ * suite runs it once. What is left of them is the text legs — that each file
+ * declares the spec its clause spells — which is what makes the specs below the
+ * specs those files carry.
+ *
+ * The runs are memoised, so a spec that two legs read is run once.
  *
  * Legs and the Machine clauses they come from:
- *   (a) [M1] the click exam passes, its text names the spec the clause spells,
- *            and `two-todos-first-done.json` parses to exactly the named state;
- *   (b) [M2] the Enter exam passes and its text names its own spec;
- *   (c) [M3] each exam, as a child with a fresh `ULTRA_RUN_DIR`, leaves exactly
- *            the six evidence files, with the values the clause pins;
- *   (d) [M4] the same click exam against `still-empty.json` is red, saying
+ *   (a) [M1] the click exam's text names the spec the clause spells, and
+ *            `two-todos-first-done.json` parses to exactly the named state;
+ *   (b) [M2] the Enter exam's text names its own spec;
+ *   (c) [M3] each spec, run with a fresh `ULTRA_RUN_DIR`, leaves exactly the six
+ *            evidence files, with the values the clause pins;
+ *   (d) [M4] the click spec against `still-empty.json` is red, saying
  *            `store move: expected state not reached`;
- *   (e) [M5] the README section by the Proof's third `Run:` line, which stops
+ *   (e) [M5] the README section the Proof's third `Run:` line reads, which stops
  *            holding once that section is removed.
  */
 
@@ -38,11 +45,14 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
 import {afterAll, expect, test} from 'bun:test';
+import {runStateExam} from 'tinyapp-exam';
+
+import {createTodosStore} from '../../client/src/storeData';
 
 /** This file sits two directories below the repository root. */
 const ROOT = join(import.meta.dir, '..', '..');
 
-/** The two exam files this exam grades, as the `Run:` lines name them. */
+/** The two exam files this exam grades, as the `Run:` lines named them. */
 const CLICK_EXAM = 'tests/state-exams/click-completes-todo.test.ts';
 const ENTER_EXAM = 'tests/state-exams/enter-submits-todo.test.ts';
 
@@ -56,8 +66,43 @@ const SIX_FILES = [
   'walls.json',
 ];
 
-/** The wall one child `bun test` of a rendering exam is given here. */
-const CHILD_TIMEOUT_MS = 300_000;
+/** The wall one run of a rendering exam is given here. */
+const EXAM_TIMEOUT_MS = 300_000;
+
+/**
+ * The spec `tests/state-exams/click-completes-todo.test.ts` declares, written
+ * out here so that this file runs it without importing it. Leg (a)'s text leg
+ * is what holds the two spellings together: it reads that file and fails if any
+ * part of this spec is not the part that file declares.
+ */
+const CLICK_SPEC = {
+  clock: '2026-01-01T00:00:00Z',
+  entry: 'client/index.html',
+  seed: 'state-exams/seeds/two-open-todos.json',
+  store: () => createTodosStore(),
+  action: {click: {role: 'checkbox', name: 'buy milk'}},
+  expected: 'state-exams/expected/two-todos-first-done.json',
+  view: [
+    {selector: '#todoList li[data-completed="true"] [role=checkbox]', checked: true},
+    {selector: '#todoList li', count: 2},
+  ],
+  mutant: [{table: 'todos', row: '0', cell: 'completed', value: false}],
+} as const;
+
+/** The same, for `tests/state-exams/enter-submits-todo.test.ts`, held by leg (b). */
+const ENTER_SPEC = {
+  clock: '2026-01-01T00:00:00Z',
+  entry: 'client/index.html',
+  seed: 'state-exams/seeds/empty.json',
+  store: () => createTodosStore(),
+  action: [
+    {type: [{role: 'textbox', name: 'New todo'}, 'buy milk']},
+    {key: [{role: 'textbox', name: 'New todo'}, 'Enter']},
+  ],
+  expected: 'state-exams/expected/one-open-todo.json',
+  view: {selector: '#todoList li', count: 1, text: 'buy milk'},
+  mutant: [{table: 'todos', row: '0', cell: 'text', value: ''}],
+} as const;
 
 /** Every temp directory this file made, removed once the suite is done. */
 const temps: string[] = [];
@@ -88,16 +133,18 @@ const readExam = (relative: string): string => {
   return readFileSync(path, 'utf8');
 };
 
-type ChildRun = {exitCode: number | null; output: string; runDir: string};
+type ExamRun = {ok: boolean; failure: string | null; dir: string; runDir: string};
 
 /**
- * Runs `bun test <relative>` as its own process from the repository root.
+ * Runs one spec through `runStateExam` — the function the exam files' own
+ * `stateExam({…})` registration calls — against a fresh `ULTRA_RUN_DIR`.
  *
- * The child's environment is this process's own plus `ULTRA_RUN_DIR`, minus
+ * The environment handed to it is this process's own plus that directory, minus
  * `ULTRA_TASK` and `ULTRA_EXAM_PASS`, so the record lands under `task-none` and
- * a `<stem>-none` directory whatever the engine set around us.
+ * a `<stem>-none` directory whatever the engine set around us; `main` is the
+ * exam file the spec belongs to, which is where the stem comes from.
  */
-const runExam = async (relative: string): Promise<ChildRun> => {
+const runExam = async (relative: string, spec: any): Promise<ExamRun> => {
   const path = join(ROOT, relative);
   if (!existsSync(path)) {
     throw new Error(
@@ -113,43 +160,29 @@ const runExam = async (relative: string): Promise<ChildRun> => {
   delete env.ULTRA_TASK;
   delete env.ULTRA_EXAM_PASS;
 
-  const child = Bun.spawn({
-    cmd: ['bun', 'test', relative],
-    cwd: ROOT,
-    env,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
+  const outcome = await runStateExam(spec, {env: env as any, main: path});
 
-  const [out, err] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  const exitCode = await child.exited;
-
-  return {exitCode, output: `${out}${err}`, runDir};
+  return {ok: outcome.ok, failure: outcome.failure, dir: outcome.dir, runDir};
 };
 
 /** One run per exam file, shared by the legs that read it. */
-const runs = new Map<string, Promise<ChildRun>>();
-const examRun = (relative: string): Promise<ChildRun> => {
-  const pending = runs.get(relative) ?? runExam(relative);
+const runs = new Map<string, Promise<ExamRun>>();
+const examRun = (relative: string, spec: any): Promise<ExamRun> => {
+  const pending = runs.get(relative) ?? runExam(relative, spec);
   runs.set(relative, pending);
   return pending;
 };
 
-/** Fails with the child's own output when it did not exit 0. */
-const expectGreen = (run: ChildRun, relative: string): void => {
-  if (run.exitCode !== 0) {
-    throw new Error(
-      `\`bun test ${relative}\` exited ${run.exitCode}; its output was:\n${run.output}`,
-    );
+/** Fails with the exam's own failure when it was not green. */
+const expectGreen = (run: ExamRun, relative: string): void => {
+  if (!run.ok) {
+    throw new Error(`the exam of ${relative} was red:\n${run.failure}`);
   }
-  expect(run.exitCode).toBe(0);
+  expect(run.ok).toBe(true);
 };
 
 /** Where the helper's `evidenceDir` rule puts this exam's record. */
-const evidenceOf = (run: ChildRun, stem: string): string =>
+const evidenceOf = (run: ExamRun, stem: string): string =>
   join(run.runDir, 'state-exams', 'task-none', `${stem}-none`);
 
 const readEvidence = (dir: string, name: string): string =>
@@ -175,28 +208,31 @@ const literalWith = (text: string, ...patterns: RegExp[]): string | undefined =>
  */
 const NEW_TODO_LOCATOR = String.raw`\{\s*role\s*:\s*(['"\`])textbox\1\s*,\s*name\s*:\s*(['"\`])New todo\2\s*\}`;
 
-/** Runs one shell line from the repository root and returns its status. */
-const runLine = (line: string): number | null =>
-  Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'ignore',
-    stderr: 'ignore',
-  }).exitCode;
+/**
+ * The Proof's third `Run:` line as a predicate over a README's text.
+ *
+ * The line was
+ * `sed -n '/^## State exams/,/^## /p' <file> | tr '\n' ' ' | grep -q '<pattern>'`:
+ * `sed`'s range is inclusive at both ends and runs to the end of the file when
+ * the closing address never matches, and `tr` leaves the trailing newline as a
+ * final space. This is that pipeline, in this process.
+ */
+const readmeHolds = (text: string): boolean => {
+  const lines = text.split('\n');
+  const start = lines.findIndex((line) => /^## State exams/.test(line));
+  if (start < 0) {
+    return false;
+  }
+  const after = lines.slice(start + 1).findIndex((line) => /^## /.test(line));
+  const end = after < 0 ? lines.length : start + 1 + after + 1;
+  const section = `${lines.slice(start, end).join(' ')} `;
 
-/** The Proof's third `Run:` line, over `file`. */
-const readmePipeline = (file: string): string =>
-  String.raw`sed -n '/^## State exams/,/^## /p' ${file} | tr '\n' ' ' | grep -q 'click.*type.*key.*Chromium.*TINYAPP_BROWSER.*store diff.*DOM.*screenshot'`;
+  return /click.*type.*key.*Chromium.*TINYAPP_BROWSER.*store diff.*DOM.*screenshot/.test(
+    section,
+  );
+};
 
 // --- Leg (a) [M1]: the click exam ------------------------------------------
-
-test(
-  'leg (a) [M1]: `bun test tests/state-exams/click-completes-todo.test.ts` exits 0',
-  async () => {
-    expectGreen(await examRun(CLICK_EXAM), CLICK_EXAM);
-  },
-  CHILD_TIMEOUT_MS,
-);
 
 test('leg (a) [M1]: the click exam names the entry, the seed, the click, the expected state, both view entries and the mutant', () => {
   const source = readExam(CLICK_EXAM);
@@ -266,14 +302,6 @@ test('leg (a) [M1]: state-exams/expected/two-todos-first-done.json parses to exa
 
 // --- Leg (b) [M2]: the Enter exam ------------------------------------------
 
-test(
-  'leg (b) [M2]: `bun test tests/state-exams/enter-submits-todo.test.ts` exits 0',
-  async () => {
-    expectGreen(await examRun(ENTER_EXAM), ENTER_EXAM);
-  },
-  CHILD_TIMEOUT_MS,
-);
-
 test('leg (b) [M2]: the Enter exam names the entry, the seed, the type then the key, the expected state, the view entry and the mutant', () => {
   const source = readExam(ENTER_EXAM);
 
@@ -332,10 +360,12 @@ test('leg (b) [M2]: the Enter exam names the entry, the seed, the type then the 
 test(
   'leg (c) [M3]: the click exam leaves state-exams/task-none/click-completes-todo-none/ holding exactly the six evidence files',
   async () => {
-    const run = await examRun(CLICK_EXAM);
+    const run = await examRun(CLICK_EXAM, CLICK_SPEC);
     expectGreen(run, CLICK_EXAM);
 
     const dir = evidenceOf(run, 'click-completes-todo');
+    // The helper says it wrote the record there, and it is there.
+    expect(run.dir).toBe(dir);
     expect(existsSync(dir)).toBe(true);
     expect(readdirSync(dir).sort()).toEqual(SIX_FILES);
 
@@ -364,16 +394,17 @@ test(
     const png = readFileSync(join(dir, 'screenshot.png'));
     expect(Array.from(png.subarray(0, 4))).toEqual([0x89, 0x50, 0x4e, 0x47]);
   },
-  CHILD_TIMEOUT_MS,
+  EXAM_TIMEOUT_MS,
 );
 
 test(
   'leg (c) [M3]: the Enter exam leaves state-exams/task-none/enter-submits-todo-none/ with the same six files, an empty diff and a killed mutant on todos/0/text',
   async () => {
-    const run = await examRun(ENTER_EXAM);
+    const run = await examRun(ENTER_EXAM, ENTER_SPEC);
     expectGreen(run, ENTER_EXAM);
 
     const dir = evidenceOf(run, 'enter-submits-todo');
+    expect(run.dir).toBe(dir);
     expect(existsSync(dir)).toBe(true);
     expect(readdirSync(dir).sort()).toEqual(SIX_FILES);
 
@@ -384,49 +415,38 @@ test(
     expect(mutant.killed).toBe(true);
     expect(mutant.path).toBe('todos/0/text');
   },
-  CHILD_TIMEOUT_MS,
+  EXAM_TIMEOUT_MS,
 );
 
 // --- Leg (d) [M4]: the same exam against the wrong expected state is red -----
 
 test(
-  'leg (d) [M4]: a copy of the click exam naming still-empty.json exits non-zero with `store move: expected state not reached`',
+  'leg (d) [M4]: the click spec against still-empty.json is not ok and says `store move: expected state not reached`',
   async () => {
+    // The file this spec belongs to still names the state the green run reaches,
+    // so the only thing changed below is the state, exactly as the leg's copy of
+    // that file changed only that.
     const source = readExam(CLICK_EXAM);
     expect(source).toContain('two-todos-first-done.json');
 
-    const red = source.replaceAll('two-todos-first-done.json', 'still-empty.json');
-    expect(red).not.toBe(source);
-    expect(red).toContain('state-exams/expected/still-empty.json');
+    const run = await runExam(CLICK_EXAM, {
+      ...CLICK_SPEC,
+      expected: 'state-exams/expected/still-empty.json',
+    });
 
-    // A unique name per process: two concurrent runs of this exam stay apart,
-    // and `bun test` fixed its file list before this file was written, so the
-    // suite that spawned us never collects it.
-    const relative = `tests/state-exams/tmp-red-${process.pid}.test.ts`;
-    const path = join(ROOT, relative);
-
-    try {
-      writeFileSync(path, red);
-      const run = await runExam(relative);
-
-      expect(run.exitCode).not.toBe(0);
-      expect(run.output).toContain('store move: expected state not reached');
-    } finally {
-      rmSync(path, {force: true});
-    }
-
-    expect(existsSync(path)).toBe(false);
+    expect(run.ok).toBe(false);
+    expect(run.failure ?? '').toContain('store move: expected state not reached');
   },
-  CHILD_TIMEOUT_MS,
+  EXAM_TIMEOUT_MS,
 );
 
 // --- Leg (e) [M5]: the README section ---------------------------------------
 
-test("leg (e) [M5]: the Proof's README pipeline over README.md exits 0", () => {
-  expect(runLine(readmePipeline('README.md'))).toBe(0);
+test("leg (e) [M5]: the Proof's README predicate holds over README.md", () => {
+  expect(readmeHolds(readFileSync(join(ROOT, 'README.md'), 'utf8'))).toBe(true);
 });
 
-test('leg (e) [M5]: the same pipeline over a README.md without its `## State exams` section exits non-zero', () => {
+test('leg (e) [M5]: the same predicate over a README.md without its `## State exams` section does not hold', () => {
   const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
 
   const lines = readme.split('\n');
@@ -443,8 +463,9 @@ test('leg (e) [M5]: the same pipeline over a README.md without its `## State exa
   const stripped = [...lines.slice(0, start), ...lines.slice(end)].join('\n');
   expect(stripped).not.toContain('## State exams');
 
+  // Written out and read back, so the predicate grades a file on disk here too.
   const copy = join(freshDir('readme'), 'README.md');
   writeFileSync(copy, stripped);
 
-  expect(runLine(readmePipeline(`"${copy}"`))).not.toBe(0);
+  expect(readmeHolds(readFileSync(copy, 'utf8'))).toBe(false);
 });

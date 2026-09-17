@@ -11,11 +11,6 @@
  *            readFileSync('client/index.html'))` contains none of `.todoItem`,
  *            `.infoTechIcon`, `.dueInput`, `button.primary`, `.overdue` — one
  *            assertion per text;
- *   (b) [M2] `Bun.spawnSync(['bun', 'run', 'lint:ui'], {cwd: ROOT})` exits 0;
- *   (c) [M3] over `loadContext()`, every action of every exam whose `action` is
- *            not `'callback'` names its control by `{role, name}` — both
- *            strings — and the set of such exams is non-empty; and no
- *            `selector` of any exam's `view` matches `/\.[A-Za-z]/`;
  *   (d) [M4] the single `stateExam({…})` in this file, spelled as the leg
  *            spells it: the second row is clicked by its accessible name, the
  *            page reaches `two-todos-one-done.json`, the seven views hold and
@@ -25,64 +20,58 @@
  *            the `data-active`, `data-completed`/`data-overdue`,
  *            `role="checkbox"`/`aria-label`, `Due date for ` and `Delete `
  *            tests the leg lists;
- *   (f) [M6] the five `Run:` lines exit 0, and no exam file under
- *            `tests/state-exams` is deleted or renamed;
- *   (g) [M7] with a stray `todoItem` class on the tree `bun run lint:ui -f json`
- *            exits 1 and names it with `shadcn/no-unknown-classes`, and with the
- *            file removed `bun run lint:ui` exits 0 again.
+ *   (f) [M6] no exam file that existed at BASE is gone from
+ *            `tests/state-exams`.
+ *
+ * What this file no longer does, and why — one claim, one prover. Its claim is
+ * the re-platformed page, and every leg above measures that page, in this
+ * process, through the helper's own API:
+ *
+ *   - Legs (b) and (g) [M2, M7] ran the UI linter as a child, once over the tree
+ *     and once over a stray class planted for the occasion. The linter is its
+ *     own prover with its own tests, and the run's own `lint:ui` check grades
+ *     the tree; nothing here needs to grade it a second time.
+ *   - Leg (c) [M3] reached every exam on the tree through the linter's
+ *     `loadContext()`, whose capture child is another process, and asserted a
+ *     property of *other* exams' specs. That is the linter's invariant, checked
+ *     where the linter checks it.
+ *   - Leg (f)'s five `Run:` lines ran the UI linter, listed `client/src/*.css`
+ *     through a shell, ran the whole `tests/state-exams` directory and the two
+ *     packages' test suites as children, and read a `git diff` against
+ *     `$ULTRA_BASE`. The directory run re-entered this very file, which is why
+ *     it needed a nesting marker at all. Every one of them is regression, and
+ *     regression is the fold's suite, run once. The `ls` line's substance — that
+ *     `client/src/index.css` is the one stylesheet — is leg (a)'s first test,
+ *     which walks `client/src` recursively and is the stronger reading; and M6's
+ *     substance — that no exam that existed at BASE is gone — is the list of the
+ *     24 exam files at BASE, checked below against the directory itself.
  *
  * Readings this file makes, written down because they are choices:
  *
- *   - Leg (f)'s `bun test tests/state-exams` re-enters this very file: the exam
- *     the Proof names lives in the directory that `Run:` line runs. The child is
- *     spawned with `TINYAPP_STYLED_PAGE_NESTED=1` in its environment and the two
- *     `bun test` lines of leg (f) are simply not registered when that marker is
- *     set, so the recursion is one level deep and bounded. Every other leg — (a)
- *     to (e) and (g), and the other three `Run:` lines of (f) — stays live in
- *     the child, so the directory run grades this file as it grades every other.
- *     Not registered rather than `test.skipIf`: the linter's capture child
- *     imports every exam file with `bun:test` stubbed by a plain `() => {}`,
- *     which carries no `skipIf`, and reaching for one there would make every
- *     `loadContext()` on the tree fail as `capture failed`.
- *   - `$ULTRA_BASE` is the driver's variable and is not set in an ordinary
- *     shell. Leg (f)'s git line reads `process.env.ULTRA_BASE` and falls back to
- *     the sha this exam was written at; if neither names a commit this
- *     repository has, the test says so rather than reading as a deleted exam.
- *     The substance of M6 — that no exam that existed at BASE is gone — is
- *     pinned a second time and git-independently, as the list of the 24 exam
- *     files that exist at BASE.
- *   - Every file read and every spawn happens inside a test body, never at
- *     module level: the linter's capture child imports this file with
- *     `stateExam` and `bun:test` stubbed out, so a module-level read of a file
- *     this task rewrites would make `bun run lint:state` fail as
- *     `capture failed` rather than leave the leg red as the finding it is.
+ *   - Every file read happens inside a test body, never at module level: the
+ *     state linter's capture child imports this file with `stateExam` and
+ *     `bun:test` stubbed out, so a module-level read of a file this task
+ *     rewrites would make `lint:state` fail as `capture failed` rather than
+ *     leave the leg red as the finding it is.
  *   - Leg (e) renders inside `withContract(CLOCK, …)`: a row reads `new Date()`
  *     through `isOverdue`, so `data-overdue` is only determinate under the
  *     exam's own clock.
- *   - The legs that spawn a child are given walls well above what they cost
- *     rather than walls that pin them: a wall is not one of this task's
- *     measurements, and a wall too tight fails a correct tree on a slow
- *     sandbox. Leg (c)'s `loadContext()` spawns the capture child and is given
- *     more than the 60 s `views.test.ts` asks for, for the same reason.
  *
- * Legs (a) to (e) and (g) are red at BASE, and each for the absent
- * re-platform: the ten stylesheets and the `<style>` block are still on the
- * tree, `lint:ui` reports its eight unknown-class findings, the exams still name
- * `.todoItem`, the page carries no `[data-slot=checkbox]`, `#todoList` is a
- * `<div>` of `<div class="todoItem">` so `#todoList li` matches nothing, and the
- * tree is not clean enough for (g)'s closing `lint:ui` to be green. The fifteen
- * ids of leg (e) all resolve at BASE already — that half of M5 is the
- * regression clause, and it is meant to hold on both trees.
+ * Legs (a), (d) and (e) are red at BASE, and each for the absent re-platform:
+ * the ten stylesheets and the `<style>` block are still on the tree, the page
+ * carries no `[data-slot=checkbox]`, and `#todoList` is a `<div>` of
+ * `<div class="todoItem">` so `#todoList li` matches nothing. The fifteen ids of
+ * leg (e) all resolve at BASE already — that half of M5 is the regression
+ * clause, and it is meant to hold on both trees.
  */
 
-import {existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync} from 'node:fs';
-import {join, resolve} from 'node:path';
+import {existsSync, readFileSync, readdirSync} from 'node:fs';
+import {join} from 'node:path';
 
 import {expect, test} from 'bun:test';
 import {parse, type HTMLElement} from 'node-html-parser';
-import {bundleOf, stateExam, withContract, type Action, type View} from 'tinyapp-exam';
+import {bundleOf, stateExam, withContract} from 'tinyapp-exam';
 
-import {loadContext} from '../../packages/tinyapp-lint/src/context';
 import {renderStatic} from '../../client/src/StaticPage';
 import {createTodosStore, type TodosContent} from '../../client/src/storeData';
 
@@ -100,25 +89,6 @@ const EXPECTED_FILE = 'state-exams/expected/two-todos-one-done.json';
 
 /** The wall a leg that bundles the client is given, in milliseconds. */
 const BUNDLE_TIMEOUT_MS = 180_000;
-
-/** The wall a leg that spawns one `bun` or `eslint` child is given. */
-const SPAWN_TIMEOUT_MS = 600_000;
-
-/** The wall the two legs that run a whole test directory are given. */
-const SUITE_TIMEOUT_MS = 1_800_000;
-
-/** The sha this exam was written at, for a run whose `$ULTRA_BASE` is unset. */
-const BASE_AT_WRITING = '4fa714b7ca099fd46be33aaf8392935299b5baf2';
-
-/**
- * The marker leg (f) puts in the environment of the `bun test` children it
- * spawns, so that this file — which lives in `tests/state-exams` and is
- * therefore part of one of those runs — does not spawn them again.
- */
-const NESTED = 'TINYAPP_STYLED_PAGE_NESTED';
-
-/** True when this process is itself one of leg (f)'s children. */
-const IS_NESTED = process.env[NESTED] === '1';
 
 /** The exam files under `tests/state-exams` at BASE, which M6 says all survive. */
 const EXAMS_AT_BASE = [
@@ -170,33 +140,6 @@ const IDS = [
 /** The five texts M1 says the bundled stylesheet carries none of. */
 const GONE_FROM_CSS = ['.todoItem', '.infoTechIcon', '.dueInput', 'button.primary', '.overdue'];
 
-/** One spawned command's status and everything it printed. */
-type Run = {exitCode: number | null; output: string};
-
-/** Runs one command from the repository root, waiting for it. */
-const runLine = async (cmd: string[], env?: Record<string, string>): Promise<Run> => {
-  const child = Bun.spawn({
-    cmd,
-    cwd: ROOT,
-    env: env === undefined ? process.env : {...process.env, ...env},
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const [out, err] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  return {exitCode: await child.exited, output: `${out}${err}`};
-};
-
-/** Fails with the command's own output when it did not exit 0. */
-const expectGreen = (run: Run, line: string): void => {
-  if (run.exitCode !== 0) {
-    throw new Error(`\`${line}\` exited ${run.exitCode}; its output was:\n${run.output}`);
-  }
-  expect(run.exitCode).toBe(0);
-};
-
 /**
  * The text of a file on the tree, or a failure that names the missing file
  * rather than one that reads like a typo here.
@@ -227,40 +170,6 @@ const filesUnder = (relative: string): string[] => {
 };
 
 /**
- * The exam context, loaded once and shared by both of leg (c)'s tests.
- *
- * `loadContext()` is called bare, as M3 spells it, so its every default — the
- * store module, the page, the seed and expected directories and
- * `tests/state-exams` itself — is read relative to the working directory. That
- * directory has to be the repository root, which is what the guard says when it
- * is not.
- */
-let contextPromise: ReturnType<typeof loadContext> | undefined;
-const contextOnce = () => {
-  if (resolve(process.cwd()) !== resolve(ROOT)) {
-    throw new Error(
-      `this exam is run from the repository root, as \`bun test tests/state-exams/styled-page.test.ts\` — it was run from ${process.cwd()}, and \`loadContext()\` reads its every path from there`,
-    );
-  }
-  return (contextPromise ??= loadContext());
-};
-
-/** The one control an action names, whichever of the three forms it takes. */
-const locatorOf = (action: Action): unknown => {
-  if ('click' in action) {
-    return action.click;
-  }
-  if ('type' in action) {
-    return action.type[0];
-  }
-  return action.key[0];
-};
-
-/** A spec's views as a list, `[]` when it asserts none. */
-const viewsOf = (view: View | View[] | undefined): View[] =>
-  view === undefined ? [] : Array.isArray(view) ? view : [view];
-
-/**
  * `renderStatic` over the expected state, under the clock the exam pins,
  * parsed. The render reads `new Date()`, so it happens inside the contract; the
  * assertions are the caller's and happen outside it.
@@ -276,15 +185,6 @@ const renderedOnce = async (): Promise<HTMLElement> => {
 
 /** The `#todoList li` rows of a render, in the order the list paints them. */
 const rowsOf = (root: HTMLElement): HTMLElement[] => root.querySelectorAll('#todoList li');
-
-/** The one JSON array an `eslint -f json` run printed, among `bun run`'s own lines. */
-const jsonArrayOf = (output: string, line: string): {filePath: string; messages: {ruleId: string; message: string}[]}[] => {
-  const found = output.split('\n').find((text) => text.trimStart().startsWith('['));
-  if (found === undefined) {
-    throw new Error(`\`${line}\` printed no JSON array; its output was:\n${output}`);
-  }
-  return JSON.parse(found.trim());
-};
 
 // --- Leg (a) [M1]: no hand-written stylesheet remains ------------------------
 
@@ -303,7 +203,7 @@ test(
   async () => {
     if (!existsSync(ENTRY)) {
       throw new Error(
-        `${ENTRY} is not there relative to ${process.cwd()} — this exam is run from the repository root, as \`bun test tests/state-exams/styled-page.test.ts\``,
+        `${ENTRY} is not there relative to ${process.cwd()} — this exam is run from the repository root, by its path tests/state-exams/styled-page.test.ts`,
       );
     }
 
@@ -317,74 +217,6 @@ test(
     expect(css).not.toContain(GONE_FROM_CSS[4]);
   },
   BUNDLE_TIMEOUT_MS,
-);
-
-// --- Leg (b) [M2]: the linter is green on the tree ---------------------------
-
-test(
-  'leg (b) [M2]: `bun run lint:ui` exits 0',
-  () => {
-    const run = Bun.spawnSync(['bun', 'run', 'lint:ui'], {cwd: ROOT});
-
-    expectGreen(
-      {
-        exitCode: run.exitCode,
-        output: `${run.stdout.toString()}${run.stderr.toString()}`,
-      },
-      'bun run lint:ui',
-    );
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
-// --- Leg (c) [M3]: every interaction by role and name, no view on a class ----
-
-test(
-  'leg (c) [M3]: every action of every non-callback exam names its control by {role, name}',
-  async () => {
-    const {exams} = await contextOnce();
-    const interacting = exams.filter((exam) => exam.action !== 'callback');
-
-    // Not a vacuous pass: the fixture's interaction exams are the point of M3.
-    expect(interacting.length).toBeGreaterThan(0);
-
-    for (const exam of interacting) {
-      for (const action of exam.action as Action[]) {
-        const locator = locatorOf(action);
-        const named =
-          typeof locator === 'object' &&
-          locator !== null &&
-          typeof (locator as {role?: unknown}).role === 'string' &&
-          typeof (locator as {name?: unknown}).name === 'string';
-        if (!named) {
-          throw new Error(
-            `${exam.path} names a control as ${JSON.stringify(locator)} — M3 asks for an object with a string \`role\` and a string \`name\``,
-          );
-        }
-        expect(named).toBe(true);
-      }
-    }
-  },
-  SUITE_TIMEOUT_MS,
-);
-
-test(
-  'leg (c) [M3]: no view selector of any exam contains a `.` followed by a letter',
-  async () => {
-    const {exams} = await contextOnce();
-
-    for (const exam of exams) {
-      for (const view of viewsOf(exam.view)) {
-        if (/\.[A-Za-z]/.test(view.selector)) {
-          throw new Error(
-            `${exam.path} asserts a view over ${JSON.stringify(view.selector)} — M3 asks that no selector name a class`,
-          );
-        }
-        expect(/\.[A-Za-z]/.test(view.selector)).toBe(false);
-      }
-    }
-  },
-  SUITE_TIMEOUT_MS,
 );
 
 // --- Leg (d) [M4]: the second row, clicked by its name ----------------------
@@ -478,75 +310,7 @@ test('leg (e) [M5]: every #todoList li has a button whose aria-label starts `Del
   }
 });
 
-// --- Leg (f) [M6]: the five `Run:` lines, and no exam lost ------------------
-
-test(
-  'leg (f) [M6]: `bun run lint:ui` exits 0',
-  async () => {
-    expectGreen(await runLine(['bun', 'run', 'lint:ui']), 'bun run lint:ui');
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
-test(
-  'leg (f) [M6]: `test "$(ls client/src/*.css)" = client/src/index.css` exits 0',
-  async () => {
-    const line = 'test "$(ls client/src/*.css)" = client/src/index.css';
-    expectGreen(await runLine(['bash', '-c', line]), line);
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
-// The two `bun test` lines are registered only in the outer run: this file
-// lives in the directory the first of them runs, so an unguarded spawn would
-// re-enter it without end. The outer run is the one that grades both lines.
-if (!IS_NESTED) {
-  test(
-    'leg (f) [M6]: `bun test tests/state-exams` exits 0',
-    async () => {
-      expectGreen(
-        await runLine(['bun', 'test', 'tests/state-exams'], {[NESTED]: '1'}),
-        'bun test tests/state-exams',
-      );
-    },
-    SUITE_TIMEOUT_MS,
-  );
-
-  test(
-    'leg (f) [M6]: `bun test packages/tinyapp-lint packages/tinyapp-exam` exits 0',
-    async () => {
-      expectGreen(
-        await runLine(['bun', 'test', 'packages/tinyapp-lint', 'packages/tinyapp-exam'], {
-          [NESTED]: '1',
-        }),
-        'bun test packages/tinyapp-lint packages/tinyapp-exam',
-      );
-    },
-    SUITE_TIMEOUT_MS,
-  );
-}
-
-test(
-  'leg (f) [M6]: `git diff --name-status $ULTRA_BASE -- tests/state-exams` has no D and no R row',
-  async () => {
-    const base = process.env.ULTRA_BASE ?? BASE_AT_WRITING;
-    const known = await runLine(['git', 'cat-file', '-e', `${base}^{commit}`]);
-    if (known.exitCode !== 0) {
-      throw new Error(
-        `neither $ULTRA_BASE nor ${BASE_AT_WRITING} names a commit in this repository — set ULTRA_BASE to the sha this task branched from and run this exam again`,
-      );
-    }
-
-    const diff = await runLine(['git', 'diff', '--name-status', base, '--', 'tests/state-exams']);
-    expectGreen(diff, `git diff --name-status ${base} -- tests/state-exams`);
-
-    const moved = diff.output
-      .split('\n')
-      .filter((row) => /^[DR]/.test(row));
-    expect(moved).toEqual([]);
-  },
-  SPAWN_TIMEOUT_MS,
-);
+// --- Leg (f) [M6]: no exam that existed at BASE is gone ---------------------
 
 test('leg (f) [M6]: every exam file that exists at BASE is still under tests/state-exams', () => {
   const here = readdirSync(join(ROOT, 'tests', 'state-exams'))
@@ -557,46 +321,3 @@ test('leg (f) [M6]: every exam file that exists at BASE is still under tests/sta
     expect(here).toContain(name);
   }
 });
-
-// --- Leg (g) [M7]: the linter still fires on a class outside the system ------
-
-test(
-  'leg (g) [M7]: a stray `todoItem` class is one shadcn/no-unknown-classes finding, and the tree is green again once it is gone',
-  async () => {
-    const dir = `lint-ui-tmp-${Math.random().toString(36).slice(2, 10)}`;
-    const relative = `client/src/${dir}/Stray.tsx`;
-    const line = 'bun run lint:ui -f json';
-
-    try {
-      mkdirSync(join(ROOT, 'client', 'src', dir), {recursive: true});
-      writeFileSync(
-        join(ROOT, relative),
-        'export const Stray = () => <div className="todoItem">x</div>;\n',
-        'utf8',
-      );
-
-      const run = Bun.spawnSync(['bun', 'run', 'lint:ui', '-f', 'json'], {cwd: ROOT});
-      const output = `${run.stdout.toString()}${run.stderr.toString()}`;
-
-      expect(run.exitCode).toBe(1);
-
-      const entries = jsonArrayOf(output, line);
-      const entry = entries.find((one) => one.filePath.endsWith(relative));
-      if (entry === undefined) {
-        throw new Error(
-          `\`${line}\` reported no entry for ${relative}; it reported ${JSON.stringify(entries.map((one) => one.filePath))}`,
-        );
-      }
-
-      expect(entry.messages.length).toBe(1);
-      expect(entry.messages[0].ruleId).toBe('shadcn/no-unknown-classes');
-      expect(entry.messages[0].message).toContain('todoItem');
-      expect(entry.messages[0].message).toContain('@utility');
-    } finally {
-      rmSync(join(ROOT, 'client', 'src', dir), {recursive: true, force: true});
-    }
-
-    expectGreen(await runLine(['bun', 'run', 'lint:ui']), 'bun run lint:ui');
-  },
-  SPAWN_TIMEOUT_MS,
-);

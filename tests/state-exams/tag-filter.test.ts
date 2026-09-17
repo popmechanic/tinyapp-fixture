@@ -3,7 +3,7 @@
  * the todos wearing that tag".
  *
  * A file's whole state exam is the single `stateExam({…})` in it — a second page
- * bundle in one `bun test` process fails with `Bundle failed`, as
+ * bundle in one test process fails with `Bundle failed`, as
  * `tests/state-exams/interaction-evidence.test.ts`'s header records — so leg (a)
  * is that one call and every other leg is an ordinary `bun:test` block beside
  * it. One test per Proof leg, named for its leg and for the Machine clause it
@@ -21,19 +21,21 @@
  *            chips in alphabetical order; and the untagged state's empty chip
  *            box beside the three status buttons;
  *   (c) [M3] the tag filter composed with the status filter, and a stale tag
- *            forgiven — one test per values half;
- *   (d) [M4] the first `Run:` line — the linter's four test files;
- *   (e) [M4] the second `Run:` line — the three exams that pin `#filterBar` and
- *            the status filter.
+ *            forgiven — one test per values half.
+ *
+ * M4's legs (d) and (e) ran the linter's four test files and three sibling
+ * exams in a child process. One claim, one prover: the linter is graded by its
+ * own tests and by the driver's lint check, and each exam is graded by its own
+ * run, so those two legs are gone from here.
  *
  * Four readings this file makes, written down because the Proof leaves them to
  * the reader:
  *
- *   - Every fixture read, every `renderStatic` and every spawn happens inside a
+ *   - Every fixture read and every `renderStatic` happens inside a
  *     test body, never at module level. The linter's capture child imports this
  *     file with `stateExam` and `bun:test` stubbed out, so a module-level
  *     `readFileSync` of a snapshot file this task has yet to create would make
- *     `bun run lint:state` fail as `capture failed` rather than leave the leg
+ *     the state linter fail as `capture failed` rather than leave the leg
  *     red as the finding it is.
  *   - Legs (b) and (c) render the contents M2 and M3 *name*, written out here as
  *     literals rather than read off disk. M2 and M3 word them as contents, and
@@ -72,11 +74,8 @@ import {assertView, stateExam} from 'tinyapp-exam';
 import {renderStatic} from '../../client/src/StaticPage';
 import {createTodosStore, type TodosContent} from '../../client/src/storeData';
 
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
-
-/** A child `bun test` over a whole suite needs far more than Bun's 5 s. */
-const RUN_LINE_TIMEOUT_MS = 600_000;
 
 /** The two snapshot files M1 names. */
 const SEED_PATH = 'state-exams/seeds/two-todos-second-tagged.json';
@@ -133,25 +132,6 @@ const withValues = (values: Record<string, string>): TodosContent =>
 /** How many times `pattern` matches `html`, `0` when it matches at all. */
 const countMatches = (html: string, pattern: RegExp): number =>
   (html.match(pattern) ?? []).length;
-
-/** One Proof `Run:` line, run from the repository root as the driver runs it. */
-const expectExit0 = (line: string): void => {
-  const run = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const tail = `${run.stdout.toString()}${run.stderr.toString()}`
-    .trim()
-    .split('\n')
-    .slice(-15)
-    .join('\n');
-
-  expect(run.exitCode === 0 ? 'exit 0' : `exit ${run.exitCode}\n${tail}`).toBe(
-    'exit 0',
-  );
-};
 
 // --- Leg (a) [M1]: the one state exam of the file ----------------------------
 
@@ -341,30 +321,3 @@ test("leg (c) [M3] over {tag: 'gone'} both rows show, 2 chips are offered and no
     ]),
   ).toEqual([]);
 });
-
-// --- Legs (d)–(e) [M4]: the two `Run:` lines, run verbatim -------------------
-
-// The linter's four test files read the tree, so the two new snapshot files and
-// this exam land in the lists they compute — the reachability walk reaches the
-// expected state from the new seed in one `setTagFilter` move.
-test(
-  "leg (d) [M4] the Run line `bun test` over the linter's four test files exits 0",
-  () => {
-    expectExit0(
-      'bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts',
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-// And the three exams that pin `#filterBar` and the status filter still pass:
-// an untagged state renders no chip, so `#filterBar button` is still 3 for them.
-test(
-  'leg (e) [M4] the Run line `bun test` over the filter-bar, filter-done and set-filter exams exits 0',
-  () => {
-    expectExit0(
-      'bun test tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/set-filter.test.ts',
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);

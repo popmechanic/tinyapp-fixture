@@ -25,7 +25,7 @@
  *     BASE and are imported statically; the second of those is also what makes
  *     this an interaction exam that bundles at all (Global Constraints, last
  *     bullet: an interaction exam importing nothing from `client/src` fails
- *     under `bun test` with `Bundle failed` before it opens a page).
+ *     under the test runner with `Bundle failed` before it opens a page).
  *   - A row is tied to its row id through the checkbox `id="todo-N"` the
  *     component already renders, and the date box is then required to be
  *     `id="due-N"` for that same N. Reading the id off the markup rather than
@@ -61,8 +61,8 @@ import {
   type TodosContent,
 } from '../../client/src/storeData';
 
-// This file sits two directories below the repository root, which is also
-// `bun test`'s cwd — the fixture reads are anchored there, and so are the
+// This file sits two directories below the repository root, which is also the
+// test runner's cwd — the fixture reads are anchored there, and so are the
 // repository-relative paths the state exam below names.
 const ROOT = resolve(import.meta.dir, '..', '..');
 

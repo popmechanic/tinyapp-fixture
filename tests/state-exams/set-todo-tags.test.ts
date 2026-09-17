@@ -29,10 +29,12 @@
  *            `INVARIANTS[0]` still the entry the linter's exam reads;
  *   (h) [M8] the static render of the tagged state and of the two-open state,
  *            and `#doneCount`'s own span unchanged in both;
- *   (i) [M9] every checked-in seed and expected state still loading to itself;
- *   (j) [M10] the first `Run:` line — the linter's four test files;
- *   (k) [M10] the second `Run:` line — the three `#doneCount`/`#filterBar`
- *            exams.
+ *   (i) [M9] every checked-in seed and expected state still loading to itself.
+ *
+ * M10's legs (j) and (k) ran the linter's four test files and three sibling
+ * exams in a child process. One claim, one prover: the linter is graded by its
+ * own tests and by the driver's lint check, and each exam is graded by its own
+ * run, so those two legs are gone from here.
  *
  * Four readings this file makes, written down because they are choices:
  *
@@ -50,7 +52,7 @@
  *   - Every fixture read happens inside a test body, never at module level: the
  *     linter's capture child imports this file with `stateExam` and `bun:test`
  *     stubbed out, so a module-level `readFileSync` of the expected file this
- *     task has yet to create would make `bun run lint:state` fail as `capture
+ *     task has yet to create would make the state linter fail as `capture
  *     failed` rather than as the finding it is. The one module-level read is
  *     `readdirSync` of the two snapshot directories, which both exist at BASE,
  *     and it is there so that leg (i)'s failing file is the failing test's name.
@@ -79,12 +81,9 @@ import {renderStatic} from '../../client/src/StaticPage';
 import * as sd from '../../client/src/storeData';
 import type {TodosContent} from '../../client/src/storeData';
 
-// This file sits two directories below the repository root, which is also
-// `bun test`'s cwd — the `Run:` lines and the fixture reads are anchored there.
+// This file sits two directories below the repository root, which is also the
+// test runner's cwd — the module and fixture reads are anchored there.
 const ROOT = join(import.meta.dir, '..', '..');
-
-/** A child `bun test` over a whole suite needs far more than Bun's 5 s. */
-const RUN_LINE_TIMEOUT_MS = 600_000;
 
 /** The seven readings `client/src/todoTags.ts` produces. */
 type TagsModule = {
@@ -458,7 +457,7 @@ test('leg (h) [M8] renderStatic over the two-open content paints #taggedCount on
 
 test('leg (h) [M8] both markups still carry the doneCount span byte for byte', () => {
   // The tagged total is its own element beside this span, never a change to it:
-  // `packages/tinyapp-lint/test/lint-cli.test.ts` pins this span verbatim.
+  // the linter's own CLI exam pins this span verbatim.
   const SPAN = '<span id="doneCount">0 of 2 done</span>';
 
   expect(renderStatic(TWO_TODOS_SECOND_TAGGED)).toContain(SPAN);
@@ -492,44 +491,3 @@ test(`leg (i) [M9] ${EXPECTED_PATH} loads through createTodosStore to its own co
 
   expect(snapshot(sd.createTodosStore(content))).toEqual(content);
 });
-
-// --- Legs (j)–(k) [M10]: the two `Run:` lines, run verbatim ------------------
-
-/** One Proof `Run:` line, run from the repository root as the driver runs it. */
-const expectExit0 = (line: string): void => {
-  const run = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const tail = `${run.stdout.toString()}${run.stderr.toString()}`
-    .trim()
-    .split('\n')
-    .slice(-15)
-    .join('\n');
-
-  expect(run.exitCode === 0 ? 'exit 0' : `exit ${run.exitCode}\n${tail}`).toBe(
-    'exit 0',
-  );
-};
-
-test(
-  "leg (j) [M10] the Run line `bun test` over the linter's four test files exits 0",
-  () => {
-    expectExit0(
-      'bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts',
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);
-
-test(
-  'leg (k) [M10] the Run line `bun test` over the done-count, filter-bar and set-filter exams exits 0',
-  () => {
-    expectExit0(
-      'bun test tests/state-exams/done-count.test.ts tests/state-exams/filter-bar.test.ts tests/state-exams/set-filter.test.ts',
-    );
-  },
-  {timeout: RUN_LINE_TIMEOUT_MS},
-);

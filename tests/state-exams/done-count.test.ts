@@ -5,8 +5,8 @@
  * '1', true)`, the expected state of M3, the five-entry view of M5 and the one
  * mutant edit that unticks row 1. Everything a state exam cannot express is an
  * ordinary `bun:test` block beside it — the pure `countTodos` rows of M1, the
- * two JSON fixtures of M3, the schema read-back of M4, and each `Run:` line of
- * M2 executed verbatim so that "exits 0" is asserted as the Proof spells it.
+ * two JSON fixtures of M3, the schema read-back of M4, and each source predicate
+ * of M2 asserted as an in-process read of the file it is about.
  */
 
 import {readFileSync} from 'node:fs';
@@ -23,18 +23,29 @@ import {
 } from '../../client/src/storeData';
 import {countTodos} from '../../client/src/todoCounts';
 
-// This file sits two directories below the repository root, which is also
-// `bun test`'s cwd — the `Run:` lines and the fixture reads are anchored there.
+// This file sits two directories below the repository root, which is also the
+// test runner's cwd — the source reads and the fixture reads are anchored there.
 const ROOT = join(import.meta.dir, '..', '..');
 
-/** Runs one Proof `Run:` line from the repository root and returns its status. */
-const runLine = (line: string): number =>
-  Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'ignore',
-    stderr: 'ignore',
-  }).exitCode;
+/** The text of one repository file, read in this process. */
+const readSource = (...parts: string[]): string =>
+  readFileSync(join(ROOT, ...parts), 'utf8');
+
+/**
+ * The lines from the first one matching `from` through the next one matching
+ * `to`, inclusive — a `sed -n '/from/,/to/p'` range, evaluated in this process.
+ */
+const lineRange = (text: string, from: RegExp, to: RegExp): string[] => {
+  const lines = text.split('\n');
+  const start = lines.findIndex((line) => from.test(line));
+  if (start === -1) return [];
+  const offset = lines.slice(start + 1).findIndex((line) => to.test(line));
+  return offset === -1 ? lines.slice(start) : lines.slice(start, start + offset + 2);
+};
+
+/** How many lines of `text` carry `needle` — a `grep -c` in this process. */
+const countLines = (text: string, needle: string): number =>
+  text.split('\n').filter((line) => line.includes(needle)).length;
 
 const readJson = (...parts: string[]): unknown =>
   JSON.parse(readFileSync(join(ROOT, ...parts), 'utf8'));
@@ -65,55 +76,58 @@ test('leg (c) [M1] countTodos of a two-row table whose rows are both completed i
 
 // --- M2: the span, the top bar's order, and the one lifted Provider ----------
 
-test('leg (d) [M2] the Run line `grep -q \'countTodos(\' client/src/DoneCount.tsx` exits 0', () => {
-  expect(runLine(`grep -q 'countTodos(' client/src/DoneCount.tsx`)).toBe(0);
+test("leg (d) [M2] client/src/DoneCount.tsx carries `countTodos(`", () => {
+  expect(readSource('client', 'src', 'DoneCount.tsx')).toContain('countTodos(');
 });
 
-test('leg (e) [M2] the Run line `grep -q \'id="doneCount"\' client/src/DoneCount.tsx` exits 0', () => {
-  expect(runLine(`grep -q 'id="doneCount"' client/src/DoneCount.tsx`)).toBe(0);
-});
-
-test("leg (f) [M2] the Run line `grep -q 'useTable' client/src/DoneCount.tsx` exits 0", () => {
-  expect(runLine(`grep -q 'useTable' client/src/DoneCount.tsx`)).toBe(0);
-});
-
-test('leg (g) [M2] the Run line `grep -qF \'{done} of {total} done\' client/src/DoneCount.tsx` exits 0', () => {
-  expect(
-    runLine(`grep -qF '{done} of {total} done' client/src/DoneCount.tsx`),
-  ).toBe(0);
-});
-
-test("leg (h) [M2] the Run line `sed -n '/<Title/,/<Info/p' client/src/TopBar.tsx | grep -q 'DoneCount'` exits 0", () => {
-  expect(
-    runLine(
-      `sed -n '/<Title/,/<Info/p' client/src/TopBar.tsx | grep -q 'DoneCount'`,
-    ),
-  ).toBe(0);
-});
-
-test('leg (i) [M2] the Run line `sed -n \'/<Provider>/,/<\\/Provider>/p\' client/src/App.tsx | tr \'\\n\' \' \' | grep -q \'<Provider>.*<TopBar.*<Main.*</Provider>\'` exits 0', () => {
-  expect(
-    runLine(
-      String.raw`sed -n '/<Provider>/,/<\/Provider>/p' client/src/App.tsx | tr '\n' ' ' | grep -q '<Provider>.*<TopBar.*<Main.*</Provider>'`,
-    ),
-  ).toBe(0);
-});
-
-test('leg (j) [M2] the Run lines counting `<Provider>` and `</Provider>` in client/src/App.tsx each exit 0', () => {
-  expect(runLine(`test "$(grep -c '<Provider>' client/src/App.tsx)" -eq 1`)).toBe(
-    0,
+test('leg (e) [M2] client/src/DoneCount.tsx carries `id="doneCount"`', () => {
+  expect(readSource('client', 'src', 'DoneCount.tsx')).toContain(
+    'id="doneCount"',
   );
-  expect(
-    runLine(`test "$(grep -c '</Provider>' client/src/App.tsx)" -eq 1`),
-  ).toBe(0);
 });
 
-test("leg (k) [M2] the Run line `grep -q 'const Main' client/src/App.tsx` exits 0", () => {
-  expect(runLine(`grep -q 'const Main' client/src/App.tsx`)).toBe(0);
+test("leg (f) [M2] client/src/DoneCount.tsx carries `useTable`", () => {
+  expect(readSource('client', 'src', 'DoneCount.tsx')).toContain('useTable');
 });
 
-test("leg (l) [M2] the Run line `grep -q 'useTable' client/src/Store.tsx` exits 0", () => {
-  expect(runLine(`grep -q 'useTable' client/src/Store.tsx`)).toBe(0);
+test('leg (g) [M2] client/src/DoneCount.tsx carries the span text `{done} of {total} done`', () => {
+  expect(readSource('client', 'src', 'DoneCount.tsx')).toContain(
+    '{done} of {total} done',
+  );
+});
+
+test("leg (h) [M2] the `<Title`…`<Info` span of client/src/TopBar.tsx carries `DoneCount`", () => {
+  const span = lineRange(
+    readSource('client', 'src', 'TopBar.tsx'),
+    /<Title/,
+    /<Info/,
+  );
+  expect(span.join('\n')).toContain('DoneCount');
+});
+
+test('leg (i) [M2] the `<Provider>` span of client/src/App.tsx reads `<Provider>` then `<TopBar` then `<Main` then `</Provider>`', () => {
+  const span = lineRange(
+    readSource('client', 'src', 'App.tsx'),
+    /<Provider>/,
+    /<\/Provider>/,
+  );
+  expect(span.join(' ')).toMatch(
+    /<Provider>.*<TopBar.*<Main.*<\/Provider>/,
+  );
+});
+
+test('leg (j) [M2] client/src/App.tsx carries exactly one `<Provider>` line and exactly one `</Provider>` line', () => {
+  const app = readSource('client', 'src', 'App.tsx');
+  expect(countLines(app, '<Provider>')).toBe(1);
+  expect(countLines(app, '</Provider>')).toBe(1);
+});
+
+test("leg (k) [M2] client/src/App.tsx carries `const Main`", () => {
+  expect(readSource('client', 'src', 'App.tsx')).toContain('const Main');
+});
+
+test("leg (l) [M2] client/src/Store.tsx carries `useTable`", () => {
+  expect(readSource('client', 'src', 'Store.tsx')).toContain('useTable');
 });
 
 // --- M3: the seed and the expected state, exactly ----------------------------

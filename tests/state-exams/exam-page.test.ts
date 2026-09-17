@@ -12,7 +12,10 @@
 //       plain `globalThis.window` — no DOM needed, the shape of
 //       `client/test/todos-store.test.ts` leg (e).
 //   (d) [M4] the one `stateExam({…})`: the seeded page still works.
-//   (e) [M5] the Proof's three `Run:` lines, each expected to exit 0.
+//   (e) [M5] the Proof's two documentation lines, read here out of `AGENTS.md`
+//       itself rather than out of a child shell's exit status. The third line of
+//       that leg ran the two BASE render exams as children; it is gone, because
+//       those two exams prove themselves and the fold's suite runs them once.
 //
 // Legs (b) and (c) [M2, M3] — the rendered flagged page — are the other file of
 // this Proof, `client/test/exam-page.test.ts`, because they need a DOM.
@@ -22,7 +25,6 @@
 // would fail this whole file to link, taking legs (d) and (e) down with it. As a
 // namespace lookup the absence is what leg (a) reports, and nothing else.
 
-import {spawnSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 
 import {expect, test} from 'bun:test';
@@ -155,38 +157,36 @@ stateExam({
 });
 
 // ---------------------------------------------------------------------------
-// Leg (e) [M5] — the Proof's three `Run:` lines, run here verbatim from the
-// repository root, each expected to exit 0.
+// Leg (e) [M5] — the Proof's two documentation lines, read here out of
+// `AGENTS.md` in this process rather than out of a child shell's exit status.
 // ---------------------------------------------------------------------------
 
 /**
- * Runs one `Run:` line under `sh` at the repository root and reports its exit
- * status as a string.
+ * `AGENTS.md`'s Key Files section, folded onto one line — the same text the
+ * leg's `sed -n '/^## Key Files/,/^## Working Method/p' AGENTS.md | tr '\n' ' '`
+ * produced, computed here by reading the file.
  *
- * A red line's output is folded into that string rather than asserted on: the
- * leg is the exit status, and a failure should say what the line printed.
+ * `sed`'s range is inclusive at both ends and runs to the end of the file when
+ * the closing address never matches, and `tr` leaves the trailing newline as a
+ * final space; this reproduces all three.
  */
-const run = (line: string): string => {
-  const result = spawnSync('sh', ['-c', line], {cwd: ROOT, encoding: 'utf8'});
-  return result.status === 0
-    ? 'exit 0'
-    : `exit ${result.status}\n${result.stdout ?? ''}${result.stderr ?? ''}`;
+const keyFilesSection = (): string => {
+  const lines = readFileSync(`${ROOT}/AGENTS.md`, 'utf8').split('\n');
+  const start = lines.findIndex((line) => /^## Key Files/.test(line));
+  if (start < 0) {
+    throw new Error('AGENTS.md carries no `## Key Files` heading');
+  }
+  const after = lines.slice(start + 1).findIndex((line) => /^## Working Method/.test(line));
+  const end = after < 0 ? lines.length : start + 1 + after + 1;
+  return `${lines.slice(start, end).join(' ')} `;
 };
-
-const KEY_FILES = String.raw`sed -n '/^## Key Files/,/^## Working Method/p' AGENTS.md | tr '\n' ' '`;
 
 test("leg (e) [M5]: AGENTS.md's Key Files section names __TINYAPP_EXAM__, then __TINYAPP_DB__, then __TINYAPP_PERSISTER__", () => {
   expect(
-    run(`${KEY_FILES} | grep -q '__TINYAPP_EXAM__.*__TINYAPP_DB__.*__TINYAPP_PERSISTER__'`),
-  ).toBe('exit 0');
+    /__TINYAPP_EXAM__.*__TINYAPP_DB__.*__TINYAPP_PERSISTER__/.test(keyFilesSection()),
+  ).toBe(true);
 });
 
 test("leg (e) [M5]: AGENTS.md's Key Files section still carries its BASE sentence, __TINYAPP_STORE__ followed later by 'normal page'", () => {
-  expect(run(`${KEY_FILES} | grep -q '__TINYAPP_STORE__.*normal page'`)).toBe('exit 0');
-});
-
-test('leg (e) [M5]: bun test over the two BASE render exams exits 0', () => {
-  expect(
-    run('bun test client/test/seeded-store.test.ts client/test/seeded-store-global.test.ts'),
-  ).toBe('exit 0');
+  expect(/__TINYAPP_STORE__.*normal page/.test(keyFilesSection())).toBe(true);
 });

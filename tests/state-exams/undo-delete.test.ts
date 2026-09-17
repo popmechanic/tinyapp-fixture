@@ -2,13 +2,14 @@
  * The exam for Task 2 — "The Undo button — shown only while a deleted todo
  * waits, gone once pressed".
  *
- * A file's whole state exam is the single `stateExam({…})` in it, as
- * `clear-completed.test.ts` and `filter-bar.test.ts` show (a second page bundle
- * in one `bun test` process fails with `Bundle failed`), so leg (a) is that one
- * call plus the block that pins the expected file it names, and every other leg
- * is an ordinary `bun:test` block beside it: the static render of M2 (b), the
- * static render of M3 (c), and each of the five `Run:` lines of M4 (d)–(h),
- * spawned as the Proof spells them.
+ * A file's whole state exam is the single `stateExam({…})` in it, as the
+ * clear-completed and filter-bar exams show (a second page bundle in one test
+ * runner process fails with `Bundle failed`), so leg (a) is that one call plus
+ * the block that pins the expected file it names, and every other leg is an
+ * ordinary `bun:test` block beside it: the static render of M2 (b), the static
+ * render of M3 (c), and the five source predicates of M4 (d)–(h), each read
+ * here out of the app file it names rather than out of a child `grep`'s exit
+ * status — the same predicate over the same file, in this process.
  *
  * `renderStatic` is `react-dom/server` and calls no `Bun.build`, so legs (b) and
  * (c) cost no second bundle — and it is the linter's own render, so the markup
@@ -19,17 +20,17 @@
  *
  *   - Nothing here imports `client/src/UndoDelete.tsx`. A named import of a
  *     module this task has yet to create would be one load error for the whole
- *     file; M4 is reached by its five greps instead, which is how the Proof
- *     words it, so each missing part of the contract is its own red.
+ *     file; M4 is reached by reading that file's text instead, which is how the
+ *     Proof words it, so each missing part of the contract is its own red.
  *   - Every fixture read happens inside a test body, never at module level, for
- *     the reason `filter-bar.test.ts` records: the linter's capture child
+ *     the reason the filter-bar exam records: the state linter's capture child
  *     imports this file with `stateExam` and `bun:test` stubbed out.
  *   - Leg (c) and leg (a)'s expected-file block are green at BASE and are meant
  *     to be — they pin the negative edge and the restored file. The file's red
  *     at BASE is the missing button: the second click of leg (a) fails with
  *     `act: no element matches #undoDelete`, the render of leg (b) carries no
- *     `id="undoDelete"`, and the four greps over a `client/src/UndoDelete.tsx`
- *     that does not exist yet exit non-zero.
+ *     `id="undoDelete"`, and the four predicates over a
+ *     `client/src/UndoDelete.tsx` that does not exist yet find no such file.
  *
  * Nothing in this file lists the tables of `TABLES_SCHEMA`, the cells of a todos
  * row or the store's values, and no `due` cell is named anywhere in it: two
@@ -48,7 +49,7 @@ import {stateExam} from 'tinyapp-exam';
 import {renderStatic} from '../../client/src/StaticPage';
 import {createTodosStore, type TodosContent} from '../../client/src/storeData';
 
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
 
 /**
@@ -79,19 +80,16 @@ const FIRST_TRASHED: TodosContent = [
 const readJson = (...parts: string[]): unknown =>
   JSON.parse(readFileSync(join(ROOT, ...parts), 'utf8'));
 
-/** Runs one Proof `Run:` line from the repository root, as the driver runs it. */
-const runLine = (line: string): number => {
-  const child = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  if (child.exitCode !== 0) {
-    console.error(child.stdout.toString());
-    console.error(child.stderr.toString());
+/**
+ * One app file's text, or a failure naming the file the task has yet to write —
+ * the reading a `grep -q` over an absent path used to report as a non-zero exit.
+ */
+const sourceOf = (relative: string): string => {
+  try {
+    return readFileSync(join(ROOT, relative), 'utf8');
+  } catch {
+    throw new Error(`${relative} does not exist — this task creates it`);
   }
-  return child.exitCode;
 };
 
 // --- Leg (a) [M1]: the expected file the state exam below names --------------
@@ -127,39 +125,20 @@ test('leg (c) [M3] renderStatic over the two-open-todos content carries no undoD
   expect(renderStatic(TWO_OPEN_TODOS)).not.toContain('undoDelete');
 });
 
-// --- Legs (d)–(h) [M4]: the five `Run:` lines, run verbatim ------------------
+// --- Legs (d)–(h) [M4]: the five source predicates, read in this process -----
 
 // (d) the component is exported; (e) it calls the callback; (f) it reads the
-// provided store; (g) it reads the `trash` table; (h) the list mounts it.
-for (const [leg, what, line] of [
-  [
-    'd',
-    'the component is exported',
-    `grep -q 'export const UndoDelete' client/src/UndoDelete.tsx`,
-  ],
-  [
-    'e',
-    'it calls the callback',
-    `grep -q 'undoDelete(' client/src/UndoDelete.tsx`,
-  ],
-  [
-    'f',
-    'it reads the provided store',
-    `grep -q 'useStore(STORE_ID)' client/src/UndoDelete.tsx`,
-  ],
-  [
-    'g',
-    'it reads the trash table',
-    `grep -q "useTable('trash'" client/src/UndoDelete.tsx`,
-  ],
-  [
-    'h',
-    'the list mounts it',
-    `grep -q '<UndoDelete />' client/src/TodoList.tsx`,
-  ],
+// provided store; (g) it reads the `trash` table; (h) the list mounts it. Each
+// needle is the literal the leg's `grep -q` searched for, over the same file.
+for (const [leg, what, file, needle] of [
+  ['d', 'the component is exported', 'client/src/UndoDelete.tsx', 'export const UndoDelete'],
+  ['e', 'it calls the callback', 'client/src/UndoDelete.tsx', 'undoDelete('],
+  ['f', 'it reads the provided store', 'client/src/UndoDelete.tsx', 'useStore(STORE_ID)'],
+  ['g', 'it reads the trash table', 'client/src/UndoDelete.tsx', "useTable('trash'"],
+  ['h', 'the list mounts it', 'client/src/TodoList.tsx', '<UndoDelete />'],
 ] as const) {
-  test(`leg (${leg}) [M4] the Run line \`${line}\` exits 0 — ${what}`, () => {
-    expect(runLine(line)).toBe(0);
+  test(`leg (${leg}) [M4] ${file} carries \`${needle}\` — ${what}`, () => {
+    expect(sourceOf(file)).toContain(needle);
   });
 }
 
