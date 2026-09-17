@@ -1,0 +1,191 @@
+{
+  "integrationBranch": "ultra/integration-run-30",
+  "baseSha": "2e7de8315b69f3e6620dbcf41898feb4dd75e7e3",
+  "setupSha": null,
+  "waves": [
+    [
+      "1",
+      "2"
+    ],
+    [
+      "3"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 3 (interface)",
+    "2 -> 4 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "0f2d5ff75ecb1bf0875e2b56f43245eb588302cc",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-30/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "unverified: the diff changes two shared client modules (`client/src/storeData.ts`'s `exposeStore` condition and `client/src/Store.tsx`'s socket URL) and adds a fourth happy-dom + `mock.module` file to a suite Bun runs in one process, but the only executed evidence over the client is `bun test client/test/sync-origin.test.ts`. The three pre-existing client exams (`exam-page.test.ts`, `seeded-store.test.ts`, `seeded-store-global.test.ts`) each assert `window.__TINYAPP_STORE__` is undefined for an unseeded, unflagged page \u2014 a claim the new `readSyncOrigin() === undefined` term preserves only while no stray `__TINYAPP_SYNC__` survives a file boundary. The new file's `afterEach`/`afterAll` `clearHandles()` is written for exactly that, so this reads as sound; it is simply not settled by the evidence supplied. What would settle it: `bun test client/test` (or the repo's whole-suite command) exiting 0 on this tree. No change to the diff is implied.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789629249594,
+      "stateExams": [],
+      "findings": []
+    },
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "blocked-after-fix",
+      "notes": "Two of the eight red exam tests were a real defect in my code and are now green; the remaining six, and the Proof's `bun test` over the two server tests, are the absent `celld` binary on this image and cannot be moved from inside this tree.\n\nThe defect: `startCelld` removed the disposable copy on both rejection paths (exit-before-ready at src/celld.ts:166, readyMs at :173). The peer exam reads that copy off the recorder probe's argv *after* the rejection \u2014 `<copy>/index.ts`, `wrangler.jsonc`, `tsconfig.json`, `facets/todos.ts`, `generated/facets.ts`, the `node_modules` symlink, `.dev.vars` present or absent \u2014 and removes it itself in `afterAll` (its `litter` array is documented as \"copy directories a rejected start left\"). So the rm was eating the evidence and both (a) probe tests died on ENOENT. That rm was my own prior-round amendment, justified as \"a machine without celld leaves no directory behind\" \u2014 but the fix for that was already in place (the binary is resolved before `mkdtemp`, so a missing binary makes no copy at all), so the rm bought nothing and cost the leg. Removed from both paths; the two rejections now carry `dir` so a caller can remove the copy itself. `terminate()` on the readyMs path is unchanged: SIGTERM, then await its exit, never a hard kill. Exam: 5 pass / 6 fail, up from 3 / 8.\n\nEvery one of the six remaining failures is one error and nothing else \u2014 `celld: no binary \u2014 set CELLD_BIN or put celld on PATH`, 12 occurrences, no other `error:` line in the run. The binary is genuinely absent: not on `PATH`, not at `/usr/local/bin/celld`, and `find / -name 'celld*'` returns only `.ts` files across the clone directories; the npm registry is reachable and answers 404 for `celld`. I checked BASE (2e7de83) out in a throwaway worktree with the workspace `node_modules` symlinked and ran the Proof's own command there \u2014 `bun test server/test/exam-surface.test.ts server/test/recorder.test.ts` gave 0 pass / 2 fail at `server/test/celld.ts:51`, the identical throw. That Run: line is red at BASE on this image for the same reason it is red now, and the BASE helper the task told me to lift byte-for-byte carries the same throw at the same place. No task-1 file can change that, so I am returning BLOCKED rather than DONE_WITH_CONCERNS to stop another fix round being spent on a tool that is not here.\n\nI did not add a missing-binary skip to the exam or to the two server tests: the exam is the peer's measurement and says in its own header that it will not skip, and a test that skips its whole substance is a worse result than one that fails loudly for an absent tool.\n\nNothing here waits on a sibling \u2014 tasks 2, 3 and 4 own no path that could supply celld \u2014 so there is no `blocked-by` edge to record. `work.attention` is `needs-human` with the reason line, the issue is labelled `needs-review`, and the full measurement is in a kata comment. `bun run typecheck` and `bun run lint:state` are clean, the three static Run: lines are green, and I touched none of the paths the two `git diff --quiet` constraint checks cover.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 1,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789629425211,
+      "stateExams": [],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": false,
+    "output": "not run \u2014 no wave merged",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [],
+  "reviewEconomy": {
+    "reviewerMs": 89087,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": false,
+    "output": "index.ts(26,22): error TS2307: Cannot find module './generated/facets' or its corresponding type declarations.\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\nerror: \"tsc\" exited with code 2\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "TEST_FAILED",
+      "detail": "baseline: the suite is RED on BASE \u2014 the sensor is blind for this run; failing: unparsed (index.ts(26,22): error TS2307: Cannot find module './generated/facets' or its corresponding type declarations.\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\nerror: \"tsc\" exited with code 2\n) \u2014 this run inherited that red: no candidate was tested and no reconcile was dispatched against it",
+      "branches": [
+        "2"
+      ]
+    }
+  ],
+  "frontier": [],
+  "coverage": {
+    "tasks_merged": 0,
+    "tasks_planned": 4,
+    "complete": false
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [
+    {
+      "task": "1",
+      "files": [
+        "packages/tinyapp-exam/src/celld.ts",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/surface.ts",
+        "packages/tinyapp-exam/test/celld.test.ts",
+        "server/test/celld.ts",
+        "server/test/exam-surface.test.ts",
+        "server/test/recorder.test.ts"
+      ]
+    },
+    {
+      "task": "3",
+      "files": [
+        "packages/tinyapp-exam/src/browser.ts",
+        "packages/tinyapp-exam/src/convergence-move.ts",
+        "packages/tinyapp-exam/src/evidence.ts",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/types.ts",
+        "packages/tinyapp-exam/test/convergence-move.test.ts",
+        "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+        "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+      ]
+    },
+    {
+      "task": "4",
+      "files": [
+        "AGENTS.md",
+        "README.md",
+        "tests/state-exams/two-pages-converge.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": false,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "baseline: the suite is RED on BASE \u2014 the sensor is blind for this run; failing: unparsed (index.ts(26,22): error TS2307: Cannot find module './generated/facets' or its corresponding type declarations.\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\nerror: \"tsc\" exited with code 2\n) \u2014 the red this run inherited, not the diff's: the run parks before the first fold at the latest, and no reconcile is dispatched at it",
+    "task 1: environment: no celld binary on this image \u2014 not on PATH and not at /usr/local/bin/celld (the image does carry /headless-shell). So `bun test server/test/exam-surface.test.ts server/test/recorder.test.ts` fails here with `celld: no binary \u2014 set CELLD_BIN or put celld on PATH`, and it failed identically on the tree as at BASE before any edit of mine. I verified the import re-point lands correctly (the failure now traces through packages/tinyapp-exam/src/celld.ts, so resolution of 'tinyapp-exam' from server/test works), and exercised startCelld and examSurface against stand-in binaries and a fake root instead. I deliberately did NOT add a missing-binary skip to the two server tests: the task's Context says to keep their form and only re-point the import, and turning a red proof green by skipping the test's whole substance would be gaming the measurement.",
+    "task 1: leg (b) detail, not a defect: the readyMs timeout stops the child with SIGTERM and awaits its exit, per the global constraint's never-a-hard-kill rule. If the exam's 'sleeps and never listens' stand-in is `#!/bin/sh` + `sleep 30`, the sh process does exit but leaves an orphaned `sleep` grandchild that a SIGTERM-only discipline cannot reach; `exec sleep 30` in the script, or asserting on the script by name (pgrep -f <script>) rather than on the grandchild, is the reliable form. The process startCelld itself spawned is always gone.",
+    "task 1: amendment (clause): M1's `serverDir`: resolved as absolute-if-absolute, else against `process.cwd()` when that path exists, else against the workspace root (three directories above `src/`). \u2014 Leg (a) passes the bare relative path `serverDir: 'server'` while the Context describes it as 'relative to the workspace root, which is two directories above the test file'. The clause fixes neither base, so the helper accepts both and the exam is green whether it is run from the repo root or elsewhere.",
+    "task 1: amendment (clause): M3's `events` 'returns `{close()}`': it returns a handle that carries `close()` synchronously and is also awaitable, resolving to `{close}` once the socket is open. \u2014 A transition fanned out while the socket is still CONNECTING reaches no one and never arrives, so leg (d)'s `events(cb)` followed by `fork(...)` would be flaky if the handle could not be awaited. The synchronous `close()` keeps the clause's literal shape.",
+    "task 1: amendment (clause): Added beyond the `Produces:` shape: an `onSpawn(argv, env)` option and `argv`/`env`/`port` fields on the resolved `Celld`; `call(verb, query?)` on the exam surface; exported `CELLD_BUDGET_MB` and `CELLD_READY_MS`. \u2014 Leg (a) asks for the argv and env to be pinned 'by a `startCelld` option or export the exam can read the argv and env through, or by a probe binary script', and leg (d) names `(surface as any).call('nope')`. Since the peer writes the exam and picks one, every route the leg allows is provided. All additions are additive to the Produces contract.",
+    "task 1: amendment (clause): The Context's lifted shape resolved the celld binary after making the temp copy; here it is resolved first. \u2014 A machine without celld otherwise leaves a `tinyapp-celld-*` directory under os.tmpdir() on every call \u2014 the failure this image actually hits. Resolving first makes a missing binary leak nothing, which the global constraint on temp copies asks for.",
+    "task 1: examiner: (e) [M4] \u2014 the fourth `Run:` line, `bun test server/test/exam-surface.test.ts server/test/recorder.test.ts` is green \u2014 An exam proves its own claim through imports and calls and never runs another package's tests; spawning a second test runner is the fold's job, not this exam's. The other three `Run:` facts of leg (e) are encoded as static file reads (`server/test/celld.ts` absent, each server test containing `from 'tinyapp-exam'` and `startCelld` and not `./celld`); the fourth is left to the driver's own `Run:` line.",
+    "task 1: the driver's pre-review pass was red (the Proof's Run: command failed: bun test server/test/exam-surface.test.ts server/test/recorder.test.ts \u2014 exit 1; the Proof's exam failed: bun test packages/tinyapp-exam/test/celld.test.ts \u2014 exit 1) \u2014 one repair round before any reviewer read the patch",
+    "task 1: amendment (clause): The two start rejections (exit-before-ready, readyMs) leave the disposable copy in place instead of removing it, and carry the copy's path as a `dir` property on the thrown Error. This reverses the fourth amendment recorded for this task in the previous round. \u2014 M1 names what the two rejections must carry \u2014 the exit code and stderr, or `readyMs` \u2014 and says nothing about removing the copy. The exam reads the copy after the rejection to check the copy list, the node_modules symlink and `.dev.vars`, and cleans it up itself. The leak the earlier removal was defending against is already prevented by resolving the binary before `mkdtemp`, so the removal only destroyed evidence. `dir` on the error is additive and gives a caller the handle it needs to remove the copy itself."
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M1's `serverDir`: resolved as absolute-if-absolute, else against `process.cwd()` when that path exists, else against the workspace root (three directories above `src/`).",
+      "why": "Leg (a) passes the bare relative path `serverDir: 'server'` while the Context describes it as 'relative to the workspace root, which is two directories above the test file'. The clause fixes neither base, so the helper accepts both and the exam is green whether it is run from the repo root or elsewhere."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M3's `events` 'returns `{close()}`': it returns a handle that carries `close()` synchronously and is also awaitable, resolving to `{close}` once the socket is open.",
+      "why": "A transition fanned out while the socket is still CONNECTING reaches no one and never arrives, so leg (d)'s `events(cb)` followed by `fork(...)` would be flaky if the handle could not be awaited. The synchronous `close()` keeps the clause's literal shape."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "Added beyond the `Produces:` shape: an `onSpawn(argv, env)` option and `argv`/`env`/`port` fields on the resolved `Celld`; `call(verb, query?)` on the exam surface; exported `CELLD_BUDGET_MB` and `CELLD_READY_MS`.",
+      "why": "Leg (a) asks for the argv and env to be pinned 'by a `startCelld` option or export the exam can read the argv and env through, or by a probe binary script', and leg (d) names `(surface as any).call('nope')`. Since the peer writes the exam and picks one, every route the leg allows is provided. All additions are additive to the Produces contract."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "The Context's lifted shape resolved the celld binary after making the temp copy; here it is resolved first.",
+      "why": "A machine without celld otherwise leaves a `tinyapp-celld-*` directory under os.tmpdir() on every call \u2014 the failure this image actually hits. Resolving first makes a missing binary leak nothing, which the global constraint on temp copies asks for."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "The two start rejections (exit-before-ready, readyMs) leave the disposable copy in place instead of removing it, and carry the copy's path as a `dir` property on the thrown Error. This reverses the fourth amendment recorded for this task in the previous round.",
+      "why": "M1 names what the two rejections must carry \u2014 the exit code and stderr, or `readyMs` \u2014 and says nothing about removing the copy. The exam reads the copy after the rejection to check the copy list, the node_modules symlink and `.dev.vars`, and cleans it up itself. The leak the earlier removal was defending against is already prevented by resolving the binary before `mkdtemp`, so the removal only destroyed evidence. `dir` on the error is additive and gives a caller the handle it needs to remove the copy itself."
+    }
+  ],
+  "unfinished": [
+    "3: never dispatched \u2014 the suite was already RED on BASE",
+    "4: never dispatched \u2014 the suite was already RED on BASE"
+  ],
+  "completenessFindings": [],
+  "blockedWaves": [
+    {
+      "wave": 1,
+      "detail": "baseline: the suite is RED on BASE \u2014 the sensor is blind for this run; failing: unparsed (index.ts(26,22): error TS2307: Cannot find module './generated/facets' or its corresponding type declarations.\n$ bun run typecheck && bun test\n$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\nerror: \"tsc\" exited with code 2\n) \u2014 this run inherited that red: no candidate was tested and no reconcile was dispatched against it"
+    }
+  ]
+}
