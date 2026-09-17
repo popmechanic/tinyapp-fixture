@@ -1,0 +1,56 @@
+{
+  "mode": "gate",
+  "stamp": "run-35",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-35/report.json",
+  "branch": "ultra/integration-run-35",
+  "gateCheck": {
+    "verdict": "PASS",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "acks": [],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 0,
+  "suite": {
+    "passed": true,
+    "unattributed": [],
+    "output": "bun test v1.4.2 (744846f84)\n\ntests/state-exams/two-pages-converge.test.ts:\n(pass) convergence exam: two-pages-converge [4511.64ms]\n(pass) leg (a) [M1]: the registration is the one M1 spells, read back in this process [0.29ms]\n(pass) leg (a) [M1]: the first Run: line \u2014 #todo-0's element is the one carrying the todo's words as its name [3.82ms]\n(pass) leg (b) [M2]: the expected file is the persistence exam's own snapshot, and the seed is inside it [0.51ms]\n(pass) leg (b) [M2]: the third Run: line \u2014 the seed carries Learn TinyBase [2.51ms]\n(pass) leg (b) [M2]: the fourth Run: line \u2014 no file under state-exams/ is created or changed [3.30ms]\n(pass) leg (c) [M3]: the same spec run in-process is ok, and leaves the walls and the transitions of the session [4488.79ms]\n(pass) leg (c) [M3]: an expected state that says otherwise fails the exam, naming the species [4492.96ms]\n(pass) leg (d) [M4]: the fifth Run: line \u2014 README's State exams section names celld, CELLD_BIN and TINYAPP_BROWSER [3.64ms]\n(pass) leg (d) [M4]: the sixth Run: line \u2014 AGENTS.md's Verification section is the convergence exam, and the two-clients sentence is gone [4.24ms]\n\n 10 pass\n 0 fail\n 35 expect() calls\nRan 10 tests across 1 file. [13.59s]\n"
+  },
+  "verdict": "PASS"
+}

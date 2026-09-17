@@ -1,0 +1,127 @@
+{
+  "integrationBranch": "ultra/integration-run-35",
+  "baseSha": "7be55c13db331973f1d1b79936b9f03c6ac4360f",
+  "setupSha": null,
+  "waves": [
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [],
+  "tasks": [
+    {
+      "task": "4",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "e355c64498a47f95245aa30875ba3f7548ab92f8",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-35/patches/task-4.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "concern: plan-defect: M1's field list for the registration omits two fields the spec needs, so a `tests/state-exams/two-pages-converge.test.ts` written from M1's words alone is red on its first run. Registered with exactly M1's `server`/`entry`/`module`/actions/`expected`/views/mutant, the exam fails with `act: no element matches role=textbox name=\"New todo\"`: the convergence page is unseeded and unflagged, so `StoreLinks` mounts `useCreatePersister`, `getDb()` fetches `/sqlite3.wasm`, `serveExam` answers the page HTML for every path `assets` does not name, `onReady` never fires, and `client/src/App.tsx` is still painting `<div id=\"loading\">` when `act` runs (evidence from that run: `walls.json` `store_ms` 212, `render` `skipped`, `action_ms` null \u2014 `__TINYAPP_STORE__` is handed out at store creation, so `waitStore` is not the wait that was missing). The registration needs `assets: {'/sqlite3.wasm': 'node_modules/@sqlite.org/sqlite-wasm/dist/sqlite3.wasm'}` \u2014 the same line `tests/state-exams/added-todo-survives-reload.test.ts` already carries for the same page \u2014 plus `clock`, which is required on `ConvergenceExamSpec` and also unnamed by M1. With those two beside M1's fields I measured the exam green. This is a disclosure that M1's list is not exhaustive, not a park: leg (c) is satisfiable and I verified it is. Recorded in full on the kata thread so the exam's author sees it.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "landedAt": 1789665980794,
+      "stateExams": [
+        {
+          "exam": "two-pages-converge",
+          "store_ms": 183.18210699999997,
+          "render_ms": 114.78864599999997,
+          "render": "ran",
+          "action_ms": 33.60925700000007,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "bun test v1.4.2 (744846f84)\n\ntests/state-exams/two-pages-converge.test.ts:\n(pass) convergence exam: two-pages-converge [4511.64ms]\n(pass) leg (a) [M1]: the registration is the one M1 spells, read back in this process [0.29ms]\n(pass) leg (a) [M1]: the first Run: line \u2014 #todo-0's element is the one carrying the todo's words as its name [3.82ms]\n(pass) leg (b) [M2]: the expected file is the persistence exam's own snapshot, and the seed is inside it [0.51ms]\n(pass) leg (b) [M2]: the third Run: line \u2014 the seed carries Learn TinyBase [2.51ms]\n(pass) leg (b) [M2]: the fourth Run: line \u2014 no file under state-exams/ is created or changed [3.30ms]\n(pass) leg (c) [M3]: the same spec run in-process is ok, and leaves the walls and the transitions of the session [4488.79ms]\n(pass) leg (c) [M3]: an expected state that says otherwise fails the exam, naming the species [4492.96ms]\n(pass) leg (d) [M4]: the fifth Run: line \u2014 README's State exams section names celld, CELLD_BIN and TINYAPP_BROWSER [3.64ms]\n(pass) leg (d) [M4]: the sixth Run: line \u2014 AGENTS.md's Verification section is the convergence exam, and the two-clients sentence is gone [4.24ms]\n\n 10 pass\n 0 fail\n 35 expect() calls\nRan 10 tests across 1 file. [13.59s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 26 snapshots and 29 exams in 11072 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- package.json client/package.json server/package.json packages/tinyapp-exam/package.json packages/tinyapp-history/package.json bun.lock",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/index.ts server/facets server/wrangler.jsonc packages/tinyapp-history/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 0,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "yapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [11405.90ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [212.40ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.30ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [10.74ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-gF69d4\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [340.48ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [248.53ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.37ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.39ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [204.92ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.52ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.51ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1623.43ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [293.92ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.77ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [8.27ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.86ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.17ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [10857.86ms]\n\n 688 pass\n 0 fail\n 2171 expect() calls\nRan 688 tests across 59 files. [218.55s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "f2e43361dfd95b70c9475bdbb623803e9e605bb4",
+      "branches": [
+        "4"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-35/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-35/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.474,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 1,
+    "tasks_planned": 1,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 4: plan-defect: M1's field list for the registration omits two fields the spec needs, so a `tests/state-exams/two-pages-converge.test.ts` written from M1's words alone is red on its first run. Registered with exactly M1's `server`/`entry`/`module`/actions/`expected`/views/mutant, the exam fails with `act: no element matches role=textbox name=\"New todo\"`: the convergence page is unseeded and unflagged, so `StoreLinks` mounts `useCreatePersister`, `getDb()` fetches `/sqlite3.wasm`, `serveExam` answers the page HTML for every path `assets` does not name, `onReady` never fires, and `client/src/App.tsx` is still painting `<div id=\"loading\">` when `act` runs (evidence from that run: `walls.json` `store_ms` 212, `render` `skipped`, `action_ms` null \u2014 `__TINYAPP_STORE__` is handed out at store creation, so `waitStore` is not the wait that was missing). The registration needs `assets: {'/sqlite3.wasm': 'node_modules/@sqlite.org/sqlite-wasm/dist/sqlite3.wasm'}` \u2014 the same line `tests/state-exams/added-todo-survives-reload.test.ts` already carries for the same page \u2014 plus `clock`, which is required on `ConvergenceExamSpec` and also unnamed by M1. With those two beside M1's fields I measured the exam green. This is a disclosure that M1's list is not exhaustive, not a park: leg (c) is satisfiable and I verified it is. Recorded in full on the kata thread so the exam's author sees it.",
+    "task 4: every mutant killed (two-pages-converge) \u2014 no reviewer was dispatched (reviewOnStateExams off)"
+  ],
+  "amendments": [],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}

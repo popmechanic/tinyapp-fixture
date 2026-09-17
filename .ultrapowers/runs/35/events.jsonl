@@ -40,3 +40,14 @@
 {"kind":"driver:wave-adopted","wave":1,"tasks":["4"],"headSha":"f2e43361dfd95b70c9475bdbb623803e9e605bb4","why":"end","applied":{"4":"base"},"id":"01M2R6FT800000YRXF4S2B70WT","ts":1789665995008}
 {"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2R6FT9W000071QYFBTHP42M","ts":1789665995068}
 {"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":1,"id":"01M2R6G09N000040JW2C9S9HBS","ts":1789666001205}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":1,"id":"01M2R6GB4K00006F20G3001Z5D","ts":1789666012307}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- package.json client/package.json server/package.json packages/tinyapp-exam/package.json packages/tinyapp-history/package.json bun.lock","exit":0,"minor":false,"wave":1,"id":"01M2R6GB4T0000WKESZDSFZZP8","ts":1789666012314}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- server/index.ts server/facets server/wrangler.jsonc packages/tinyapp-history/src","exit":0,"minor":false,"wave":1,"id":"01M2R6GB530000TXDACZBTVETN","ts":1789666012323}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2R6GBF60000MGA2QS0719FQ","ts":1789666012646}
+{"kind":"driver:stage","stage":"finalize","id":"01M2R6GBG10000FBQ30H22NJ33","ts":1789666012673}
+{"kind":"driver:stage","stage":"gate","id":"01M2R6GBHY000001Z7EZ0QPPSY","ts":1789666012734}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2R6GBP000005C7KEXW57KGM","ts":1789666012864}
+{"kind":"driver:stage","stage":"approve","id":"01M2R6GBP000019BQHNRZEVN39","ts":1789666012864}
+{"kind":"driver:approved","stamp":"run-35","integrationBranch":"ultra/integration-run-35","id":"01M2R6GBQR00008YBE77Q0G4JR","ts":1789666012920}
+{"kind":"run:open","runId":"run-35","base":"7be55c13db331973f1d1b79936b9f03c6ac4360f","source":"fleet/publish-fold.mjs","id":"01M2R6GDDF0000SKS11D4VR8N2","ts":1789666014639}
+{"kind":"driver:publish-fold","run":"35","attempt":"1","base":"7be55c13db331973f1d1b79936b9f03c6ac4360f","tip":"7be55c13db331973f1d1b79936b9f03c6ac4360f","candidate":"f2e43361dfd95b70c9475bdbb623803e9e605bb4","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2R6GDT30000ZX4221PBMZCG","ts":1789666015043}
