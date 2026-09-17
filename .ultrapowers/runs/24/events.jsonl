@@ -45,3 +45,4 @@
 {"kind":"transcript:slice","label":"exam:3","sessionId":"0914ae02-59ab-4b82-ada1-11aeb7b39f0e","bytes":11767,"id":"01M2PCCPWY00001BEPP10DNHZH","ts":1789605075870}
 {"kind":"driver:exam-handoff","task":"3","paths":["tests/state-exams/tag-filter.test.ts"],"id":"01M2PCK0390000601KAMGEGWKA","ts":1789605281897}
 {"kind":"driver:proof-run","task":"3","cmd":"bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts packages/tinyapp-lint/test/views.test.ts","exit":0,"iter":0,"id":"01M2PCMVHV0000K0474TS4RZ7F","ts":1789605342779}
+{"kind":"driver:proof-run","task":"3","cmd":"bun test tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/set-filter.test.ts","exit":0,"iter":0,"id":"01M2PCSW3E0000NPZRATZ2R09Y","ts":1789605507182}
