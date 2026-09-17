@@ -1,0 +1,550 @@
+{
+  "ok": true,
+  "stamp": "run-33",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-33"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "4 task(s) in 3 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "add-command",
+      "ok": true,
+      "detail": "no dependencies declared \u2014 nothing to add"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The exam helper owns the runtime and speaks the root's exam surface",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/celld.ts",
+          "packages/tinyapp-exam/src/index.ts",
+          "packages/tinyapp-exam/src/surface.ts",
+          "server/test/celld.ts",
+          "server/test/exam-surface.test.ts",
+          "server/test/recorder.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "`startCelld({ serverDir, exam, budgetMb?, readyMs? }) -> Promise<{ url, ws, dir, port, stop }>`",
+            "`examSurface(url) -> { content, rows, fork, reload, discard, events }`"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "A page under exam dials the exam's own runtime",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "AGENTS.md",
+          "client/src/Store.tsx",
+          "client/src/config.ts",
+          "client/src/storeData.ts",
+          "client/src/vite-env.d.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "`readSyncOrigin() -> string | undefined`",
+            "`syncUrl(module: string) -> string`"
+          ]
+        }
+      },
+      {
+        "id": "3",
+        "title": "The convergence species \u2014 two pages, three-way equality, the session's transitions as evidence",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "packages/tinyapp-exam/src/browser.ts",
+          "packages/tinyapp-exam/src/convergence-move.ts",
+          "packages/tinyapp-exam/src/evidence.ts",
+          "packages/tinyapp-exam/src/index.ts",
+          "packages/tinyapp-exam/src/types.ts",
+          "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+          "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`startCelld({ serverDir, exam, budgetMb?, readyMs? }) -> Promise<{ url, ws, dir, port, stop }>`",
+            "`examSurface(url) -> { content, rows, fork, reload, discard, events }`"
+          ],
+          "produces": [
+            "`runConvergenceExam(spec, opts?) -> Promise<ExamOutcome>`",
+            "`convergenceExam(spec) -> void`",
+            "`ConvergenceExamSpec`"
+          ]
+        }
+      },
+      {
+        "id": "4",
+        "title": "The fixture's convergence exam, registered \u2014 two pages add a todo and agree, the module's rows say so, a third page converges",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "AGENTS.md",
+          "README.md"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`convergenceExam(spec) -> void`",
+            "`syncUrl(module: string) -> string`"
+          ],
+          "produces": [
+            "nothing"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [
+      {
+        "from": "1",
+        "to": "3",
+        "why": "interface"
+      },
+      {
+        "from": "2",
+        "to": "4",
+        "why": "interface"
+      },
+      {
+        "from": "3",
+        "to": "4",
+        "why": "interface"
+      }
+    ],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1",
+        "2"
+      ],
+      [
+        "3"
+      ],
+      [
+        "4"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The exam helper owns the runtime and speaks the root's exam surface",
+          "files": [
+            "packages/tinyapp-exam/src/celld.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/surface.ts",
+            "packages/tinyapp-exam/test/celld.test.ts",
+            "server/test/exam-surface.test.ts",
+            "server/test/recorder.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "`startCelld({ serverDir, exam, budgetMb?, readyMs? }) -> Promise<{ url, ws, dir, port, stop }>`",
+              "`examSurface(url) -> { content, rows, fork, reload, discard, events }`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/celld.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/surface.ts",
+            "server/test/celld.ts",
+            "server/test/exam-surface.test.ts",
+            "server/test/recorder.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/celld.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/celld.test.ts",
+          "proofRuns": [
+            "test ! -e server/test/celld.ts",
+            "grep -q \"from 'tinyapp-exam'\" server/test/exam-surface.test.ts",
+            "grep -q \"from 'tinyapp-exam'\" server/test/recorder.test.ts",
+            "bun test server/test/exam-surface.test.ts server/test/recorder.test.ts"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/celld.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-exam/src/celld.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/surface.ts",
+              "packages/tinyapp-exam/test/celld.test.ts",
+              "server/test/celld.ts",
+              "server/test/exam-surface.test.ts",
+              "server/test/recorder.test.ts"
+            ],
+            "deletes": [
+              "server/test/celld.ts"
+            ],
+            "guards": [
+              "packages/tinyapp-exam/test/celld.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-exam/test/celld.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-exam/test/celld.test.ts": "packages/tinyapp-exam/test/celld.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-exam/test/celld.test.ts"
+            ],
+            "siblingOwned": [
+              "AGENTS.md",
+              "client/src/Store.tsx",
+              "client/src/config.ts",
+              "client/src/storeData.ts",
+              "client/src/vite-env.d.ts",
+              "client/test/sync-origin.test.ts"
+            ],
+            "produces": [
+              "`startCelld({ serverDir, exam, budgetMb?, readyMs? }) -> Promise<{ url, ws, dir, port, stop }>`",
+              "`examSurface(url) -> { content, rows, fork, reload, discard, events }`"
+            ],
+            "consumes": []
+          }
+        },
+        {
+          "id": "2",
+          "title": "A page under exam dials the exam's own runtime",
+          "files": [
+            "AGENTS.md",
+            "client/src/Store.tsx",
+            "client/src/config.ts",
+            "client/src/storeData.ts",
+            "client/src/vite-env.d.ts",
+            "client/test/sync-origin.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "`readSyncOrigin() -> string | undefined`",
+              "`syncUrl(module: string) -> string`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "AGENTS.md",
+            "client/src/Store.tsx",
+            "client/src/config.ts",
+            "client/src/storeData.ts",
+            "client/src/vite-env.d.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "client/test/sync-origin.test.ts"
+          ],
+          "testCmd": "bun test client/test/sync-origin.test.ts",
+          "proofRuns": [
+            "sed -n '/^## Key Files/,/^## Working Method/p' AGENTS.md | tr '\\n' ' ' | grep -q '__TINYAPP_SYNC__.*/sync/todos.*store'",
+            "grep -q '__TINYAPP_SYNC__?: string' client/src/vite-env.d.ts",
+            "grep -q \"^export const SERVER = 'ws://localhost:9876';$\" client/src/config.ts"
+          ],
+          "proofGuards": [
+            "client/test/sync-origin.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "AGENTS.md",
+              "client/src/Store.tsx",
+              "client/src/config.ts",
+              "client/src/storeData.ts",
+              "client/src/vite-env.d.ts",
+              "client/test/sync-origin.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "client/test/sync-origin.test.ts"
+            ],
+            "proofTests": [
+              "client/test/sync-origin.test.ts"
+            ],
+            "landing": {
+              "client/test/sync-origin.test.ts": "client/test/sync-origin.test.ts"
+            },
+            "driverOwned": [
+              "client/test/sync-origin.test.ts"
+            ],
+            "siblingOwned": [
+              "packages/tinyapp-exam/src/celld.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/surface.ts",
+              "packages/tinyapp-exam/test/celld.test.ts",
+              "server/test/celld.ts",
+              "server/test/exam-surface.test.ts",
+              "server/test/recorder.test.ts"
+            ],
+            "produces": [
+              "`readSyncOrigin() -> string | undefined`",
+              "`syncUrl(module: string) -> string`"
+            ],
+            "consumes": []
+          }
+        }
+      ],
+      [
+        {
+          "id": "3",
+          "title": "The convergence species \u2014 two pages, three-way equality, the session's transitions as evidence",
+          "files": [
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/convergence-move.ts",
+            "packages/tinyapp-exam/src/evidence.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/convergence-move.test.ts",
+            "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+            "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`startCelld({ serverDir, exam, budgetMb?, readyMs? }) -> Promise<{ url, ws, dir, port, stop }>`",
+              "`examSurface(url) -> { content, rows, fork, reload, discard, events }`"
+            ],
+            "produces": [
+              "`runConvergenceExam(spec, opts?) -> Promise<ExamOutcome>`",
+              "`convergenceExam(spec) -> void`",
+              "`ConvergenceExamSpec`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "packages/tinyapp-exam/src/browser.ts",
+            "packages/tinyapp-exam/src/convergence-move.ts",
+            "packages/tinyapp-exam/src/evidence.ts",
+            "packages/tinyapp-exam/src/index.ts",
+            "packages/tinyapp-exam/src/types.ts",
+            "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+            "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "packages/tinyapp-exam/test/convergence-move.test.ts"
+          ],
+          "testCmd": "bun test packages/tinyapp-exam/test/convergence-move.test.ts",
+          "proofRuns": [
+            "grep -q 'convergenceExam' packages/tinyapp-exam/src/index.ts",
+            "grep -q 'ConvergenceExamSpec' packages/tinyapp-exam/src/types.ts"
+          ],
+          "proofGuards": [
+            "packages/tinyapp-exam/test/convergence-move.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "packages/tinyapp-exam/src/browser.ts",
+              "packages/tinyapp-exam/src/convergence-move.ts",
+              "packages/tinyapp-exam/src/evidence.ts",
+              "packages/tinyapp-exam/src/index.ts",
+              "packages/tinyapp-exam/src/types.ts",
+              "packages/tinyapp-exam/test/convergence-move.test.ts",
+              "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+              "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+            ],
+            "deletes": [],
+            "guards": [
+              "packages/tinyapp-exam/test/convergence-move.test.ts"
+            ],
+            "proofTests": [
+              "packages/tinyapp-exam/test/convergence-move.test.ts"
+            ],
+            "landing": {
+              "packages/tinyapp-exam/test/convergence-move.test.ts": "packages/tinyapp-exam/test/convergence-move.test.ts"
+            },
+            "driverOwned": [
+              "packages/tinyapp-exam/test/convergence-move.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`runConvergenceExam(spec, opts?) -> Promise<ExamOutcome>`",
+              "`convergenceExam(spec) -> void`",
+              "`ConvergenceExamSpec`"
+            ],
+            "consumes": [
+              "`startCelld({ serverDir, exam, budgetMb?, readyMs? }) -> Promise<{ url, ws, dir, port, stop }>`",
+              "`examSurface(url) -> { content, rows, fork, reload, discard, events }`"
+            ]
+          }
+        }
+      ],
+      [
+        {
+          "id": "4",
+          "title": "The fixture's convergence exam, registered \u2014 two pages add a todo and agree, the module's rows say so, a third page converges",
+          "files": [
+            "AGENTS.md",
+            "README.md",
+            "tests/state-exams/two-pages-converge.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`convergenceExam(spec) -> void`",
+              "`syncUrl(module: string) -> string`"
+            ],
+            "produces": [
+              "nothing"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "AGENTS.md",
+            "README.md"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/two-pages-converge.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/two-pages-converge.test.ts",
+          "proofRuns": [
+            "bun run lint:state",
+            "grep -q 'Learn TinyBase' state-exams/seeds/default-todos.json",
+            "git diff --quiet $ULTRA_BASE -- state-exams",
+            "sed -n '/^## State exams/,/^## /p' README.md | tr '\\n' ' ' | grep -q 'convergence exam.*celld.*CELLD_BIN.*TINYAPP_BROWSER'",
+            "sed -n '/^## Verification/,$p' AGENTS.md | tr '\\n' ' ' | grep -q 'convergence exam' && ! grep -q 'Open the same room URL in two clients' AGENTS.md"
+          ],
+          "proofGuards": [
+            "tests/state-exams/two-pages-converge.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "AGENTS.md",
+              "README.md",
+              "tests/state-exams/two-pages-converge.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/two-pages-converge.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/two-pages-converge.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/two-pages-converge.test.ts": "tests/state-exams/two-pages-converge.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/two-pages-converge.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [],
+            "consumes": [
+              "`convergenceExam(spec) -> void`",
+              "`syncUrl(module: string) -> string`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 Runtimes",
+      "The convergence species \u2014 two pages, three-way equality\u2026",
+      "The fixture's convergence exam, registered \u2014 two pages \u2026"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- No manifest moves: no task adds a package; DoltLite stays in `tinyapp-history` and never enters `tinyapp-exam` or the app; the exam records the session's transitions as JSON and leaves the DoltLite commit to the history package.\n- The server is not edited: the root's exam surface (`content`, `rows`, `fork`, `reload`, `discard`, `events`, `transition`), the module object and the recorder are exactly as at BASE; a task that needs a different verb has found a plan defect and says so.\n- No exam dials anything but loopback: every request a page makes is to the exam's own page origin or the exam's own celld origin, both on 127.0.0.1, and a request anywhere else is failed in the browser before it leaves the machine, as at BASE.\n- A page without the handle is the page at BASE: no seed, no exam flag and no `__TINYAPP_SYNC__` means the client dials `SERVER` exactly as before and exposes nothing on `window`.\n- Every runtime an exam starts is stopped by the exam: SIGTERM to the supervisor, a wait for its exit and for the port to clear, the temp copy removed \u2014 never a hard kill, never a port left held.\n- Findings are about the result \u2014 what the tree, the exams and their evidence now do \u2014 never about the order the work was done in, the number of commits, or whether a test was written before its code.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- package.json client/package.json server/package.json packages/tinyapp-exam/package.json packages/tinyapp-history/package.json bun.lock",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- server/index.ts server/facets server/wrangler.jsonc packages/tinyapp-history/src",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-33/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-33/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-33/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-33/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for addCmd/addDevCmd \u2014 the package-add commands are driver-derived from the same lockfile/manifest beside the bootstrap and stamped in the args file and receipt (only when the plan declares packages); there is no knob for them",
+    "nothing for regenerateCmd \u2014 the lockfile regenerator is derived from the same lockfile/manifest beside the bootstrap (and only when the bootstrap itself was derived) and stamped in the args file and receipt; there is no knob for it",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "regenerateCmd": "bun install",
+  "regenerateCmdSource": "detected:bun-lockfile",
+  "foldTestCmd": "bun test {paths}"
+}
