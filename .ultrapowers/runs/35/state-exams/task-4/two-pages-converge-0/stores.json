@@ -1,0 +1,78 @@
+{
+  "a": [
+    {
+      "todos": {
+        "0": {
+          "text": "buy milk",
+          "completed": false
+        },
+        "1": {
+          "text": "Learn TinyBase",
+          "completed": false
+        },
+        "2": {
+          "text": "Build an app",
+          "completed": false
+        }
+      }
+    },
+    {}
+  ],
+  "b": [
+    {
+      "todos": {
+        "0": {
+          "text": "buy milk",
+          "completed": false
+        },
+        "1": {
+          "text": "Learn TinyBase",
+          "completed": false
+        },
+        "2": {
+          "text": "Build an app",
+          "completed": false
+        }
+      }
+    },
+    {}
+  ],
+  "c": [
+    {
+      "todos": {
+        "0": {
+          "text": "buy milk",
+          "completed": false
+        },
+        "1": {
+          "text": "Learn TinyBase",
+          "completed": false
+        },
+        "2": {
+          "text": "Build an app",
+          "completed": false
+        }
+      }
+    },
+    {}
+  ],
+  "object": [
+    {
+      "todos": {
+        "0": {
+          "text": "buy milk",
+          "completed": false
+        },
+        "1": {
+          "text": "Learn TinyBase",
+          "completed": false
+        },
+        "2": {
+          "text": "Build an app",
+          "completed": false
+        }
+      }
+    },
+    {}
+  ]
+}

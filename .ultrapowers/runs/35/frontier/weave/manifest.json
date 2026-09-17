@@ -1,0 +1,17 @@
+{
+  "wave": 1,
+  "entries": {
+    "AGENTS.md": {
+      "stateBlob": "232e5f3e3008572aba237bc73e2bd89c240b07cf264928dd290b19210290083c",
+      "visibleSha": "6459544194cda3f68d1430b289b617035ea51ca0"
+    },
+    "README.md": {
+      "stateBlob": "7b0c741031f6b350ecfe00fe77f949cb3bc63e666db4a1b9c7fa886d51d63d00",
+      "visibleSha": "eaa2eab6a1a40226a0825cd08b359a2b3c56d942"
+    },
+    "tests/state-exams/two-pages-converge.test.ts": {
+      "stateBlob": "e60adf9390814e35543f92031fea9ccecb1d7eaeb2ad940222e949bb97f95ef3",
+      "visibleSha": "c8a64f8f363789af2da266ec458c022d04723912"
+    }
+  }
+}
