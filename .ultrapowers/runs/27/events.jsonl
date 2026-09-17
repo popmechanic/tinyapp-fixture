@@ -26,3 +26,9 @@
 {"kind":"driver:proof-run","task":"2","cmd":"set -o pipefail; bun test tests/state-exams/type-due-date.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 7)} END {exit !ok}'","exit":0,"iter":0,"id":"01M2PS96210000MTHGE23RFB6Q","ts":1789618591809}
 {"kind":"driver:proof-run","task":"2","cmd":"set -o pipefail; bun test tests/state-exams/mutant-from-diff.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 8)} END {exit !ok}'","exit":0,"iter":0,"id":"01M2PS97DW0000GNM14WHR5YH6","ts":1789618593212}
 {"kind":"driver:proof-run","task":"2","cmd":"! git diff --name-status $ULTRA_BASE | grep -vE '^M[[:space:]]+tests/state-exams/[a-z0-9-]+\\.test\\.ts$|^[AMD][[:space:]]+\\.ultrapowers/'","exit":0,"iter":0,"id":"01M2PS97EA0000FHPHBBNE7AMQ","ts":1789618593226}
+{"kind":"driver:check-run","task":"2","cmd":"bun run lint:ui","exit":0,"minor":false,"iter":0,"id":"01M2PS984D0000F6P23RD3RPE9","ts":1789618593933}
+{"kind":"driver:check-run","task":"2","cmd":"bun run typecheck","exit":0,"minor":false,"iter":0,"id":"01M2PS9EV70000KPZ9N2EVQGCZ","ts":1789618600807}
+{"kind":"driver:check-run","task":"2","cmd":"bun run lint:state","exit":0,"minor":false,"iter":0,"id":"01M2PS9TJY0000GEGT3XBFN26E","ts":1789618612830}
+{"kind":"driver:check-run","task":"2","cmd":"git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock","exit":0,"minor":false,"iter":0,"id":"01M2PS9TK40000KNDEG3A0AT43","ts":1789618612836}
+{"kind":"driver:suite-runs","task":"2","count":0,"slices":1,"id":"01M2PS9TPW00006NRFAH114BP0","ts":1789618612956}
+{"kind":"engine:log","line":"task 2 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2PS9TQ100002068JN3C8436","ts":1789618612961}
