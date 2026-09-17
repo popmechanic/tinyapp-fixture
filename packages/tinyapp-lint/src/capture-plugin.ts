@@ -39,15 +39,25 @@ import {resolve} from 'node:path';
  * storage. So a file whose only top-level call is `persistenceExam(` hands
  * nothing over and is counted as no state exam, which is what the CLI's own
  * exam, counting the files that match `^stateExam\(`, already says it is.
+ *
+ * `convergenceExam` is a no-op for the same reason, and `startCelld` and
+ * `examSurface` are among them because an exam file declaring a convergence
+ * exam is free to name the runtime it runs against.
  */
 const EXAM_NO_OPS = [
   'runStateExam',
   'persistenceExam',
   'runPersistenceExam',
   'contentOf',
+  'convergenceExam',
+  'runConvergenceExam',
+  'startCelld',
+  'examSurface',
   'EXAM_PRELUDE',
   'READY_TIMEOUT_MS',
   'PERSIST_TIMEOUT_MS',
+  'SYNC_TIMEOUT_MS',
+  'CONVERGE_TIMEOUT_MS',
   'STATE_EXAM_TIMEOUT_MS',
   'launchBrowser',
   'withContract',

@@ -12,12 +12,15 @@
 export {actionsOf, isCallbackAction, VALUES_TABLE} from './types';
 export type {
   Cell,
+  ConvergenceExamSpec,
+  ConvergenceRecord,
   Difference,
   ExamRecord,
   ExamStore,
   Locator,
   MutantEdit,
   PersistenceExamSpec,
+  SessionTransition,
   Snapshot,
   StateExamSpec,
   Tables,
@@ -36,6 +39,13 @@ export {
   PERSIST_TIMEOUT_MS,
   READY_TIMEOUT_MS,
 } from './persistence-move';
+
+export {
+  convergenceExam,
+  runConvergenceExam,
+  CONVERGE_TIMEOUT_MS,
+  SYNC_TIMEOUT_MS,
+} from './convergence-move';
 
 export {launchBrowser} from './browser';
 export type {Action, Browser, Page} from './browser';
