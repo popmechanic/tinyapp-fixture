@@ -111,8 +111,8 @@ export type TodosContent = Content<Schemas>;
 export const STORE_ID = 'todos';
 
 // The handles a page hands *out*, declared beside the store they belong to.
-// (The two a harness sets *into* a page — `__TINYAPP_SEED__` and
-// `__TINYAPP_EXAM__` — are declared in `vite-env.d.ts`.)
+// (The three a harness sets *into* a page — `__TINYAPP_SEED__`,
+// `__TINYAPP_EXAM__` and `__TINYAPP_SYNC__` — are declared in `vite-env.d.ts`.)
 //
 // The seeded page hands its store back the way it was handed its seed: on
 // `window`, under a name the exam knows. A normal page leaves no such handle,
@@ -154,9 +154,13 @@ export const createTodosStore = (seed?: TodosContent): TodosStore => {
     ]);
   const created: TodosStore = seed === undefined ? store : store.setContent(seed);
   // A seeded store is exposed as it always was, flag or no flag; an unseeded
-  // one only under the exam flag. Creating an unexposed store on a page that
-  // once held one clears the handle rather than leaving a stale one.
-  exposeStore(seed === undefined && !readExamFlag() ? undefined : created);
+  // one under the exam flag, and — since the sync handle — under that too, so
+  // an exam that points the page at its own runtime can read the very store
+  // the synchronizer syncs. Creating an unexposed store on a page that once
+  // held one clears the handle rather than leaving a stale one.
+  const exposed =
+    seed !== undefined || readExamFlag() || readSyncOrigin() !== undefined;
+  exposeStore(exposed ? created : undefined);
   return created;
 };
 
@@ -334,3 +338,27 @@ export const readSeed = (): TodosContent | undefined =>
  */
 export const readExamFlag = (): boolean =>
   typeof window === 'undefined' ? false : window.__TINYAPP_EXAM__ === true;
+
+/**
+ * The origin an exam handed in for this page to sync to, or none.
+ *
+ * A third mode beside the seed and the exam flag: an ordinary, unseeded,
+ * unflagged page that starts both its links as usual, but dials the origin it
+ * was given rather than the built-in server. Read exactly like the other two,
+ * and as narrowly — only a WebSocket origin counts, so a page carrying the name
+ * under an `http://` URL, a number or `''` is the normal page it was, and
+ * outside a browser (the linter imports this module under Bun) there is no
+ * handle at all.
+ *
+ * `config.ts` is what turns the origin into the URL a module is synced at.
+ */
+export const readSyncOrigin = (): string | undefined => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+  const origin = window.__TINYAPP_SYNC__;
+  return typeof origin === 'string' &&
+    (origin.startsWith('ws://') || origin.startsWith('wss://'))
+    ? origin
+    : undefined;
+};

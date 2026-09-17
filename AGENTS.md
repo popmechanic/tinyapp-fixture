@@ -40,6 +40,13 @@ initial in-memory data does not overwrite persisted data during startup.
   back what it persisted), and it starts no synchronizer and dials no socket.
   Without the flag the page is exactly what it was, and a seeded page is
   unchanged by the flag.
+- `__TINYAPP_SYNC__` is the third handle a harness sets into a page: an
+  unseeded, unflagged page opened with it set to a `ws://` or `wss://` origin
+  syncs to that origin's `/sync/todos` instead of the built-in `SERVER`, and
+  exposes `window.__TINYAPP_STORE__` — the very store its synchronizer syncs —
+  for the exam to read. `readSyncOrigin` in `client/src/storeData.ts` reads the
+  handle and `syncUrl` in `client/src/config.ts` builds the URL; without the
+  handle the page dials `SERVER` and exposes nothing, exactly as before.
 - `client/src/App.tsx` contains the main application UI.
 - `client/src/config.tsx` contains synchronization configuration.
 - `server/index.tsx` contains the synchronization server.

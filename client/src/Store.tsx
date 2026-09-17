@@ -17,7 +17,7 @@ import {
 } from './storeData';
 import {createSqliteWasmPersister} from 'tinybase/persisters/persister-sqlite-wasm/with-schemas';
 import {getDb} from './sqlite';
-import {SERVER} from './config';
+import {syncUrl} from './config';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import {createWsSynchronizer} from 'tinybase/synchronizers/synchronizer-ws-client/with-schemas';
 
@@ -152,7 +152,8 @@ const StoreLinks = ({
 const SyncLink = ({store}: {store: TodosStore}) => {
   useCreateSynchronizer(store, async (store) => {
     // The module this store belongs to — the root maps it to the todos facet.
-    const serverPathId = '/sync/todos';
+    // `syncUrl` picks the host: the built-in server, or the origin an exam
+    // handed the page in `window.__TINYAPP_SYNC__`.
     const synchronizer = await createWsSynchronizer(
       store,
       // `WebSocketTypes` is `WebSocket | ws.WebSocket`; pulling
@@ -160,7 +161,7 @@ const SyncLink = ({store}: {store: TodosStore}) => {
       // with it, which resolves that union for the first time and exposes
       // `ReconnectingWebSocket`'s narrower `onerror`. It is a drop-in
       // WebSocket at runtime, so say so.
-      new ReconnectingWebSocket(SERVER + serverPathId) as unknown as WebSocket,
+      new ReconnectingWebSocket(syncUrl('todos')) as unknown as WebSocket,
     );
     await synchronizer.startSync();
 
