@@ -71,3 +71,5 @@
 {"kind":"driver:approved","stamp":"run-27","integrationBranch":"ultra/integration-run-27","id":"01M2PT9W720000RPJFBCVGNZ8C","ts":1789619663074}
 {"kind":"run:open","runId":"run-27","base":"42d19c50aaecd92f13367b2b97324a3013bb62fb","source":"fleet/publish-fold.mjs","id":"01M2PT9XZJ0000GM3MEDR1W8GM","ts":1789619664882}
 {"kind":"driver:publish-fold","run":"27","attempt":"1","base":"42d19c50aaecd92f13367b2b97324a3013bb62fb","tip":"42d19c50aaecd92f13367b2b97324a3013bb62fb","candidate":"1a3cf7417040dfd4163ad67ea02adaefca7bdb8b","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2PT9YCV0000K93F8WCCFXGS","ts":1789619665307}
+{"kind":"publish:pr","url":"https://github.com/popmechanic/tinyapp-fixture/pull/26","number":26,"draft":false,"id":"01M2PTA4HX0000JD4XC09CR9ST","ts":1789619671613}
+{"kind":"publish:merge","sha":"d1f17d41318d687b35216a84594bdce6d72f3db1","id":"01M2PTA76H0000Q8J5RAB6TQMT","ts":1789619674321}
