@@ -1,0 +1,3 @@
+{"type": "base", "sha": "42d19c50aaecd92f13367b2b97324a3013bb62fb"}
+{"type": "fold", "task": "2", "headSha": "80266cc0d592bf510357c65596e4b55c66990395", "patch": "/home/exedev/target/.claude/ultrapowers/run-run-27/patches/task-2.patch"}
+{"type": "fold", "task": "1", "headSha": "22346889bdf46266239ecb16f852043380e41c63", "patch": "/home/exedev/target/.claude/ultrapowers/run-run-27/patches/task-1.patch"}
