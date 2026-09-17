@@ -86,3 +86,5 @@
 {"kind":"driver:stage","stage":"finalize","id":"01M2R2V3M10000JTWVZ2014EM3","ts":1789662170753}
 {"kind":"driver:stage","stage":"gate","id":"01M2R2V3NX00006T27KAGDQFNW","ts":1789662170813}
 {"kind":"driver:fail","verdict":"gate-blocked","detail":"ultra_gate exited 1 — gate receipt is the terminal artifact","id":"01M2R2V3T50000W591KHP5BVZ7","ts":1789662170949}
+{"kind":"run:open","runId":"run-33","base":"e3b1d490e54d6a1ff0a205ffcbc05a7f755b50bb","source":"fleet/publish-fold.mjs","id":"01M2R2VPTA00002MH4GN1H0PD7","ts":1789662190410}
+{"kind":"driver:publish-fold","run":"33","attempt":"1","base":"e3b1d490e54d6a1ff0a205ffcbc05a7f755b50bb","tip":"e3b1d490e54d6a1ff0a205ffcbc05a7f755b50bb","candidate":"3caefa0f7e92e54eb896724d458d82ba772171dd","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2R2VQ8R0000ZJV0K6WHKMVP","ts":1789662190872}
