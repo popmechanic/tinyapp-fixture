@@ -85,3 +85,11 @@
 {"kind":"driver:integrated-clean","wave":2,"removed":0,"id":"01M2PKYX1P0000Y12QET8QJE8K","ts":1789613012022}
 {"kind":"driver:integrated-check","cmd":"bun run lint:ui","exit":0,"minor":false,"wave":2,"id":"01M2PKYXQH0000AR1VSG9GBPY4","ts":1789613012721}
 {"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":2,"id":"01M2PKZ3CR00006Q8MVH1SN1PD","ts":1789613018520}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":2,"id":"01M2PKZEGQ0000A84VMJXKA0MC","ts":1789613029911}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/config.ts client/src/index.css client/src/components packages/tinyapp-exam packages/tinyapp-lint/src packages/tinyapp-history package.json client/package.json server/package.json bun.lock","exit":0,"minor":false,"wave":2,"id":"01M2PKZEGY0000AS0F8XCJBQK2","ts":1789613029918}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2PKZER80000189JWGW93ZGW","ts":1789613030152}
+{"kind":"driver:stage","stage":"finalize","id":"01M2PKZES90000ZA0TX3JTEN3N","ts":1789613030185}
+{"kind":"driver:stage","stage":"gate","id":"01M2PKZETD0000NEKWGJB5BMQP","ts":1789613030221}
+{"kind":"driver:fail","verdict":"gate-blocked","detail":"ultra_gate exited 1 — gate receipt is the terminal artifact","id":"01M2PKZEWK0000RQVAYRJR5B1V","ts":1789613030291}
+{"kind":"run:open","runId":"run-24","base":"0fac23239655e7169b11a8be97fe9a1b7142ced5","source":"fleet/publish-fold.mjs","id":"01M2PKZP1N0000J924RZ6MTQE5","ts":1789613037621}
+{"kind":"driver:publish-fold","run":"24","attempt":"1","base":"0fac23239655e7169b11a8be97fe9a1b7142ced5","tip":"0fac23239655e7169b11a8be97fe9a1b7142ced5","candidate":"f3597cb3e24de8c77177c62b15c4a4116cd83692","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2PKZPEZ000040BA1EZ68VSF","ts":1789613038047}
