@@ -1,29 +1,45 @@
 {
-  "wave": 1,
+  "wave": 2,
   "entries": {
-    "packages/tinyapp-exam/src/celld.ts": {
-      "stateBlob": "0043edebb016ad93daf4008af99bd581a3adee82fff6c1877c63976eac234f87",
-      "visibleSha": "960d7fd5094fd361dc2b6e185400f058a0d4f873"
+    "packages/tinyapp-exam/src/browser.ts": {
+      "stateBlob": "ee98cf0ea740bbe64a572627ee8eec1a4380a7a5154c76f35908ae400081eace",
+      "visibleSha": "ee04212be45fdeffa871145d34014cbac05dc9d9"
+    },
+    "packages/tinyapp-exam/src/convergence-move.ts": {
+      "stateBlob": "e97c43c3722af654114c6a0dae768f9e987d8d161b1cff1e43d8328c2bc3810b",
+      "visibleSha": "55b8e3e0ac42a4d00810f8aa7d2132c6f99f29b6"
+    },
+    "packages/tinyapp-exam/src/evidence.ts": {
+      "stateBlob": "3c1ff0c6ca5fb16395ae46066c56ab1960fc2b4fe7fdaae7c9f72330973d45fa",
+      "visibleSha": "b4b26995ad4ed425257cc49e76f4b2907540ad5d"
     },
     "packages/tinyapp-exam/src/index.ts": {
-      "stateBlob": "e9ad6537bdeaf0528b47a196979748addcc83998bb2ded18974326ebcfecccf5",
-      "visibleSha": "f030e3800eea21cb616857c5aa506c9996db4054"
+      "stateBlob": "f921b8a9888059feb53b151dc9223b485cc23fda5be060cdfd2a8277254bf9f9",
+      "visibleSha": "e9b5180d975c2c80cd2d2c774a2fad40c4660130"
     },
-    "packages/tinyapp-exam/src/surface.ts": {
-      "stateBlob": "f58c7792bf05628ce6b9825c3da1fccca0f0fbe22d94a9bd89ed9ab0372a2c66",
-      "visibleSha": "921564f72ca6d6c0c0379971df437d9813440154"
+    "packages/tinyapp-exam/src/types.ts": {
+      "stateBlob": "91566072915259ca0c292672a7e64d4d133439f56413cd7affdc279c97703885",
+      "visibleSha": "01013418265cfd7b5d8bfde1c05e8269a30cc49a"
     },
-    "packages/tinyapp-exam/test/celld.test.ts": {
-      "stateBlob": "ebecbf8957cd23ed9d56f17d038ba96260433897afb704ba019ed39ed4306be7",
-      "visibleSha": "ddc4a0e444ba7c63f4b4b9a9c13cf28ee0ba012a"
+    "packages/tinyapp-exam/test/convergence-move.test.ts": {
+      "stateBlob": "eb3d5272e9fba72f7a66ca181af7b09707e22301dfe0b71886e43a2e2e73c922",
+      "visibleSha": "53580691cb59229d314a6e24f5990becae5b2a8f"
     },
-    "server/test/exam-surface.test.ts": {
-      "stateBlob": "c897185d07deaaf6f68a4791effd7c30626478519bb20b9fea4a3cacd9b7cf7d",
-      "visibleSha": "889821a8f2d7711df0b70aea8fa1ea4cad397236"
+    "packages/tinyapp-exam/test/fixtures/convergence/app.ts": {
+      "stateBlob": "75d653988888c92c19d431ac9e4ad318ba55e79bd829ee63b2d9aa22308bd980",
+      "visibleSha": "11044264b5281520aec348f05b4e5a30c7641b43"
     },
-    "server/test/recorder.test.ts": {
-      "stateBlob": "b373f5423812c1333187eb5c2164b24a301004c905cc5141b83c4c9695feff4a",
-      "visibleSha": "78752e4014c51a964878dde35ce5a6d0e021f82e"
+    "packages/tinyapp-exam/test/fixtures/convergence/entry.html": {
+      "stateBlob": "7e3c338b2485cd0947eeea0b1e5abee2b4657454458f831d8c48b21e2c2c2840",
+      "visibleSha": "890a5e8526841a2aaa479d5eadbc8455a82a0b1e"
+    },
+    "packages/tinyapp-exam/test/fixtures/convergence/expected-one-row.json": {
+      "stateBlob": "9a7639b093b4cb94dbbc71897d582f6c3c1059f86f39a021a9071d13fda85956",
+      "visibleSha": "444e6ca5343951404c8d49c6ce0f7f052e1488e8"
+    },
+    "packages/tinyapp-lint/src/capture-plugin.ts": {
+      "stateBlob": "38132b4f0b057f77025053f0b3b86ba136f0d8629a9598cd8b52fb9b4b533aca",
+      "visibleSha": "858f1ad24929be2fa9542a6bacec41f9fe1b9a51"
     }
   }
 }
