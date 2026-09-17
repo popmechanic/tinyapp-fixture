@@ -1,0 +1,11 @@
+{
+  "store_ms": 133.000494,
+  "render_ms": 33.63300700000002,
+  "action_ms": 14.121422999999936,
+  "mutant_ms": 0.18251900000007026,
+  "render": "ran",
+  "browser": "ran",
+  "sync_ms": 52.69482400000004,
+  "converge_ms": 0.6647369999999455,
+  "transitions": 7
+}
