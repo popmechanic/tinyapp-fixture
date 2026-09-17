@@ -1,9 +1,9 @@
 {
-  "store_ms": 169.26679100000183,
+  "store_ms": 167.41597700000057,
   "render_ms": null,
-  "action_ms": 6.410867999999027,
+  "action_ms": 7.536336000001029,
   "mutant_ms": 0,
   "render": "skipped",
   "browser": "ran",
-  "persist_ms": 519.7408869999999
+  "persist_ms": 520.4914510000017
 }
