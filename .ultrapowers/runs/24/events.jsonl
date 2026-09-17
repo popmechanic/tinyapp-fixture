@@ -43,3 +43,4 @@
 {"kind":"driver:attention","task":"3","attention":"needs-human","msg":"session ended without hand-off","actor":"","id":"01M2PBYES80000A1547BXRHTS0","ts":1789604608808}
 {"kind":"worker:end","label":"exam:3","role":"examiner","sessionId":"0914ae02-59ab-4b82-ada1-11aeb7b39f0e","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"reason":null,"meter":{"input":4688,"output":19189,"cacheRead":1603580,"cacheCreation":62798,"costUsd":1.9329349999999998,"models":["claude-opus-5"]},"id":"01M2PCCPWH00008CYRHB5MA3KR","ts":1789605075857}
 {"kind":"transcript:slice","label":"exam:3","sessionId":"0914ae02-59ab-4b82-ada1-11aeb7b39f0e","bytes":11767,"id":"01M2PCCPWY00001BEPP10DNHZH","ts":1789605075870}
+{"kind":"driver:exam-handoff","task":"3","paths":["tests/state-exams/tag-filter.test.ts"],"id":"01M2PCK0390000601KAMGEGWKA","ts":1789605281897}
