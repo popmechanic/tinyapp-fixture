@@ -1,0 +1,352 @@
+{
+  "ok": true,
+  "stamp": "run-27",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-27"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "2 task(s) in 1 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "add-command",
+      "ok": true,
+      "detail": "no dependencies declared \u2014 nothing to add"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The nine runner-spawning exams prove only themselves",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "tests/state-exams/delete-to-trash.test.ts",
+          "tests/state-exams/derived-exam.test.ts",
+          "tests/state-exams/design-system-installed.test.ts",
+          "tests/state-exams/exam-page.test.ts",
+          "tests/state-exams/interaction-evidence.test.ts",
+          "tests/state-exams/persistence-exam.test.ts",
+          "tests/state-exams/pin-todo.test.ts",
+          "tests/state-exams/styled-page.test.ts",
+          "tests/state-exams/undo-delete.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "nothing"
+          ]
+        }
+      },
+      {
+        "id": "2",
+        "title": "The twelve grep-and-typecheck exams prove only themselves",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "tests/state-exams/done-count.test.ts",
+          "tests/state-exams/due-date-marks-overdue.test.ts",
+          "tests/state-exams/filter-bar.test.ts",
+          "tests/state-exams/filter-done.test.ts",
+          "tests/state-exams/mutant-from-diff.test.ts",
+          "tests/state-exams/session-transitions.test.ts",
+          "tests/state-exams/set-filter.test.ts",
+          "tests/state-exams/set-todo-due.test.ts",
+          "tests/state-exams/set-todo-tags.test.ts",
+          "tests/state-exams/store-history.test.ts",
+          "tests/state-exams/tag-filter.test.ts",
+          "tests/state-exams/type-due-date.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "nothing"
+          ],
+          "produces": [
+            "nothing"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1",
+        "2"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The nine runner-spawning exams prove only themselves",
+          "files": [
+            "tests/state-exams/delete-to-trash.test.ts",
+            "tests/state-exams/derived-exam.test.ts",
+            "tests/state-exams/design-system-installed.test.ts",
+            "tests/state-exams/exam-page.test.ts",
+            "tests/state-exams/interaction-evidence.test.ts",
+            "tests/state-exams/persistence-exam.test.ts",
+            "tests/state-exams/pin-todo.test.ts",
+            "tests/state-exams/styled-page.test.ts",
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "nothing"
+            ]
+          },
+          "tier": null,
+          "review": "lean",
+          "writes": [
+            "tests/state-exams/delete-to-trash.test.ts",
+            "tests/state-exams/derived-exam.test.ts",
+            "tests/state-exams/design-system-installed.test.ts",
+            "tests/state-exams/exam-page.test.ts",
+            "tests/state-exams/interaction-evidence.test.ts",
+            "tests/state-exams/persistence-exam.test.ts",
+            "tests/state-exams/pin-todo.test.ts",
+            "tests/state-exams/styled-page.test.ts",
+            "tests/state-exams/undo-delete.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [],
+          "testCmd": null,
+          "proofRuns": [
+            "! grep -lE \"child_process|spawn|(^|[^.A-Za-z])exec(Sync|File)?\\(|Bun\\.[$]|Bun\\[|from [\\\"']bun[\\\"']|(^|[^A-Za-z])bunx?[[:space:]]|(^|[^A-Za-z-])tsc([^A-Za-z-]|$)|tinyapp-lint|from [\\\"']\\./|from [\\\"']\\.\\./[^.]|from [\\\"']\\.\\./\\.\\./tests/|import\\(.*tests/|require\\(\" tests/state-exams/styled-page.test.ts tests/state-exams/interaction-evidence.test.ts tests/state-exams/persistence-exam.test.ts tests/state-exams/derived-exam.test.ts tests/state-exams/design-system-installed.test.ts tests/state-exams/exam-page.test.ts tests/state-exams/delete-to-trash.test.ts tests/state-exams/pin-todo.test.ts tests/state-exams/undo-delete.test.ts",
+            "set -o pipefail; bun test tests/state-exams/styled-page.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 11)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/interaction-evidence.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 3)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/persistence-exam.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 3)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/derived-exam.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 7)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/design-system-installed.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 11)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/exam-page.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 5)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/delete-to-trash.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 11)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/pin-todo.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 10)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/undo-delete.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 4)} END {exit !ok}'",
+            "! git diff --name-status $ULTRA_BASE | grep -vE '^M[[:space:]]+tests/state-exams/[a-z0-9-]+\\.test\\.ts$|^[AMD][[:space:]]+\\.ultrapowers/'"
+          ],
+          "proofGuards": [],
+          "factsheet": {
+            "files": [
+              "tests/state-exams/delete-to-trash.test.ts",
+              "tests/state-exams/derived-exam.test.ts",
+              "tests/state-exams/design-system-installed.test.ts",
+              "tests/state-exams/exam-page.test.ts",
+              "tests/state-exams/interaction-evidence.test.ts",
+              "tests/state-exams/persistence-exam.test.ts",
+              "tests/state-exams/pin-todo.test.ts",
+              "tests/state-exams/styled-page.test.ts",
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "deletes": [],
+            "guards": [],
+            "proofTests": [],
+            "landing": {},
+            "driverOwned": [],
+            "siblingOwned": [
+              "tests/state-exams/done-count.test.ts",
+              "tests/state-exams/due-date-marks-overdue.test.ts",
+              "tests/state-exams/filter-bar.test.ts",
+              "tests/state-exams/filter-done.test.ts",
+              "tests/state-exams/mutant-from-diff.test.ts",
+              "tests/state-exams/session-transitions.test.ts",
+              "tests/state-exams/set-filter.test.ts",
+              "tests/state-exams/set-todo-due.test.ts",
+              "tests/state-exams/set-todo-tags.test.ts",
+              "tests/state-exams/store-history.test.ts",
+              "tests/state-exams/tag-filter.test.ts",
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "produces": [],
+            "consumes": []
+          }
+        },
+        {
+          "id": "2",
+          "title": "The twelve grep-and-typecheck exams prove only themselves",
+          "files": [
+            "tests/state-exams/done-count.test.ts",
+            "tests/state-exams/due-date-marks-overdue.test.ts",
+            "tests/state-exams/filter-bar.test.ts",
+            "tests/state-exams/filter-done.test.ts",
+            "tests/state-exams/mutant-from-diff.test.ts",
+            "tests/state-exams/session-transitions.test.ts",
+            "tests/state-exams/set-filter.test.ts",
+            "tests/state-exams/set-todo-due.test.ts",
+            "tests/state-exams/set-todo-tags.test.ts",
+            "tests/state-exams/store-history.test.ts",
+            "tests/state-exams/tag-filter.test.ts",
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "nothing"
+            ],
+            "produces": [
+              "nothing"
+            ]
+          },
+          "tier": null,
+          "review": "lean",
+          "writes": [
+            "tests/state-exams/done-count.test.ts",
+            "tests/state-exams/due-date-marks-overdue.test.ts",
+            "tests/state-exams/filter-bar.test.ts",
+            "tests/state-exams/filter-done.test.ts",
+            "tests/state-exams/mutant-from-diff.test.ts",
+            "tests/state-exams/session-transitions.test.ts",
+            "tests/state-exams/set-filter.test.ts",
+            "tests/state-exams/set-todo-due.test.ts",
+            "tests/state-exams/set-todo-tags.test.ts",
+            "tests/state-exams/store-history.test.ts",
+            "tests/state-exams/tag-filter.test.ts",
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [],
+          "testCmd": null,
+          "proofRuns": [
+            "! grep -lE \"child_process|spawn|(^|[^.A-Za-z])exec(Sync|File)?\\(|Bun\\.[$]|Bun\\[|from [\\\"']bun[\\\"']|(^|[^A-Za-z])bunx?[[:space:]]|(^|[^A-Za-z-])tsc([^A-Za-z-]|$)|tinyapp-lint|from [\\\"']\\./|from [\\\"']\\.\\./[^.]|from [\\\"']\\.\\./\\.\\./tests/|import\\(.*tests/|require\\(\" tests/state-exams/set-todo-due.test.ts tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/set-filter.test.ts tests/state-exams/tag-filter.test.ts tests/state-exams/set-todo-tags.test.ts tests/state-exams/due-date-marks-overdue.test.ts tests/state-exams/done-count.test.ts tests/state-exams/store-history.test.ts tests/state-exams/session-transitions.test.ts tests/state-exams/type-due-date.test.ts tests/state-exams/mutant-from-diff.test.ts",
+            "set -o pipefail; bun test tests/state-exams/set-todo-due.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 12)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/filter-bar.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 4)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/filter-done.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 1)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/set-filter.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 6)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/tag-filter.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 13)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/set-todo-tags.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 28)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/due-date-marks-overdue.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 3)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/done-count.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 7)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/store-history.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 9)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/session-transitions.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 7)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/type-due-date.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 7)} END {exit !ok}'",
+            "set -o pipefail; bun test tests/state-exams/mutant-from-diff.test.ts 2>&1 | awk '/^ *[0-9]+ pass$/ {ok = ($1 >= 8)} END {exit !ok}'",
+            "! git diff --name-status $ULTRA_BASE | grep -vE '^M[[:space:]]+tests/state-exams/[a-z0-9-]+\\.test\\.ts$|^[AMD][[:space:]]+\\.ultrapowers/'"
+          ],
+          "proofGuards": [],
+          "factsheet": {
+            "files": [
+              "tests/state-exams/done-count.test.ts",
+              "tests/state-exams/due-date-marks-overdue.test.ts",
+              "tests/state-exams/filter-bar.test.ts",
+              "tests/state-exams/filter-done.test.ts",
+              "tests/state-exams/mutant-from-diff.test.ts",
+              "tests/state-exams/session-transitions.test.ts",
+              "tests/state-exams/set-filter.test.ts",
+              "tests/state-exams/set-todo-due.test.ts",
+              "tests/state-exams/set-todo-tags.test.ts",
+              "tests/state-exams/store-history.test.ts",
+              "tests/state-exams/tag-filter.test.ts",
+              "tests/state-exams/type-due-date.test.ts"
+            ],
+            "deletes": [],
+            "guards": [],
+            "proofTests": [],
+            "landing": {},
+            "driverOwned": [],
+            "siblingOwned": [
+              "tests/state-exams/delete-to-trash.test.ts",
+              "tests/state-exams/derived-exam.test.ts",
+              "tests/state-exams/design-system-installed.test.ts",
+              "tests/state-exams/exam-page.test.ts",
+              "tests/state-exams/interaction-evidence.test.ts",
+              "tests/state-exams/persistence-exam.test.ts",
+              "tests/state-exams/pin-todo.test.ts",
+              "tests/state-exams/styled-page.test.ts",
+              "tests/state-exams/undo-delete.test.ts"
+            ],
+            "produces": [],
+            "consumes": []
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "2 Themselves"
+    ],
+    "mode": "parallel",
+    "degrade_reason": null,
+    "globalConstraints": "- The app, its snapshots and the packages do not change: every edit of this plan lands under `tests/state-exams/`, and the `Check:` above is the fence that says so.\n- One claim, one prover: an exam proves its own claim through imports and calls on the helper (`runStateExam`, `runPersistenceExam`, `renderStatic`, the store module, `readFileSync` of a repository file) and never spawns a process. A leg that only proved \"some other exam, a package's tests, the linter or the typecheck still passes\" is deleted, because the fold's suite proves that once.\n- Deletion is per leg, never per file: a leg whose assertion ran in this process at BASE is kept as it was, and no file loses its `stateExam(` or `persistenceExam(` registration. A reviewer reads a file that lost an in-process leg, or a file reduced to its registration, as a blocking finding.\n- A spawned `grep`/`sed` over an app file (`client/`, `packages/*/src`, `AGENTS.md`, `README.md`, `.gitignore`, `package.json`) may keep its predicate as an in-process read of that file; a spawned `grep` over another test file is deleted \u2014 that is the text pin on a sibling file that folds away (run-13). A leg that never spawned stays as it is, whatever it reads.\n- Every exam file's own legs still pass when the file is run alone: `bun test tests/state-exams/<file>.test.ts` exits 0 for every file either task touched, and elapsed seconds are a reading on the record, never a threshold a leg asserts.\n- Hermetic: no exam opens the network; `withContract` still holds every action.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run lint:ui",
+        "minor": false
+      },
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-27/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-27/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-27/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-27/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for addCmd/addDevCmd \u2014 the package-add commands are driver-derived from the same lockfile/manifest beside the bootstrap and stamped in the args file and receipt (only when the plan declares packages); there is no knob for them",
+    "nothing for regenerateCmd \u2014 the lockfile regenerator is derived from the same lockfile/manifest beside the bootstrap (and only when the bootstrap itself was derived) and stamped in the args file and receipt; there is no knob for it",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "regenerateCmd": "bun install",
+  "regenerateCmdSource": "detected:bun-lockfile",
+  "foldTestCmd": "bun test {paths}"
+}
