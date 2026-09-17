@@ -4,6 +4,7 @@ import {ClearCompleted} from './ClearCompleted';
 import {UndoDelete} from './UndoDelete';
 import {FilterBar} from './FilterBar';
 import {admits, filterOf} from './todoFilter';
+import {activeTag, hasTag, tagsInUse} from './todoTags';
 
 export const TodoList = () => {
   const todoIds = useSortedRowIds(
@@ -16,9 +17,17 @@ export const TodoList = () => {
   );
   const table = useTable('todos', STORE_ID);
   const filter = filterOf(useValue('filter', STORE_ID));
-  // The filter hides rows from the list and from nothing else: the counter in
-  // the top bar goes on reading the whole table.
-  const shown = todoIds.filter((id) => admits(filter, table[id]?.completed === true));
+  // Read against the tags actually in use, so a `tag` no row carries any more
+  // reads as no tag filter and never strands the list behind an empty one.
+  const tag = activeTag(useValue('tag', STORE_ID), tagsInUse(table));
+  // The two filters compose — a row has to be admitted by the status choice and
+  // to carry the chosen tag — and both hide rows from the list and from nothing
+  // else: the counter in the top bar goes on reading the whole table.
+  const shown = todoIds.filter(
+    (id) =>
+      admits(filter, table[id]?.completed === true) &&
+      hasTag(table[id]?.tags, tag),
+  );
   // Pinned rows to the top, and nothing else moved: `sort` is stable, so the
   // rows that share a group keep the ascending-by-row-id order `todoIds` gave
   // them. `pinned` has no schema default — an unpinned todo has no such cell —
