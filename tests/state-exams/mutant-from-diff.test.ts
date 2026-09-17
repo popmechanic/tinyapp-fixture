@@ -21,8 +21,9 @@
  *     `VALUES_TABLE`: the leg's words are the literal, and the linter's capture
  *     child stubs every `tinyapp-exam` export out of an exam file's own
  *     imports, so a literal reads the same in that process as in this one.
- *   - Leg (i) spawns the Proof's `Run:` line verbatim. It is the module alone
- *     under the package's flags, which is what M1 asks of it.
+ *   - M1's leg (i) ran the project's type checker over the module alone in a
+ *     child process. One claim, one prover: the typecheck is the driver's own
+ *     check over the whole tree, run once, so that leg is gone from here.
  *
  * Red at BASE for one reason: `packages/tinyapp-history/src/mutant.ts` does not
  * exist, so the import below fails and the file does not load.
@@ -225,40 +226,3 @@ describe('mutantOf — editOf over the rows in list order [M2]', () => {
     expect(mutantOf([])).toEqual([]);
   });
 });
-
-/**
- * Leg (i) [M1] — the `Run:` line of the Proof, verbatim: the module typechecks
- * alone under the package's flags, in a clone whose
- * `packages/tinyapp-history/tsconfig.json` a sibling task owns.
- */
-test(
-  '(i) the module typechecks alone under the package’s flags [M1]',
-  async () => {
-    const run = Bun.spawn(
-      [
-        'bunx',
-        'tsc',
-        '--noEmit',
-        '--strict',
-        '--skipLibCheck',
-        '--types',
-        'bun',
-        '--module',
-        'esnext',
-        '--moduleResolution',
-        'bundler',
-        '--target',
-        'es2022',
-        'packages/tinyapp-history/src/mutant.ts',
-      ],
-      {cwd: process.cwd(), stdout: 'pipe', stderr: 'pipe'},
-    );
-    const [out, err, code] = await Promise.all([
-      new Response(run.stdout).text(),
-      new Response(run.stderr).text(),
-      run.exited,
-    ]);
-    expect(`${code}\n${out}${err}`.trim()).toBe('0');
-  },
-  120_000,
-);

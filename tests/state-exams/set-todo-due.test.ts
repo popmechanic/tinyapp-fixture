@@ -13,29 +13,29 @@
  *            `'2025-13-45'` and `'soon'`, and returns `undefined` every time;
  *   (c) [M3] `isIsoDate` over the seven pinned values;
  *   (d) [M4] `isOverdue` over the six pinned rows at `2026-01-01T00:00:00Z`;
- *   (e) [M5] the `INVARIANTS` entry carrying the pinned message, and the
- *            Proof's lint `Run:` line run verbatim;
+ *   (e) [M5] the `INVARIANTS` entry carrying the pinned message;
  *   (f) [M6] `state-exams/expected/two-todos-second-due.json` parses to exactly
  *            the M6 literal, and the state exam itself;
- *   (g) [M7] the two `bun test` `Run:` lines, and `done-count.test.ts`'s own
- *            source pinning the sorted cells `['completed', 'due', 'text']`.
+ *   (g) [M7] `done-count.test.ts`'s own source pinning the cells it names.
+ *
+ * Leg (e)'s second half ran the state linter over a seeded directory in a child
+ * process, and leg (g)'s first two halves ran two other suites the same way.
+ * One claim, one prover: the linter is graded by its own tests and by the
+ * driver's lint check, and each exam is graded by its own run, so those three
+ * halves are gone from here.
  *
  * Three readings this file makes, written down because they are choices:
  *
  *   - `setTodoDue` and the whole `client/src/overdue.ts` module are reached
  *     with a computed-specifier `import()` inside each test body rather than a
- *     static import or a top-level `await`. That is the precedent
- *     `packages/tinyapp-lint/test/invariants.test.ts` set in this repository,
+ *     static import or a top-level `await`. That is the precedent the linter
+ *     package's own invariants exam set in this repository,
  *     and it is load-bearing: a static import of a module — or of a named
  *     export — that does not exist yet fails the whole file at load, so every
  *     leg would then report that one missing import instead of the thing it is
  *     itself about. `createTodosStore`, `TABLES_SCHEMA` and `INVARIANTS` do
  *     exist at BASE and are imported statically, which is also what keeps this
  *     file importing from `client/src` at all.
- *   - Leg (e)'s lint line and leg (g)'s two `bun test` lines are run verbatim
- *     through `bash -c` from the repository root, so the ordering leg (e)
- *     spells out — capture the status, require it to be exactly 1, and only
- *     then grep — is the line's own rather than something this exam re-states.
  *   - Nothing here pins a sibling plan's surface: no count of exams or
  *     snapshots, no callback list, no invariant count, no key set of
  *     `TABLES_SCHEMA` itself. The only key sets pinned are this plan's own
@@ -61,12 +61,9 @@ import {
   type TodosStore,
 } from '../../client/src/storeData';
 
-// This file sits two directories below the repository root, which is also
-// `bun test`'s cwd — the `Run:` lines and the fixture reads are anchored there.
+// This file sits two directories below the repository root, which is also the
+// test runner's cwd — the module and fixture reads are anchored there.
 const ROOT = resolve(import.meta.dir, '..', '..');
-
-/** A child `bun` process needs more than Bun's default per-test 5 s. */
-const SPAWN_TIMEOUT_MS = 300_000;
 
 /** `setTodoDue` as the task's Produces spells it. */
 type SetTodoDue = (store: TodosStore, id: string, due: string) => void;
@@ -87,29 +84,6 @@ const storeModule = async (): Promise<{setTodoDue: SetTodoDue}> =>
 /** The sibling module M3 and M4 declare. See this file's header. */
 const overdueModule = async (): Promise<OverdueModule> =>
   (await import(resolve(ROOT, 'client/src/overdue.ts'))) as OverdueModule;
-
-/** One `Run:` line, run from the repository root: its status and its output. */
-const run = (line: string): {code: number; out: string} => {
-  const spawned = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  return {
-    code: spawned.exitCode,
-    out: `${spawned.stdout.toString()}${spawned.stderr.toString()}`,
-  };
-};
-
-/** `run`, with the output printed when the line did not exit 0. */
-const statusOf = (line: string): number => {
-  const {code, out} = run(line);
-  if (code !== 0) {
-    console.log(`$ ${line}\n${out}`);
-  }
-  return code;
-};
 
 const readJson = (...parts: string[]): unknown =>
   JSON.parse(readFileSync(join(ROOT, ...parts), 'utf8'));
@@ -246,7 +220,7 @@ test('[Produces] dateOf(now) is the instant`s UTC calendar date', async () => {
   expect(dateOf(new Date('2025-06-30T23:59:59Z'))).toBe('2025-06-30');
 });
 
-// --- (e) [M5]: the invariant, and the linter that rejects a bad seed ---------
+// --- (e) [M5]: the invariant the bad due dates break -------------------------
 
 /** M5's message, character for character. */
 const DUE_MESSAGE = 'a due date is absent or a valid YYYY-MM-DD';
@@ -275,22 +249,6 @@ test('leg (e) [M5] INVARIANTS holds a todos entry with the pinned message and pr
   );
 });
 
-/**
- * The Proof's lint `Run:` line, character for character.
- *
- * `String.raw` because the line spells `printf '%s\n'`: in an ordinary template
- * literal that `\n` would reach `bash` as a real newline.
- */
-const LINT_RUN = String.raw`d=$(mktemp -d state-exams/lint-tmp-XXXXXX); mkdir "$d/seeds"; printf '%s' '[{"todos":{"0":{"text":"a","completed":false,"due":"2025-13-45"}}},{}]' > "$d/seeds/bad.json"; out=$(bun run lint:state --seeds "$d/seeds" --expected "$d/none" --exams "$d/none" 2>&1); code=$?; rm -rf "$d"; test "$code" -eq 1 && printf '%s\n' "$out" | grep -q 'todos/0: breaks the invariant "a due date is absent or a valid YYYY-MM-DD"'`;
-
-test(
-  'leg (e) [M5] the lint Run line — one seed with a bad due date exits 1 and prints the pinned finding',
-  () => {
-    expect(statusOf(LINT_RUN)).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
 // --- (f) [M6]: the expected state, and the exam that reaches it --------------
 
 test('leg (f) [M6] state-exams/expected/two-todos-second-due.json parses to exactly the M6 literal', () => {
@@ -308,22 +266,6 @@ test('leg (f) [M6] state-exams/expected/two-todos-second-due.json parses to exac
 });
 
 // --- (g) [M7]: the pins the new cell, callback and snapshot move -------------
-
-test(
-  'leg (g) [M7] the Run line `bun test tests/state-exams/done-count.test.ts` exits 0',
-  () => {
-    expect(statusOf('bun test tests/state-exams/done-count.test.ts')).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
-test(
-  'leg (g) [M7] the Run line `bun test packages/tinyapp-lint` exits 0',
-  () => {
-    expect(statusOf('bun test packages/tinyapp-lint')).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
 
 test('leg (g) [M7] done-count.test.ts reads the todos cells of TABLES_SCHEMA and pins no exact list of them', () => {
   // Read with every run of whitespace removed, so the pin is graded on the

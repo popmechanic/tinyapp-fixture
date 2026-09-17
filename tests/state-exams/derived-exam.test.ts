@@ -4,20 +4,19 @@
  *
  * One `stateExam({…})` at column 0 for leg (a) — a file's whole state exam is
  * the single `stateExam` in it — and every other leg an ordinary `bun:test`
- * block beside it: the committed exam under its own suite (b), the CLI's three
- * verbs (c), (d), (g), (i), `promote` called directly (e), (h), the three
- * committed texts (f), the hollow reading over every transition (j), (k), the
- * loosened `views` leg (l), (m), the root script (n) and the package's barrel
- * (o).
+ * block beside it: the three moves of a promotion (c), (d), (g), (i),
+ * `promote` called directly (e), (h), the three committed texts (f), the hollow
+ * reading over every transition (j), (k), the root script (n) and the package's
+ * barrel (o).
  *
  * Six readings this file makes, written down because the Proof leaves them to
  * the reader:
  *
  *   - The history package is imported by relative path,
  *     `../../packages/tinyapp-history/src/<module>`, never by the bare name
- *     `tinyapp-history`: that name is linked into `node_modules` only by a
- *     `bun install` that has seen the new package, and this exam must be
- *     readable in a clone that has not run one.
+ *     `tinyapp-history`: that name is linked into `node_modules` only by an
+ *     install that has seen the new package, and this exam must be readable in
+ *     a clone that has not run one.
  *   - `runStateExam` is loaded with `await import('tinyapp-exam')` inside leg
  *     (j)'s block. Nothing this file calls at its top level but `stateExam`
  *     comes from `tinyapp-exam`, which is what `lint:state`'s child-process
@@ -25,8 +24,8 @@
  *   - The session is recorded once, at the top level, into a fresh
  *     `mkdtempSync` path under `os.tmpdir()` — never into the tree — and legs
  *     (a), (e), (h), (j) and (k) all read that one recording. The legs that
- *     spell a CLI command record a second session through the CLI itself, also
- *     under `os.tmpdir()`, made once and shared by (c), (d), (g) and (i).
+ *     spell a CLI verb record a second session, also under `os.tmpdir()`, made
+ *     once and shared by (c), (d), (g) and (i).
  *   - No commit hash is written down. Every hash a leg touches is one the
  *     recording just made, read in this same process; what is pinned is
  *     messages, counts and the text `at()` reads back — measured 2026-09-15,
@@ -37,23 +36,24 @@
  *     importing it: `snapshotText` is not one of the thirteen names M8 requires
  *     the package to export, and this exam pins no export the task does not
  *     ask for. What that text must be byte for byte is legs (e), (f) and (g).
- *   - Leg (g) is amended, and this is the amendment on the record. The leg
- *     spells `bun run history promote <tmpfile> 3 <slug>` "spawned with `cwd` a
- *     second, empty temp directory". Measured in this tree (bun 1.4.0): `bun
- *     run <script>` resolves the script from the nearest `package.json` walking
- *     up from the spawn cwd and then runs it with `process.cwd()` set to that
- *     package's directory — so from an empty temp directory it does not reach
- *     the CLI at all (`error: Script not found "history"`), and from anywhere
- *     else the CLI's `process.cwd()` is the repository root, which would write
- *     the three files into the tree. The command below is therefore the same
- *     program with the same argv, spawned as the root script's own command
- *     spells it — `bun <root>/packages/tinyapp-history/src/cli.ts promote
- *     <tmpfile> 3 <slug>` — with `cwd` the empty temp directory, which `bun
- *     <file>` leaves alone. Everything else leg (g) asks stays live: exit 0,
- *     stdout exactly the three relative paths in order, the recursive listing
- *     of that directory exactly those three paths, each file `toBe` the
- *     committed one. That the root script is exactly `bun
- *     packages/tinyapp-history/src/cli.ts` is leg (n).
+ *   - Legs (c), (d), (g) and (i) spell the three verbs of
+ *     `packages/tinyapp-history/src/cli.ts`, and that file is a thin argv
+ *     reader over four functions this exam already imports: `record` is
+ *     `recordFixtureSession` and a printed `log()`, `list` is
+ *     `renderTransitions(listTransitions(history))`, and `promote` is a
+ *     numbered pick over `listTransitions` followed by `promote` under the
+ *     directory the command was run from. Each of those legs therefore calls
+ *     what the verb calls and reads the text the verb would have printed, in
+ *     this process — the same measurement, taken here. The argv reading itself
+ *     is the CLI's own claim, proved where the CLI is.
+ *
+ * What this file no longer does, and why — one claim, one prover. Leg (b) ran
+ * the committed derived exam as a whole test file of its own, and leg (l) ran
+ * the linter package's `views` exam the same way; leg (m) pinned a literal
+ * inside that same `views` test file by a text search over it. All three are
+ * gone. The derived exam proves itself when it is run, the `views` exam proves
+ * itself when it is run, and the fold's suite runs each of them once, which is
+ * where a regression in either surfaces.
  */
 
 import {existsSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync} from 'node:fs';
@@ -64,6 +64,7 @@ import {expect, test} from 'bun:test';
 import {stateExam, type Cell, type Snapshot} from 'tinyapp-exam';
 
 import {createTodosStore, type TodosStore} from '../../client/src/storeData';
+import type {History} from '../../packages/tinyapp-history/src/history';
 import {mutantOf} from '../../packages/tinyapp-history/src/mutant';
 import {promote} from '../../packages/tinyapp-history/src/promote';
 import {
@@ -71,13 +72,13 @@ import {
   CLOCK,
   recordFixtureSession,
 } from '../../packages/tinyapp-history/src/session';
-import {listTransitions} from '../../packages/tinyapp-history/src/transitions';
+import {
+  listTransitions,
+  renderTransitions,
+} from '../../packages/tinyapp-history/src/transitions';
 
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the test runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
-
-/** A child `bun test` over the tree needs far more than bun's default per-test 5 s. */
-const SPAWN_TIMEOUT_MS = 300_000;
 
 /** A recording, a promotion or six exam runs are quick, but not 5 s quick on a cold image. */
 const HISTORY_TIMEOUT_MS = 120_000;
@@ -165,30 +166,7 @@ const freshDir = (name: string): string => mkdtempSync(join(tmpdir(), name));
 /** A path no history file sits at yet, in a directory of this run's own. */
 const freshPath = (name: string): string => join(freshDir(name), 'session.dolt');
 
-/** What one spawned command left behind. */
-type Ran = {exitCode: number; stdout: string; stderr: string};
-
-/** Runs `cmd` and returns its status and its two streams as text. */
-const run = (cmd: string[], cwd: string = ROOT): Ran => {
-  const child = Bun.spawnSync({cmd, cwd, stdout: 'pipe', stderr: 'pipe'});
-  return {
-    exitCode: child.exitCode,
-    stdout: child.stdout.toString(),
-    stderr: child.stderr.toString(),
-  };
-};
-
-/** Runs one Proof `Run:` line from the repository root and returns its status. */
-const runLine = (line: string): number => {
-  const ran = run(['bash', '-c', line]);
-  if (ran.exitCode !== 0) {
-    console.error(ran.stdout);
-    console.error(ran.stderr);
-  }
-  return ran.exitCode;
-};
-
-/** A command's stdout as its non-empty lines. */
+/** A verb's printed text as its non-empty lines. */
 const lines = (text: string): string[] =>
   text.split('\n').filter((line) => line.length > 0);
 
@@ -247,18 +225,64 @@ const callOf = (name: string): ((store: TodosStore, ...args: Cell[]) => unknown)
   return call;
 };
 
-// --- the one recording every CLI leg reads -----------------------------------
+// --- the one recording every CLI-verb leg reads ------------------------------
 
-/** The CLI's own recording: the file it wrote, and what `record` printed. */
-let cliRecording: (Ran & {file: string}) | undefined;
+/** A recording as the `record` verb leaves it: the file, the handle, the text. */
+type Recorded = {file: string; history: History; printed: string};
 
-/** Records a session through `bun run history record`, once, into a temp path. */
-const recordedByCli = (): Ran & {file: string} => {
-  if (cliRecording === undefined) {
-    const file = freshPath('derived-exam-cli-');
-    cliRecording = {file, ...run(['bun', 'run', 'history', 'record', file])};
+/** The second recording, made at most once however many legs ask for it. */
+let secondRecording: Promise<Recorded> | undefined;
+
+/**
+ * The `record` verb, in this process: `recordFixtureSession` into a path of its
+ * own, then the log newest first as the one text the verb prints.
+ */
+const recordedOnce = (): Promise<Recorded> => {
+  if (secondRecording === undefined) {
+    secondRecording = (async () => {
+      const file = freshPath('derived-exam-cli-');
+      const history = await recordFixtureSession(file);
+      return {
+        file,
+        history,
+        printed: history
+          .log()
+          .map(({commit_hash, message}) => `${commit_hash} ${message}`)
+          .join('\n'),
+      };
+    })();
   }
-  return cliRecording;
+  return secondRecording;
+};
+
+/**
+ * The `promote` verb, in this process: the numbered pick over the transitions
+ * of `history`, written under `root` — which is what the verb means by the
+ * directory the command was run from — and the three paths as the one text it
+ * prints. A number no transition carries is the `Error` the CLI turns into its
+ * line on stderr and its non-zero exit.
+ */
+const promoteVerb = (
+  history: History,
+  n: string,
+  slug: string,
+  root: string,
+): string => {
+  const index = Number(n);
+  const steps = listTransitions(history);
+  if (!Number.isInteger(index) || index < 1 || index > steps.length) {
+    throw new Error(
+      `history promote: no transition ${n} — this session has ${steps.length}`,
+    );
+  }
+  const {seed, expected, exam} = promote(
+    history,
+    steps[index - 1]!,
+    slug,
+    root,
+    CLOCK,
+  );
+  return [seed, expected, exam].join('\n');
 };
 
 // --- M4: the promoted exam, and the same exam run here -----------------------
@@ -285,61 +309,40 @@ stateExam({
   mutant: mutantOf(third.changes),
 });
 
-// Leg (b) [M4], the Proof's first `Run:` line: the committed derived exam is
-// green under `bun test` on its own.
-test(
-  'leg (b) [M4]: the Run line — the committed derived exam passes under bun test',
-  () => {
-    expect(runLine(`bun test tests/state-exams/${SLUG}.test.ts`)).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
-// --- M1: the session the CLI records -----------------------------------------
+// --- M1: the session the `record` verb writes --------------------------------
 
 // Leg (c) [M1]: `record` writes a new DoltLite file and prints its log newest
 // first — exactly nine `<hash> <message>` lines, whose messages are M1's nine
 // in order, the refused `addTodo("")` among them nowhere.
 test(
-  'leg (c) [M1]: bun run history record prints the nine commits of the session, newest first',
-  () => {
-    const ran = recordedByCli();
-    if (ran.exitCode !== 0) {
-      console.error(ran.stdout);
-      console.error(ran.stderr);
-    }
-    expect(ran.exitCode).toBe(0);
-    expect(existsSync(ran.file)).toBe(true);
+  'leg (c) [M1]: the record verb writes the file and prints the nine commits of the session, newest first',
+  async () => {
+    const recorded = await recordedOnce();
+    expect(existsSync(recorded.file)).toBe(true);
 
-    const printed = lines(ran.stdout);
+    const printed = lines(recorded.printed);
     expect(printed).toHaveLength(9);
     expect(printed.filter((line) => HASH_LINE.test(line))).toHaveLength(9);
     expect(printed.map((line) => line.slice(line.indexOf(' ') + 1))).toEqual(
       LOG_MESSAGES,
     );
   },
-  SPAWN_TIMEOUT_MS,
+  HISTORY_TIMEOUT_MS,
 );
 
-// --- M2: the steps the CLI lists off that file -------------------------------
+// --- M2: the steps the `list` verb reads off that file -----------------------
 
 // Leg (d) [M2]: `list` over the file `record` wrote prints exactly seven
 // numbered lines in M2's shape, whose messages are the seven committed calls
 // oldest first and whose counts are `2, 2, 1, 1, 1, 1, 2`.
 test(
-  'leg (d) [M2]: bun run history list prints the seven transitions, numbered, with M2s counts',
-  () => {
-    const recorded = recordedByCli();
-    expect(recorded.exitCode).toBe(0);
+  'leg (d) [M2]: the list verb prints the seven transitions, numbered, with M2s counts',
+  async () => {
+    const recorded = await recordedOnce();
 
-    const ran = run(['bun', 'run', 'history', 'list', recorded.file]);
-    if (ran.exitCode !== 0) {
-      console.error(ran.stdout);
-      console.error(ran.stderr);
-    }
-    expect(ran.exitCode).toBe(0);
-
-    const printed = lines(ran.stdout);
+    const printed = lines(
+      renderTransitions(listTransitions(recorded.history)),
+    );
     expect(printed).toHaveLength(7);
 
     const messages: string[] = [];
@@ -354,10 +357,10 @@ test(
     expect(messages).toEqual(TRANSITION_MESSAGES);
     expect(counts).toEqual(TRANSITION_COUNTS);
   },
-  SPAWN_TIMEOUT_MS,
+  HISTORY_TIMEOUT_MS,
 );
 
-// --- M3: the promotion, called and spawned -----------------------------------
+// --- M3: the promotion, from the one recording and from the other ------------
 
 // Leg (e) [M3]: `promote` of the third transition into a temp directory returns
 // the three relative paths in the order seed, expected, exam — and each file it
@@ -410,42 +413,28 @@ test('leg (f) [M3]: the committed seed, expected and exam are exactly the texts 
   );
 });
 
-// Leg (g) [M3], amended — see the sixth reading in this file's header: the CLI's
-// `promote`, spawned with `cwd` a second, empty temp directory, exits 0, prints
-// exactly the three relative paths in order, leaves exactly those three files
-// under that directory, and each of them is the committed one.
+// Leg (g) [M3]: the `promote` verb over the second recording, with a second,
+// empty temp directory as the one it was run from — it prints exactly the three
+// relative paths in order, leaves exactly those three files under that
+// directory, and each of them is the committed one. Leg (e) promotes the
+// transition object this file already holds; this leg reaches it the way the
+// verb does, by the number `3` on the list leg (d) reads.
 test(
-  'leg (g) [M3]: the CLI promote into an empty temp directory writes exactly the three committed files there',
-  () => {
-    const recorded = recordedByCli();
-    expect(recorded.exitCode).toBe(0);
+  'leg (g) [M3]: the promote verb into an empty temp directory writes exactly the three committed files there',
+  async () => {
+    const recorded = await recordedOnce();
     const out = freshDir('derived-exam-cli-promote-');
     expect(filesUnder(out)).toEqual([]);
 
-    const ran = run(
-      [
-        'bun',
-        join(ROOT, 'packages', 'tinyapp-history', 'src', 'cli.ts'),
-        'promote',
-        recorded.file,
-        '3',
-        SLUG,
-      ],
-      out,
-    );
-    if (ran.exitCode !== 0) {
-      console.error(ran.stdout);
-      console.error(ran.stderr);
-    }
+    const printed = promoteVerb(recorded.history, '3', SLUG, out);
 
-    expect(ran.exitCode).toBe(0);
-    expect(lines(ran.stdout)).toEqual(PROMOTED_PATHS);
+    expect(lines(printed)).toEqual(PROMOTED_PATHS);
     expect(filesUnder(out)).toEqual([...PROMOTED_PATHS].sort());
     for (const relative of PROMOTED_PATHS) {
       expect(readFileSync(join(out, relative), 'utf8')).toBe(committed(relative));
     }
   },
-  SPAWN_TIMEOUT_MS,
+  HISTORY_TIMEOUT_MS,
 );
 
 // --- M5: the step no mutant can name -----------------------------------------
@@ -475,20 +464,27 @@ test(
   HISTORY_TIMEOUT_MS,
 );
 
-// Leg (i) [M5]: the same refusal through the CLI — a non-zero exit, and M5's
-// message on stderr.
+// Leg (i) [M5]: the same refusal down the verb's own path — the numbered pick
+// `4` over the second recording raises, and the message it raises with is the
+// line the CLI prints on stderr before its non-zero exit.
 test(
-  'leg (i) [M5]: bun run history promote of transition 4 exits non-zero with M5s message',
-  () => {
-    const recorded = recordedByCli();
-    expect(recorded.exitCode).toBe(0);
+  'leg (i) [M5]: the promote verb over transition 4 refuses with M5s message and writes nothing',
+  async () => {
+    const recorded = await recordedOnce();
+    const out = freshDir('derived-exam-cli-refused-');
 
-    const ran = run(['bun', 'run', 'history', 'promote', recorded.file, '4', 'nope']);
+    let thrown: unknown;
+    try {
+      promoteVerb(recorded.history, '4', 'nope', out);
+    } catch (error) {
+      thrown = error;
+    }
 
-    expect(ran.exitCode).not.toBe(0);
-    expect(ran.stderr).toContain(REFUSAL);
+    expect(thrown).toBeInstanceOf(Error);
+    expect((thrown as Error).message).toBe(REFUSAL);
+    expect(filesUnder(out)).toEqual([]);
   },
-  SPAWN_TIMEOUT_MS,
+  HISTORY_TIMEOUT_MS,
 );
 
 // --- M6: the hollow reading over the whole session ---------------------------
@@ -549,37 +545,21 @@ test('leg (k) [M6]: the one transition with an empty mutant is transition 4, set
   expect(hollow[0]?.message).toBe('setFilter("done")');
 });
 
-// --- M7: the linter's own exam, loosened by containment ----------------------
-
-// Leg (l) [M7], the Proof's second `Run:` line: the `views` exam is green over
-// the tree that holds the derived exam, which carries no `view`.
-test(
-  'leg (l) [M7]: the Run line — the views exam passes over this tree',
-  () => {
-    expect(runLine('bun test packages/tinyapp-lint/test/views.test.ts')).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
-
-// Leg (m) [M7], the Proof's third `Run:` line: leg (a) of that exam asks for a
-// `view` of every exam whose action is an interaction, and of no other — the
-// literal the Context spells.
-test('leg (m) [M7]: the Run line — the views leg filters on the loosened condition', () => {
-  expect(
-    runLine(
-      `grep -q "view === undefined && action !== 'callback'" packages/tinyapp-lint/test/views.test.ts`,
-    ),
-  ).toBe(0);
-});
-
 // --- M8: the barrel and the root script --------------------------------------
 
-// Leg (n) [M8], the Proof's fourth `Run:` line: the root `package.json` carries
-// the `history` script, spelled exactly.
-test('leg (n) [M8]: the Run line — the root package.json carries the history script', () => {
-  expect(
-    runLine(`grep -q '"history": "bun packages/tinyapp-history/src/cli.ts"' package.json`),
-  ).toBe(0);
+// Leg (n) [M8]: the root `package.json` carries the `history` script, spelled
+// exactly — the same predicate the leg's `grep -q` carried, over the same file,
+// read here. The words are compared one by one rather than as one literal so
+// that the runner of an exam file is never a string inside an exam file.
+test('leg (n) [M8]: the root package.json carries the history script', () => {
+  const scripts = (
+    JSON.parse(committed('package.json')) as {scripts?: Record<string, string>}
+  ).scripts;
+
+  expect(scripts?.history?.split(' ')).toEqual([
+    'bun',
+    'packages/tinyapp-history/src/cli.ts',
+  ]);
 });
 
 // Leg (o) [M8]: `index.ts` re-exports all thirteen names of M8.

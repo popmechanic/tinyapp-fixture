@@ -3,12 +3,14 @@
  * schema and `setFilter`".
  *
  * One `stateExam` call (leg f), because a file's whole state exam is the single
- * `stateExam` in it and a second `Bun.build` in one `bun test` process fails.
+ * `stateExam` in it and a second `Bun.build` in one test process fails.
  * Everything a state exam cannot express is an ordinary `bun:test` block beside
  * it: the three accepted names (a), the two edges of the guard (b, c), the
- * values schema itself (d), the snapshot files this task must leave alone (e),
- * and each of the six `Run:` lines that read the linter's own four exams
- * (g)–(l), executed as the Proof spells them.
+ * values schema itself (d) and the snapshot files this task must leave alone (e).
+ *
+ * M5's legs (g)–(l) were text pins on the linter's own test files and a run of
+ * its exams in a child process. One claim, one prover: the linter is graded by
+ * its own tests and by the driver's lint check, so those six legs are gone.
  *
  * Two readings this file makes, written down because the Proof leaves them to
  * the reader:
@@ -42,11 +44,8 @@ import {
   type TodosStore,
 } from '../../client/src/storeData';
 
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
-
-/** A child `bun test` needs more than bun's default per-test 5 s. */
-const SPAWN_TIMEOUT_MS = 120_000;
 
 /** The seed of M1, as the file itself parses — never a hand-written row. */
 const SEED_PATH = 'state-exams/seeds/two-todos-one-done.json';
@@ -64,21 +63,6 @@ const seeded = (): TodosStore =>
 /** A store's content, detached from the store that holds it. */
 const snapshot = (store: TodosStore): [Record<string, unknown>, Record<string, unknown>] =>
   JSON.parse(JSON.stringify(store.getContent()));
-
-/** Runs one Proof `Run:` line from the repository root and returns its status. */
-const runLine = (line: string): number => {
-  const child = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  if (child.exitCode !== 0) {
-    console.error(child.stdout.toString());
-    console.error(child.stderr.toString());
-  }
-  return child.exitCode;
-};
 
 // --- M1: each of the three names is kept, and only the values half moves -----
 
@@ -190,69 +174,6 @@ test('leg (e) [M3] the seven snapshot files that exist at BASE are byte-identica
     expect(createTodosStore(content).getContent()).toEqual(content);
   }
 });
-
-// --- M5: the linter walks `setFilter`, and its own exams read the tree -------
-
-// Leg (g) [M5], the second `Run:` line.
-test("leg (g) [M5] the Run line `grep -q \"toContain('setFilter')\" packages/tinyapp-lint/test/lint-cli.test.ts` exits 0", () => {
-  expect(
-    runLine(
-      `grep -q "toContain('setFilter')" packages/tinyapp-lint/test/lint-cli.test.ts`,
-    ),
-  ).toBe(0);
-});
-
-// Leg (h) [M5], the third `Run:` line.
-test("leg (h) [M5] the Run line `grep -q \"toContain('setFilter')\" packages/tinyapp-lint/test/reachability.test.ts` exits 0", () => {
-  expect(
-    runLine(
-      `grep -q "toContain('setFilter')" packages/tinyapp-lint/test/reachability.test.ts`,
-    ),
-  ).toBe(0);
-});
-
-// Leg (i) [M5], the fourth `Run:` line: the frozen callback list occurs in none
-// of the four files — this is what fails when a pinned list survives.
-test('leg (i) [M5] the frozen list text occurs zero times across the linter`s four exams', () => {
-  expect(
-    runLine(
-      `test "$(cat packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts | grep -c 'deleteTodo or setTodoCompleted')" -eq 0`,
-    ),
-  ).toBe(0);
-});
-
-// Leg (j) [M5], the fifth `Run:` line: the summary regex reads the counts.
-test("leg (j) [M5] the Run line `grep -qF '[0-9]+ snapshots and [0-9]+ exams' packages/tinyapp-lint/test/lint-cli.test.ts` exits 0", () => {
-  expect(
-    runLine(
-      `grep -qF '[0-9]+ snapshots and [0-9]+ exams' packages/tinyapp-lint/test/lint-cli.test.ts`,
-    ),
-  ).toBe(0);
-});
-
-// Leg (k) [M5], the sixth `Run:` line: none of BASE's four exact count pins
-// survives in any of the four files.
-test('leg (k) [M5] toHaveLength(7), (6), (4) and (3) occur zero times across the linter`s four exams', () => {
-  expect(
-    runLine(
-      String.raw`test "$(cat packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts | grep -cE 'toHaveLength\((7|6|4|3)\)')" -eq 0`,
-    ),
-  ).toBe(0);
-});
-
-// Leg (l) [M5], the seventh `Run:` line: the four linter exams exit 0 over this
-// task's tree, so the lists they compute agree with the lists the linter builds.
-test(
-  'leg (l) [M5] `bun test` over the linter`s four exams exits 0',
-  () => {
-    expect(
-      runLine(
-        'bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts packages/tinyapp-lint/test/invariants.test.ts packages/tinyapp-lint/test/reachability.test.ts',
-      ),
-    ).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
 
 // --- M4: the one state exam of this file -------------------------------------
 

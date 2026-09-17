@@ -6,16 +6,19 @@
  * the single `stateExam` in it, as `clear-completed.test.ts` records — and every
  * other leg as an ordinary `bun:test` block beside it: `parseMessage`'s three
  * readings (b)–(d), the two walks of `listTransitions` (e)–(f), the three
- * renders of `renderTransitions` (g), and the Proof's one `Run:` line (h),
- * spawned as the Proof spells it.
+ * renders of `renderTransitions` (g).
+ *
+ * M2's leg (h) ran the project's type checker over the module alone in a child
+ * process. One claim, one prover: the typecheck is the driver's own check over
+ * the whole tree, run once, so that leg is gone from here.
  *
  * Four readings this file makes, written down because the Proof leaves them to
  * the reader:
  *
  *   - The module under exam is imported by relative path,
  *     `../../packages/tinyapp-history/src/transitions`, never by the bare name
- *     `tinyapp-history`: the package is linked into `node_modules` only by a
- *     `bun install` that has seen it, and this exam must be readable in a clone
+ *     `tinyapp-history`: the package is linked into `node_modules` only by an
+ *     install that has seen it, and this exam must be readable in a clone
  *     that has not run one.
  *   - `HistoryReader` is structural, so the readers here are plain objects
  *     spelling `log()` and `diff()` — no import of the real history module,
@@ -35,8 +38,6 @@
  * its state through the store module's own callback.
  */
 
-import {join} from 'node:path';
-
 import {expect, test} from 'bun:test';
 import {stateExam, type Cell} from 'tinyapp-exam';
 
@@ -51,12 +52,6 @@ import {
   renderTransitions,
   type Transition,
 } from '../../packages/tinyapp-history/src/transitions';
-
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
-const ROOT = join(import.meta.dir, '..', '..');
-
-/** A child `bunx tsc` needs more than bun's default per-test 5 s. */
-const SPAWN_TIMEOUT_MS = 120_000;
 
 /** One row of `dolt_log`, verbatim from the shared literal the Context quotes. */
 type LogEntry = {commit_hash: string; message: string};
@@ -149,21 +144,6 @@ const FIRST_LINE = '1. c1 --setTodoCompleted("0", true)--> c2 (1 change)';
 
 /** The second line M3 spells over M2's second transition. */
 const SECOND_LINE = '2. c2 --setFilter("done")--> c3 (1 change)';
-
-/** Runs the Proof's `Run:` line from the repository root and returns its status. */
-const runLine = (line: string): number => {
-  const child = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  if (child.exitCode !== 0) {
-    console.error(child.stdout.toString());
-    console.error(child.stderr.toString());
-  }
-  return child.exitCode;
-};
 
 // --- M1: a recorded message read back into its call --------------------------
 
@@ -271,22 +251,6 @@ test('leg (g) [M3]: renderTransitions is the numbered lines M3 spells, exactly',
     '1. 01234567 --clearCompleted()--> fedcba98 (1 change)',
   );
 });
-
-// --- M2: the module stands alone under the package's flags -------------------
-
-// Leg (h) [M2], the Proof's `Run:` line: the module typechecks by itself, with
-// no `packages/tinyapp-history/tsconfig.json` to carry the flags for it.
-test(
-  'leg (h) [M2]: the Run line typechecks transitions.ts alone under the package flags',
-  () => {
-    expect(
-      runLine(
-        'bunx tsc --noEmit --strict --skipLibCheck --types bun --module esnext --moduleResolution bundler --target es2022 packages/tinyapp-history/src/transitions.ts',
-      ),
-    ).toBe(0);
-  },
-  SPAWN_TIMEOUT_MS,
-);
 
 // --- M4: the call a transition names is one the app performs -----------------
 

@@ -20,9 +20,12 @@
  *   (f) [M4] the single `stateExam({…})` in this file, spelled as the leg does:
  *            the seeded page still reaches `one-open-todo.json`, shows
  *            `#todoList` once with `buy milk` and `#todo-0` unchecked, and the
- *            mutant of row `0`'s `completed` is killed;
- *   (g) [M5] the two `Run:` lines, `bun run typecheck` and
- *            `bun install --frozen-lockfile`, each exiting 0.
+ *            mutant of row `0`'s `completed` is killed.
+ *
+ * Leg (g) [M5] ran the typecheck and a frozen-lockfile install as child
+ * commands. Both are gone: one claim, one prover — this file proves the design
+ * system is installed, and the run's own checks prove the tree still typechecks
+ * and its lockfile is still honoured.
  *
  * Four readings this file makes, written down because they are choices:
  *
@@ -37,20 +40,19 @@
  *     element, rendered by the same `renderToStaticMarkup`. No element's props
  *     or children differ from the clause.
  *   - Every file read happens inside a test body, never at module level: the
- *     linter's capture child imports this file with `stateExam` and `bun:test`
- *     stubbed out, so a module-level read of `client/src/index.css` — a file
- *     this task creates — would make `bun run lint:state` fail as `capture
+ *     state linter's capture child imports this file with `stateExam` and
+ *     `bun:test` stubbed out, so a module-level read of `client/src/index.css`
+ *     — a file this task creates — would make `lint:state` fail as `capture
  *     failed` rather than leave leg (a) red as the finding it is.
- *   - Legs (b), (f) and (g) are written for a run whose working directory is
- *     the repository root, which is what `bun test tests/state-exams/…` and the
- *     helper's own `pageFor` already assume; leg (b) keeps the leg's literal
- *     relative `'client/index.html'` and says so when the directory is wrong,
- *     so a mis-run never reads as a missing entry.
+ *   - Legs (b) and (f) are written for a run whose working directory is the
+ *     repository root, which is what running this file by its
+ *     `tests/state-exams/…` path and the helper's own `pageFor` already assume;
+ *     leg (b) keeps the leg's literal relative `'client/index.html'` and says so
+ *     when the directory is wrong, so a mis-run never reads as a missing entry.
  *
- * Legs (f) and (g) hold at BASE and are meant to: M4 is the regression clause —
- * the app still works over the seeded page — and M5's two commands pass on the
- * tree as it stands, the point being that installing the system leaves both
- * alone. The red at BASE is legs (a)–(e).
+ * Leg (f) holds at BASE and is meant to: M4 is the regression clause — the app
+ * still works over the seeded page — the point being that installing the system
+ * leaves it alone. The red at BASE is legs (a)–(e).
  */
 
 import {existsSync, readFileSync} from 'node:fs';
@@ -71,9 +73,6 @@ const ENTRY = 'client/index.html';
 
 /** The wall a leg that bundles the client is given, in milliseconds. */
 const BUNDLE_TIMEOUT_MS = 180_000;
-
-/** The wall one spawned `Run:` line is given, in milliseconds. */
-const RUN_TIMEOUT_MS = 600_000;
 
 /**
  * The text of a file this task must write, or a failure that names the missing
@@ -150,34 +149,6 @@ const exportOf = async (name: string, exported: string): Promise<ComponentType<a
   return component as ComponentType<any>;
 };
 
-/** Runs one `Run:` line from the repository root and returns its status and output. */
-const runLine = async (
-  cmd: string[],
-): Promise<{exitCode: number | null; output: string}> => {
-  const child = Bun.spawn({
-    cmd,
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const [out, err] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  return {exitCode: await child.exited, output: `${out}${err}`};
-};
-
-/** Fails with the command's own output when it did not exit 0. */
-const expectGreen = (
-  run: {exitCode: number | null; output: string},
-  line: string,
-): void => {
-  if (run.exitCode !== 0) {
-    throw new Error(`\`${line}\` exited ${run.exitCode}; its output was:\n${run.output}`);
-  }
-  expect(run.exitCode).toBe(0);
-};
-
 // --- Leg (a) [M1]: the entry imports the stylesheet, the stylesheet is Tailwind's
 
 test("leg (a) [M1]: client/src/index.tsx's first statement is `import './index.css';`", () => {
@@ -202,7 +173,7 @@ test(
   async () => {
     if (!existsSync(ENTRY)) {
       throw new Error(
-        `${ENTRY} is not there relative to ${process.cwd()} — this exam is run from the repository root, as \`bun test ${'tests/state-exams/design-system-installed.test.ts'}\``,
+        `${ENTRY} is not there relative to ${process.cwd()} — this exam is run from the repository root, by its path ${'tests/state-exams/design-system-installed.test.ts'}`,
       );
     }
 
@@ -297,24 +268,3 @@ stateExam({
   ],
   mutant: [{table: 'todos', row: '0', cell: 'completed', value: true}],
 });
-
-// --- Leg (g) [M5]: the two `Run:` lines -------------------------------------
-
-test(
-  'leg (g) [M5]: `bun run typecheck` exits 0',
-  async () => {
-    expectGreen(await runLine(['bun', 'run', 'typecheck']), 'bun run typecheck');
-  },
-  RUN_TIMEOUT_MS,
-);
-
-test(
-  'leg (g) [M5]: `bun install --frozen-lockfile` exits 0 — the CLI added no package and moved no manifest',
-  async () => {
-    expectGreen(
-      await runLine(['bun', 'install', '--frozen-lockfile']),
-      'bun install --frozen-lockfile',
-    );
-  },
-  RUN_TIMEOUT_MS,
-);

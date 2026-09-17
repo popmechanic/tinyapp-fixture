@@ -4,7 +4,7 @@
  *
  * One `stateExam` call, carrying legs (a)–(d), because a file's whole state
  * exam is the single `stateExam` in it: a second `Bun.build` of the entry in one
- * `bun test` process fails with `Bundle failed` (measured on Bun 1.3.0,
+ * test process fails with `Bundle failed` (measured on Bun 1.3.0,
  * recorded in `tests/state-exams/interaction-evidence.test.ts`'s header). That
  * is why the Done press lives in this file at all —
  * `tests/state-exams/filter-bar.test.ts` already bundles `client/index.html`
@@ -12,8 +12,12 @@
  * process.
  *
  * Everything the state exam cannot express is an ordinary `bun:test` block
- * beside it: the four `Run:` lines of M5 and M6, legs (e)–(h), each spawned
- * through bash from the repository root exactly as the Proof spells it.
+ * beside it: the three source predicates of M5, legs (e)–(g), each asserted as
+ * an in-process read of the file it is about, from the repository root.
+ *
+ * M6's leg (h) ran the linter's own exams in a child process. One claim, one
+ * prover: the linter is graded by its own tests and by the driver's lint check,
+ * so that leg is gone from here.
  *
  * Three readings this file makes, written down because the Proof leaves them to
  * the reader:
@@ -21,10 +25,10 @@
  *   - No filesystem read happens at module level — this file reads no fixture
  *     outside a test body at all. The linter's capture child imports this file
  *     with `stateExam` and `bun:test` stubbed out, so a module-level read of a
- *     file the tree may not carry would make `bun run lint:state` — and so leg
- *     (h) — fail as `capture failed` rather than as the M5 leg it belongs to.
- *   - Legs (e), (f) and (g) are asserted as `Run:` lines rather than as a
- *     paraphrase of them, because M5 pins text. They were three lines about
+ *     file the tree may not carry would make the state linter fail as `capture
+ *     failed` rather than as the M5 leg it belongs to.
+ *   - Legs (e), (f) and (g) pin text verbatim rather than paraphrasing it,
+ *     because M5 pins text. They were three lines about
  *     `client/src/filterBar.css` — its import, its
  *     `#filterBar button[data-active="true"] {` rule and that rule's
  *     `background: var(--accent)` — and the stylesheet is gone: the re-platform
@@ -40,7 +44,7 @@
  *     component and the token behind it. The bar, `todoFilter`, `TodoList`'s
  *     single mount of the bar and
  *     `state-exams/expected/two-todos-one-done-filter-done.json` are an earlier
- *     task's, so legs (a)–(d) and (h) speak of what this task must not disturb.
+ *     task's, so legs (a)–(d) speak of what this task must not disturb.
  *     Nothing here is loosened on that account: the click, the seven views and
  *     the mutant are asserted in full, so a change to the bar that broke the
  *     Done press would be caught here as well.
@@ -52,6 +56,7 @@
  * this exam green.
  */
 
+import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 
 import {expect, test} from 'bun:test';
@@ -59,11 +64,8 @@ import {stateExam} from 'tinyapp-exam';
 
 import {createTodosStore} from '../../client/src/storeData';
 
-/** This file sits two directories below the repository root, which is `bun test`'s cwd. */
+/** This file sits two directories below the repository root, the runner's cwd. */
 const ROOT = join(import.meta.dir, '..', '..');
-
-/** A child `bun test` over the linter's two exams needs far more than bun's 5 s. */
-const LINT_TIMEOUT_MS = 600_000;
 
 /** The seed of M1 — row `0` `buy milk` open, row `1` `walk the dog` done. */
 const SEED_PATH = 'state-exams/seeds/two-todos-one-done.json';
@@ -71,79 +73,41 @@ const SEED_PATH = 'state-exams/seeds/two-todos-one-done.json';
 /** The expected state of M1: the seed's tables beside `{filter: 'done'}`. */
 const DONE_PATH = 'state-exams/expected/two-todos-one-done-filter-done.json';
 
-/**
- * Runs one Proof `Run:` line from the repository root and returns its status.
- *
- * A non-zero exit puts the child's own output on this process's, so a red leg
- * reads as whatever the line said rather than as a bare exit code.
- */
-const runLine = (line: string): number => {
-  const child = Bun.spawnSync({
-    cmd: ['bash', '-c', line],
-    cwd: ROOT,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  if (child.exitCode !== 0) {
-    console.error(child.stdout.toString());
-    console.error(child.stderr.toString());
-  }
-  return child.exitCode;
-};
+/** One repository file's text, read from the repository root in this process. */
+const readSource = (relative: string): string =>
+  readFileSync(join(ROOT, relative), 'utf8');
 
 // --- M5: the component, the variant, and the token that paints the pressed look
 
-// Leg (e) [M5], the first `Run:` line: `FilterBar.tsx` takes its button from the
+// Leg (e) [M5], the first predicate: `FilterBar.tsx` takes its button from the
 // design system, the way every component of this app reaches a control now that
 // no component imports a stylesheet of its own.
-test("leg (e) [M5] the Run line `grep -qF \"import {Button} from '@/components/ui/button';\" client/src/FilterBar.tsx` exits 0", () => {
-  expect(
-    runLine(
-      `grep -qF "import {Button} from '@/components/ui/button';" client/src/FilterBar.tsx`,
-    ),
-  ).toBe(0);
+test("leg (e) [M5] client/src/FilterBar.tsx carries `import {Button} from '@/components/ui/button';`", () => {
+  expect(readSource('client/src/FilterBar.tsx')).toContain(
+    `import {Button} from '@/components/ui/button';`,
+  );
 });
 
-// Leg (f) [M5], the second `Run:` line: the pressed look is the component's own
+// Leg (f) [M5], the second predicate: the pressed look is the component's own
 // variant, chosen from the filter the store holds and written out in full —
 // read as a fixed string, so a computed class string or a comment naming the
 // variant does not carry it.
-test('leg (f) [M5] the Run line `grep -qF "variant={filter === name ? \'default\' : \'outline\'}" client/src/FilterBar.tsx` exits 0', () => {
-  expect(
-    runLine(
-      `grep -qF "variant={filter === name ? 'default' : 'outline'}" client/src/FilterBar.tsx`,
-    ),
-  ).toBe(0);
+test(`leg (f) [M5] client/src/FilterBar.tsx carries \`variant={filter === name ? 'default' : 'outline'}\``, () => {
+  expect(readSource('client/src/FilterBar.tsx')).toContain(
+    `variant={filter === name ? 'default' : 'outline'}`,
+  );
 });
 
-// Leg (g) [M5], the third `Run:` line: that variant is not an empty one. The
+// Leg (g) [M5], the third predicate: that variant is not an empty one. The
 // `default` variant of the button paints `bg-primary`, and `--primary` is
 // declared in `client/src/index.css` — the project's one stylesheet and the one
-// place a colour is written. Both halves must hold, so the line is one `&&`.
-test("leg (g) [M5] the Run line `grep -qF 'default: \"bg-primary' client/src/components/ui/button.tsx && grep -q -- '--primary:' client/src/index.css` exits 0", () => {
-  expect(
-    runLine(
-      `grep -qF 'default: "bg-primary' client/src/components/ui/button.tsx && grep -q -- '--primary:' client/src/index.css`,
-    ),
-  ).toBe(0);
+// place a colour is written. Both halves must hold, so the leg asserts both.
+test('leg (g) [M5] client/src/components/ui/button.tsx carries `default: "bg-primary` and client/src/index.css declares `--primary:`', () => {
+  expect(readSource('client/src/components/ui/button.tsx')).toContain(
+    'default: "bg-primary',
+  );
+  expect(readSource('client/src/index.css')).toContain('--primary:');
 });
-
-// --- M6: the linter's own exams read the tree, and pass over this one --------
-
-// Leg (h) [M6], the fourth `Run:` line: the two linter exams exit 0 over this
-// task's tree, so the exam list they compute — this file in it by construction,
-// since it calls `stateExam(` at a line start — is the list the linter reads.
-test(
-  'leg (h) [M6] `bun test` over the linter`s two exams exits 0 over this tree',
-  () => {
-    expect(
-      runLine(
-        'bun test packages/tinyapp-lint/test/lint-cli.test.ts packages/tinyapp-lint/test/views.test.ts',
-      ),
-    ).toBe(0);
-  },
-  LINT_TIMEOUT_MS,
-);
 
 // --- M1–M4: the one state exam of this file ----------------------------------
 
