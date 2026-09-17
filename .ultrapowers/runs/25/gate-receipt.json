@@ -1,0 +1,61 @@
+{
+  "mode": "gate",
+  "stamp": "run-25",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-25/report.json",
+  "branch": "ultra/integration-run-25",
+  "gateCheck": {
+    "verdict": "BLOCKED",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": false,
+        "detail": "merge-sha guard unavailable \u2014 result lacks waveMerges[last].headSha (budget-exhausted or SKIPPED-only run); inspect and redirect/re-run"
+      },
+      {
+        "name": "head-match",
+        "ok": false,
+        "detail": "skipped \u2014 no recorded merge headSha to compare"
+      },
+      {
+        "name": "git-verified",
+        "ok": false,
+        "detail": "gitVerified is not true \u2014 the completeness critic could not confirm it reviewed the recorded merge HEAD; the review is unverified"
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": false,
+        "detail": "failed/blocked tasks left declared deliverables unproduced: [{\"task\": \"2\", \"files\": [\"tests/state-exams/done-count.test.ts\", \"tests/state-exams/due-date-marks-overdue.test.ts\", \"tests/state-exams/filter-bar.test.ts\", \"tests/state-exams/filter-done.test.ts\", \"tests/state-exams/mutant-from-diff.test.ts\", \"tests/state-exams/session-transitions.test.ts\", \"tests/state-exams/set-filter.test.ts\", \"tests/state-exams/set-todo-due.test.ts\", \"tests/state-exams/set-todo-tags.test.ts\", \"tests/state-exams/store-history.test.ts\", \"tests/state-exams/tag-filter.test.ts\", \"tests/state-exams/type-due-date.test.ts\"]}, {\"task\": \"1\", \"files\": [\"tests/state-exams/delete-to-trash.test.ts\", \"tests/state-exams/derived-exam.test.ts\", \"tests/state-exams/design-system-installed.test.ts\", \"tests/state-exams/exam-page.test.ts\", \"tests/state-exams/interaction-evidence.test.ts\", \"tests/state-exams/persistence-exam.test.ts\", \"tests/state-exams/pin-todo.test.ts\", \"tests/state-exams/styled-page.test.ts\", \"tests/state-exams/undo-delete.test.ts\"]}]"
+      }
+    ],
+    "acks": [
+      {
+        "type": "coverage",
+        "detail": "green suite but 0/2 tasks merged \u2014 a passing suite over an incomplete merge is a false-green"
+      }
+    ],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 1,
+  "suite": {
+    "passed": false,
+    "unattributed": [],
+    "output": "not run \u2014 no wave merged"
+  },
+  "verdict": "BLOCKED"
+}

@@ -92,3 +92,8 @@
 {"kind":"driver:check-run","task":"1","cmd":"bun run lint:state","exit":0,"minor":false,"iter":0,"id":"01M2PRSNDJ0000WM3QAGKPT0VQ","ts":1789618083250}
 {"kind":"driver:check-run","task":"1","cmd":"git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock","exit":0,"minor":false,"iter":0,"id":"01M2PRSNDR0000Z74KKB02DPVE","ts":1789618083256}
 {"kind":"engine:log","line":"task 1 proof-red after the pre-review repair round","id":"01M2PRSNHD0000Q8JM6ACAWJYF","ts":1789618083373}
+{"kind":"engine:log","line":"baseline: green on 42d19c50aaecd92f13367b2b97324a3013bb62fb","id":"01M2PS5EAR0000K64CP4YKJPV7","ts":1789618469208}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2PS5EN900002KCPAYM7F9N2","ts":1789618469545}
+{"kind":"driver:stage","stage":"finalize","id":"01M2PS5ENT0000A66WFKVKQ6H7","ts":1789618469562}
+{"kind":"driver:stage","stage":"gate","id":"01M2PS5ER60000MSN6V9ZJTB9J","ts":1789618469638}
+{"kind":"driver:fail","verdict":"gate-blocked","detail":"ultra_gate exited 1 — gate receipt is the terminal artifact","id":"01M2PS5EW00000FJ1E6KZ5X2TM","ts":1789618469760}
