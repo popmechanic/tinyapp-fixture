@@ -28,3 +28,13 @@
 {"kind":"handshake:settled","task":"1","expected":"state-exams/expected/two-todos-second-tagged.json","id":"01M2PA7YDT0001AJ3ZN99HEWQD","ts":1789602822586}
 {"kind":"engine:log","line":"task 1 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2PA7YE00000JJV3S6Z3JDT3","ts":1789602822592}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2PA7YEX00009P1DG8YXW2VJ","ts":1789602822621}
+{"kind":"driver:wave-adopted","wave":1,"tasks":["1"],"headSha":"d965df9243429f96e06ab9c504ad088cdbde923f","why":"released","released":["2","3"],"applied":{"1":"base"},"id":"01M2PBB48T00004KZGF7QWP4XK","ts":1789603975450}
+{"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2PBB4AE0000E9EYV6CY0JS1","ts":1789603975502}
+{"kind":"driver:integrated-check","cmd":"bun run lint:ui","exit":0,"minor":false,"wave":1,"id":"01M2PBB4Y900006CVG62P70T11","ts":1789603976137}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":1,"id":"01M2PBBAHE0000FEBNEK0PNK48","ts":1789603981870}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":1,"id":"01M2PBBN270000X1790WHMZSM5","ts":1789603992647}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/config.ts client/src/index.css client/src/components packages/tinyapp-exam packages/tinyapp-lint/src packages/tinyapp-history package.json client/package.json server/package.json bun.lock","exit":0,"minor":false,"wave":1,"id":"01M2PBBN2D0000AB06SSXC7PAV","ts":1789603992653}
+{"kind":"worker:start","label":"exam:3","role":"examiner","sessionId":"0914ae02-59ab-4b82-ada1-11aeb7b39f0e","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-24/clones/exam-3","model":"opus","id":"01M2PBBNSB0000WN75D5T21W27","ts":1789603993387}
+{"kind":"worker:start","label":"impl:3","role":"implementer","sessionId":"48f57c82-190e-4656-9626-8c66d8cd5d4b","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-24/clones/task-3","model":"opus","id":"01M2PBBNSD0000DY9ADWZKZ0X7","ts":1789603993389}
+{"kind":"worker:start","label":"exam:2","role":"examiner","sessionId":"0f76a790-2407-4a61-9e61-c906b44023dc","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-24/clones/exam-2","model":"opus","id":"01M2PBBNSV00004MP7G4QSN953","ts":1789603993403}
+{"kind":"worker:start","label":"impl:2","role":"implementer","sessionId":"a7dfadda-a3a0-49c9-8eac-8fbf3b40e830","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-24/clones/task-2","model":"opus","id":"01M2PBBNSX00008KT2SK8782EJ","ts":1789603993405}
