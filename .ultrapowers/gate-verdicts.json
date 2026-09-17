@@ -1,0 +1,155 @@
+{
+ "tasks": {
+  "1": {
+   "hash": "5085034e2507eaa54db30cf6654ca82e998d3eafb114708f5cf454eee6de206f",
+   "verdict": "pass",
+   "reason": "Every M1 branch has its leg, M2 is the port-free/dir-gone check, M3 covers the six verbs, the 404 rejection and the events socket, and M4's Run lines fail at BASE where server/test/celld.ts exists and both tests import ./celld."
+  },
+  "3": {
+   "hash": "ef3c7922850adadd2fd4dee22e86b30b13fdc1541efde861193a55d0c5e8e68b",
+   "verdict": "pass",
+   "reason": "Lowest/highest-seq pins the socket-before-action, the four pinned failure spellings and the ok judgment are exercised, the allow list has both cases, M4 and M6 are pinned, and every consumed symbol is at BASE or in the sibling's Produces."
+  },
+  "4": {
+   "hash": "53e8ffc9648634ac995b292f11b260979bc569743ed5d6d411f0e23c6449af93",
+   "verdict": "pass",
+   "reason": "Registration read back in-process, the BASE-present expected file parsed against the seed's rows with git diff --quiet on state-exams as the no-new-snapshot pin, evidence files read from disk under ULTRA_RUN_DIR with a negative control, and the AGENTS negation fails while BASE's sentence survives."
+  }
+ },
+ "tally": {
+  "base": "1081e08aab43d5cead1fd09cacd5a1c8749ae07c",
+  "dispatched": 9,
+  "rejected": 4,
+  "rounds": 4,
+  "per_round": {
+   "1": {
+    "dispatched": 4,
+    "rejected": 3
+   },
+   "2": {
+    "dispatched": 3,
+    "rejected": 1
+   },
+   "3": {
+    "dispatched": 1,
+    "rejected": 0
+   },
+   "4": {
+    "dispatched": 1,
+    "rejected": 0
+   }
+  },
+  "note": "run-33 re-driven narrower: its task 2 merged as PR #32, so that task and its verdict are gone; tasks 1, 3 and 4 keep their verdicts, whose hashes are over Claim and Proof only and are unchanged (task 1 gained Context alone, carrying run-33s blocking finding)."
+ },
+ "history": [
+  {
+   "round": 1,
+   "task": "1",
+   "hash": "5085034e2507eaa54db30cf6654ca82e998d3eafb114708f5cf454eee6de206f",
+   "verdict": "pass",
+   "reason": "as recorded"
+  },
+  {
+   "round": 1,
+   "task": "2",
+   "hash": "497b4af2deb3",
+   "verdict": "fail",
+   "reason": "M1's window-undefined row had no leg."
+  },
+  {
+   "round": 1,
+   "task": "3",
+   "hash": "c44d8bedccdf",
+   "verdict": "fail",
+   "reason": "M3 enumerated six failure sentences with legs for two; leg (c) read a runtime field M1 did not carry; leg (a) could not pin the events socket opened before the action."
+  },
+  {
+   "round": 1,
+   "task": "4",
+   "hash": "821775bca172",
+   "verdict": "fail",
+   "reason": "M3's evidence files were not read from disk; the AGENTS sentence and the seed's rows were not in the reader's excerpt."
+  },
+  {
+   "round": 2,
+   "task": "2",
+   "hash": "8b22c7815ba4f0e411fa2a6ebfc4266752ec2ee2ab89a7bb22127c809815fb6d",
+   "verdict": "pass",
+   "reason": "as recorded"
+  },
+  {
+   "round": 2,
+   "task": "3",
+   "hash": "ef3c7922850adadd2fd4dee22e86b30b13fdc1541efde861193a55d0c5e8e68b",
+   "verdict": "pass",
+   "reason": "as recorded"
+  },
+  {
+   "round": 2,
+   "task": "4",
+   "hash": "95795f97ea7b",
+   "verdict": "fail",
+   "reason": "The AGENTS negation was vacuous in the reader's excerpt; the sentence was then named as a literal in M4."
+  },
+  {
+   "round": 3,
+   "task": "4",
+   "hash": "cbaabf1bdae3b3f5ce0fa61c95efc5c3f39ddd9f8d43c520367d01a0ddeb93db",
+   "verdict": "pass",
+   "reason": "as recorded"
+  },
+  {
+   "round": 3,
+   "task": "4",
+   "hash": "cbaabf1bdae3",
+   "verdict": "pass",
+   "reason": "passed, then the task was re-pointed at the expected file already on the tree (a BASE fact), which changed its hash"
+  },
+  {
+   "round": 4,
+   "task": "4",
+   "hash": "53e8ffc9648634ac995b292f11b260979bc569743ed5d6d411f0e23c6449af93",
+   "verdict": "pass",
+   "reason": "as recorded"
+  }
+ ],
+ "authoring": {
+  "minutes": 80,
+  "probes": 0,
+  "routing": {
+   "branch": "width",
+   "lane": "ultrapowers"
+  },
+  "questions": [
+   {
+    "question": "Claim and summary",
+    "options": [
+     "Adopt both as written",
+     "Adopt with my edits"
+    ],
+    "recommended": "Adopt both as written",
+    "picked": "Adopt both as written"
+   },
+   {
+    "question": "Execution handoff",
+    "options": [
+     "Ultrapowers, launch now",
+     "Ultrapowers, hold the launch",
+     "Subagent-Driven",
+     "Inline"
+    ],
+    "recommended": "Ultrapowers, launch now",
+    "picked": "Ultrapowers, launch now"
+   },
+   {
+    "question": "Re-drive run-33 narrower after merging its task 2",
+    "options": [
+     "Merge PR #32 and re-drive tasks 1, 3, 4",
+     "Re-drive all four"
+    ],
+    "recommended": "Merge PR #32 and re-drive tasks 1, 3, 4",
+    "picked": "Merge PR #32 and re-drive tasks 1, 3, 4"
+   }
+  ]
+ }
+}
