@@ -20,6 +20,7 @@
     "generated/*.ts",
     "build-facets.ts",
     "probe/*.ts",
-    "test/*.ts"
+    "test/*.ts",
+    "test/cases/*.ts"
   ]
 }

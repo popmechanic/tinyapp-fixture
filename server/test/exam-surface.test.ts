@@ -5,7 +5,7 @@
 import {afterAll, beforeAll, expect, test} from 'bun:test';
 
 import {startCelld, type Celld} from './celld';
-import {client, same, until} from './clients';
+import {runCase} from './child';
 
 const VERBS = ['content?f=todos', 'rows?f=todos', 'fork?from=todos&to=todos@x', 'reload?f=todos', 'discard?f=todos@x', 'events', 'transition'];
 
@@ -15,7 +15,7 @@ beforeAll(async () => {
 }, 90_000);
 afterAll(async () => {
   await off?.stop();
-});
+}, 30_000);
 
 test('flag off: every exam verb is 404', async () => {
   for (const verb of VERBS) {
@@ -25,15 +25,13 @@ test('flag off: every exam verb is 404', async () => {
 }, 30_000);
 
 test('flag off: two clients still converge through the module object', async () => {
+  // In a child process: the client tests mock TinyBase's ws client for the
+  // life of this process, and a harness has to dial the real one.
   const m = `todos@off-${Date.now().toString(36)}`;
-  const a = await client(off.ws, m);
-  const b = await client(off.ws, m);
-  a.store.setRow('todos', '0', {text: 'buy milk', completed: false});
-  const ms = await until('B equals A', () => same(a.store, b.store));
-  expect(b.store.getCell('todos', '0', 'text')).toBe('buy milk');
-  console.log(JSON.stringify({flag: 'off', sync_ms: ms}));
-  await a.sync.destroy();
-  await b.sync.destroy();
+  const r = await runCase('converge', off.ws, m);
+  console.log(JSON.stringify({flag: 'off', ...r.out}));
+  expect([r.code, r.err.trim()]).toEqual([0, '']);
+  expect(r.out['text']).toBe('buy milk');
 }, 30_000);
 
 test('flag on: the same verb answers 200', async () => {
