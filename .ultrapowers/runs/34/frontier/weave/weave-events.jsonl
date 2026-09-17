@@ -5,3 +5,4 @@
 {"event": "superseded", "wave": 1, "path": "server/test/celld.ts", "reason": "absent at adopt head"}
 {"event": "emitted", "wave": 1, "path": "server/test/exam-surface.test.ts", "stateBlob": "c897185d07deaaf6f68a4791effd7c30626478519bb20b9fea4a3cacd9b7cf7d", "visibleSha": "889821a8f2d7711df0b70aea8fa1ea4cad397236"}
 {"event": "emitted", "wave": 1, "path": "server/test/recorder.test.ts", "stateBlob": "b373f5423812c1333187eb5c2164b24a301004c905cc5141b83c4c9695feff4a", "visibleSha": "78752e4014c51a964878dde35ce5a6d0e021f82e"}
+{"event": "seeded", "wave": 2, "path": "packages/tinyapp-exam/src/index.ts"}
