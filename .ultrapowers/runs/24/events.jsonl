@@ -54,3 +54,4 @@
 {"kind":"fact:state.reached","task":"3","expected":"state-exams/expected/two-todos-second-tagged-filter-home.json","sha256":"314d4754fff5fda609a94113fe6be50c2e6bd62bf10e5c61416d753f196e27d8","id":"01M2PD1EEN0000XD3W1VJ57DZM","ts":1789605755349}
 {"kind":"handshake:settled","task":"3","expected":"state-exams/expected/two-todos-second-tagged-filter-home.json","id":"01M2PD1EEN00013G8FFVW4G4XA","ts":1789605755349}
 {"kind":"engine:log","line":"task 3 every mutant killed — no reviewer dispatched (reviewOnStateExams off)","id":"01M2PD1EEP0000YC3SJVGZTTQ9","ts":1789605755350}
+{"kind":"driver:attention","task":"2","attention":"stuck","msg":"leg (c) [M3]'s Run line is already red at BASE without this exam: styled-page leg (f)'s `bun test packages/tinyapp-lint packages/tinyapp-exam` fails on render-move.test.ts's process.chdir breaking loadContext's @/ alias — outside this task's file scope","actor":"","id":"01M2PDRM7J0000XVHN1DVHY9GA","ts":1789606514930}
