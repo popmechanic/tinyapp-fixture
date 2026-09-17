@@ -57,3 +57,17 @@
 {"kind":"engine:log","line":"baseline: green on 42d19c50aaecd92f13367b2b97324a3013bb62fb","id":"01M2PT80V30000TATME8NP4YC0","ts":1789619602275}
 {"kind":"engine:phase","phase":"Wave 1","id":"01M2PT80V40000KNH6YJ8PAQWF","ts":1789619602276}
 {"kind":"engine:log","line":"wave 1 fold suite: bun test tests/state-exams/delete-to-trash.test.ts tests/state-exams/derived-exam.test.ts tests/state-exams/design-system-installed.test.ts tests/state-exams/done-count.test.ts tests/state-exams/due-date-marks-overdue.test.ts tests/state-exams/exam-page.test.ts tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/interaction-evidence.test.ts tests/state-exams/mutant-from-diff.test.ts tests/state-exams/persistence-exam.test.ts tests/state-exams/pin-todo.test.ts tests/state-exams/session-transitions.test.ts tests/state-exams/set-filter.test.ts tests/state-exams/set-todo-due.test.ts tests/state-exams/set-todo-tags.test.ts tests/state-exams/store-history.test.ts tests/state-exams/styled-page.test.ts tests/state-exams/tag-filter.test.ts tests/state-exams/type-due-date.test.ts tests/state-exams/undo-delete.test.ts","id":"01M2PT823P0000W1TFKKCEN5V5","ts":1789619603574}
+{"kind":"driver:wave-adopted","wave":1,"tasks":["1","2"],"headSha":"1a3cf7417040dfd4163ad67ea02adaefca7bdb8b","why":"end","applied":{"1":"base","2":"base"},"id":"01M2PT9ADT0000S57FJV43DDJH","ts":1789619644858}
+{"kind":"driver:integrated-clean","wave":1,"removed":0,"id":"01M2PT9AF70000WTNN1TFDPW79","ts":1789619644903}
+{"kind":"driver:integrated-check","cmd":"bun run lint:ui","exit":0,"minor":false,"wave":1,"id":"01M2PT9B800000CCJK278BHYRH","ts":1789619645696}
+{"kind":"driver:integrated-check","cmd":"bun run typecheck","exit":0,"minor":false,"wave":1,"id":"01M2PT9GKC0000DWDPYKP0A70B","ts":1789619651180}
+{"kind":"driver:integrated-check","cmd":"bun run lint:state","exit":0,"minor":false,"wave":1,"id":"01M2PT9VP600006KXJVTYXEHMG","ts":1789619662534}
+{"kind":"driver:integrated-check","cmd":"git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock","exit":0,"minor":false,"wave":1,"id":"01M2PT9VPB0000SGCGEH75T44H","ts":1789619662539}
+{"kind":"driver:stage","stage":"engine-done","detail":"report saved","id":"01M2PT9VZT0000Z48JHJSRTNZ8","ts":1789619662842}
+{"kind":"driver:stage","stage":"finalize","id":"01M2PT9W1E0000R8GM4KYMRRK2","ts":1789619662894}
+{"kind":"driver:stage","stage":"gate","id":"01M2PT9W2Y0000FWBJHQC1RHPY","ts":1789619662942}
+{"kind":"driver:critic-decision","approve":true,"reason":"0 completeness finding(s), none blocking","id":"01M2PT9W5X0000D2AD07ECQB91","ts":1789619663037}
+{"kind":"driver:stage","stage":"approve","id":"01M2PT9W5X0001D8HQNHDD4F2P","ts":1789619663037}
+{"kind":"driver:approved","stamp":"run-27","integrationBranch":"ultra/integration-run-27","id":"01M2PT9W720000RPJFBCVGNZ8C","ts":1789619663074}
+{"kind":"run:open","runId":"run-27","base":"42d19c50aaecd92f13367b2b97324a3013bb62fb","source":"fleet/publish-fold.mjs","id":"01M2PT9XZJ0000GM3MEDR1W8GM","ts":1789619664882}
+{"kind":"driver:publish-fold","run":"27","attempt":"1","base":"42d19c50aaecd92f13367b2b97324a3013bb62fb","tip":"42d19c50aaecd92f13367b2b97324a3013bb62fb","candidate":"1a3cf7417040dfd4163ad67ea02adaefca7bdb8b","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2PT9YCV0000K93F8WCCFXGS","ts":1789619665307}

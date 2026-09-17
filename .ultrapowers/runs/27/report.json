@@ -1,0 +1,384 @@
+{
+  "integrationBranch": "ultra/integration-run-27",
+  "baseSha": "42d19c50aaecd92f13367b2b97324a3013bb62fb",
+  "setupSha": null,
+  "waves": [
+    [
+      "1",
+      "2"
+    ]
+  ],
+  "dependencyEdges": [],
+  "tasks": [
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": null,
+      "headSha": "a7a12953032165cb20e6f7653005240fe4a1b6ee",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-27/patches/task-2.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "",
+      "tier": "opus",
+      "review": "lean",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "landedAt": 1789618612962,
+      "stateExams": [
+        {
+          "exam": "done-count",
+          "store_ms": 5.785062999999994,
+          "render_ms": 1170.0761029999999,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "due-date-marks-overdue",
+          "store_ms": 1042.9218759999999,
+          "render_ms": 166.98291199999994,
+          "render": "ran",
+          "action_ms": 105.02487900000006,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "filter-bar",
+          "store_ms": 1116.1303950000001,
+          "render_ms": 200.20342800000003,
+          "render": "ran",
+          "action_ms": 164.75510899999995,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "filter-done",
+          "store_ms": 1089.996917,
+          "render_ms": 211.61976299999992,
+          "render": "ran",
+          "action_ms": 139.27811399999996,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "mutant-from-diff",
+          "store_ms": 6.29780199999999,
+          "render_ms": 1177.733727,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "session-transitions",
+          "store_ms": 6.067481999999998,
+          "render_ms": 1113.025935,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "set-filter",
+          "store_ms": 0.956474,
+          "render_ms": 1310.928409,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "set-todo-due",
+          "store_ms": 1.082242000000008,
+          "render_ms": 1137.900457,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "set-todo-tags",
+          "store_ms": 5.684411000000011,
+          "render_ms": 1072.688897,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "store-history",
+          "store_ms": 9.519738000000018,
+          "render_ms": 1129.802107,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "tag-filter",
+          "store_ms": 1078.844078,
+          "render_ms": 222.47873299999992,
+          "render": "ran",
+          "action_ms": 113.04316900000003,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "type-due-date",
+          "store_ms": 1061.477569,
+          "render_ms": 202.63869,
+          "render": "ran",
+          "action_ms": 162.88822699999992,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": null,
+      "headSha": "99eeb2dc66600aaec01f94288fcf9688cf1e5a3e",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-27/patches/task-1.patch",
+      "reviewVerdict": "skipped-mutant-killed",
+      "notes": "",
+      "tier": "opus",
+      "review": "lean",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "landedAt": 1789619069105,
+      "stateExams": [
+        {
+          "exam": "delete-to-trash",
+          "store_ms": 983.258709,
+          "render_ms": 192.71750199999997,
+          "render": "ran",
+          "action_ms": 109.43590299999994,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "derived-exam",
+          "store_ms": 0.9054979999998523,
+          "render_ms": null,
+          "render": "skipped",
+          "action_ms": null,
+          "browser": "skipped",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "design-system-installed",
+          "store_ms": 7.419330000000002,
+          "render_ms": 1105.096704,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "exam-page",
+          "store_ms": 1.4481600000000014,
+          "render_ms": 1139.657358,
+          "render": "ran",
+          "action_ms": null,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "persistence-exam",
+          "store_ms": 1077.853732,
+          "render_ms": 220.90799200000015,
+          "render": "ran",
+          "action_ms": 175.66155200000003,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "pin-todo",
+          "store_ms": 1091.254242,
+          "render_ms": 216.28753899999992,
+          "render": "ran",
+          "action_ms": 128.82671500000015,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "red",
+          "store_ms": 171.88781000000017,
+          "render_ms": 29.854343999999855,
+          "render": "ran",
+          "action_ms": 14.135197000000062,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "styled-page",
+          "store_ms": 1001.0734190000001,
+          "render_ms": 191.40871800000014,
+          "render": "ran",
+          "action_ms": 104.34340900000007,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "undo-delete",
+          "store_ms": 1123.1730159999997,
+          "render_ms": 188.54587300000003,
+          "render": "ran",
+          "action_ms": 276.92031700000007,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "s/two-open-todos-first-past-due.json loads through createTodosStore to its own content [0.45ms]\n(pass) leg (j) [M8] state-exams/seeds/two-open-todos.json loads through createTodosStore to its own content [0.40ms]\n(pass) leg (j) [M8] state-exams/seeds/two-todos-one-done.json loads through createTodosStore to its own content [0.41ms]\n(pass) leg (j) [M8] state-exams/seeds/two-todos-second-tagged.json loads through createTodosStore to its own content [0.46ms]\n(pass) leg (j) [M8] state-exams/expected/default-todos-first-done.json loads through createTodosStore to its own content [0.33ms]\n(pass) leg (j) [M8] state-exams/expected/default-todos-plus-buy-milk.json loads through createTodosStore to its own content [0.35ms]\n(pass) leg (j) [M8] state-exams/expected/derived-complete-first-todo.json loads through createTodosStore to its own content [0.39ms]\n(pass) leg (j) [M8] state-exams/expected/one-open-todo.json loads through createTodosStore to its own content [0.45ms]\n(pass) leg (j) [M8] state-exams/expected/second-delete-replaces-trash.json loads through createTodosStore to its own content [0.45ms]\n(pass) leg (j) [M8] state-exams/expected/still-empty.json loads through createTodosStore to its own content [0.37ms]\n(pass) leg (j) [M8] state-exams/expected/two-open-todos-first-trashed.json loads through createTodosStore to its own content [0.44ms]\n(pass) leg (j) [M8] state-exams/expected/two-open-todos-restored.json loads through createTodosStore to its own content [0.43ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-first-done.json loads through createTodosStore to its own content [0.41ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-first-due.json loads through createTodosStore to its own content [0.46ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-first-past-due-done.json loads through createTodosStore to its own content [0.40ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-one-done-filter-done.json loads through createTodosStore to its own content [0.48ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-one-done-filter-open.json loads through createTodosStore to its own content [0.56ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-one-done.json loads through createTodosStore to its own content [0.33ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-second-due.json loads through createTodosStore to its own content [0.27ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-second-pinned-done.json loads through createTodosStore to its own content [0.28ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-second-pinned.json loads through createTodosStore to its own content [0.26ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-second-tagged-filter-home.json loads through createTodosStore to its own content [0.31ms]\n(pass) leg (j) [M8] state-exams/expected/two-todos-second-tagged.json loads through createTodosStore to its own content [0.24ms]\n\ntests/state-exams/mutant-from-diff.test.ts:\n(pass) state exam: mutant-from-diff [949.97ms]\n(pass) editOf \u2014 one diff row to one mutant edit [M1] > (b) a `modified` row becomes the cell put back the way the seed had it [0.12ms]\n(pass) editOf \u2014 one diff row to one mutant edit [M1] > (c) an `added` row becomes the cell dropped [0.03ms]\n(pass) editOf \u2014 one diff row to one mutant edit [M1] > (d) a `removed` row becomes the cell put back the way the seed had it [0.02ms]\n(pass) mutantOf \u2014 editOf over the rows in list order [M2] > (e) over M2\u2019s one-row diff it is exactly the one reversed cell [0.03ms]\n(pass) mutantOf \u2014 editOf over the rows in list order [M2] > (f) over the two `added` rows of `todos/1` it is the two edits in that order [0.02ms]\n(pass) mutantOf \u2014 editOf over the rows in list order [M2] > (g) a row of the `$values` table is skipped, so a values-only diff is [] [0.01ms]\n(pass) mutantOf \u2014 editOf over the rows in list order [M2] > (h) over no rows at all it is [] [0.01ms]\n\n 331 pass\n 0 fail\n 628 expect() calls\nRan 331 tests across 21 files. [40.93s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run lint:ui",
+      "exit": 0,
+      "stdout": "$ node node_modules/eslint/bin/eslint.js client/src\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 26 snapshots and 28 exams in 11316 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 0,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "nyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [10850.11ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [199.77ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.41ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [16.34ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules /tmp/tinyapp-lint-rules-SDVoOc\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [299.16ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [223.68ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.37ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.38ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [202.46ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.51ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.50ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1522.28ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [313.02ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [3.01ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.18ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.05ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [10747.79ms]\n\n 680 pass\n 0 fail\n 2070 expect() calls\nRan 680 tests across 53 files. [1572.80s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "1a3cf7417040dfd4163ad67ea02adaefca7bdb8b",
+      "branches": [
+        "2",
+        "1"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-27/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-27/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 1.582,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 2,
+    "tasks_planned": 2,
+    "complete": true
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 2: amendment (clause): set-todo-due.test.ts leg (e), the lint half: the Context offers \"deleted, or rewritten as a call to `loadContext`/`runLint` from `packages/tinyapp-lint/src`\". I read it as deleted-only. \u2014 Any import from `packages/tinyapp-lint/src` spells `tinyapp-lint`, which M1's own blocking pattern refuses in these twelve files, so the rewrite alternative is unreachable. The file's floor of 12 is computed without that leg, confirming deletion is the intended reading.",
+    "task 2: amendment (clause): store-history.test.ts leg (j), the package.json half: the Context says it is \"kept as an in-process read\". Kept, but as a read of the *parsed* `typecheck` script asserting its last two steps name `packages/tinyapp-history` then `packages/tinyapp-exam` \u2014 not as the verbatim line-text pin it was. \u2014 The original predicate's text is `bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\"`, which M1 blocks twice over (`bunx `, `tsc`). Reading the order off the parsed script makes the same claim the leg's comment states \u2014 the new step immediately before the exam package's, which stays last \u2014 with no blocked literal in the file.",
+    "task 2: every mutant killed (done-count, due-date-marks-overdue, filter-bar, filter-done, mutant-from-diff, session-transitions, set-filter, set-todo-due, set-todo-tags, store-history, tag-filter, type-due-date) \u2014 no reviewer was dispatched (reviewOnStateExams off)",
+    "task 1: amendment (clause): Deleted derived-exam leg (m) (a spawned `grep` over `packages/tinyapp-lint/test/views.test.ts`) and styled-page leg (c) (a spawned read over sibling exam files' text), neither of which the Context's per-file sentence names explicitly. \u2014 The Context's own floor arithmetic excludes both \u2014 it says derived-exam 'keeps 6 (legs (e), (f), (h), (j), (k), (o))' and styled-page 'keeps 10' \u2014 and the Global constraint says a spawned `grep` over another test file is deleted, being the text pin on a sibling file that folds away. Leg (m) also names `tinyapp-lint`, which the M1 pattern blocks outright.",
+    "task 1: amendment (clause): Removed derived-exam's sixth header reading \u2014 the recorded amendment explaining why leg (g) spawned `bun <root>/packages/tinyapp-history/src/cli.ts` instead of `bun run history promote` \u2014 and replaced it with a reading explaining the in-process call. \u2014 That amendment existed only to describe how the leg spawned the CLI with a usable cwd. With the leg no longer spawning anything, the note described code that is gone, and its text ('spawned', 'bun run') matched the M1 pattern the file must now clear.",
+    "task 1: amendment (clause): Reworded prose and doc comments across all nine files: `bun test` \u2192 'the test runner' / 'running this file by its path', `bun run lint:state` \u2192 `lint:state`, `bun install` \u2192 'an install', and every occurrence of 'spawn'/'spawned' in comments. \u2014 The M1 blocking pattern is a plain `grep -lE` over the whole file and does not distinguish code from prose, so a doc comment naming a child command fails the first Proof line exactly as a live call would. The Context flags this ('a doc comment naming `bun test`').",
+    "task 1: every mutant killed (delete-to-trash, derived-exam, design-system-installed, exam-page, persistence-exam, pin-todo, red, styled-page, undo-delete) \u2014 no reviewer was dispatched (reviewOnStateExams off)"
+  ],
+  "amendments": [
+    {
+      "task": "2",
+      "amends": "clause",
+      "what": "set-todo-due.test.ts leg (e), the lint half: the Context offers \"deleted, or rewritten as a call to `loadContext`/`runLint` from `packages/tinyapp-lint/src`\". I read it as deleted-only.",
+      "why": "Any import from `packages/tinyapp-lint/src` spells `tinyapp-lint`, which M1's own blocking pattern refuses in these twelve files, so the rewrite alternative is unreachable. The file's floor of 12 is computed without that leg, confirming deletion is the intended reading."
+    },
+    {
+      "task": "2",
+      "amends": "clause",
+      "what": "store-history.test.ts leg (j), the package.json half: the Context says it is \"kept as an in-process read\". Kept, but as a read of the *parsed* `typecheck` script asserting its last two steps name `packages/tinyapp-history` then `packages/tinyapp-exam` \u2014 not as the verbatim line-text pin it was.",
+      "why": "The original predicate's text is `bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\"`, which M1 blocks twice over (`bunx `, `tsc`). Reading the order off the parsed script makes the same claim the leg's comment states \u2014 the new step immediately before the exam package's, which stays last \u2014 with no blocked literal in the file."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "Deleted derived-exam leg (m) (a spawned `grep` over `packages/tinyapp-lint/test/views.test.ts`) and styled-page leg (c) (a spawned read over sibling exam files' text), neither of which the Context's per-file sentence names explicitly.",
+      "why": "The Context's own floor arithmetic excludes both \u2014 it says derived-exam 'keeps 6 (legs (e), (f), (h), (j), (k), (o))' and styled-page 'keeps 10' \u2014 and the Global constraint says a spawned `grep` over another test file is deleted, being the text pin on a sibling file that folds away. Leg (m) also names `tinyapp-lint`, which the M1 pattern blocks outright."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "Removed derived-exam's sixth header reading \u2014 the recorded amendment explaining why leg (g) spawned `bun <root>/packages/tinyapp-history/src/cli.ts` instead of `bun run history promote` \u2014 and replaced it with a reading explaining the in-process call.",
+      "why": "That amendment existed only to describe how the leg spawned the CLI with a usable cwd. With the leg no longer spawning anything, the note described code that is gone, and its text ('spawned', 'bun run') matched the M1 pattern the file must now clear."
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "Reworded prose and doc comments across all nine files: `bun test` \u2192 'the test runner' / 'running this file by its path', `bun run lint:state` \u2192 `lint:state`, `bun install` \u2192 'an install', and every occurrence of 'spawn'/'spawned' in comments.",
+      "why": "The M1 blocking pattern is a plain `grep -lE` over the whole file and does not distinguish code from prose, so a doc comment naming a child command fails the first Proof line exactly as a live call would. The Context flags this ('a doc comment naming `bun test`')."
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
