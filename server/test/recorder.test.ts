@@ -9,12 +9,16 @@ import {mkdtempSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 
-import {startCelld, type Celld} from './celld';
+import {startCelld, type Celld} from 'tinyapp-exam';
+
 import {runCase} from './child';
+
+/** This server, the one the exam helper copies. */
+const SERVER = join(import.meta.dir, '..');
 
 let on: Celld;
 beforeAll(async () => {
-  on = await startCelld({exam: true});
+  on = await startCelld({serverDir: SERVER, exam: true});
 }, 90_000);
 afterAll(async () => {
   await on?.stop();
