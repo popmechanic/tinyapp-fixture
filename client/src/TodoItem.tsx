@@ -12,6 +12,7 @@ import {
   STORE_ID,
 } from './Store';
 import {DueInput} from './DueInput';
+import {TagsInput} from './TagsInput';
 import {isOverdue} from './overdue';
 export const TodoItem = ({rowId}: {rowId: string}) => {
   const todo = useRow('todos', rowId, STORE_ID) as TodoRow;
@@ -74,6 +75,9 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
       </span>
       {/* `due` is optional on `TodoRow` — a todo with no date has no cell. */}
       <DueInput rowId={rowId} due={todo.due ?? ''} todoText={todo.text} />
+      {/* `tags` is optional on `TodoRow` too — a todo with no tags has no
+          cell, so the absence reads as the empty box here. */}
+      <TagsInput rowId={rowId} tags={todo.tags ?? ''} todoText={todo.text} />
 
       {/* Two rows would otherwise carry two buttons both named `Delete`, and a
           role-and-name locator picks the first in tree order: the row's own
