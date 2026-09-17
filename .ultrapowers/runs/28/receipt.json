@@ -1,0 +1,203 @@
+{
+  "ok": true,
+  "stamp": "run-28",
+  "stages": [
+    {
+      "stage": "fleet-run",
+      "ok": true,
+      "detail": "fleet run run-28"
+    },
+    {
+      "stage": "git-repo",
+      "ok": true,
+      "detail": "/home/exedev/target"
+    },
+    {
+      "stage": "worktree-probe",
+      "ok": true,
+      "detail": "worktree capability verified (probe cut and removed)"
+    },
+    {
+      "stage": "compile",
+      "ok": true,
+      "detail": "1 task(s) in 1 wave(s)"
+    },
+    {
+      "stage": "test-command",
+      "ok": true,
+      "detail": "bun run test (detected:package-json-bun)"
+    },
+    {
+      "stage": "bootstrap-command",
+      "ok": true,
+      "detail": "bun install --frozen-lockfile (detected:bun-lockfile)"
+    },
+    {
+      "stage": "add-command",
+      "ok": true,
+      "detail": "no dependencies declared \u2014 nothing to add"
+    },
+    {
+      "stage": "dirty-baseline",
+      "ok": true,
+      "detail": "dirty baseline recorded: 0 pre-existing line(s)"
+    },
+    {
+      "stage": "base-branch",
+      "ok": true,
+      "detail": "detached HEAD \u2192 fell back to repo default 'main'"
+    }
+  ],
+  "compile": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "The tags box in the row \u2014 typed, entered, carried",
+        "disposition": "implementation",
+        "heuristic": false,
+        "writes": [
+          "client/src/TagsInput.tsx",
+          "client/src/TodoItem.tsx",
+          "tests/state-exams/type-due-date.test.ts"
+        ],
+        "depends_on": [],
+        "interfaces": {
+          "consumes": [
+            "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+            "`normalizeTags(text: string): string`"
+          ],
+          "produces": [
+            "`TagsInput`"
+          ]
+        }
+      }
+    ],
+    "dag_edges": [],
+    "marker_conflicts": [],
+    "waves": [
+      [
+        "1"
+      ]
+    ],
+    "launch_waves": [
+      [
+        {
+          "id": "1",
+          "title": "The tags box in the row \u2014 typed, entered, carried",
+          "files": [
+            "client/src/TagsInput.tsx",
+            "client/src/TodoItem.tsx",
+            "tests/state-exams/type-due-date.test.ts",
+            "tests/state-exams/type-tags.test.ts"
+          ],
+          "depends_on": [],
+          "interfaces": {
+            "consumes": [
+              "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+              "`normalizeTags(text: string): string`"
+            ],
+            "produces": [
+              "`TagsInput`"
+            ]
+          },
+          "tier": null,
+          "review": "peer",
+          "writes": [
+            "client/src/TagsInput.tsx",
+            "client/src/TodoItem.tsx",
+            "tests/state-exams/type-due-date.test.ts"
+          ],
+          "commutes": [],
+          "proofTests": [
+            "tests/state-exams/type-tags.test.ts"
+          ],
+          "testCmd": "bun test tests/state-exams/type-tags.test.ts",
+          "proofRuns": [
+            "bun test tests/state-exams/type-due-date.test.ts"
+          ],
+          "proofGuards": [
+            "tests/state-exams/type-tags.test.ts"
+          ],
+          "factsheet": {
+            "files": [
+              "client/src/TagsInput.tsx",
+              "client/src/TodoItem.tsx",
+              "tests/state-exams/type-due-date.test.ts",
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "deletes": [],
+            "guards": [
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "proofTests": [
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "landing": {
+              "tests/state-exams/type-tags.test.ts": "tests/state-exams/type-tags.test.ts"
+            },
+            "driverOwned": [
+              "tests/state-exams/type-tags.test.ts"
+            ],
+            "siblingOwned": [],
+            "produces": [
+              "`TagsInput`"
+            ],
+            "consumes": [
+              "`setTodoTags(store: TodosStore, id: string, text: string): void`",
+              "`normalizeTags(text: string): string`"
+            ]
+          }
+        }
+      ]
+    ],
+    "waveLabels": [
+      "The tags box in the row \u2014 typed, entered, carried"
+    ],
+    "mode": "sequential",
+    "degrade_reason": "Sequential mode: 1 implementation tasks",
+    "globalConstraints": "- The synced shape is untouched: `client/src/Store.tsx` \u2014 the one `MergeableStore`, its `WsSynchronizer` and its SQLite persister \u2014 is byte-identical to BASE, and so are `client/src/storeData.ts` and `client/src/todoTags.ts`: the `tags` cell, `setTodoTags` and `normalizeTags` are consumed, never edited.\n- The box is the design system's own `Input` from `@/components/ui/input`, carrying its `data-slot=\"input\"`: no raw colour, no arbitrary value, no inline style, no class that is not a Tailwind class, and no restyling beyond layout (`w-40 shrink-0` is layout; a colour or a radius is not).\n- Every control an exam reaches is reached by role and accessible name \u2014 the box's name is `Tags for <todo text>` through `aria-label`, so two rows are two names \u2014 and every view selects by id or by `data-*`, never by a class.\n- The exam is hermetic and proves only itself: it spawns no test runner, opens no network, reads its fixtures inside test bodies, and every pinned literal in it is one the plan pins.",
+    "constraintChecks": [
+      {
+        "cmd": "bun run lint:ui",
+        "minor": false
+      },
+      {
+        "cmd": "bun run typecheck",
+        "minor": false
+      },
+      {
+        "cmd": "bun run lint:state",
+        "minor": false
+      },
+      {
+        "cmd": "git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/todoTags.ts client/src/storeData.ts client/src/FilterBar.tsx client/src/DoneCount.tsx client/src/DueInput.tsx client/src/components client/src/index.css packages package.json client/package.json server/package.json bun.lock state-exams",
+        "minor": false
+      },
+      {
+        "cmd": "! grep -rlE 'bun test|bun run|Bun\\.spawn|spawnSync|execSync' tests/state-exams",
+        "minor": false
+      }
+    ],
+    "launch_file": "/home/exedev/target/.claude/ultrapowers/run-run-28/launch.json",
+    "args_file": "/home/exedev/target/.claude/ultrapowers/run-run-28/args.json"
+  },
+  "baseBranch": "main",
+  "launchFile": "/home/exedev/target/.claude/ultrapowers/run-run-28/launch.json",
+  "argsFile": "/home/exedev/target/.claude/ultrapowers/run-run-28/args.json",
+  "workflowName": "ultrapowers-run",
+  "llmDerives": [
+    "waves[][].tier on the args-file wave entries (slots pre-emitted as null; the engine reads knobs ONLY from these inline entries \u2014 never a top-level launch key)",
+    "nothing for waves[][].testCmd \u2014 the per-task command is compiler-derived from the task's Proof `Test:` paths and pre-filled on the wave entries (run-wide testCmd is driver-derived \u2014 knob or detection \u2014 and already stamped in the args file and receipt)",
+    "nothing for bootstrapCmd \u2014 driver-derived from the target's lockfile/manifest (or the --bootstrap-cmd knob) and stamped in the args file and receipt, so validation, the engine and the gate share one value",
+    "nothing for addCmd/addDevCmd \u2014 the package-add commands are driver-derived from the same lockfile/manifest beside the bootstrap and stamped in the args file and receipt (only when the plan declares packages); there is no knob for them",
+    "nothing for regenerateCmd \u2014 the lockfile regenerator is derived from the same lockfile/manifest beside the bootstrap (and only when the bootstrap itself was derived) and stamped in the args file and receipt; there is no knob for it",
+    "nothing for review depth \u2014 it is plan-authored (**Review:** marker), pre-filled on the args wave entries"
+  ],
+  "testCmd": "bun run test",
+  "testCmdSource": "detected:package-json-bun",
+  "bootstrapCmd": "bun install --frozen-lockfile",
+  "bootstrapCmdSource": "detected:bun-lockfile",
+  "regenerateCmd": "bun install",
+  "regenerateCmdSource": "detected:bun-lockfile",
+  "foldTestCmd": "bun test {paths}"
+}
