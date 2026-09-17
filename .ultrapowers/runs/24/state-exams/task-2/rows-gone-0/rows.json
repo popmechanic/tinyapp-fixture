@@ -1,0 +1,24 @@
+{
+  "sql": "SELECT _id, store FROM \"todos\"",
+  "rows": [],
+  "content": [
+    {},
+    {}
+  ],
+  "diff": [
+    {
+      "table": "todos",
+      "row": "0",
+      "cell": "completed",
+      "got": null,
+      "wanted": false
+    },
+    {
+      "table": "todos",
+      "row": "0",
+      "cell": "text",
+      "got": null,
+      "wanted": "buy milk"
+    }
+  ]
+}

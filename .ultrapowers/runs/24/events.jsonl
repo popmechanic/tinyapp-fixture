@@ -60,3 +60,4 @@
 {"kind":"worker:end","label":"impl:2","role":"implementer","sessionId":"a7dfadda-a3a0-49c9-8eac-8fbf3b40e830","exitCode":0,"timedOut":false,"outcome":"ok","class":"success","status":null,"reason":null,"meter":{"input":5605,"output":42143,"cacheRead":5941704,"cacheCreation":97216,"costUsd":5.024612000000002,"models":["claude-opus-5"]},"id":"01M2PEJDZT0000WM85DSZ31DDH","ts":1789607360506}
 {"kind":"transcript:slice","label":"impl:2","sessionId":"a7dfadda-a3a0-49c9-8eac-8fbf3b40e830","bytes":11717,"id":"01M2PEJE030000BC41GJ17BPZT","ts":1789607360515}
 {"kind":"driver:exam-handoff","task":"2","paths":["tests/state-exams/type-tags.test.ts"],"id":"01M2PF41PJ0000NX6JK3BSDZ9M","ts":1789607937746}
+{"kind":"driver:proof-run","task":"2","cmd":"bun test tests/state-exams/type-due-date.test.ts tests/state-exams/styled-page.test.ts","exit":1,"iter":0,"id":"01M2PFNPH90000Y6ZG9KNG4Q6Q","ts":1789608516137}

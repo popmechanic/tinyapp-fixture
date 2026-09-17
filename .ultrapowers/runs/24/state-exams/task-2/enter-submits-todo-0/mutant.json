@@ -1,0 +1,12 @@
+{
+  "killed": true,
+  "path": "todos/0/text",
+  "edits": [
+    {
+      "table": "todos",
+      "row": "0",
+      "cell": "text",
+      "value": ""
+    }
+  ]
+}
