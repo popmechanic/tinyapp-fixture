@@ -69,7 +69,10 @@ npm run build
 ```
 
 Change data in the running app, reload the page, and confirm the change remains.
-Open the same room URL in two clients, change data in one, and confirm the other
-updates. Test reconnection if synchronization behavior changes.
+Two-client sync is not checked by hand: the convergence exam in
+`tests/state-exams/two-pages-converge.test.ts` opens two pages onto one module,
+types into the first, and holds the second, the module object's own rows and a
+third page opened afterwards to what the first page says. Run it when
+synchronization behavior changes.
 
 Current TinyBase documentation: https://tinybase.org/llms.txt
