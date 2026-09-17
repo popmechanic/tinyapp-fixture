@@ -73,3 +73,4 @@
 {"kind":"driver:check-run","task":"1","cmd":"bun run lint:state","exit":0,"minor":false,"iter":0,"id":"01M2PRG8D30000GCZSD3REV7N3","ts":1789617775011}
 {"kind":"driver:check-run","task":"1","cmd":"git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock","exit":0,"minor":false,"iter":0,"id":"01M2PRG8DB0000S41YDG91BW9D","ts":1789617775019}
 {"kind":"worker:start","label":"fix:1:0","role":"implementer","sessionId":"43cb08c6-4ac2-42a8-9f1a-be10ea062b28","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-25/clones/task-1","model":"opus","id":"01M2PRG8JJ000066HDE9CQFTMG","ts":1789617775186}
+{"kind":"driver:attention","task":"1","attention":"stuck","msg":"proof lines use 'tee /dev/stderr' and the driver's shell has a socket on fd 2, so tee exits ENXIO and pipefail fails the pipeline regardless of the tests; all nine exams pass alone above their floors","actor":"","id":"01M2PRPNST0000QXS0FHSX9JV6","ts":1789617985338}
