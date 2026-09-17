@@ -1,0 +1,6 @@
+{"event": "emitted", "wave": 1, "path": "AGENTS.md", "stateBlob": "c33b378cc4dfa5b53ca40801fad4fab53ad624f1a3e2d10d02cc086298be159f", "visibleSha": "1d454b16502efd0fd9175b9b4b02254465c9915b"}
+{"event": "emitted", "wave": 1, "path": "client/src/Store.tsx", "stateBlob": "17826ec2106a86780b19bcb3b6aae8097407032612e0a44f28293c051e1fc844", "visibleSha": "e4039a3acc0a61d4b8d3686fb263db98d05df410"}
+{"event": "emitted", "wave": 1, "path": "client/src/config.ts", "stateBlob": "2a074b2316a6ae5a2707cc6359bfc775d34852c1f84056a2ade422d1b8a09006", "visibleSha": "798c8456ae7306c46ce0a2bddc54cdf2155093f3"}
+{"event": "emitted", "wave": 1, "path": "client/src/storeData.ts", "stateBlob": "bf741d76edce34d06728a9eb56a0a82f6af17ab3e0fa0a66428c55046a1cdb11", "visibleSha": "eb38785444ca45af3d567fd6990aea9060884058"}
+{"event": "emitted", "wave": 1, "path": "client/src/vite-env.d.ts", "stateBlob": "6b5c554dde056477bd531c95ff79b56c86e1f7b0e798f75398f071cab3b05f59", "visibleSha": "4e680891e42f57893ef3acab741d666039e5f4eb"}
+{"event": "emitted", "wave": 1, "path": "client/test/sync-origin.test.ts", "stateBlob": "91b997b3a1f23f829c932f99458b5d0af2c2f0777a06ee616358b3d4297a0924", "visibleSha": "48911dc253a657ad5d4ce5b3f0f64b887ab8574c"}

@@ -1,0 +1,210 @@
+{
+  "integrationBranch": "ultra/integration-run-33",
+  "baseSha": "e3b1d490e54d6a1ff0a205ffcbc05a7f755b50bb",
+  "setupSha": null,
+  "waves": [
+    [
+      "1",
+      "2"
+    ],
+    [
+      "3"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 3 (interface)",
+    "2 -> 4 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "2",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "9d444fd382182d6b886ae726b1cbeccc09bb7470",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-33/patches/task-2.patch",
+      "reviewVerdict": "clean",
+      "notes": "Sibling-path overlap on `AGENTS.md`. The diff edits `AGENTS.md` (the new `__TINYAPP_SYNC__` bullet in `## Key Files`, patch lines 9-15), which this task's own Files block declares as `Modify:` and which M5 plus the first Proof `Run:` line require \u2014 but `AGENTS.md` is also listed under SIBLING FILES group 4 (popmechanic-tinyapp-fixture#7n6t). Both tasks therefore append to the same `## Key Files` list, so the two branches will collide on integration. The implementer could not have avoided this without abandoning M5; the fix is in the plan's file assignment, not in this tree. Nothing else in the diff leaves this task's FILES (`client/src/config.ts`, `client/src/Store.tsx`, `client/src/storeData.ts`, `client/src/vite-env.d.ts`, `client/test/sync-origin.test.ts` are all declared), no BASE file is deleted, and no other sibling-owned path is touched.; unverified: GLOBAL CONSTRAINT \"No exam dials anything but loopback\" is not settled by this diff. `readSyncOrigin` (client/src/storeData.ts) accepts any `ws://`/`wss://` string \u2014 exactly what M1 specifies \u2014 so the origin is scheme-checked but not host-checked; a harness handing in `ws://example.com` would be dialled. Enforcement of the loopback-only rule lives in the browser-side request block owned by sibling group 3 (`packages/tinyapp-exam/src/browser.ts`), which this patch does not touch. What would settle it: the sibling's block failing every non-127.0.0.1 request before it leaves the machine, exercised against a page carrying a non-loopback `__TINYAPP_SYNC__`.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789661630656,
+      "stateExams": [],
+      "findings": []
+    },
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "fix-loop-exhausted",
+      "notes": "Proof leg (d) requires that `events(cb)` followed by `fork('todos','todos@y')` deliver \"a transition whose `module` is `todos@y` and whose `seq` is a number\". The exam at packages/tinyapp-exam/test/celld.test.ts does not pin the `module` half: its header paragraph declares the clause \"not satisfiable against the server as at BASE\" and returns it \"under `unsatisfiable`\", and the test body asserts only `expect(typeof t.module).toBe('string')` with the wait loop keyed on `seen.length === 0`. That declaration is contradicted by the submission's own first AMENDMENTS entry, which says `examSurface.fork` now dials `<ws>/sync/<to>` and hangs up before fetching `/exam/fork` precisely so the module object learns its name, and that \"after it, the seed transition reads `{module:'todos@y',seq:2}`\" \u2014 and the diff does carry that dial (packages/tinyapp-exam/src/surface.ts, `prime`). So the amendment's whole justification is a leg the exam then refuses to read: the named clause of leg (d) has no evidence anywhere in the submission, and the amendment's `why` is itself unverified. Pin the clause \u2014 wait for, and assert, a transition whose `module` is `todos@y` \u2014 and drop the stale \"unsatisfiable\" paragraph. (Assert over the forked subset rather than over every message in `seen`, since transitions of other modules may also arrive on the socket.) EXAM EVIDENCE shows the file green, so the fix is a strengthening of a green exam, not a repair of a red one.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 1,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789662150203,
+      "stateExams": [],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "bun test v1.4.2 (744846f84)\n\nclient/test/sync-origin.test.ts:\n(pass) leg (a) [M1]: readSyncOrigin returns the ws:// and wss:// handles and undefined for every other case, including no window [0.11ms]\n(pass) leg (a) [M1]: readSyncOrigin is undefined with globalThis.window replaced by undefined, and the window is restored after [0.03ms]\n(pass) leg (a) [M1]: vite-env.d.ts declares __TINYAPP_SYNC__?: string on Window beside the two existing handles [0.06ms]\n(pass) leg (b) [M2]: syncUrl('todos') is the handle's /sync/todos with the handle set and SERVER's with it unset, SERVER unchanged [0.11ms]\n(pass) leg (b) [M2]: an unseeded, unflagged render with the handle set constructs the socket exactly once, with the handle's /sync/todos [303.91ms]\n(pass) leg (c) [M3]: that render exposes the Provider store itself, which follows setTodoCompleted, with one persister and one synchronizer [306.76ms]\n(pass) leg (d) [M4]: with no handle the page dials ws://localhost:9876/sync/todos once and leaves __TINYAPP_STORE__ undefined [306.94ms]\n(pass) leg (d) [M4]: a seeded page with the handle set dials nothing and is the seeded page it was at BASE [302.11ms]\n(pass) leg (d) [M4]: a flagged page with the handle set dials nothing and is the flagged page it was at BASE [302.21ms]\n(pass) leg (e) [M5]: the Key Files section of AGENTS.md names __TINYAPP_SYNC__, then /sync/todos, then store, in that order [0.55ms]\n\n 10 pass\n 0 fail\n 46 expect() calls\nRan 10 tests across 1 file. [1.66s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 26 snapshots and 29 exams in 11329 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- package.json client/package.json server/package.json packages/tinyapp-exam/package.json packages/tinyapp-history/package.json bun.lock",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/index.ts server/facets server/wrangler.jsonc packages/tinyapp-history/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 196205,
+    "blockingFindings": 1,
+    "blockingPerReviewerMinute": 0.3058026044188476
+  },
+  "baseline": {
+    "passed": true,
+    "output": "yapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [11599.58ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [225.94ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.29ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [13.88ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules \"/tmp/tinyapp-lint-rules-fQcpI0\"\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [345.68ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [192.35ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.16ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.15ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [221.89ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [1.69ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.54ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1501.66ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [321.52ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [3.23ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.51ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [4.51ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [10936.03ms]\n\n 651 pass\n 0 fail\n 1971 expect() calls\nRan 651 tests across 56 files. [176.80s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "3caefa0f7e92e54eb896724d458d82ba772171dd",
+      "branches": [
+        "2"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-33/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-33/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.632,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 1,
+    "tasks_planned": 4,
+    "complete": false
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [
+    {
+      "task": "1",
+      "files": [
+        "packages/tinyapp-exam/src/celld.ts",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/surface.ts",
+        "packages/tinyapp-exam/test/celld.test.ts",
+        "server/test/celld.ts",
+        "server/test/exam-surface.test.ts",
+        "server/test/recorder.test.ts"
+      ]
+    },
+    {
+      "task": "3",
+      "files": [
+        "packages/tinyapp-exam/src/browser.ts",
+        "packages/tinyapp-exam/src/convergence-move.ts",
+        "packages/tinyapp-exam/src/evidence.ts",
+        "packages/tinyapp-exam/src/index.ts",
+        "packages/tinyapp-exam/src/types.ts",
+        "packages/tinyapp-exam/test/convergence-move.test.ts",
+        "packages/tinyapp-exam/test/fixtures/convergence/app.ts",
+        "packages/tinyapp-exam/test/fixtures/convergence/entry.html"
+      ]
+    },
+    {
+      "task": "4",
+      "files": [
+        "AGENTS.md",
+        "README.md",
+        "tests/state-exams/two-pages-converge.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [],
+  "judgmentCalls": [
+    "task 1: out-of-FILES (not taken): server/index.ts \u2014 the root's exam verbs (`content`, `rows`, `fork`, `reload`) forward no `x-tinyapp-module` header to the facet, so a module object reached only through the exam surface reports its transitions with `module: ''`. Owed there: set that header on the forwarded request the way `/sync/<name>` does. The plan freezes `server/index.ts` (global constraint plus the `git diff --quiet` check), so the surface works around it by dialling `/sync/<to>` before a fork.",
+    "task 1: plan-defect: leg (d) is satisfied but narrowly. The two load-time transitions each facet fires when it wakes still arrive with `module: ''` and always will while `server/index.ts` is frozen, so the fork's named transition is the third message on the socket, not the first. An exam that waits for *a* transition whose `module` is `todos@y` (the leg's wording) passes; one that asserts on the first message delivered would be red for a reason no implementation of this task's files can remove.",
+    "task 1: amendment (clause): M3 says the first five verbs each `fetch <url>/exam/<verb>?\u2026`; `fork(from, to)` sends one extra request first \u2014 it opens a WebSocket to `<ws>/sync/<to>` and closes it (best effort, 2 s cap, cached per name) before fetching `/exam/fork`. \u2014 Leg (d) requires the fork's transition to arrive with `module` `todos@y`. A module object learns its name only from the `x-tinyapp-module` header the root forwards on `/sync/<name>`; the root's exam verbs build a bare `Request('http://facet/exam/\u2026')`, so measured at BASE a fork delivers `[{module:'',seq:1},{module:'',seq:1},{module:'',seq:2}]`. The server is frozen by the global constraints, so the dial through the existing sync route is the only way the leg passes; after it, the seed transition reads `{module:'todos@y',seq:2}`.",
+    "task 1: amendment (clause): `events(onTransition)` returns a handle that is both `{close()}` (M3's wording) and a thenable resolving to that same handle once the socket is open; `examSurface` also exposes `call(verb, query?)` beyond the six the Produces line names. \u2014 Leg (d) runs `events(cb)` immediately followed by `fork(...)`, so an exam that awaits the handle cannot outrun the root's socket registration while one that does not await still gets a working `close()`. `call` exists because leg (d) names `(surface as any).call('nope')` as one of its two readings of the 404 check \u2014 without it that reading is a TypeError rather than a rejection carrying `404`.",
+    "task 1: examiner: (d) \u2026 `events(cb)` followed by `fork('todos', 'todos@y')` delivers to `cb` within 5 s a transition whose `module` is `todos@y` \u2014 The module a transition names is the facet's own `#name`, learnt only from the `x-tinyapp-module` header the root sets when forwarding `/sync/<module>`. The root builds its `/exam/fork` seed request with no such header (server/index.ts), so a facet reached only through `/exam/*` reports `module: \"\"` \u2014 measured at BASE on a real `celld dev` runtime: a fork on `todos@y` delivered `{\"module\":\"\",\"seq\":1,\u2026}` and `{\"module\":\"\",\"seq\":2,\u2026}`. `examSurface` cannot supply it (M3 gives `fork` one fetch and no dial), and the global constraints freeze the server, so this is a plan defect rather than something the implementer can satisfy. The exam keeps the rest of the leg live \u2014 a transition delivered within 5 s of the fork, `seq` a number, each message parsed as `{module, seq, content, at}`, `close()` resolving \u2014 and asserts `module` is a string without pinning the empty value as the contract."
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M3 says the first five verbs each `fetch <url>/exam/<verb>?\u2026`; `fork(from, to)` sends one extra request first \u2014 it opens a WebSocket to `<ws>/sync/<to>` and closes it (best effort, 2 s cap, cached per name) before fetching `/exam/fork`.",
+      "why": "Leg (d) requires the fork's transition to arrive with `module` `todos@y`. A module object learns its name only from the `x-tinyapp-module` header the root forwards on `/sync/<name>`; the root's exam verbs build a bare `Request('http://facet/exam/\u2026')`, so measured at BASE a fork delivers `[{module:'',seq:1},{module:'',seq:1},{module:'',seq:2}]`. The server is frozen by the global constraints, so the dial through the existing sync route is the only way the leg passes; after it, the seed transition reads `{module:'todos@y',seq:2}`.",
+      "jev": {
+        "compelled": 0.8,
+        "plan_fault": 0.42,
+        "magnitude": 1.86
+      }
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "`events(onTransition)` returns a handle that is both `{close()}` (M3's wording) and a thenable resolving to that same handle once the socket is open; `examSurface` also exposes `call(verb, query?)` beyond the six the Produces line names.",
+      "why": "Leg (d) runs `events(cb)` immediately followed by `fork(...)`, so an exam that awaits the handle cannot outrun the root's socket registration while one that does not await still gets a working `close()`. `call` exists because leg (d) names `(surface as any).call('nope')` as one of its two readings of the 404 check \u2014 without it that reading is a TypeError rather than a rejection carrying `404`.",
+      "jev": {
+        "compelled": 0.59,
+        "plan_fault": 0.33,
+        "magnitude": 1.85
+      }
+    }
+  ],
+  "unfinished": [
+    "3: blocked \u2014 depends on a failed task",
+    "4: blocked \u2014 depends on a failed task"
+  ],
+  "completenessFindings": [],
+  "blockedWaves": []
+}
