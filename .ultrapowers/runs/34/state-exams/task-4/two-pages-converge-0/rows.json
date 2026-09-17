@@ -25,7 +25,7 @@
       "cell_id": null,
       "value_data": "[0]",
       "timestamp": "",
-      "hash": 833359692
+      "hash": 2800999099
     },
     {
       "type": "t",
@@ -34,16 +34,16 @@
       "cell_id": null,
       "value_data": "[0]",
       "timestamp": "",
-      "hash": 993620737
+      "hash": 403514400
     },
     {
       "type": "t",
       "table_id": "todos",
       "row_id": "0",
       "cell_id": null,
-      "value_data": "[{\"text\":[\"buy milk\",\"OhqqeV-----Hnpvf\",298727615],\"completed\":[false,\"OhqqeV----0Hnpvf\",523270610]}]",
+      "value_data": "[{\"text\":[\"buy milk\",\"OhqqeV-----wnvdu\",1875141147],\"completed\":[false,\"OhqqeV----0wnvdu\",2219647234]}]",
       "timestamp": "",
-      "hash": 1833293957
+      "hash": 3268574905
     }
   ],
   "tinybase_values": [

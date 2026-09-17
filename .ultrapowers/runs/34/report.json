@@ -1,0 +1,394 @@
+{
+  "integrationBranch": "ultra/integration-run-34",
+  "baseSha": "1081e08aab43d5cead1fd09cacd5a1c8749ae07c",
+  "setupSha": null,
+  "waves": [
+    [
+      "1"
+    ],
+    [
+      "3"
+    ],
+    [
+      "4"
+    ]
+  ],
+  "dependencyEdges": [
+    "1 -> 3 (interface)",
+    "3 -> 4 (interface)"
+  ],
+  "tasks": [
+    {
+      "task": "1",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "e40421e5b1fea16e451fda4d79d0300770b1a0d6",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-34/patches/task-1.patch",
+      "reviewVerdict": "clean",
+      "notes": "Global constraint \"Every runtime an exam starts is stopped by the exam: SIGTERM ... never a hard kill, never a port left held\" \u2014 the readiness-timeout path in `packages/tinyapp-exam/src/celld.ts` does not honour it. `end()` (celld.ts:93-100) sends SIGTERM and then escalates to `proc.kill('SIGKILL')` after 2 s, and the timeout branch (celld.ts:146-150) removes `dir` and throws without ever waiting for the port to clear the way `stop()` does (celld.ts:159-165). The task's own Context records the consequence of a hard kill: \"a hard kill leaves the node draining with the port held, and the next `--port` dies on `Address already in use`\". A real `celld dev` that is merely slower than `readyMs` would be SIGKILLed here. Leg (b) passes because its stand-in is `sleep 600`, which dies on SIGTERM alone, so the escalation is untested as well as unwanted. This constraint carries no `Check:` the driver ran, so it is graded minor on my reading of the prose. Fix inside this task's own FILES: drop the SIGKILL escalation and reuse the `stop()` shape on the timeout path \u2014 SIGTERM, `await proc.exited`, poll `portFree(port)` for at most 10 s, then `rmSync(dir, \u2026)` \u2014 so that both the failure path and the success path leave the port bindable and the copy gone.; Ownership overlap, recorded so rule 3 is not read as trespass: `packages/tinyapp-exam/src/index.ts` appears both in this task's Files block (`Modify:`) and in SIBLING FILES group 3 (popmechanic-tinyapp-fixture#99f1). The diff's change to it is purely additive \u2014 six export lines appended at index.ts:176-182, no existing line touched \u2014 so it is this task's declared path, not a sibling's file taken. Nothing for the implementer to do; the operator should expect task 3 to append to the same tail and merge both sets of exports rather than replace them.; Plan-text slip in the task's Context, corrected by the submission and worth recording so a later round does not 'fix' it back: the Context says the exam's `server/` is at \"path `server` relative to the workspace root, which is two directories above the test file\". The exam lands at `packages/tinyapp-exam/test/celld.test.ts`, so the workspace root is three directories above it, which is what the diff uses (`const ROOT = join(import.meta.dir, '..', '..', '..')`, celld.test.ts:359, with its comment saying three). The exam is green on that reading; two levels would have pointed at `packages/`.; concern: plan-defect: the Context sentence `/exam/discard?f=<facet>` \"answers text `discarded <facet>`\" describes the facet shape (server/index.ts, MODULE_SHAPE === 'facet'); the fixture runs the named shape, where server/facets/todos.ts answers the bare text `discarded`. Leg (d) asks only for text containing `discarded`, which is what it gets, so nothing here is unsatisfiable \u2014 but an exam that pinned the whole string `discarded todos@x` would be red for a reason no implementation can reach, the server being uneditable by this task.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789663205812,
+      "stateExams": [],
+      "findings": []
+    },
+    {
+      "task": "3",
+      "baseCorrected": null,
+      "status": "done",
+      "branch": "",
+      "exam": "red",
+      "headSha": "ab8353d9300ed98e61f433fdb354af750c71c4b7",
+      "patch": "/home/exedev/target/.claude/ultrapowers/run-run-34/patches/task-3.patch",
+      "reviewVerdict": "clean",
+      "notes": "Narrow runtime-leak window in `packages/tinyapp-exam/src/convergence-move.ts` (`measure`): `startCelld` is awaited, and then `serveExam(html, \u2026)` and `examSurface(runtime.url).events(\u2026)` run *before* the `try` whose `finally` calls `runtime.stop()`. If `Bun.serve` or the events socket construction throws, the `celld dev` this call started is never stopped \u2014 its port and its temp copy stay held, which is exactly what the global constraint \"Every runtime an exam starts is stopped by the exam\" forbids. The persistence move has the same shape at BASE, but there the pre-`try` resource is only a `Bun.serve`, not a supervised child process. Fix: open the `try` immediately after `startCelld` and hold the page server and the events handle in the same `ours` object the browser already uses (`ours.server`, `ours.events`), so the existing `finally` lets all three go: `const ours: {browser?: Browser; server?: ReturnType<typeof Bun.serve>; events?: {close(): Promise<void>}} = {}` \u2026 `finally { \u2026 await ours.events?.close().catch(() => {}); ours.server?.stop(true); await runtime.stop().catch(() => {}); }`. No `Check:` command grades this constraint, so it is graded minor on my reading of it.; Advisory, no change required: receipt 01M2R4HH0D0000C59AXT7T5332 (\"hollow: hollow left its mutant todos/0/text alive \u2014 the exam did not catch the wrong state\") is the deliberate negative control of this exam, not a hole in it. `packages/tinyapp-exam/test/convergence-move.test.ts` runs the `mutant survived` leg with `{main: '/x/hollow.test.ts'}`, so that run's evidence directory is stemmed `hollow` and its `mutant.json` carries `{killed: false, path: 'todos/0/text'}` by design \u2014 the leg's whole point is a mutant that sets `todos/0/text` to the value the expected state already has, and it asserts `failure` starts with `convergence: mutant survived` and `record.mutant.killed === false`. The opposite direction is pinned too: leg (a) asserts `record.mutant.killed === true` and that `stores.a`, `.b`, `.c` and `.object` each equal `[{todos:{'0':{text:'buy milk',completed:false}}},{}]`, so a wrong state is caught by the exam. The `/x/hollow.test.ts` stem is the convention already used at BASE by `packages/tinyapp-exam/test/persistence-move.test.ts:835`; if the driver's hollow scan is to stay quiet over convergence evidence, the cheapest change is renaming that leg's `main` to `/x/mutant-survived.test.ts`, at the cost of diverging from the sibling move's naming.",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789664143613,
+      "stateExams": [
+        {
+          "exam": "buy-bread",
+          "store_ms": 114.00309700000071,
+          "render_ms": 42.826474999999846,
+          "render": "ran",
+          "action_ms": 12.123365000000376,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "convergence-move",
+          "store_ms": 133.6756060000007,
+          "render_ms": 34.196123000001535,
+          "render": "ran",
+          "action_ms": 10.62209299999813,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "hollow",
+          "store_ms": 134.76595799999996,
+          "render_ms": 32.707282999999734,
+          "render": "ran",
+          "action_ms": 12.224827000000005,
+          "browser": "ran",
+          "mutant_killed": false,
+          "contract": "ok"
+        },
+        {
+          "exam": "honest",
+          "store_ms": 138.75198800000004,
+          "render_ms": 44.77221499999996,
+          "render": "ran",
+          "action_ms": 10.853640000000041,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "red",
+          "store_ms": 133.000494,
+          "render_ms": 33.63300700000002,
+          "render": "ran",
+          "action_ms": 14.121422999999936,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "sync-1ms",
+          "store_ms": 126.40224300000045,
+          "render_ms": 38.47208600000158,
+          "render": "ran",
+          "action_ms": 15.291978000001109,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        },
+        {
+          "exam": "view",
+          "store_ms": 109.5849849999995,
+          "render_ms": 28.029031000000032,
+          "render": "ran",
+          "action_ms": 11.641349000001355,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    },
+    {
+      "task": "4",
+      "baseCorrected": null,
+      "status": "failed",
+      "branch": "",
+      "exam": "red",
+      "reviewVerdict": "plan-defect",
+      "notes": "plan-defect: leg (c) cannot pass with M1's view as written \u2014 `{selector: '#todo-0', text: 'buy milk'}` is unsatisfiable for any implementation of this task. `#todo-0` is the Checkbox root: `client/src/TodoItem.tsx` passes `render={<span id={`todo-${rowId}`} />}` so the id lands on `<span role=\"checkbox\" aria-checked=\"false\" aria-label=\"buy milk\">`, whose textContent is empty \u2014 the todo's text is in the sibling `<span class=\"flex-1 \u2026\">`. `assertView`'s `text` is `element.textContent.includes(...)`, so the exam fails `convergence: view not satisfied / view #todo-0: no match has text \"buy milk\"`. Verified against the run's own dom.html. Everything before that view is green: the same spec with only `{selector: '#todoList li', count: 3}` resolves `ok: true` in-process under ULTRA_RUN_DIR, with walls.json carrying sync_ms and converge_ms and transitions.json carrying 3 entries. Two spellings that would pass, either of which the plan can pick: `{selector: '#todo-0', attr: {name: 'aria-label', value: 'buy milk'}}` (which is how `#todo-0` 'carries buy milk', as the Context puts it) or the persistence exam's own `{selector: '#todoList li', count: 3, text: 'buy milk'}`. I implemented M1 as written rather than working around it, since the spec literal leg (a) reads back is written by the peer's exam over this same path.",
+      "actor": "plan",
+      "tier": "opus",
+      "review": "peer",
+      "fixIterations": 0,
+      "proposedPatches": 0,
+      "proofFixes": 0,
+      "examEdited": [],
+      "examRounds": 1,
+      "landedAt": 1789664773013,
+      "stateExams": [
+        {
+          "exam": "two-pages-converge",
+          "store_ms": 202.46167400000002,
+          "render_ms": 86.43878999999993,
+          "render": "ran",
+          "action_ms": 62.08988199999999,
+          "browser": "ran",
+          "mutant_killed": true,
+          "contract": "ok"
+        }
+      ],
+      "findings": []
+    }
+  ],
+  "tests": {
+    "command": "bun run test",
+    "passed": true,
+    "output": "bun test v1.4.2 (744846f84)\n\npackages/tinyapp-exam/test/convergence-move.test.ts:\n(pass) leg (a) [M1] [M2] [M3]: A acts, B agrees, the object and C agree, and the session is on the record [4366.21ms]\n(pass) leg (c) [M2]: after the honest run the runtime is stopped \u2014 its port bindable, its copy gone [0.24ms]\n(pass) leg (b) [M3]: an expected state page A never reaches is `page A differs from expected` [4413.51ms]\n(pass) leg (b) [M3]: a mutant that leaves the expected unchanged is `mutant survived` [4425.93ms]\n(pass) leg (b) [M3]: a view page B does not satisfy is `view not satisfied` [4402.70ms]\n(pass) leg (b) [M3]: `syncTimeoutMs: 1` is either already equal or `B never matched A within 1 ms`, and nothing else [1297.02ms]\n(pass) leg (d) [M4]: the honest record leaves the six files, and the walls count the transitions it wrote [0.95ms]\n(pass) leg (e) [M5]: a listed origin is continued and the same request unlisted is failed in the browser [249.03ms]\n(pass) convergence exam: convergence-move [4392.34ms]\n(pass) leg (f) [M6]: this file registers `convergence exam: convergence-move` [0.17ms]\n(pass) leg (f) [M6]: a red registration run as a child `bun test` exits non-zero with the failure on its output [4478.92ms]\n(pass) [M1]: the package names `convergenceExam` and `ConvergenceExamSpec` where the Proof asks [0.16ms]\n\n 12 pass\n 0 fail\n 106 expect() calls\nRan 12 tests across 1 file. [28.07s]\n",
+    "unattributed": []
+  },
+  "integratedRuns": [],
+  "integratedChecks": [
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 26 snapshots and 29 exams in 10206 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- package.json client/package.json server/package.json packages/tinyapp-exam/package.json packages/tinyapp-history/package.json bun.lock",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/index.ts server/facets server/wrangler.jsonc packages/tinyapp-history/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "bun run typecheck",
+      "exit": 0,
+      "stdout": "$ bun run --cwd client tsc --noEmit && bun run --cwd server tsc --noEmit && bunx tsc -p packages/tinyapp-lint --noEmit && bunx tsc -p packages/tinyapp-history --noEmit && bunx tsc -p packages/tinyapp-exam --noEmit\n",
+      "minor": false
+    },
+    {
+      "cmd": "bun run lint:state",
+      "exit": 0,
+      "stdout": "lint:state: 0 findings over 26 snapshots and 29 exams in 11126 ms\n$ bun packages/tinyapp-lint/src/cli.ts\n",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- package.json client/package.json server/package.json packages/tinyapp-exam/package.json packages/tinyapp-history/package.json bun.lock",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    },
+    {
+      "cmd": "git diff --quiet $ULTRA_BASE -- server/index.ts server/facets server/wrangler.jsonc packages/tinyapp-history/src",
+      "exit": 0,
+      "stdout": "",
+      "minor": false
+    }
+  ],
+  "reviewEconomy": {
+    "reviewerMs": 287740,
+    "blockingFindings": 0,
+    "blockingPerReviewerMinute": 0
+  },
+  "baseline": {
+    "passed": true,
+    "output": "tinyapp-lint/test/lint-cli.test.ts:\n(pass) (a) [M1] `bun run lint:state` exits 0 with one zero-findings summary line [11575.21ms]\n(pass) (b) [M2] `loadContext()` resolves to the pinned context [208.36ms]\n(pass) (c) [M3] the exam specs, in path order, and the pinned click entry [0.21ms]\n(pass) (d) [M4] `ctx.render` reflects `checked` and paints the two rows [6.26ms]\n$ bun packages/tinyapp-lint/src/cli.ts --rules /tmp/tinyapp-lint-rules-cAmpOW\nerror: script \"lint:state\" exited with code 1\n\n(pass) (e) [M5] `runLint` over two rule modules, the CLI `--rules` run, and an absent directory [346.41ms]\n(pass) (f) [M6] `captureExams` leaves no exam file in the caller`s `require.cache` [202.20ms]\n\npackages/tinyapp-lint/test/invariants.test.ts:\n(pass) (a) [M1] `INVARIANTS` carries the todos invariant first, with the pinned predicate [0.37ms]\n(pass) (a) [M5] the due-date invariant is on `todos`, and holds of an absent or valid date [0.36ms]\n(pass) (b) [M2] the rule is named `invariants` and is quiet over the fixture [203.53ms]\n(pass) (c) [M3] the bad snapshot is exactly one finding, formatted character for character [0.47ms]\n(pass) (d) [M4] an empty snapshot is quiet, and a throwing invariant is one finding per row [0.50ms]\n(pass) (e) [M5] the CLI over one seeded violation exits 1 and names the row [1561.96ms]\n\npackages/tinyapp-lint/test/views.test.ts:\n(pass) (a) [M1] the `views` rule finds nothing over the fixture`s own six exams [301.53ms]\n(pass) (b) [M2] the run-7 spec is one finding naming the narrower selector `#todo-1` [2.84ms]\n(pass) (c) [M3] the `count: 1` spec is one finding reading `found 2` [2.19ms]\n(pass) (d) [M4] the corrected selector holds, and the `unchecked` breach names `#todo-0` [3.82ms]\n(pass) (e) [M5] a `view` of `undefined` asserts nothing, and a missing state is one finding [0.15ms]\n(pass) (f) [M6] `bun run lint:state -- --exams <dir>` exits 1 and prints that line [11250.33ms]\n\n 661 pass\n 0 fail\n 2017 expect() calls\nRan 661 tests across 57 files. [178.14s]\n"
+  },
+  "waveMerges": [
+    {
+      "wave": 1,
+      "status": "MERGED",
+      "headSha": "a22d151d69c580aca4dc17a953f8325c88b52813",
+      "branches": [
+        "1"
+      ],
+      "joined": []
+    },
+    {
+      "wave": 2,
+      "status": "MERGED",
+      "headSha": "ed928f227ceaf1618b87c738b68d4ca578c7d605",
+      "branches": [
+        "3"
+      ],
+      "joined": []
+    }
+  ],
+  "frontier": [
+    {
+      "wave": 1,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-34/frontier/wave-1/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-34/frontier/wave-1/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.565,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    },
+    {
+      "wave": 2,
+      "foldLogPath": "/home/exedev/target/.claude/ultrapowers/run-run-34/frontier/wave-2/fold_log.jsonl",
+      "conflictsIndex": "/home/exedev/target/.claude/ultrapowers/run-run-34/frontier/wave-2/conflicts.json",
+      "selfChecks": "ok",
+      "foldCliCalls": 3,
+      "foldCliWallTimeSec": 0.782,
+      "autoResolved": 0,
+      "resolverTranscripts": []
+    }
+  ],
+  "coverage": {
+    "tasks_merged": 2,
+    "tasks_planned": 3,
+    "complete": false
+  },
+  "engineCoverage": null,
+  "missingDeliverables": [
+    {
+      "task": "4",
+      "files": [
+        "AGENTS.md",
+        "README.md",
+        "tests/state-exams/two-pages-converge.test.ts"
+      ]
+    }
+  ],
+  "gitVerified": true,
+  "ancestryMisses": [],
+  "deferredVerification": [
+    {
+      "deliverable": "4",
+      "reason": "plan-defect",
+      "why": "plan-defect: leg (c) cannot pass with M1's view as written \u2014 `{selector: '#todo-0', text: 'buy milk'}` is unsatisfiable for any implementation of this task. `#todo-0` is the Checkbox root: `client/src/TodoItem.tsx` passes `render={<span id={`todo-${rowId}`} />}` so the id lands on `<span role=\"checkbox\" aria-checked=\"false\" aria-label=\"buy milk\">`, whose textContent is empty \u2014 the todo's text is in the sibling `<span class=\"flex-1 \u2026\">`. `assertView`'s `text` is `element.textContent.includes(...)`, so the exam fails `convergence: view not satisfied / view #todo-0: no match has text \"buy milk\"`. Verified against the run's own dom.html. Everything before that view is green: the same spec with only `{selector: '#todoList li', count: 3}` resolves `ok: true` in-process under ULTRA_RUN_DIR, with walls.json carrying sync_ms and converge_ms and transitions.json carrying 3 entries. Two spellings that would pass, either of which the plan can pick: `{selector: '#todo-0', attr: {name: 'aria-label', value: 'buy milk'}}` (which is how `#todo-0` 'carries buy milk', as the Context puts it) or the persistence exam's own `{selector: '#todoList li', count: 3, text: 'buy milk'}`. I implemented M1 as written rather than working around it, since the spec literal leg (a) reads back is written by the peer's exam over this same path."
+    }
+  ],
+  "judgmentCalls": [
+    "task 1: plan-defect: the Context sentence `/exam/discard?f=<facet>` \"answers text `discarded <facet>`\" describes the facet shape (server/index.ts, MODULE_SHAPE === 'facet'); the fixture runs the named shape, where server/facets/todos.ts answers the bare text `discarded`. Leg (d) asks only for text containing `discarded`, which is what it gets, so nothing here is unsatisfiable \u2014 but an exam that pinned the whole string `discarded todos@x` would be red for a reason no implementation can reach, the server being uneditable by this task.",
+    "task 1: amendment (clause): M1's result list `{url, ws, dir, port, stop}` \u2014 the instance also carries `argv` and `env`, and `startCelld` takes an extra `onSpawn?: (spawn) => void` option. \u2014 Leg (a) requires the spawned argv and env to be pinned \"by a `startCelld` option or export the exam can read the argv and env through, or by a probe binary script\"; both routes are provided so the peer's exam can take either, and the M1 shape is a subset of what is returned.",
+    "task 1: amendment (clause): M1's `CELLD_ESBUILD=<root>/node_modules/.bin/esbuild` and the `node_modules` symlink target \u2014 `<root>` is read as the parent of the resolved `serverDir`, not as a separately discovered workspace root. \u2014 `serverDir` became a parameter, so `<root>` had to be defined from it; the parent of `serverDir` is exactly what `server/test/celld.ts` used at BASE (`join(SERVER, '..')`), which is the shape the task says to lift byte for byte.",
+    "task 3: amendment (files): packages/tinyapp-lint/src/capture-plugin.ts \u2014 added `convergenceExam`, `runConvergenceExam`, `startCelld`, `examSurface`, `SYNC_TIMEOUT_MS` and `CONVERGE_TIMEOUT_MS` to `EXAM_NO_OPS`, with a sentence in the doc comment saying why `convergenceExam` is a no-op rather than a second capture. \u2014 The lint capture child links a stub of `tinyapp-exam` built from that list; a name missing from it makes `bun run lint:state` die as `capture failed`. Without the edit, `lint:state` \u2014 one of my own Check proofs \u2014 goes red for the whole tree the moment task 4's `tests/state-exams/two-pages-converge.test.ts` folds in and imports `convergenceExam`. The persistence move's names are already there by the same rule.",
+    "task 3: amendment (files): packages/tinyapp-exam/test/fixtures/convergence/expected-one-row.json \u2014 created, holding `[{\"todos\":{\"0\":{\"text\":\"buy milk\",\"completed\":false}}},{}]`. \u2014 The task's Context names this file and its exact contents as part of the stand-in, and leg (a) of the Proof passes its path as `expected`, but the Files list stops at `entry.html` and `app.ts`. The fixture is unusable without it and the peer's exam cannot write it, since the Context pins it as the fixture's own.",
+    "task 3: amendment (clause): M3's failure ladder \u2014 I read \"the first failed step in run order\" as: run every step and record it, then judge in the order the steps ran (sync wait, converge wait, A-vs-expected, object-vs-expected, C-vs-expected, view, mutant). A page C that differs from expected is spelled with the converge-timeout sentence, as M3 says, and that branch is unreachable while the two diffs above it hold \u2014 kept anyway, with a comment saying so, since M3 makes `ok` out of all three diffs. \u2014 M3 pins six sentences and an order but not whether a failed step short-circuits the rest of the run. Running everything before judging is the persistence move's own stated rule (\"a red exam's evidence is as complete as a green one's\"), and it is what makes a red run's `transitions.json` and `rows.json` worth reading.",
+    "task 3: amendment (clause): The mutant failure is `convergence: mutant survived \u2014 the perturbation <path> is not told apart from the expected state`; `converge_ms` is measured from the moment page C's store handle appears rather than from its navigation. \u2014 M3 pins `mutant survived` as a prefix and the Context asks for failures that are \"a sentence a reader can act on\", so the path is appended after the pinned words. The Context's measured wall for a third client converging is 0 ms, which is the wait itself and not the page load, so `converge_ms` times the wait; leg (a) only asks that it be a number of at least 0 either way.",
+    "task 4: plan-defect: leg (c) cannot pass with M1's view as written \u2014 `{selector: '#todo-0', text: 'buy milk'}` is unsatisfiable for any implementation of this task. `#todo-0` is the Checkbox root: `client/src/TodoItem.tsx` passes `render={<span id={`todo-${rowId}`} />}` so the id lands on `<span role=\"checkbox\" aria-checked=\"false\" aria-label=\"buy milk\">`, whose textContent is empty \u2014 the todo's text is in the sibling `<span class=\"flex-1 \u2026\">`. `assertView`'s `text` is `element.textContent.includes(...)`, so the exam fails `convergence: view not satisfied / view #todo-0: no match has text \"buy milk\"`. Verified against the run's own dom.html. Everything before that view is green: the same spec with only `{selector: '#todoList li', count: 3}` resolves `ok: true` in-process under ULTRA_RUN_DIR, with walls.json carrying sync_ms and converge_ms and transitions.json carrying 3 entries. Two spellings that would pass, either of which the plan can pick: `{selector: '#todo-0', attr: {name: 'aria-label', value: 'buy milk'}}` (which is how `#todo-0` 'carries buy milk', as the Context puts it) or the persistence exam's own `{selector: '#todoList li', count: 3, text: 'buy milk'}`. I implemented M1 as written rather than working around it, since the spec literal leg (a) reads back is written by the peer's exam over this same path.",
+    "task 4: amendment (clause): M1's spec list read as the fields the registration must carry rather than as an exhaustive literal: the registered spec also names `clock: '2026-01-01T00:00:00Z'` and `assets: {'/sqlite3.wasm': 'node_modules/@sqlite.org/sqlite-wasm/dist/sqlite3.wasm'}`. \u2014 `clock` is a required field of `ConvergenceExamSpec`, so the spec does not typecheck without it. `assets` is load-bearing and measured: without the wasm mapping the page's SQLite persister never initialises, the app never mounts, and the run dies at `act: no element matches role=textbox name=\"New todo\"` before any convergence leg is reached. The persistence exam on the same entry (`tests/state-exams/added-todo-survives-reload.test.ts`) names the same asset for the same reason.",
+    "task 4: examiner: (c) [M3] \u2014 the registered exam passes on the tree, and `runConvergenceExam` over the same spec resolves `ok: true` \u2014 M1's second view, `{selector: '#todo-0', text: 'buy milk'}`, cannot hold against the app at BASE. `TodoItem` renders the row id onto the checkbox root \u2014 `<span id=\"todo-0\" role=\"checkbox\" aria-checked=\"false\" aria-label=\"buy milk\">` \u2014 deliberately, so the id sits on the element carrying the role rather than on base-ui's hidden input; the todo's text is the sibling span beside it. `breachOf` reads a view's `text` as `element.textContent.includes(...)`, and `#todo-0`'s textContent is empty, so the run reports `convergence: view not satisfied / view #todo-0: no match has text \"buy milk\"`. Everything else in the session is green: measured at BASE with the views dropped, the same spec resolves `ok: true`, and the first view `{selector: '#todoList li', count: 3}` holds. The task's file scope is README.md, AGENTS.md and this exam, and the global constraints keep the app, the server and the species as they are, so no implementation of this task can turn the leg green. The view is written exactly as M1 spells it and the exam is red saying so; the spelling that would pass is `{selector: '#todo-0', attr: {name: 'aria-label', value: 'buy milk'}}`, or the `{selector: '#todoList li', count: 3, text: 'buy milk'}` that `added-todo-survives-reload.test.ts` already uses on this page \u2014 but choosing one is an amendment to M1, not the examiner's substitution to make.",
+    "task 4: plan-defect against a Proof leg named by the implementer \u2014 no fix round dispatched; failed with actor plan \u2014 plan-defect: leg (c) cannot pass with M1's view as written \u2014 `{selector: '#todo-0', text: 'buy milk'}` is unsatisfiable for any implementation of this task. `#todo-0` is the Checkbox root: `client/src/TodoItem.tsx` passes `render={<span id={`todo-${rowId}`} />}` so the id lands on `<span role=\"checkbox\" aria-checked=\"false\" aria-label=\"buy milk\">`, whose textContent is empty \u2014 the todo's text is in the sibling `<span class=\"flex-1 \u2026\">`. `assertView`'s `text` is `element.textContent.includes(...)`, so the exam fails `convergence: view not satisfied / view #todo-0: no match has text \"buy milk\"`. Verified against the run's own dom.html. Everything before that view is green: the same spec with only `{selector: '#todoList li', count: 3}` resolves `ok: true` in-process under ULTRA_RUN_DIR, with walls.json carrying sync_ms and converge_ms and transitions.json carrying 3 entries. Two spellings that would pass, either of which the plan can pick: `{selector: '#todo-0', attr: {name: 'aria-label', value: 'buy milk'}}` (which is how `#todo-0` 'carries buy milk', as the Context puts it) or the persistence exam's own `{selector: '#todoList li', count: 3, text: 'buy milk'}`. I implemented M1 as written rather than working around it, since the spec literal leg (a) reads back is written by the peer's exam over this same path."
+  ],
+  "amendments": [
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M1's result list `{url, ws, dir, port, stop}` \u2014 the instance also carries `argv` and `env`, and `startCelld` takes an extra `onSpawn?: (spawn) => void` option.",
+      "why": "Leg (a) requires the spawned argv and env to be pinned \"by a `startCelld` option or export the exam can read the argv and env through, or by a probe binary script\"; both routes are provided so the peer's exam can take either, and the M1 shape is a subset of what is returned.",
+      "jev": {
+        "compelled": 0.4,
+        "plan_fault": 0.37,
+        "magnitude": 1.65
+      }
+    },
+    {
+      "task": "1",
+      "amends": "clause",
+      "what": "M1's `CELLD_ESBUILD=<root>/node_modules/.bin/esbuild` and the `node_modules` symlink target \u2014 `<root>` is read as the parent of the resolved `serverDir`, not as a separately discovered workspace root.",
+      "why": "`serverDir` became a parameter, so `<root>` had to be defined from it; the parent of `serverDir` is exactly what `server/test/celld.ts` used at BASE (`join(SERVER, '..')`), which is the shape the task says to lift byte for byte.",
+      "jev": {
+        "compelled": 0.51,
+        "plan_fault": 0.35,
+        "magnitude": 1.62
+      }
+    },
+    {
+      "task": "3",
+      "amends": "files",
+      "what": "packages/tinyapp-lint/src/capture-plugin.ts \u2014 added `convergenceExam`, `runConvergenceExam`, `startCelld`, `examSurface`, `SYNC_TIMEOUT_MS` and `CONVERGE_TIMEOUT_MS` to `EXAM_NO_OPS`, with a sentence in the doc comment saying why `convergenceExam` is a no-op rather than a second capture.",
+      "why": "The lint capture child links a stub of `tinyapp-exam` built from that list; a name missing from it makes `bun run lint:state` die as `capture failed`. Without the edit, `lint:state` \u2014 one of my own Check proofs \u2014 goes red for the whole tree the moment task 4's `tests/state-exams/two-pages-converge.test.ts` folds in and imports `convergenceExam`. The persistence move's names are already there by the same rule.",
+      "jev": {
+        "compelled": 0.75,
+        "plan_fault": 0.27,
+        "magnitude": 1.05
+      }
+    },
+    {
+      "task": "3",
+      "amends": "files",
+      "what": "packages/tinyapp-exam/test/fixtures/convergence/expected-one-row.json \u2014 created, holding `[{\"todos\":{\"0\":{\"text\":\"buy milk\",\"completed\":false}}},{}]`.",
+      "why": "The task's Context names this file and its exact contents as part of the stand-in, and leg (a) of the Proof passes its path as `expected`, but the Files list stops at `entry.html` and `app.ts`. The fixture is unusable without it and the peer's exam cannot write it, since the Context pins it as the fixture's own.",
+      "jev": {
+        "compelled": 0.81,
+        "plan_fault": 0.62,
+        "magnitude": 1.01
+      }
+    },
+    {
+      "task": "3",
+      "amends": "clause",
+      "what": "M3's failure ladder \u2014 I read \"the first failed step in run order\" as: run every step and record it, then judge in the order the steps ran (sync wait, converge wait, A-vs-expected, object-vs-expected, C-vs-expected, view, mutant). A page C that differs from expected is spelled with the converge-timeout sentence, as M3 says, and that branch is unreachable while the two diffs above it hold \u2014 kept anyway, with a comment saying so, since M3 makes `ok` out of all three diffs.",
+      "why": "M3 pins six sentences and an order but not whether a failed step short-circuits the rest of the run. Running everything before judging is the persistence move's own stated rule (\"a red exam's evidence is as complete as a green one's\"), and it is what makes a red run's `transitions.json` and `rows.json` worth reading.",
+      "jev": {
+        "compelled": 0.21,
+        "plan_fault": 0.49,
+        "magnitude": 1.8
+      }
+    },
+    {
+      "task": "3",
+      "amends": "clause",
+      "what": "The mutant failure is `convergence: mutant survived \u2014 the perturbation <path> is not told apart from the expected state`; `converge_ms` is measured from the moment page C's store handle appears rather than from its navigation.",
+      "why": "M3 pins `mutant survived` as a prefix and the Context asks for failures that are \"a sentence a reader can act on\", so the path is appended after the pinned words. The Context's measured wall for a third client converging is 0 ms, which is the wait itself and not the page load, so `converge_ms` times the wait; leg (a) only asks that it be a number of at least 0 either way.",
+      "jev": {
+        "compelled": 0.41,
+        "plan_fault": 0.39,
+        "magnitude": 1.71
+      }
+    },
+    {
+      "task": "4",
+      "amends": "clause",
+      "what": "M1's spec list read as the fields the registration must carry rather than as an exhaustive literal: the registered spec also names `clock: '2026-01-01T00:00:00Z'` and `assets: {'/sqlite3.wasm': 'node_modules/@sqlite.org/sqlite-wasm/dist/sqlite3.wasm'}`.",
+      "why": "`clock` is a required field of `ConvergenceExamSpec`, so the spec does not typecheck without it. `assets` is load-bearing and measured: without the wasm mapping the page's SQLite persister never initialises, the app never mounts, and the run dies at `act: no element matches role=textbox name=\"New todo\"` before any convergence leg is reached. The persistence exam on the same entry (`tests/state-exams/added-todo-survives-reload.test.ts`) names the same asset for the same reason.",
+      "jev": {
+        "compelled": 0.86,
+        "plan_fault": 0.54,
+        "magnitude": 1.72
+      }
+    }
+  ],
+  "unfinished": [],
+  "completenessFindings": [],
+  "blockedWaves": []
+}

@@ -1,0 +1,65 @@
+{
+  "mode": "gate",
+  "stamp": "run-34",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-34/report.json",
+  "branch": "ultra/integration-run-34",
+  "gateCheck": {
+    "verdict": "BLOCKED",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": false,
+        "detail": "failed/blocked tasks left declared deliverables unproduced: [{\"task\": \"4\", \"files\": [\"AGENTS.md\", \"README.md\", \"tests/state-exams/two-pages-converge.test.ts\"]}]"
+      }
+    ],
+    "acks": [
+      {
+        "type": "coverage",
+        "detail": "green suite but 2/3 tasks merged \u2014 a passing suite over an incomplete merge is a false-green"
+      },
+      {
+        "type": "deferred:plan-defect",
+        "detail": "4 \u2014 plan-defect: leg (c) cannot pass with M1's view as written \u2014 `{selector: '#todo-0', text: 'buy milk'}` is unsatisfiable for any implementation of this task. `#todo-0` is the Checkbox root: `client/src/TodoItem.tsx` passes `render={<span id={`todo-${rowId}`} />}` so the id lands on `<span role=\"checkbox\" aria-checked=\"false\" aria-label=\"buy milk\">`, whose textContent is empty \u2014 the todo's text is in the sibling `<span class=\"flex-1 \u2026\">`. `assertView`'s `text` is `element.textContent.includes(...)`, so the exam fails `convergence: view not satisfied / view #todo-0: no match has text \"buy milk\"`. Verified against the run's own dom.html. Everything before that view is green: the same spec with only `{selector: '#todoList li', count: 3}` resolves `ok: true` in-process under ULTRA_RUN_DIR, with walls.json carrying sync_ms and converge_ms and transitions.json carrying 3 entries. Two spellings that would pass, either of which the plan can pick: `{selector: '#todo-0', attr: {name: 'aria-label', value: 'buy milk'}}` (which is how `#todo-0` 'carries buy milk', as the Context puts it) or the persistence exam's own `{selector: '#todoList li', count: 3, text: 'buy milk'}`. I implemented M1 as written rather than working around it, since the spec literal leg (a) reads back is written by the peer's exam over this same path."
+      }
+    ],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 1,
+  "suite": {
+    "passed": true,
+    "unattributed": [],
+    "output": "bun test v1.4.2 (744846f84)\n\npackages/tinyapp-exam/test/convergence-move.test.ts:\n(pass) leg (a) [M1] [M2] [M3]: A acts, B agrees, the object and C agree, and the session is on the record [4366.21ms]\n(pass) leg (c) [M2]: after the honest run the runtime is stopped \u2014 its port bindable, its copy gone [0.24ms]\n(pass) leg (b) [M3]: an expected state page A never reaches is `page A differs from expected` [4413.51ms]\n(pass) leg (b) [M3]: a mutant that leaves the expected unchanged is `mutant survived` [4425.93ms]\n(pass) leg (b) [M3]: a view page B does not satisfy is `view not satisfied` [4402.70ms]\n(pass) leg (b) [M3]: `syncTimeoutMs: 1` is either already equal or `B never matched A within 1 ms`, and nothing else [1297.02ms]\n(pass) leg (d) [M4]: the honest record leaves the six files, and the walls count the transitions it wrote [0.95ms]\n(pass) leg (e) [M5]: a listed origin is continued and the same request unlisted is failed in the browser [249.03ms]\n(pass) convergence exam: convergence-move [4392.34ms]\n(pass) leg (f) [M6]: this file registers `convergence exam: convergence-move` [0.17ms]\n(pass) leg (f) [M6]: a red registration run as a child `bun test` exits non-zero with the failure on its output [4478.92ms]\n(pass) [M1]: the package names `convergenceExam` and `ConvergenceExamSpec` where the Proof asks [0.16ms]\n\n 12 pass\n 0 fail\n 106 expect() calls\nRan 12 tests across 1 file. [28.07s]\n"
+  },
+  "verdict": "BLOCKED"
+}
