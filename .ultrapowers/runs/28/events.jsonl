@@ -25,3 +25,4 @@
 {"kind":"fact:state.reached","task":"1","expected":"state-exams/expected/two-todos-second-tagged.json","sha256":"a7f6d26a45f70846a81eb20578afa019c4e6d20cdc4971a6507c12377472ba97","id":"01M2PVJ6V100002CXGAK4GB5HS","ts":1789620984673}
 {"kind":"handshake:settled","task":"1","expected":"state-exams/expected/two-todos-second-tagged.json","id":"01M2PVJ6V10001CSXEBJCVPH2P","ts":1789620984673}
 {"kind":"worker:start","label":"fix:1:0","role":"implementer","sessionId":"ad8aacb6-1d68-46bf-b7b1-88620a4c0806","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-28/clones/task-1","model":"opus","id":"01M2PVJ6WC00002XHEE6H1468S","ts":1789620984716}
+{"kind":"driver:attention","task":"1","attention":"ok","msg":"session ended without hand-off","actor":"","id":"01M2PVJNK20000N3SZVHHQABN2","ts":1789620999778}
