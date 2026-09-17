@@ -123,3 +123,4 @@
 {"kind":"driver:fail","verdict":"gate-blocked","detail":"ultra_gate exited 1 — gate receipt is the terminal artifact","id":"01M2R5AH8S0000QQDJR2DTFG6C","ts":1789664773401}
 {"kind":"run:open","runId":"run-34","base":"1081e08aab43d5cead1fd09cacd5a1c8749ae07c","source":"fleet/publish-fold.mjs","id":"01M2R5AR8Q0000S019TF1FEN9W","ts":1789664780567}
 {"kind":"driver:publish-fold","run":"34","attempt":"1","base":"1081e08aab43d5cead1fd09cacd5a1c8749ae07c","tip":"1081e08aab43d5cead1fd09cacd5a1c8749ae07c","candidate":"ed928f227ceaf1618b87c738b68d4ca578c7d605","pathsJoined":0,"pathsConflicted":0,"resolversDispatched":0,"resolverRetries":0,"suite":"none","disposition":"nothing to join","checks":[],"checkRetries":0,"id":"01M2R5ARP800002P6B4W0C25HR","ts":1789664781000}
+{"kind":"publish:pr","url":"https://github.com/popmechanic/tinyapp-fixture/pull/34","number":34,"draft":true,"id":"01M2R5B0BC0000NMM3AMF9MPHX","ts":1789664788844}
