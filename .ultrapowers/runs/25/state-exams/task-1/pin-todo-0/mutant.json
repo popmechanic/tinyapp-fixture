@@ -1,0 +1,12 @@
+{
+  "killed": true,
+  "path": "todos/1/pinned",
+  "edits": [
+    {
+      "table": "todos",
+      "row": "1",
+      "cell": "pinned",
+      "absent": true
+    }
+  ]
+}
