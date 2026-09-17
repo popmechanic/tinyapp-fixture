@@ -1,0 +1,4 @@
+{"event": "emitted", "wave": 1, "path": "client/src/TagsInput.tsx", "stateBlob": "40c4c387daa9e4de5865c06bbd924952a654cec84e7a5a1729f29b5680d6a817", "visibleSha": "29685f3fc27b585c3173e29def1856f440e96b5a"}
+{"event": "emitted", "wave": 1, "path": "client/src/TodoItem.tsx", "stateBlob": "3d5984d73d0a23896363d74f1179892d7f50d9865173c2555ce507226e2c568b", "visibleSha": "92aa7f53e19bcf02ff2edb49fd204c3bd87c4a1e"}
+{"event": "emitted", "wave": 1, "path": "tests/state-exams/type-due-date.test.ts", "stateBlob": "257c5ff4881117bdbb0daac8dfc4790b6fce74019734567a4f4dcccef9c73de5", "visibleSha": "373c6cd17a2301393b9cfc1316ead5d0f8a64c7a"}
+{"event": "emitted", "wave": 1, "path": "tests/state-exams/type-tags.test.ts", "stateBlob": "956273b8f7384d2b844c7815dd15532379575d86c6a62a44bbfa34506a7ec2d7", "visibleSha": "8a814e1a29d633c56d95e236800322a3516bb4f2"}

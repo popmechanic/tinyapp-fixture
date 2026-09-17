@@ -1,0 +1,56 @@
+{
+  "mode": "gate",
+  "stamp": "run-28",
+  "reportPath": "/home/exedev/target/.claude/ultrapowers/run-run-28/report.json",
+  "branch": "ultra/integration-run-28",
+  "gateCheck": {
+    "verdict": "PASS",
+    "checks": [
+      {
+        "name": "report-parse",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "clean-tree",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "wave-merges",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "head-match",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "git-verified",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "ancestry",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "deliverables",
+        "ok": true,
+        "detail": ""
+      }
+    ],
+    "acks": [],
+    "notes": [],
+    "repo": "/home/exedev/target"
+  },
+  "gateCheckExit": 0,
+  "suite": {
+    "passed": true,
+    "unattributed": [],
+    "output": "bun test v1.4.0 (34cbb9a40)\n\ntests/state-exams/type-due-date.test.ts:\n(pass) leg (a) [M1] the date boxes of the markup are exactly the rows' own #due-<N> [24.19ms]\n(pass) leg (a) [M1] the two rows of the markup are rows 0 and 1 [0.36ms]\n(pass) leg (a) [M1] row 0 holds exactly one #due-0, the design system's text input [0.49ms]\n(pass) leg (a) [M1] #due-0 is type=text placeheld YYYY-MM-DD [0.14ms]\n(pass) leg (a) [M1] #due-0 carries value=\"\" [0.09ms]\n(pass) leg (a) [M1] #due-0 comes after row 0's text [0.17ms]\n(pass) leg (a) [M1] row 1 holds exactly one #due-1, the design system's text input [0.16ms]\n(pass) leg (a) [M1] #due-1 is type=text placeheld YYYY-MM-DD [0.08ms]\n(pass) leg (a) [M1] #due-1 carries value=\"2025-06-30\" [0.25ms]\n(pass) leg (a) [M1] #due-1 comes after row 1's text [0.09ms]\n(pass) state exam: type-due-date [2151.93ms]\n\ntests/state-exams/type-tags.test.ts:\n(pass) state exam: type-tags [2496.12ms]\n(pass) leg (a) [M1] state-exams/expected/two-todos-second-tagged.json is exactly the content M1 names [0.20ms]\n(pass) leg (b) [M2] the two rows of the markup over the expected state are rows 0 and 1 [15.94ms]\n(pass) leg (b) [M2] row 0 holds exactly one #tags-0, an input with type=text and data-slot=input [0.60ms]\n(pass) leg (b) [M2] #tags-0 is placeheld \"tags, comma-separated\" [0.17ms]\n(pass) leg (b) [M2] #tags-0 is named \"Tags for buy milk\" [0.17ms]\n(pass) leg (b) [M2] #tags-0 carries value=\"\" [0.14ms]\n(pass) leg (b) [M2] in row 0, #due-0 comes before #tags-0, which comes before the Delete button [0.37ms]\n(pass) leg (b) [M2] row 1 holds exactly one #tags-1, an input with type=text and data-slot=input [0.30ms]\n(pass) leg (b) [M2] #tags-1 is placeheld \"tags, comma-separated\" [0.10ms]\n(pass) leg (b) [M2] #tags-1 is named \"Tags for walk the dog\" [0.09ms]\n(pass) leg (b) [M2] #tags-1 carries value=\"home,urgent\" [0.09ms]\n(pass) leg (b) [M2] in row 1, #due-1 comes before #tags-1, which comes before the Delete button [0.12ms]\n(pass) leg (c) [M3] TagsInput holds the cell, writes it on Enter only, and clears it on an empty Enter [190.95ms]\n\n 25 pass\n 0 fail\n 67 expect() calls\nRan 25 tests across 2 files. [5.09s]\n"
+  },
+  "verdict": "PASS"
+}
