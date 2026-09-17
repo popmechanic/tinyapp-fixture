@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tinyapp-fixture-server",
+  "main": "index.ts",
+  "compatibility_date": "2026-09-01",
+  // The root: one AppRoot per app instance. Every module of the app is a facet
+  // of it, loaded through LOADER from the bundled code in generated/facets.ts.
+  "durable_objects": {
+    "bindings": [
+      { "name": "APP", "class_name": "AppRoot" },
+      { "name": "MODULES", "class_name": "Facet" }
+    ]
+  },
+  "migrations": [
+    // The single-DO shape (TinyBaseDurableObject, tag v1 on main) is not
+    // migrated here: this branch starts its runtime clean. A production move
+    // from that shape is a wrangler migration with deleted_classes, which
+    // celld deploy refuses (0.5.0), so it is done by wrangler, once.
+    { "tag": "v1", "new_sqlite_classes": ["AppRoot", "Facet"] }
+  ],
+  "worker_loaders": [{ "binding": "LOADER" }],
+  // The worker bound to itself: a module object reports each finished
+  // transaction to the root through it in exam mode (root → harness → history).
+  "services": [{ "binding": "SELF", "service": "tinyapp-fixture-server" }]
+}

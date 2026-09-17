@@ -3,3 +3,6 @@ dist/
 .wrangler/
 *.log
 state-exams/posted/
+.dev.vars
+generated/
+.celld/
