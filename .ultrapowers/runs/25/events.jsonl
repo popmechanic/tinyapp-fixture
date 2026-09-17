@@ -28,3 +28,6 @@
 {"kind":"driver:proof-run","task":"2","cmd":"! git diff --name-status $ULTRA_BASE | grep -vE '^M[[:space:]]+tests/state-exams/[a-z0-9-]+\\.test\\.ts$|^[AMD][[:space:]]+\\.ultrapowers/'","exit":0,"iter":0,"id":"01M2PR56MW00005CZPTJ4VGXWM","ts":1789617412764}
 {"kind":"driver:check-run","task":"2","cmd":"bun run lint:ui","exit":0,"minor":false,"iter":0,"id":"01M2PR579A0000PTCZAX57B1Q3","ts":1789617413418}
 {"kind":"driver:check-run","task":"2","cmd":"bun run typecheck","exit":0,"minor":false,"iter":0,"id":"01M2PR5FMZ0000DNNDGQGB3R65","ts":1789617421983}
+{"kind":"driver:check-run","task":"2","cmd":"bun run lint:state","exit":0,"minor":false,"iter":0,"id":"01M2PR5WRT0000AS612GMP2BBE","ts":1789617435418}
+{"kind":"driver:check-run","task":"2","cmd":"git diff --quiet $ULTRA_BASE -- client server state-exams packages package.json bun.lock","exit":0,"minor":false,"iter":0,"id":"01M2PR5WS00000V4Z5J8VZVHDC","ts":1789617435424}
+{"kind":"worker:start","label":"fix:2:0","role":"implementer","sessionId":"262b1697-37f1-480e-97cd-e262f0325c93","cwd":"/home/exedev/target/.claude/ultrapowers/run-run-25/clones/task-2","model":"opus","id":"01M2PR5WXH00008FT16VYMK99Q","ts":1789617435569}
