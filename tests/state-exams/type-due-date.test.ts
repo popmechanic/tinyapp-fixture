@@ -5,8 +5,9 @@
  * case rather than the file:
  *
  *   (a) [M1] the static markup `renderStatic` paints over
- *            `state-exams/expected/two-todos-second-due.json`: exactly two date
- *            boxes, each `type="text"` with `placeholder="YYYY-MM-DD"`, `#due-0`
+ *            `state-exams/expected/two-todos-second-due.json`: the date boxes
+ *            are exactly `#due-0` and `#due-1`, one to a row, each
+ *            `type="text"` with `placeholder="YYYY-MM-DD"`, `#due-0`
  *            carrying `value=""` and `#due-1` carrying `value="2025-06-30"`, and
  *            each sitting inside a `#todoList li` after that row's text, one to
  *            a row;
@@ -104,10 +105,17 @@ const rowIdOf = (row: HTMLElement): string => {
 
 // --- (a) [M1]: the date box in the static markup -----------------------------
 
-test('leg (a) [M1] the markup over the expected state holds exactly two date boxes', () => {
-  expect(markup().querySelectorAll('#todoList li input[type=text]').length).toBe(
-    2,
-  );
+test("leg (a) [M1] the date boxes of the markup are exactly the rows' own #due-<N>", () => {
+  // Loosened from a count of the list's text inputs to the ids that count
+  // meant. A row carries a tags box beside its date box now, so how many text
+  // boxes the list holds is not this exam's to pin; which boxes are date boxes
+  // still is.
+  expect(
+    markup()
+      .querySelectorAll('#todoList li input[type=text]')
+      .map((input) => input.getAttribute('id') ?? '')
+      .filter((id) => id.startsWith('due-')),
+  ).toEqual(['due-0', 'due-1']);
 });
 
 test('leg (a) [M1] the two rows of the markup are rows 0 and 1', () => {
@@ -125,14 +133,17 @@ const rowOf = (rowId: string): HTMLElement => {
 };
 
 for (const [rowId, due] of Object.entries(DUE_BY_ROW)) {
-  test(`leg (a) [M1] row ${rowId} holds exactly one text input, and it is #due-${rowId}, the design system's input`, () => {
-    const texts = rowOf(rowId).querySelectorAll('input[type=text]');
+  test(`leg (a) [M1] row ${rowId} holds exactly one #due-${rowId}, the design system's text input`, () => {
+    // Loosened the same way: the pin is on the one `#due-<N>` of the row and
+    // on what that element is, never on how many text inputs sit beside it.
+    const dues = rowOf(rowId).querySelectorAll(`#due-${rowId}`);
 
-    expect(texts.length).toBe(1);
-    expect(texts[0]!.getAttribute('id')).toBe(`due-${rowId}`);
+    expect(dues.length).toBe(1);
+    expect(dues[0]!.rawTagName.toLowerCase()).toBe('input');
+    expect(dues[0]!.getAttribute('type')).toBe('text');
     // What `.dueInput` used to say — that the box is the one the app styles —
     // the design system says with the slot its own `Input` carries.
-    expect(texts[0]!.getAttribute('data-slot')).toBe('input');
+    expect(dues[0]!.getAttribute('data-slot')).toBe('input');
   });
 
   test(`leg (a) [M1] #due-${rowId} is type=text placeheld YYYY-MM-DD`, () => {
