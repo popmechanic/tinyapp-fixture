@@ -198,3 +198,16 @@
 {"ts":"2026-09-21T16:54:25.878Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"sed -n 150,300p tests/state-exams/two-pages-converge.test.ts"}
 {"ts":"2026-09-21T16:54:26.550Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"env | grep -i ultra; echo \"exit=$?\""}
 {"ts":"2026-09-21T16:54:37.375Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"grep -n \"BASE_SHA\" -A 12 -B 12 tests/state-exams/two-pages-converge.test.ts | head -60"}
+{"ts":"2026-09-21T16:55:07.765Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"ls -a /home/exedev/run/impl-1-0/.git 2>/dev/null | head; echo ---; cat /home/exedev/run/impl-1-0/.git/HEAD 2>/dev/null; echo ---; tail -5 /home/exedev/run/impl-1-0/.git/logs/HEAD 2>/dev/null"}
+{"ts":"2026-09-21T16:55:09.010Z","kind":"worker:tool","task":"2","label":"referee:2","tool":"StructuredOutput"}
+{"ts":"2026-09-21T16:55:09.144Z","kind":"dispatch:end","task":"2","label":"referee:2","role":"referee","wall_ms":463709,"cost_usd":1.0958905,"error":null}
+{"ts":"2026-09-21T16:55:11.032Z","kind":"referee","task":"2","findings":10,"blocking":0,"grades":["minor","minor","minor","minor","minor","minor","minor","minor","minor","minor"]}
+{"ts":"2026-09-21T16:55:11.421Z","kind":"landing","task":"2","k":1,"examExit":0,"claim":0.83,"coverage":[0.86,0.95,0.96,0.73,0.94],"candidateSha":"e660dc68fb82814924094068974f0dcf63e2bc99","wall_ms":1067884}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"check:line","task":"2","cmd":"bun run lint:ui","exit":0,"minor":false}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"check:line","task":"2","cmd":"bun run typecheck","exit":0,"minor":false}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"check:line","task":"2","cmd":"bun run lint:state","exit":0,"minor":false}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"check:line","task":"2","cmd":"git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/config.ts client/src/index.css client/src/components packages package.json client/package.json server/package.json bun.lock","exit":0,"minor":false}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"check:line","task":"2","cmd":"! grep -rnE 'bun test|bun run|Bun\\.spawn|spawnSync|execSync' tests/state-exams | grep -vE ':[0-9]+:[[:space:]]*(//|\\*|/\\*)' | grep .","exit":1,"minor":false}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"fold:verify","task":"2","ran":[{"task":"2","exit":0}]}
+{"ts":"2026-09-21T16:55:44.627Z","kind":"fold:red","task":"2","exam":null,"cmd":"! grep -rnE 'bun test|bun run|Bun\\.spawn|spawnSync|execSync' tests/state-exams | grep -vE ':[0-9]+:[[:space:]]*(//|\\*|/\\*)' | grep .","exit":1}
+{"ts":"2026-09-21T16:55:44.628Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"strings .git/index | grep -c 'state-exams/' ; strings .git/index | grep 'state-exams/expected' | sort"}
