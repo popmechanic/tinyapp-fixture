@@ -231,3 +231,9 @@
 {"ts":"2026-09-21T16:56:40.693Z","kind":"worker:tool","task":"2","label":"impl:2:fold","tool":"Bash","target":"ls -la state-exams/seeds/three-todos-mixed-due.json state-exams/expected/three-todos-mixed-due-sorted.json tests/state-exams/sort-by-due.test.ts client/src/todoOrder.ts client/src/SortBar.tsx"}
 {"ts":"2026-09-21T16:56:40.723Z","kind":"worker:test-run","task":"2","label":"impl:2:fold","cmd":"ls -la state-exams/seeds/three-todos-mixed-due.json state-exams/expected/three-todos-mixed-due-sorted.json tests/state-exams/sort-by-due.test.ts client/src/todoOrder.ts client/src/SortBar.tsx","exit":null,"red":null,"via":"bash"}
 {"ts":"2026-09-21T16:56:46.626Z","kind":"worker:tool","task":"2","label":"impl:2:fold","tool":"Bash","target":"git status --short"}
+{"ts":"2026-09-21T16:56:52.252Z","kind":"worker:tool","task":"2","label":"impl:2:fold","tool":"Bash","target":"bun test tests/state-exams/sort-by-due.test.ts tests/state-exams/set-todo-tags.test.ts 2>&1 | tail -20"}
+{"ts":"2026-09-21T16:56:55.819Z","kind":"worker:test-run","task":"2","label":"impl:2:fold","cmd":"bun test tests/state-exams/sort-by-due.test.ts tests/state-exams/set-todo-tags.test.ts 2>&1 | tail -20","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:56:58.560Z","kind":"worker:tool","task":"2","label":"impl:2:fold","tool":"Bash","target":"bun test 2>&1 | tail -30"}
+{"ts":"2026-09-21T16:57:07.103Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"StructuredOutput"}
+{"ts":"2026-09-21T16:57:07.243Z","kind":"dispatch:end","task":"1","label":"referee:1","role":"referee","wall_ms":675965,"cost_usd":2.2794065000000003,"error":null}
+{"ts":"2026-09-21T16:57:08.737Z","kind":"referee","task":"1","findings":8,"blocking":0,"grades":["minor","minor","minor","minor","minor","minor","minor","minor"]}
