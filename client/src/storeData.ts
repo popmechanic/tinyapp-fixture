@@ -188,6 +188,23 @@ export const setTodoCompleted = (
 };
 
 /**
+ * Renames todo `id` to `text`, trimmed.
+ *
+ * Words that are only spaces trim to `''` and are refused outright — nothing
+ * is written — rather than stored as an empty-text todo. An id the list does
+ * not hold is left alone, for `pinTodo`'s reason: `setPartialRow` on a missing
+ * row would create a phantom row out of the schema's defaults rather than
+ * fail.
+ */
+export const renameTodo = (store: TodosStore, id: string, text: string): void => {
+  const trimmed = text.trim();
+  if (trimmed === '' || !store.hasRow('todos', id)) {
+    return;
+  }
+  store.setPartialRow('todos', id, {text: trimmed});
+};
+
+/**
  * Sets row `id`'s due date, or clears it when `due` is `''`.
  *
  * Nothing but a real `YYYY-MM-DD` is ever written: a date that does not parse
