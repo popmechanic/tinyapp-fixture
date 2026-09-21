@@ -104,3 +104,4 @@
 {"ts":"2026-09-21T16:41:58.477Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"ls tests/state-exams/*.test.ts | wc -l; ls state-exams/seeds/*.json | wc -l; ls state-exams/expected/*.json | wc -l"}
 {"ts":"2026-09-21T16:42:03.629Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/set-filter.test.ts 2>&1 | tail -30"}
 {"ts":"2026-09-21T16:42:10.800Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test 2>&1 | tail -80"}
+{"ts":"2026-09-21T16:42:37.575Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"sleep 60; cat /tmp/claude-1000/-home-exedev-run-impl-1-0/75c0ca50-efa5-4223-ba4a-a405bb86858e/tasks/b02uogwhv.output | tail -100"}
