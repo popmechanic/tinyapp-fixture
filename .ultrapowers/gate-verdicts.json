@@ -1,0 +1,46 @@
+{
+ "tasks": {
+  "1": {
+   "hash": "fec4ffa141584f8b5b4e43a3686fa1247973ffe2339cbb3c3e4ba6cb8370fe68",
+   "verdict": "pass",
+   "reason": "Every computable fact has a Run line that exits non-zero when it is false; M1 rests on the exam's own exit, M2's absences on the two inverted greps, M3 on the anchored counts and name greps; nothing at BASE pins the opposite."
+  }
+ },
+ "tally": {
+  "dispatched": 2,
+  "rejected": 0,
+  "rounds": 2,
+  "base": "a6c0d9af4438db8d9120df8619aa599f08b7626f",
+  "note": "round 1 passed and named a comment filter that could false-fail on single-file grep -n output; the author fixed the filter, computed it at BASE and on a comment-only file, and re-dispatched",
+  "question": "facts-only (experiment, rollback the old sentence)"
+ },
+ "authoring": {
+  "minutes": 25,
+  "probes": 0,
+  "routing": {
+   "branch": "inline",
+   "lane": "ultrapowers"
+  },
+  "questions": [
+   {
+    "question": "Claim and summary",
+    "options": [
+     "Sign as drafted",
+     "Keep the snapshot guard, rewritten"
+    ],
+    "recommended": "Sign as drafted",
+    "picked": "Sign as drafted"
+   },
+   {
+    "question": "Execute",
+    "options": [
+     "Ultrapowers, self-merging",
+     "Ultrapowers, with --hold",
+     "Inline"
+    ],
+    "recommended": "Ultrapowers, self-merging",
+    "picked": "Ultrapowers, self-merging"
+   }
+  ]
+ }
+}
