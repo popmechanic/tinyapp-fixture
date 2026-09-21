@@ -263,3 +263,4 @@
 {"ts":"2026-09-21T17:01:56.607Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"bun run typecheck 2>&1 | tail -30"}
 {"ts":"2026-09-21T17:02:05.811Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"bun run lint:ui 2>&1 | tail -40; echo \"---lint:state---\"; bun run lint:state 2>&1 | tail -40"}
 {"ts":"2026-09-21T17:02:20.116Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"bun test tests/ 2>&1 | tail -30"}
+{"ts":"2026-09-21T17:04:00.118Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"sed -n '1,60p' tests/state-exams/two-pages-converge.test.ts"}
