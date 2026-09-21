@@ -39,3 +39,39 @@
 {"ts":"2026-09-21T16:39:08.558Z","kind":"worker:test-run","task":"2","label":"exam:2","cmd":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | head -150","exit":null,"red":null,"via":"bash"}
 {"ts":"2026-09-21T16:39:11.415Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"bunx tsc --noEmit -p . 2>&1 | grep -i \"sort-by-due\" | head -50"}
 {"ts":"2026-09-21T16:39:13.726Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"cat package.json | grep -A3 '\"typecheck\"'; ls tsconfig*.json 2>/dev/null; find . -maxdepth 2 -name \"tsconfig.json\" -not -path \"*/node_modules/*\""}
+{"ts":"2026-09-21T16:39:21.178Z","kind":"worker:tool","task":"1","label":"exam:1","tool":"mcp__factory__note"}
+{"ts":"2026-09-21T16:39:27.241Z","kind":"dispatch:end","task":"1","label":"exam:1","role":"exam","wall_ms":123956,"cost_usd":0.4199816,"error":null}
+{"ts":"2026-09-21T16:39:34.047Z","kind":"dispatch:start","task":"1","label":"impl:1:0","role":"implement"}
+{"ts":"2026-09-21T16:39:36.189Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"cat client/src/storeData.ts"}
+{"ts":"2026-09-21T16:39:37.281Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Edit","target":"/home/exedev/run/exam-2/tests/state-exams/sort-by-due.test.ts"}
+{"ts":"2026-09-21T16:39:37.356Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"cat client/src/TodoItem.tsx"}
+{"ts":"2026-09-21T16:39:38.681Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"mcp__factory__run_exam"}
+{"ts":"2026-09-21T16:39:38.982Z","kind":"worker:test-run","task":"2","label":"exam:2","cmd":"bun test tests/state-exams/sort-by-due.test.ts","exit":1,"red":true,"via":"run_exam"}
+{"ts":"2026-09-21T16:39:39.427Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"cat client/src/DueInput.tsx; echo ---; cat client/src/Store.tsx; echo ---; cat client/src/TagsInput.tsx 2>/dev/null | head -60"}
+{"ts":"2026-09-21T16:39:40.493Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Read","target":"/home/exedev/run/exam-2/tests/state-exams/sort-by-due.test.ts"}
+{"ts":"2026-09-21T16:39:43.628Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Edit","target":"/home/exedev/run/impl-1-0/client/src/storeData.ts"}
+{"ts":"2026-09-21T16:39:51.483Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Write","target":"/home/exedev/run/impl-1-0/client/src/RenameTodo.tsx"}
+{"ts":"2026-09-21T16:39:53.029Z","kind":"supervisor","task":"1","label":"impl:1:0","answers":{"stuck":{"type":"noul","noul":0.29},"off_track":{"type":"noul","noul":0.27},"needs_human":{"type":"noul","noul":0.15},"done_not_exited":{"type":"noul","noul":0.1}}}
+{"ts":"2026-09-21T16:39:53.875Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Edit","target":"/home/exedev/run/impl-1-0/client/src/TodoItem.tsx"}
+{"ts":"2026-09-21T16:39:55.083Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"mcp__factory__note"}
+{"ts":"2026-09-21T16:39:56.366Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Edit","target":"/home/exedev/run/impl-1-0/client/src/TodoItem.tsx"}
+{"ts":"2026-09-21T16:39:57.650Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"ls state-exams/expected/ | head -5; cat state-exams/expected/*.json | head -1"}
+{"ts":"2026-09-21T16:39:59.357Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Write","target":"/home/exedev/run/impl-1-0/state-exams/expected/two-todos-first-renamed.json"}
+{"ts":"2026-09-21T16:40:01.244Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"ls tests/state-exams/rename-todo.test.ts 2>&1; cat tests/state-exams/rename-todo.test.ts 2>&1"}
+{"ts":"2026-09-21T16:40:01.275Z","kind":"worker:test-run","task":"1","label":"impl:1:0","cmd":"ls tests/state-exams/rename-todo.test.ts 2>&1; cat tests/state-exams/rename-todo.test.ts 2>&1","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:40:01.980Z","kind":"dispatch:end","task":"2","label":"exam:2","role":"exam","wall_ms":150474,"cost_usd":0.6904444000000001,"error":null}
+{"ts":"2026-09-21T16:40:02.165Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"mcp__factory__run_exam"}
+{"ts":"2026-09-21T16:40:04.884Z","kind":"worker:test-run","task":"1","label":"impl:1:0","cmd":"bun test tests/state-exams/rename-todo.test.ts","exit":0,"red":false,"via":"run_exam"}
+{"ts":"2026-09-21T16:40:06.854Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -40"}
+{"ts":"2026-09-21T16:40:07.024Z","kind":"dispatch:start","task":"2","label":"impl:2:0","role":"implement"}
+{"ts":"2026-09-21T16:40:09.333Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"cat client/src/storeData.ts"}
+{"ts":"2026-09-21T16:40:09.654Z","kind":"worker:test-run","task":"1","label":"impl:1:0","cmd":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -40","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:40:11.383Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"cat client/src/TodoList.tsx; echo ---; cat client/src/todoFilter.ts; echo ---FILTERBAR---; cat client/src/FilterBar.tsx"}
+{"ts":"2026-09-21T16:40:11.417Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun run typecheck 2>&1 | tail -60"}
+{"ts":"2026-09-21T16:40:13.376Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"sed -n '190,220p' tests/state-exams/set-todo-tags.test.ts; echo ---SETFILTER---; sed -n '120,150p' tests/state-exams/set-filter.test.ts; echo ---STATICPAGE---; cat client/src/StaticPage.tsx"}
+{"ts":"2026-09-21T16:40:16.026Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"cat client/src/Store.tsx | head -40; echo ---; ls state-exams/seeds/ | head; echo ---; cat state-exams/seeds/*.json | head -3; echo ---EXPECTED---; ls state-exams/expected/ | head; cat state-exams/exp"}
+{"ts":"2026-09-21T16:40:18.160Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"grep -n \"^export\" client/src/Store.tsx"}
+{"ts":"2026-09-21T16:40:18.345Z","kind":"supervisor","task":"2","label":"impl:2:0","answers":{"stuck":{"type":"noul","noul":0.22},"off_track":{"type":"noul","noul":0.32},"needs_human":{"type":"noul","noul":0.1},"done_not_exited":{"type":"noul","noul":0.12}}}
+{"ts":"2026-09-21T16:40:19.440Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"sed -n '41,66p' client/src/Store.tsx"}
+{"ts":"2026-09-21T16:40:19.561Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun run lint:ui 2>&1 | tail -60"}
+{"ts":"2026-09-21T16:40:22.011Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun run lint:state 2>&1 | tail -60"}
