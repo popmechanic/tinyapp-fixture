@@ -3,7 +3,9 @@ import {TodoItem} from './TodoItem';
 import {ClearCompleted} from './ClearCompleted';
 import {UndoDelete} from './UndoDelete';
 import {FilterBar} from './FilterBar';
+import {SortBar} from './SortBar';
 import {admits, filterOf} from './todoFilter';
+import {orderTodos} from './todoOrder';
 import {activeTag, hasTag, tagsInUse} from './todoTags';
 
 export const TodoList = () => {
@@ -28,14 +30,9 @@ export const TodoList = () => {
       admits(filter, table[id]?.completed === true) &&
       hasTag(table[id]?.tags, tag),
   );
-  // Pinned rows to the top, and nothing else moved: `sort` is stable, so the
-  // rows that share a group keep the ascending-by-row-id order `todoIds` gave
-  // them. `pinned` has no schema default — an unpinned todo has no such cell —
-  // so the read is `=== true` rather than a truthiness test.
-  const ordered = [...shown].sort(
-    (a, b) =>
-      Number(table[b]?.pinned === true) - Number(table[a]?.pinned === true),
-  );
+  // Pinned rows to the top, and — when the sort setting is on — the dated
+  // rows above the undated ones within each group, soonest first.
+  const ordered = orderTodos(shown, table, useValue('sort', STORE_ID));
 
   return (
     <>
@@ -43,6 +40,7 @@ export const TodoList = () => {
           `TodoList` — so the live page and the linter's static render carry
           the bar by this one line. */}
       <FilterBar />
+      <SortBar />
       {/* `todoList.css` drew the empty list's "No todos yet" line with
           `#todoList:empty::before`. A pseudo-element is not a class Tailwind
           generates, so the line is an element now, rendered only when the
