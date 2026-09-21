@@ -75,3 +75,25 @@
 {"ts":"2026-09-21T16:40:19.440Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"sed -n '41,66p' client/src/Store.tsx"}
 {"ts":"2026-09-21T16:40:19.561Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun run lint:ui 2>&1 | tail -60"}
 {"ts":"2026-09-21T16:40:22.011Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun run lint:state 2>&1 | tail -60"}
+{"ts":"2026-09-21T16:40:26.651Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Write","target":"/home/exedev/run/impl-2-0/client/src/todoOrder.ts"}
+{"ts":"2026-09-21T16:40:30.372Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Edit","target":"/home/exedev/run/impl-2-0/client/src/storeData.ts"}
+{"ts":"2026-09-21T16:40:33.839Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Edit","target":"/home/exedev/run/impl-2-0/client/src/storeData.ts"}
+{"ts":"2026-09-21T16:40:35.374Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"bun test 2>&1 | tail -80"}
+{"ts":"2026-09-21T16:40:37.692Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Write","target":"/home/exedev/run/impl-2-0/client/src/SortBar.tsx"}
+{"ts":"2026-09-21T16:40:41.213Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Edit","target":"/home/exedev/run/impl-2-0/client/src/TodoList.tsx"}
+{"ts":"2026-09-21T16:40:44.294Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Edit","target":"/home/exedev/run/impl-2-0/client/src/TodoList.tsx"}
+{"ts":"2026-09-21T16:40:46.291Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Edit","target":"/home/exedev/run/impl-2-0/client/src/TodoList.tsx"}
+{"ts":"2026-09-21T16:40:48.705Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Write","target":"/home/exedev/run/impl-2-0/state-exams/seeds/three-todos-mixed-due.json"}
+{"ts":"2026-09-21T16:40:51.239Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Write","target":"/home/exedev/run/impl-2-0/state-exams/expected/three-todos-mixed-due-sorted.json"}
+{"ts":"2026-09-21T16:40:55.708Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Edit","target":"/home/exedev/run/impl-2-0/tests/state-exams/set-todo-tags.test.ts"}
+{"ts":"2026-09-21T16:40:59.599Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"sed -n '1,60p' tests/state-exams/set-filter.test.ts"}
+{"ts":"2026-09-21T16:41:01.485Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"grep -rl \"mutant:\" tests/state-exams/ | head -5"}
+{"ts":"2026-09-21T16:41:02.588Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"cat tests/state-exams/due-date-marks-overdue.test.ts"}
+{"ts":"2026-09-21T16:41:10.216Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"ls -la tests/state-exams/sort-by-due.test.ts 2>&1"}
+{"ts":"2026-09-21T16:41:10.230Z","kind":"worker:test-run","task":"2","label":"impl:2:0","cmd":"ls -la tests/state-exams/sort-by-due.test.ts 2>&1","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:41:11.890Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Read","target":"/home/exedev/run/impl-2-0/tests/state-exams/sort-by-due.test.ts"}
+{"ts":"2026-09-21T16:41:13.343Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__run_exam"}
+{"ts":"2026-09-21T16:41:15.879Z","kind":"worker:test-run","task":"2","label":"impl:2:0","cmd":"bun test tests/state-exams/sort-by-due.test.ts","exit":0,"red":false,"via":"run_exam"}
+{"ts":"2026-09-21T16:41:18.076Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | tail -60"}
+{"ts":"2026-09-21T16:41:20.665Z","kind":"worker:test-run","task":"2","label":"impl:2:0","cmd":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | tail -60","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:41:22.003Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test tests/state-exams/set-todo-tags.test.ts 2>&1 | tail -30"}
