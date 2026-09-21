@@ -1,0 +1,92 @@
+{
+ "tasks": {
+  "1": {
+   "hash": "497cd542c104f71ccc846dc39b85f6d7edfa6863da722657de48c9f0e5a25f50",
+   "verdict": "pass",
+   "reason": "Every computable fact has a leg that would catch it false: M1's exact content, views and absent box by the stateExam and its mutant, M2's trimmed literal by toEqual, M3's two no-write cases by before/after snapshots; nothing at BASE pins the opposite."
+  },
+  "2": {
+   "hash": "23ea428d5dd7b0ac591221f031d95acf46909ab2955ddb1c5eaf29eadf865847",
+   "verdict": "pass",
+   "reason": "Every computable fact has a leg; the M3 orders compute as pinned (d,c,a,b and d,a,b,c); the one opposite pin at BASE, the exact {filter, tag} values schema in set-todo-tags.test.ts, sits in a file this task owns and M5 loosens."
+  }
+ },
+ "tally": {
+  "dispatched": 2,
+  "rejected": 0,
+  "rounds": 1,
+  "base": "6797f7e7fc671a7cc2af49fbeab90d0a1d3b0174",
+  "question": "facts-only (experiment, rollback the old sentence)"
+ },
+ "authoring": {
+  "minutes": 20,
+  "probes": 0,
+  "routing": {
+   "branch": "inline",
+   "lane": "ultrapowers"
+  },
+  "questions": [
+   {
+    "question": "Plan shape",
+    "options": [
+     "Two small todo features",
+     "Issue #27: one browser per exam file",
+     "Both in one plan"
+    ],
+    "recommended": "Two small todo features",
+    "picked": "Two small todo features"
+   },
+   {
+    "question": "Which features (multi-select, first pick)",
+    "options": [
+     "Rename a todo",
+     "Mark all done",
+     "Open count in the top bar",
+     "Sort by due date"
+    ],
+    "recommended": null,
+    "picked": "Rename a todo"
+   },
+   {
+    "question": "Which features (multi-select, second pick)",
+    "options": [
+     "Rename a todo",
+     "Mark all done",
+     "Open count in the top bar",
+     "Sort by due date"
+    ],
+    "recommended": null,
+    "picked": "Sort by due date"
+   },
+   {
+    "question": "Claim and summary",
+    "options": [
+     "Sign as drafted",
+     "Click the text itself to rename",
+     "Sign, but make sorting not remembered"
+    ],
+    "recommended": "Sign as drafted",
+    "picked": "Sign as drafted"
+   },
+   {
+    "question": "Execute",
+    "options": [
+     "Ultrapowers",
+     "Inline",
+     "Subagent-Driven"
+    ],
+    "recommended": "Ultrapowers",
+    "picked": "Ultrapowers"
+   },
+   {
+    "question": "Self-merge hold",
+    "options": [
+     "Let it merge itself",
+     "Hold at an open PR"
+    ],
+    "recommended": "Let it merge itself",
+    "picked": "Let it merge itself"
+   }
+  ]
+ }
+}
