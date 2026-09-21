@@ -270,3 +270,4 @@
 {"ts":"2026-09-21T17:04:41.777Z","kind":"worker:test-run","task":"1","label":"impl:1:fold","cmd":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -10","exit":null,"red":null,"via":"bash"}
 {"ts":"2026-09-21T17:04:49.732Z","kind":"dispatch:end","task":"1","label":"impl:1:fold","role":"implement","wall_ms":206659,"cost_usd":0.2632852,"error":null}
 {"ts":"2026-09-21T17:04:55.556Z","kind":"pair:label","a":"1","b":"2","calls":null,"fold":"clean"}
+{"kind":"publish:pr","url":"https://github.com/popmechanic/tinyapp-fixture/pull/36","number":36,"draft":false}
