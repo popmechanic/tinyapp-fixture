@@ -97,3 +97,10 @@
 {"ts":"2026-09-21T16:41:18.076Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | tail -60"}
 {"ts":"2026-09-21T16:41:20.665Z","kind":"worker:test-run","task":"2","label":"impl:2:0","cmd":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | tail -60","exit":null,"red":null,"via":"bash"}
 {"ts":"2026-09-21T16:41:22.003Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test tests/state-exams/set-todo-tags.test.ts 2>&1 | tail -30"}
+{"ts":"2026-09-21T16:41:25.309Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"cat package.json | grep -A20 '\"scripts\"'"}
+{"ts":"2026-09-21T16:41:26.569Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun run typecheck 2>&1 | tail -40"}
+{"ts":"2026-09-21T16:41:36.097Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun run lint:ui 2>&1 | tail -60"}
+{"ts":"2026-09-21T16:41:38.197Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun run lint:state 2>&1 | tail -60"}
+{"ts":"2026-09-21T16:41:58.477Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"ls tests/state-exams/*.test.ts | wc -l; ls state-exams/seeds/*.json | wc -l; ls state-exams/expected/*.json | wc -l"}
+{"ts":"2026-09-21T16:42:03.629Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test tests/state-exams/filter-bar.test.ts tests/state-exams/filter-done.test.ts tests/state-exams/set-filter.test.ts 2>&1 | tail -30"}
+{"ts":"2026-09-21T16:42:10.800Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun test 2>&1 | tail -80"}
