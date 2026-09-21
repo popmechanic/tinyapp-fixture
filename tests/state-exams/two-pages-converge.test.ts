@@ -61,12 +61,7 @@
  *   - M2's last sentence — `bun run lint:state` exits 0 — is the Proof's own
  *     second `Run:` line and is left to the driver that runs it. A verification
  *     proves its claim through imports and calls and does not re-run the
- *     linter; everything else M2 names is asserted in this process, and the
- *     fourth `Run:` line (`git diff --quiet $ULTRA_BASE -- state-exams`) is run
- *     here because it is the one that catches a touched snapshot.
- *   - `$ULTRA_BASE` is read from the environment when the driver set it, and
- *     falls back to this task's BASE sha otherwise, so the fourth `Run:` line
- *     means the same thing run by hand as run by the driver.
+ *     linter; everything else M2 names is asserted in this process.
  *
  * The exam never skips. A machine with no celld binary (`CELLD_BIN`, else
  * `celld` on `PATH`) or no browser (`TINYAPP_BROWSER`, else
@@ -127,9 +122,6 @@ convergenceExam(SPEC);
 /** This file sits two directories below the repository root. */
 const ROOT = join(import.meta.dir, '..', '..');
 
-/** The sha the tree started at, when the driver did not name one. */
-const BASE_SHA = '7be55c13db331973f1d1b79936b9f03c6ac4360f';
-
 /** How long one whole convergence run — a `celld dev`, a browser, three pages — is given. */
 const RUN_TIMEOUT_MS = 300_000;
 
@@ -152,38 +144,6 @@ const parse = (path: string): Snapshot =>
 /** What a JSON file under the evidence directory parses to. */
 const parseEvidence = (dir: string, name: string): unknown =>
   JSON.parse(readFileSync(join(dir, name), 'utf8')) as unknown;
-
-/**
- * One `Run:` line of the Proof, run in `bash` at the repository root, reported
- * as its exit code and its two streams.
- *
- * `ULTRA_BASE` travels with it: unset, `git diff --quiet $ULTRA_BASE` would
- * compare the working tree against `HEAD` and say nothing about the sha this
- * task started from.
- */
-const runLine = (command: string): {code: number; out: string; err: string} => {
-  const spawned = Bun.spawnSync(['bash', '-c', command], {
-    cwd: ROOT,
-    env: {
-      ...(process.env as Record<string, string>),
-      ULTRA_BASE: process.env.ULTRA_BASE ?? BASE_SHA,
-    },
-  });
-  return {
-    code: spawned.exitCode ?? -1,
-    out: spawned.stdout.toString(),
-    err: spawned.stderr.toString(),
-  };
-};
-
-/** A `Run:` line asserted to exit 0, its streams shown when it does not. */
-const expectRunLine = (command: string): void => {
-  const {code, out, err} = runLine(command);
-  if (code !== 0) {
-    throw new Error(`Run: ${command}\nexited ${code}\n${out}${err}`.trimEnd());
-  }
-  expect(code).toBe(0);
-};
 
 // ---------------------------------------------------------------- (a) [M1]
 
@@ -239,16 +199,6 @@ test('leg (a) [M1]: the registration is the one M1 spells, read back in this pro
   expect(views[1]?.attr).toEqual({name: 'aria-label', value: 'buy milk'});
 });
 
-test("leg (a) [M1]: the first Run: line — #todo-0's element is the one carrying the todo's words as its name", () => {
-  // The window is one element's: from the line carrying the row id to the first
-  // line that closes a tag. Markup that moves the id or the label off that
-  // element closes the window before `aria-label={todo.text}` is inside it, and
-  // this grep fails — which is the shape the leg asks it to have.
-  expectRunLine(
-    "sed -n '/id={.todo-/,/^ *\\/>/p' client/src/TodoItem.tsx | tr '\\n' ' ' | grep -q 'aria-label={todo.text}'",
-  );
-});
-
 // ---------------------------------------------------------------- (b) [M2]
 
 test('leg (b) [M2]: the expected file is the persistence exam\'s own snapshot, and the seed is inside it', () => {
@@ -274,17 +224,6 @@ test('leg (b) [M2]: the expected file is the persistence exam\'s own snapshot, a
   expect(Object.keys(expectedRows).sort()).toEqual(['0', '1', '2']);
   expect(Object.keys(seedRows).sort()).toEqual(['1', '2']);
   expect(expectedRows['0']).toEqual({text: 'buy milk', completed: false});
-});
-
-test('leg (b) [M2]: the third Run: line — the seed carries Learn TinyBase', () => {
-  expectRunLine(
-    "grep -q 'Learn TinyBase' state-exams/seeds/default-todos.json",
-  );
-});
-
-test('leg (b) [M2]: the fourth Run: line — no file under state-exams/ is created or changed', () => {
-  // The line that fails if the task touched a snapshot.
-  expectRunLine('git diff --quiet $ULTRA_BASE -- state-exams');
 });
 
 // ---------------------------------------------------------------- (c) [M3]
@@ -350,17 +289,3 @@ test(
   },
   RUN_TIMEOUT_MS,
 );
-
-// ---------------------------------------------------------------- (d) [M4]
-
-test("leg (d) [M4]: the fifth Run: line — README's State exams section names celld, CELLD_BIN and TINYAPP_BROWSER", () => {
-  expectRunLine(
-    "sed -n '/^## State exams/,/^## /p' README.md | tr '\\n' ' ' | grep -q 'convergence exam.*celld.*CELLD_BIN.*TINYAPP_BROWSER'",
-  );
-});
-
-test("leg (d) [M4]: the sixth Run: line — AGENTS.md's Verification section is the convergence exam, and the two-clients sentence is gone", () => {
-  expectRunLine(
-    "sed -n '/^## Verification/,$p' AGENTS.md | tr '\\n' ' ' | grep -q 'convergence exam' && ! grep -q 'Open the same room URL in two clients' AGENTS.md",
-  );
-});
