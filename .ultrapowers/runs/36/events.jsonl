@@ -244,3 +244,20 @@
 {"ts":"2026-09-21T17:00:47.010Z","kind":"worker:tool","task":"2","label":"impl:2:fold","tool":"Bash","target":"true"}
 {"ts":"2026-09-21T17:00:51.355Z","kind":"dispatch:end","task":"2","label":"impl:2:fold","role":"implement","wall_ms":302475,"cost_usd":0.4125032,"error":null}
 {"ts":"2026-09-21T17:00:54.954Z","kind":"landing","task":"1","k":1,"examExit":0,"claim":0.85,"coverage":[0.9,0.96,0.96],"candidateSha":"bfb7633b2d9ef50e5db38afa0c5c07a42af7cbc5","wall_ms":1185591}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"check:line","task":"1","cmd":"bun run lint:ui","exit":0,"minor":false}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"check:line","task":"1","cmd":"bun run typecheck","exit":0,"minor":false}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"check:line","task":"1","cmd":"bun run lint:state","exit":0,"minor":false}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"check:line","task":"1","cmd":"git diff --quiet $ULTRA_BASE -- server client/src/Store.tsx client/src/sqlite.tsx client/src/config.ts client/src/index.css client/src/components packages package.json client/package.json server/package.json bun.lock","exit":0,"minor":false}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"check:line","task":"1","cmd":"! grep -rnE 'bun test|bun run|Bun\\.spawn|spawnSync|execSync' tests/state-exams | grep -vE ':[0-9]+:[[:space:]]*(//|\\*|/\\*)' | grep .","exit":1,"minor":false}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"fold:verify","task":"1","ran":[{"task":"1","exit":0},{"task":"2","exit":0}]}
+{"ts":"2026-09-21T17:01:18.607Z","kind":"fold:red","task":"1","exam":null,"cmd":"! grep -rnE 'bun test|bun run|Bun\\.spawn|spawnSync|execSync' tests/state-exams | grep -vE ':[0-9]+:[[:space:]]*(//|\\*|/\\*)' | grep .","exit":1}
+{"ts":"2026-09-21T17:01:23.073Z","kind":"dispatch:start","task":"1","label":"impl:1:fold","role":"implement"}
+{"ts":"2026-09-21T17:01:26.705Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"cat client/src/storeData.ts"}
+{"ts":"2026-09-21T17:01:30.187Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"cat client/src/TodoItem.tsx; echo ---; ls client/src/RenameTodo.tsx 2>&1; echo ---; cat client/src/RenameTodo.tsx 2>&1"}
+{"ts":"2026-09-21T17:01:42.615Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"cat state-exams/expected/two-todos-first-renamed.json 2>&1; echo ---; cat tests/state-exams/rename-todo.test.ts 2>&1"}
+{"ts":"2026-09-21T17:01:42.650Z","kind":"worker:test-run","task":"1","label":"impl:1:fold","cmd":"cat state-exams/expected/two-todos-first-renamed.json 2>&1; echo ---; cat tests/state-exams/rename-todo.test.ts 2>&1","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T17:01:45.541Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -50"}
+{"ts":"2026-09-21T17:01:48.217Z","kind":"worker:test-run","task":"1","label":"impl:1:fold","cmd":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -50","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T17:01:51.584Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"which run_exam 2>&1; ls; cat package.json | grep -A3 '\"scripts\"' | head -20"}
+{"ts":"2026-09-21T17:01:51.874Z","kind":"supervisor","task":"1","label":"impl:1:fold","answers":{"stuck":{"type":"noul","noul":0.21},"off_track":{"type":"noul","noul":0.23},"needs_human":{"type":"noul","noul":0.1},"done_not_exited":{"type":"noul","noul":0.65}}}
+{"ts":"2026-09-21T17:01:56.607Z","kind":"worker:tool","task":"1","label":"impl:1:fold","tool":"Bash","target":"bun run typecheck 2>&1 | tail -30"}
