@@ -22,3 +22,15 @@
 {"ts":"2026-09-21T18:54:27.029Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"git status --porcelain 2>&1; echo \"---\"; git diff --stat 2>&1"}
 {"ts":"2026-09-21T18:54:38.629Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"mcp__factory__note"}
 {"ts":"2026-09-21T18:54:45.109Z","kind":"dispatch:end","task":"1","label":"impl:1:0","role":"implement","wall_ms":176201,"cost_usd":0.48188120000000007,"error":null}
+{"ts":"2026-09-21T18:54:58.714Z","kind":"run:line","task":"1","cmd":"bun test tests/state-exams/two-pages-converge.test.ts","exit":0}
+{"ts":"2026-09-21T18:54:58.714Z","kind":"run:line","task":"1","cmd":"! grep -nE 'Bun\\.spawn|spawnSync|execSync' tests/state-exams/two-pages-converge.test.ts | grep -vE '^[0-9]+:[[:space:]]*(//|\\*|/\\*)' | grep .","exit":0}
+{"ts":"2026-09-21T18:54:58.714Z","kind":"run:line","task":"1","cmd":"! grep -qE '[0-9a-f]{40}' tests/state-exams/two-pages-converge.test.ts","exit":0}
+{"ts":"2026-09-21T18:54:58.714Z","kind":"run:line","task":"1","cmd":"test \"$(grep -c '^convergenceExam(SPEC);$' tests/state-exams/two-pages-converge.test.ts)\" = 1 && test \"$(grep -c 'Run: line' tests/state-exams/two-pages-converge.test.ts)\" = 0 && grep -q 'the registration is the one M1 spells' tests/state-exams/two-pages-converge.test.ts && grep -q 'the seed is inside it' tests/state-exams/two-pages-converge.test.ts && test \"$(grep -c 'leg (c) \\[M3\\]' tests/state-exams/two-pages-converge.test.ts)\" -ge 2","exit":0}
+{"ts":"2026-09-21T18:54:59.228Z","kind":"select:landing","task":"1","candidates":["packages/tinyapp-exam/test/browser-exam.test.ts","packages/tinyapp-exam/test/browser.test.ts","packages/tinyapp-exam/test/convergence-move.test.ts","packages/tinyapp-exam/test/evidence.test.ts","packages/tinyapp-exam/test/persistence-move.test.ts","packages/tinyapp-exam/test/render-move.test.ts","packages/tinyapp-lint/test/lint-cli.test.ts","packages/tinyapp-lint/test/reachability.test.ts"],"selected":[],"ran":[]}
+{"ts":"2026-09-21T18:54:59.228Z","kind":"floor","task":"1","exam":null,"lowest":null,"excluded":[1,2,3],"fired":false}
+{"ts":"2026-09-21T18:54:59.600Z","kind":"landing","task":"1","k":1,"examExit":0,"claim":0.76,"coverage":[0.94,0.96,0.94],"candidateSha":"09564cc3679d3553644bf6a3369b30a2a6762327","wall_ms":191580}
+{"ts":"2026-09-21T18:55:22.186Z","kind":"check:line","task":"1","cmd":"bun run typecheck","exit":0,"minor":false}
+{"ts":"2026-09-21T18:55:22.186Z","kind":"check:line","task":"1","cmd":"bun run lint:state","exit":0,"minor":false}
+{"ts":"2026-09-21T18:55:22.186Z","kind":"check:line","task":"1","cmd":"git diff --quiet $ULTRA_BASE -- server client packages state-exams package.json bun.lock README.md AGENTS.md","exit":0,"minor":false}
+{"ts":"2026-09-21T18:55:22.186Z","kind":"check:line","task":"1","cmd":"! grep -rnE 'bun test|bun run|Bun\\.spawn|spawnSync|execSync' tests/state-exams | grep -vE ':[0-9]+:[[:space:]]*(//|\\*|/\\*)' | grep .","exit":0,"minor":false}
+{"ts":"2026-09-21T18:55:22.186Z","kind":"fold:verify","task":"1","ran":[]}
