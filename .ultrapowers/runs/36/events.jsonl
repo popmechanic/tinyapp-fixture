@@ -118,3 +118,25 @@
 {"ts":"2026-09-21T16:45:21.898Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"mcp__factory__task_facts"}
 {"ts":"2026-09-21T16:45:24.960Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"Bash","target":"grep -n \"export const renameTodo\" /home/exedev/run/impl-1-0/client/src/storeData.ts; grep -n \"export const RenameTodo\" /home/exedev/run/impl-1-0/client/src/RenameTodo.tsx"}
 {"ts":"2026-09-21T16:45:27.265Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:45:39.201Z","kind":"worker:tool","task":"1","label":"impl:1:0","tool":"mcp__factory__note"}
+{"ts":"2026-09-21T16:45:43.410Z","kind":"dispatch:end","task":"1","label":"impl:1:0","role":"implement","wall_ms":369363,"cost_usd":0.45194539999999994,"error":null}
+{"ts":"2026-09-21T16:45:47.048Z","kind":"select:landing","task":"1","candidates":["tests/state-exams/due-date-marks-overdue.test.ts","client/test/todos-store.test.ts","packages/tinyapp-exam/test/state-exam.test.ts","packages/tinyapp-lint/test/invariants.test.ts","packages/tinyapp-lint/test/lint-cli.test.ts","tests/state-exams/clear-completed.test.ts","tests/state-exams/session-transitions.test.ts","tests/state-exams/set-todo-due.test.ts"],"selected":[],"ran":[]}
+{"ts":"2026-09-21T16:45:47.048Z","kind":"floor","task":"1","exam":0,"lowest":0.9,"excluded":[],"fired":false}
+{"ts":"2026-09-21T16:45:51.278Z","kind":"dispatch:start","task":"1","label":"referee:1","role":"referee"}
+{"ts":"2026-09-21T16:45:53.980Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"cat /home/exedev/run/patch-1-0.diff"}
+{"ts":"2026-09-21T16:45:54.583Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"ls /home/exedev/run/impl-1-0"}
+{"ts":"2026-09-21T16:46:04.743Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"cat AGENTS.md && echo ---- && cat package.json && echo ---- && ls client/src tests/state-exams state-exams/expected state-exams/seeds"}
+{"ts":"2026-09-21T16:46:05.470Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"cat client/src/storeData.ts"}
+{"ts":"2026-09-21T16:46:09.219Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"cat client/src/TodoItem.tsx && echo ====FILTERBAR && cat client/src/FilterBar.tsx && echo ====DUEINPUT && cat client/src/DueInput.tsx"}
+{"ts":"2026-09-21T16:46:10.497Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"cat client/src/RenameTodo.tsx && echo ====EXPECTED && cat state-exams/expected/two-todos-first-renamed.json && echo ====SEED && cat state-exams/seeds/two-open-todos.json"}
+{"ts":"2026-09-21T16:46:19.736Z","kind":"supervisor","task":"1","label":"referee:1","answers":{"stuck":{"type":"noul","noul":0.15},"off_track":{"type":"noul","noul":0.24},"needs_human":{"type":"noul","noul":0.12},"done_not_exited":{"type":"noul","noul":0.09}}}
+{"ts":"2026-09-21T16:46:20.310Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"cat tests/state-exams/pin-todo.test.ts"}
+{"ts":"2026-09-21T16:46:20.776Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"cat /tmp/claude-1000/-home-exedev-run-impl-2-0/da2b0997-8a36-4601-b796-dbfb62114232/tasks/birf0ei76.output"}
+{"ts":"2026-09-21T16:46:21.099Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"ls packages/tinyapp-lint/src packages/tinyapp-exam/src 2>/dev/null"}
+{"ts":"2026-09-21T16:46:23.585Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"bun run lint:ui; echo \"EXIT: $?\""}
+{"ts":"2026-09-21T16:46:24.890Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"timeout 600 bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -40"}
+{"ts":"2026-09-21T16:46:25.837Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"timeout 600 bun run typecheck 2>&1 | tail -20"}
+{"ts":"2026-09-21T16:46:25.997Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"git status --short && echo --- && git diff --stat"}
+{"ts":"2026-09-21T16:46:27.741Z","kind":"worker:test-run","task":"1","label":"referee:1","cmd":"timeout 600 bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -40","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:46:28.078Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:46:30.664Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
