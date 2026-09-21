@@ -12,6 +12,7 @@ import {
   STORE_ID,
 } from './Store';
 import {DueInput} from './DueInput';
+import {RenameTodo} from './RenameTodo';
 import {TagsInput} from './TagsInput';
 import {isOverdue} from './overdue';
 export const TodoItem = ({rowId}: {rowId: string}) => {
@@ -73,6 +74,7 @@ export const TodoItem = ({rowId}: {rowId: string}) => {
       <span className="flex-1 select-none group-data-[completed=true]:line-through group-data-[completed=true]:opacity-60 group-data-[overdue=true]:text-primary">
         {todo.text}
       </span>
+      <RenameTodo rowId={rowId} todoText={todo.text} />
       {/* `due` is optional on `TodoRow` — a todo with no date has no cell. */}
       <DueInput rowId={rowId} due={todo.due ?? ''} todoText={todo.text} />
       {/* `tags` is optional on `TodoRow` too — a todo with no tags has no

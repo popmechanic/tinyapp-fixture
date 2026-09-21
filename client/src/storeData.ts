@@ -50,6 +50,11 @@ export const VALUES_SCHEMA = {
   // same reason — a store nobody has filtered by tag carries no `tag` value,
   // which is how the app says every tag.
   tag: {type: 'string'},
+  // The chosen sort, or absent. No default, for `filter` and `tag`'s reason —
+  // a default would materialise `{sort: ...}` into every store's
+  // `getContent()`, rewriting every snapshot checked in before this value
+  // existed. An absent value is how the app says unsorted.
+  sort: {type: 'string'},
 } as const;
 
 // What every row of a table must satisfy, whoever wrote the row: the UI, an
@@ -180,6 +185,23 @@ export const setTodoCompleted = (
   completed: boolean,
 ): void => {
   store.setPartialRow('todos', id, {completed});
+};
+
+/**
+ * Renames todo `id` to `text`, trimmed.
+ *
+ * Words that are only spaces trim to `''` and are refused outright — nothing
+ * is written — rather than stored as an empty-text todo. An id the list does
+ * not hold is left alone, for `pinTodo`'s reason: `setPartialRow` on a missing
+ * row would create a phantom row out of the schema's defaults rather than
+ * fail.
+ */
+export const renameTodo = (store: TodosStore, id: string, text: string): void => {
+  const trimmed = text.trim();
+  if (trimmed === '' || !store.hasRow('todos', id)) {
+    return;
+  }
+  store.setPartialRow('todos', id, {text: trimmed});
 };
 
 /**
@@ -319,6 +341,21 @@ export const clearCompleted = (store: TodosStore): void => {
 export const setFilter = (store: TodosStore, filter: string): void => {
   if (filter === 'all' || filter === 'open' || filter === 'done') {
     store.setValue('filter', filter);
+  }
+};
+
+/**
+ * Chooses the sort, or clears it when `sort` is `''`.
+ *
+ * `''` deletes the value rather than writing it, so an unsorted store is byte
+ * for byte the store it was before this value existed — exactly as
+ * `setFilter` leaves an unrecognised name alone rather than storing it.
+ */
+export const setSort = (store: TodosStore, sort: string): void => {
+  if (sort === '') {
+    store.delValue('sort');
+  } else if (sort === 'due') {
+    store.setValue('sort', 'due');
   }
 };
 

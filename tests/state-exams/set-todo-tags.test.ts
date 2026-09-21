@@ -202,11 +202,17 @@ test('leg (b) [M2] VALUES_SCHEMA.tag is exactly {type: "string"} with no default
   expect(Object.hasOwn(tag ?? {}, 'default')).toBe(false);
 });
 
-test('leg (b) [M2] a fresh store reads its values schema back as exactly {filter, tag}', () => {
-  expect(JSON.parse(sd.createTodosStore().getValuesSchemaJson())).toEqual({
-    filter: {type: 'string'},
-    tag: {type: 'string'},
-  });
+test('leg (b) [M2] a fresh store reads its values schema back with tag exactly {type: "string"}', () => {
+  // Loosened from the whole-schema literal to the `tag` entry it meant, the
+  // way `set-filter.test.ts` already loosened its own `filter` pin: a sibling
+  // plan adds a values entry of its own (`sort`), and what this leg is about
+  // is that *this* task's entry is a bare string — not how many entries the
+  // values schema holds the day it was written. Not re-pinned to a new
+  // three-entry literal, which a later task would break again.
+  const valuesSchema = JSON.parse(
+    sd.createTodosStore().getValuesSchemaJson(),
+  ) as Record<string, unknown>;
+  expect(valuesSchema.tag).toEqual({type: 'string'});
 });
 
 // --- Leg (c) [M3]: parseTags, normalizeTags, isNormalizedTags ----------------
