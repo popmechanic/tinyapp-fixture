@@ -140,3 +140,35 @@
 {"ts":"2026-09-21T16:46:27.741Z","kind":"worker:test-run","task":"1","label":"referee:1","cmd":"timeout 600 bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -40","exit":null,"red":null,"via":"bash"}
 {"ts":"2026-09-21T16:46:28.078Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
 {"ts":"2026-09-21T16:46:30.664Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:46:34.578Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"grep -n \"export const orderTodos\" /home/exedev/run/impl-2-0/client/src/todoOrder.ts; grep -n \"export const setSort\" /home/exedev/run/impl-2-0/client/src/storeData.ts"}
+{"ts":"2026-09-21T16:46:36.611Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:46:38.751Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"timeout 600 bun test tests/state-exams/rename-todo.test.ts --reporter=junit --reporter-outfile=/tmp/j.xml 2>&1 | tail -5; grep -o 'name=\"[^\"]*\"' /tmp/j.xml | head -20"}
+{"ts":"2026-09-21T16:46:39.450Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"sed -n 1,120p packages/tinyapp-exam/src/state-exam.ts"}
+{"ts":"2026-09-21T16:46:41.644Z","kind":"worker:test-run","task":"1","label":"referee:1","cmd":"timeout 600 bun test tests/state-exams/rename-todo.test.ts --reporter=junit --reporter-outfile=/tmp/j.xml 2>&1 | tail -5; grep -o 'name=\"[^\"]*\"' /tmp/j.xml | head -20","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:46:42.080Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__task_facts"}
+{"ts":"2026-09-21T16:46:44.633Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"sed -n 1,80p packages/tinyapp-exam/src/evidence.ts"}
+{"ts":"2026-09-21T16:46:45.674Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:46:45.945Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"ls -la state-exams/posted 2>/dev/null | head -40; find . -path ./node_modules -prune -o -name '*.png' -newermt '-1 hour' -print 2>/dev/null | head"}
+{"ts":"2026-09-21T16:46:48.536Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"Bash","target":"sleep 5; echo done"}
+{"ts":"2026-09-21T16:46:48.689Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"ls -dt /tmp/tinyapp-exam-* 2>/dev/null | head -5"}
+{"ts":"2026-09-21T16:46:51.287Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"ls -la /tmp/tinyapp-exam-rename-todo-cE8FrY; echo ---; cat /tmp/tinyapp-exam-rename-todo-cE8FrY/walls.json; echo ---; cat /tmp/tinyapp-exam-rename-todo-cE8FrY/store-diff.json; echo ---; cat /tmp/tinya"}
+{"ts":"2026-09-21T16:46:53.879Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"timeout 600 bun run lint:ui 2>&1 | tail -20"}
+{"ts":"2026-09-21T16:46:54.627Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"timeout 900 bun run lint:state 2>&1 | tail -40"}
+{"ts":"2026-09-21T16:46:54.885Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:47:05.404Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__note"}
+{"ts":"2026-09-21T16:47:06.989Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__settled"}
+{"ts":"2026-09-21T16:47:08.409Z","kind":"worker:tool","task":"2","label":"impl:2:0","tool":"mcp__factory__run_exam"}
+{"ts":"2026-09-21T16:47:10.737Z","kind":"worker:test-run","task":"2","label":"impl:2:0","cmd":"bun test tests/state-exams/sort-by-due.test.ts","exit":0,"red":false,"via":"run_exam"}
+{"ts":"2026-09-21T16:47:16.734Z","kind":"dispatch:end","task":"2","label":"impl:2:0","role":"implement","wall_ms":429709,"cost_usd":0.9064576000000002,"error":null}
+{"ts":"2026-09-21T16:47:20.522Z","kind":"run:line","task":"2","cmd":"bun test tests/state-exams/set-todo-tags.test.ts","exit":0}
+{"ts":"2026-09-21T16:47:21.361Z","kind":"select:landing","task":"2","candidates":["tests/state-exams/clear-completed.test.ts","tests/state-exams/tag-filter.test.ts","tests/state-exams/undo-delete.test.ts","packages/tinyapp-exam/test/state-exam.test.ts","packages/tinyapp-lint/test/invariants.test.ts","packages/tinyapp-lint/test/lint-cli.test.ts","tests/state-exams/completed-past-due-not-overdue.test.ts","tests/state-exams/filter-bar.test.ts"],"selected":[],"ran":[]}
+{"ts":"2026-09-21T16:47:21.361Z","kind":"floor","task":"2","exam":0,"lowest":0.73,"excluded":[],"fired":false}
+{"ts":"2026-09-21T16:47:25.435Z","kind":"dispatch:start","task":"2","label":"referee:2","role":"referee"}
+{"ts":"2026-09-21T16:47:27.615Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"timeout 1800 bun test 2>&1 | tail -30"}
+{"ts":"2026-09-21T16:47:27.907Z","kind":"worker:tool","task":"2","label":"referee:2","tool":"Bash","target":"cat /home/exedev/run/patch-2-0.diff"}
+{"ts":"2026-09-21T16:47:28.751Z","kind":"worker:tool","task":"2","label":"referee:2","tool":"Bash","target":"ls /home/exedev/run/impl-2-0; echo ---; ls /home/exedev/run/impl-2-0/client/src"}
+{"ts":"2026-09-21T16:47:29.188Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"grep -nE \"bun test|bun run|Bun\\.spawn|spawnSync|execSync\" tests/state-exams/rename-todo.test.ts; echo \"exit=$?\"; echo ---; grep -n \"storeData\" client/src/Store.tsx | head; echo ---; wc -c client/src/S"}
+{"ts":"2026-09-21T16:47:29.290Z","kind":"worker:test-run","task":"1","label":"referee:1","cmd":"grep -nE \"bun test|bun run|Bun\\.spawn|spawnSync|execSync\" tests/state-exams/rename-todo.test.ts; echo \"exit=$?\"; echo ---; grep -n \"storeData\" client/src/Store.tsx | head; echo ---; wc -c client/src/Store.tsx","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:47:31.511Z","kind":"worker:tool","task":"1","label":"referee:1","tool":"Bash","target":"sed -n 1,60p client/src/Store.tsx"}
+{"ts":"2026-09-21T16:47:34.319Z","kind":"worker:tool","task":"2","label":"referee:2","tool":"Read","target":"/home/exedev/run/impl-2-0/client/src/TodoList.tsx"}
+{"ts":"2026-09-21T16:47:34.723Z","kind":"worker:tool","task":"2","label":"referee:2","tool":"Read","target":"/home/exedev/run/impl-2-0/client/src/todoOrder.ts"}
