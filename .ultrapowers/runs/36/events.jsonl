@@ -26,3 +26,16 @@
 {"ts":"2026-09-21T16:38:11.220Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"sed -n '80,115p' tests/state-exams/set-todo-tags.test.ts"}
 {"ts":"2026-09-21T16:38:15.216Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"cat -A state-exams/seeds/two-todos-one-done.json | head -3; echo; ls state-exams/seeds | head -5; ls state-exams/expected | head -5"}
 {"ts":"2026-09-21T16:38:17.485Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Write","target":"/home/exedev/run/exam-2/state-exams/seeds/three-todos-mixed-due.json"}
+{"ts":"2026-09-21T16:38:26.685Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"sed -n '1,100p' tests/state-exams/set-todo-due.test.ts"}
+{"ts":"2026-09-21T16:38:27.108Z","kind":"worker:tool","task":"1","label":"exam:1","tool":"Write","target":"/home/exedev/run/exam-1/tests/state-exams/rename-todo.test.ts"}
+{"ts":"2026-09-21T16:38:39.988Z","kind":"worker:tool","task":"1","label":"exam:1","tool":"mcp__factory__run_exam"}
+{"ts":"2026-09-21T16:38:42.217Z","kind":"worker:test-run","task":"1","label":"exam:1","cmd":"bun test tests/state-exams/rename-todo.test.ts","exit":1,"red":true,"via":"run_exam"}
+{"ts":"2026-09-21T16:38:45.733Z","kind":"worker:tool","task":"1","label":"exam:1","tool":"Bash","target":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -100"}
+{"ts":"2026-09-21T16:38:46.919Z","kind":"worker:test-run","task":"1","label":"exam:1","cmd":"bun test tests/state-exams/rename-todo.test.ts 2>&1 | tail -100","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:39:05.473Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Write","target":"/home/exedev/run/exam-2/tests/state-exams/sort-by-due.test.ts"}
+{"ts":"2026-09-21T16:39:06.506Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"mcp__factory__run_exam"}
+{"ts":"2026-09-21T16:39:06.835Z","kind":"worker:test-run","task":"2","label":"exam:2","cmd":"bun test tests/state-exams/sort-by-due.test.ts","exit":1,"red":true,"via":"run_exam"}
+{"ts":"2026-09-21T16:39:08.280Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | head -150"}
+{"ts":"2026-09-21T16:39:08.558Z","kind":"worker:test-run","task":"2","label":"exam:2","cmd":"bun test tests/state-exams/sort-by-due.test.ts 2>&1 | head -150","exit":null,"red":null,"via":"bash"}
+{"ts":"2026-09-21T16:39:11.415Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"bunx tsc --noEmit -p . 2>&1 | grep -i \"sort-by-due\" | head -50"}
+{"ts":"2026-09-21T16:39:13.726Z","kind":"worker:tool","task":"2","label":"exam:2","tool":"Bash","target":"cat package.json | grep -A3 '\"typecheck\"'; ls tsconfig*.json 2>/dev/null; find . -maxdepth 2 -name \"tsconfig.json\" -not -path \"*/node_modules/*\""}
