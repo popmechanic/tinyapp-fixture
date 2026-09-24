@@ -75,3 +75,7 @@
 {"ts":"2026-09-24T06:34:45.335Z","kind":"merge","code":200}
 {"ts":"2026-09-24T06:34:50.432Z","kind":"publish:deploy","cmd":"bun install --frozen-lockfile && bun run --cwd server deploy","exit":0,"ms":4914,"url":"https://tinyapp-fixture-server.marcus-e.workers.dev"}
 {"ts":"2026-09-24T06:35:25.726Z","kind":"publish:verify","cmd":"bun server/probe/converge-live.ts $ULTRA_PUBLISH_URL","exit":0,"ms":35254,"url":"https://tinyapp-fixture-server.marcus-e.workers.dev"}
+{"ts":"2026-09-24T06:35:27.307Z","kind":"board:leave","rc":0}
+{"ts":"2026-09-24T06:35:27.457Z","kind":"board:close","what":"task 1","code":200}
+{"ts":"2026-09-24T06:35:27.520Z","kind":"board:close","what":"run","code":200}
+{"ts":"2026-09-24T06:35:27.597Z","kind":"run:audit","state":"done","missing":[]}
