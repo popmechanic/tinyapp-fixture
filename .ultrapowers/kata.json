@@ -1,0 +1,19 @@
+{
+  "url": "https://kata.int.exe.xyz",
+  "project": {
+    "id": 33,
+    "uid": "01M2HSJCAB4WXJ7C6XEG23B869",
+    "name": "popmechanic-tinyapp-fixture"
+  },
+  "run": {
+    "uid": "01M38ZHXPS5KREH1PJFCW8C28M",
+    "revision": 1
+  },
+  "tasks": {
+    "1": {
+      "uid": "01M38ZHYRE4M3K6GJHVW58FDSS",
+      "short_id": "fdss",
+      "revision": 2
+    }
+  }
+}
