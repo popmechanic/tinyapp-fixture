@@ -1,0 +1,61 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "8e994ddd4146a2d084050104cf3c73e4b3ad8210234d980e516c81305f8dc1b4",
+      "verdict": "pass",
+      "reason": "M1's exit and JSON keys, M2's non-zero exit inside 30 s, and M3's absence each have a leg that would fail if false; the file is absent at BASE and created here."
+    },
+    "2": {
+      "hash": "a14835b5163d4a2569f6b1fdcd8c096f6e92ba0ac182785ef74e0d55fc673c12",
+      "verdict": "pass",
+      "reason": "The one-line env file, the exact deploy script and wrangler.jsonc byte-identical to BASE, and the README's four literals, each have a probe clause that would fail if false."
+    }
+  },
+  "tally": {
+    "dispatched": 3,
+    "rejected": 0,
+    "rounds": {
+      "1": {
+        "dispatched": 2,
+        "rejected": 0
+      },
+      "2": {
+        "dispatched": 1,
+        "rejected": 0,
+        "why": "author edit after run-38's fold check"
+      }
+    },
+    "base": "e79447d83dab34ea0d830be0efeca823c1421be5",
+    "question": "facts-only (2026-09-18)"
+  },
+  "authoring": {
+    "minutes": 61,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Claim and summary",
+        "options": [
+          "Sign as drafted",
+          "Sign, probe only, no publish lines",
+          "Please explain"
+        ],
+        "recommended": "Sign as drafted",
+        "picked": "Sign as drafted",
+        "explain_rounds": 0
+      }
+    ]
+  },
+  "history": [
+    {
+      "round": 1,
+      "task": "2",
+      "hash": "bdd3383cc883fe45dbbaf311fec04d2c05f609d7bb8305c695b16e46277f5a54",
+      "verdict": "pass",
+      "note": "run-38 parked: celld refuses account_id/workers_dev in wrangler.jsonc; task 2 rewritten around server/.env.deploy"
+    }
+  ]
+}
