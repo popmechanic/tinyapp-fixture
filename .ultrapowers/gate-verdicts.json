@@ -1,0 +1,47 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "8e994ddd4146a2d084050104cf3c73e4b3ad8210234d980e516c81305f8dc1b4",
+      "verdict": "pass",
+      "reason": "M1's exit and JSON keys, M2's non-zero exit inside 30 s, and M3's absence each have a leg that would fail if false; the file is absent at BASE and created here."
+    },
+    "2": {
+      "hash": "bdd3383cc883fe45dbbaf311fec04d2c05f609d7bb8305c695b16e46277f5a54",
+      "verdict": "pass",
+      "reason": "The three config values after comment-stripping and the README section's four strings each have a probe; neither file is a shared record."
+    }
+  },
+  "tally": {
+    "dispatched": 2,
+    "rejected": 0,
+    "rounds": {
+      "1": {
+        "dispatched": 2,
+        "rejected": 0
+      }
+    },
+    "base": "e79447d83dab34ea0d830be0efeca823c1421be5",
+    "question": "facts-only (2026-09-18)"
+  },
+  "authoring": {
+    "minutes": 38,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Claim and summary",
+        "options": [
+          "Sign as drafted",
+          "Sign, probe only, no publish lines",
+          "Please explain"
+        ],
+        "recommended": "Sign as drafted",
+        "picked": "Sign as drafted",
+        "explain_rounds": 0
+      }
+    ]
+  }
+}
