@@ -6,7 +6,7 @@
   "scripts": {
     "build:facets": "bun build-facets.ts",
     "dev": "bun build-facets.ts && cp .dev.vars.exam .dev.vars && celld dev . --clean",
-    "deploy": "bun build-facets.ts && wrangler deploy"
+    "deploy": "bun build-facets.ts && wrangler deploy --env-file .env.deploy"
   },
   "dependencies": {
     "tinybase": "^9.7.0"

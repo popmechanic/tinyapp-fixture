@@ -86,3 +86,18 @@ CELLD_BIN=/usr/local/bin/celld \
   TINYAPP_BROWSER="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
   bun test tests/state-exams/two-pages-converge.test.ts
 ```
+
+## Publishing
+
+A plan that deploys this app carries three header lines:
+
+**Publish:** `bun install --frozen-lockfile && bun run --cwd server deploy`
+**Verify:** `bun server/probe/converge-live.ts $ULTRA_PUBLISH_URL`
+**Rollback:** `cd server && bunx wrangler rollback --yes --message "…"`
+
+The sandbox runs them after its own merge, reaching the Cloudflare API through
+the fleet's edge and the account named by `server/.env.deploy`; the token
+itself never enters this repository. `wrangler.jsonc` carries no account,
+because `celld deploy` refuses that key. `server/probe/converge-live.ts
+<origin>` is the live check: sockets only, and usable by hand against any
+origin.
