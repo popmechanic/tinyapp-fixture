@@ -101,3 +101,12 @@ itself never enters this repository. `wrangler.jsonc` carries no account,
 because `celld deploy` refuses that key. `server/probe/converge-live.ts
 <origin>` is the live check: sockets only, and usable by hand against any
 origin.
+
+**By hand.** Against a deployed server the check is
+`bun server/probe/converge-live.ts https://tinyapp-fixture-server.<subdomain>.workers.dev`
+(the `<subdomain>` is the account's workers.dev subdomain, which the deploy
+prints); it opens a fresh facet `todos@live-<stamp>` over the `/sync/` socket,
+writes one row from client A, waits for B and then a fresh C to receive it,
+prints one JSON line `{facet, connect_ms, sync_ms, converge_ms}` and exits 0,
+or throws and exits non-zero when a client does not converge within ten
+seconds.
