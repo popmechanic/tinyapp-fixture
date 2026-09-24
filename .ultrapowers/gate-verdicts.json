@@ -1,0 +1,41 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "de581aa9ee8213d6a326cbcfd97126fd22b3bab1f4102bc1d01f1e39fb347183",
+      "verdict": "pass",
+      "reason": "Both clauses are literal-presence facts with a tagged probe each; the base excerpt carries run-39's literals and pins nothing opposite."
+    }
+  },
+  "tally": {
+    "dispatched": 1,
+    "rejected": 0,
+    "rounds": {
+      "1": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    },
+    "base": "2d277630b1e555ce9fa7c9f4ed9902fa5188f35b",
+    "question": "facts-only (2026-09-18)"
+  },
+  "authoring": {
+    "minutes": 9,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Claim and summary",
+        "options": [
+          "Sign as drafted",
+          "Please explain"
+        ],
+        "recommended": "Sign as drafted",
+        "picked": "Sign as drafted",
+        "explain_rounds": 0
+      }
+    ]
+  }
+}
