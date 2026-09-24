@@ -1,0 +1,1 @@
+{"url":null,"published":false,"deploy":{"cmd":"bun install --frozen-lockfile && bun run --cwd server deploy","exit":1,"ms":2039},"verify":null,"rollback":null}
