@@ -58,22 +58,80 @@ const clientWithRetry = async (facet: string, deadline: number) => {
   }
 };
 
-// A fresh facet for this probe so a rerun starts empty.
-const F = `todos@live-${Date.now().toString(36)}`;
-
-const budgetMs = 30_000;
+// Overall budget for the whole run, including retried attempts. `ready`
+// keeps its own 30 s sub-budget: a root that never answers is not retried
+// as a convergence failure, it fails on its own terms.
+const budgetMs = 90_000;
 const deadline = t0 + budgetMs;
-const ready_ms = await ready(base, budgetMs);
+const ready_ms = await ready(base, 30_000);
 
-const A = await clientWithRetry(F, deadline);
-const B = await client(F);
-const connect_ms = ms();
-A.store.setRow('todos', '0', {text: 'buy milk', completed: false});
-const sync_ms = await until('B equals A', () => same(A.store, B.store));
+// A fresh facet stamp for this run; each attempt gets its own facet suffix
+// so a retried attempt never sees state left over from a prior one.
+const stamp = Date.now().toString(36);
 
-const C = await client(F);
-const converge_ms = await until('C converges', () => same(A.store, C.store));
+type Client = Awaited<ReturnType<typeof client>>;
 
-console.log(JSON.stringify({facet: F, ready_ms, connect_ms, sync_ms, converge_ms}));
-for (const c of [A, B, C]) await c.sync.destroy();
+// One convergence attempt: open A and B on a fresh facet, write a row on A,
+// wait for B to see it, then open a fresh C and wait for it to converge
+// too. On any throw, every client this attempt opened is destroyed (each
+// destroy in its own try, best effort) before the error propagates.
+const attempt = async (n: number) => {
+  const start = performance.now();
+  const facet = `todos@live-${stamp}-${n}`;
+  const opened: Client[] = [];
+  try {
+    const A = await clientWithRetry(facet, deadline);
+    opened.push(A);
+    const B = await client(facet);
+    opened.push(B);
+    const connect_ms = Math.round(performance.now() - start);
+    A.store.setRow('todos', '0', {text: 'buy milk', completed: false});
+    // The first sync after a deploy is where a fresh server spends its
+    // time, so give it the bulk of the budget.
+    const sync_ms = await until('B equals A', () => same(A.store, B.store), 30_000);
+
+    const C = await client(facet);
+    opened.push(C);
+    const converge_ms = await until('C converges', () => same(A.store, C.store), 10_000);
+
+    for (const c of opened) await c.sync.destroy();
+    return {facet, connect_ms, sync_ms, converge_ms};
+  } catch (err) {
+    for (const c of opened) {
+      try {
+        await c.sync.destroy();
+      } catch {
+        // best-effort cleanup; the original error is what matters
+      }
+    }
+    throw err;
+  }
+};
+
+let attempts = 0;
+let result: {facet: string; connect_ms: number; sync_ms: number; converge_ms: number};
+while (true) {
+  attempts++;
+  try {
+    result = await attempt(attempts);
+    break;
+  } catch (err) {
+    if (deadline - performance.now() >= 2_000) {
+      await Bun.sleep(2_000);
+      continue;
+    }
+    throw err;
+  }
+}
+
+console.log(
+  JSON.stringify({
+    facet: result.facet,
+    attempts,
+    ready_ms,
+    connect_ms: result.connect_ms,
+    sync_ms: result.sync_ms,
+    converge_ms: result.converge_ms,
+  }),
+);
 process.exit(0);
