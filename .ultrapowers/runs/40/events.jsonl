@@ -59,3 +59,7 @@
 {"ts":"2026-09-24T05:47:17.726Z","kind":"publish:deploy","cmd":"bun install --frozen-lockfile && bun run --cwd server deploy","exit":0,"ms":4483,"url":"https://tinyapp-fixture-server.marcus-e.workers.dev"}
 {"ts":"2026-09-24T05:47:18.161Z","kind":"publish:verify","cmd":"bun server/probe/converge-live.ts $ULTRA_PUBLISH_URL","exit":1,"ms":386,"url":"https://tinyapp-fixture-server.marcus-e.workers.dev"}
 {"ts":"2026-09-24T05:47:19.670Z","kind":"publish:rollback","cmd":"cd server && bunx wrangler rollback --yes --message \"fleet: the live check was red\"","exit":1}
+{"ts":"2026-09-24T05:47:21.208Z","kind":"board:leave","rc":0}
+{"ts":"2026-09-24T05:47:21.349Z","kind":"board:close","what":"task 1","code":200}
+{"ts":"2026-09-24T05:47:21.391Z","kind":"board:close","what":"run","code":200}
+{"ts":"2026-09-24T05:47:21.466Z","kind":"run:audit","state":"done","missing":[]}
