@@ -29,10 +29,43 @@ const client = async (facet: string) => {
   return {store, sync};
 };
 
+// Wait for the origin itself to answer before dialing its sync socket: a
+// server started a few seconds after the probe (or after a slow boot) is
+// otherwise indistinguishable from one that will never come up.
+const ready = async (origin: string, budgetMs = 30_000) => {
+  while (true) {
+    try {
+      const res = await fetch(`${origin}/`);
+      if (res.ok) return ms();
+    } catch {
+      // origin not accepting connections yet
+    }
+    if (performance.now() - t0 > budgetMs) throw new Error(`origin not answering within ${budgetMs} ms`);
+    await Bun.sleep(500);
+  }
+};
+
+// Retry opening a client within the remainder of the same budget: the root
+// route can answer before the sync socket is ready to accept upgrades.
+const clientWithRetry = async (facet: string, deadline: number) => {
+  while (true) {
+    try {
+      return await client(facet);
+    } catch (err) {
+      if (performance.now() > deadline) throw err;
+      await Bun.sleep(500);
+    }
+  }
+};
+
 // A fresh facet for this probe so a rerun starts empty.
 const F = `todos@live-${Date.now().toString(36)}`;
 
-const A = await client(F);
+const budgetMs = 30_000;
+const deadline = t0 + budgetMs;
+const ready_ms = await ready(base, budgetMs);
+
+const A = await clientWithRetry(F, deadline);
 const B = await client(F);
 const connect_ms = ms();
 A.store.setRow('todos', '0', {text: 'buy milk', completed: false});
@@ -41,6 +74,6 @@ const sync_ms = await until('B equals A', () => same(A.store, B.store));
 const C = await client(F);
 const converge_ms = await until('C converges', () => same(A.store, C.store));
 
-console.log(JSON.stringify({facet: F, connect_ms, sync_ms, converge_ms}));
+console.log(JSON.stringify({facet: F, ready_ms, connect_ms, sync_ms, converge_ms}));
 for (const c of [A, B, C]) await c.sync.destroy();
 process.exit(0);
