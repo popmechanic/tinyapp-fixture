@@ -1,0 +1,1 @@
+{"url":"https://tinyapp-fixture-server.marcus-e.workers.dev","published":true,"deploy":{"cmd":"bun install --frozen-lockfile && bun run --cwd server deploy","exit":0,"ms":4914},"verify":{"cmd":"bun server/probe/converge-live.ts $ULTRA_PUBLISH_URL","exit":0,"ms":35254},"rollback":null}
