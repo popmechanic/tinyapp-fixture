@@ -1,0 +1,83 @@
+{
+ "tasks": {
+  "1": {
+   "hash": "9d9841bb25e3ca9b3a91604787b314ddb990ece7de76ef33b23b108d436a0ca5",
+   "verdict": "pass",
+   "reason": "Every computable fact has a tagged one-command probe; the file's absence at BASE is what the task creates."
+  },
+  "2": {
+   "hash": "fc09bcb1eb46fb7b5d9153c890747a1ebe9305656c04e719f3c55cec4e437e24",
+   "verdict": "pass",
+   "reason": "Every clause pins a computable fact with a tagged single-command probe; M2/M3 absences covered; base pins nothing opposite."
+  },
+  "3": {
+   "hash": "8d5488cf67a83b2f521e88d8d847b3cdd194bdbcac567dc50f402f6f5f8a863b",
+   "verdict": "pass",
+   "reason": "Filtered markup, box attributes, empty render, whole-table count and wiring each have one tagged probe; no literal unsatisfiable."
+  }
+ },
+ "tally": {
+  "dispatched": 3,
+  "rejected": 0,
+  "rounds": {
+   "1": {
+    "dispatched": 3,
+    "rejected": 0
+   }
+  },
+  "base": "09ae7ddb65b6b6082091abbd9a2faf821e424900"
+ },
+ "authoring": {
+  "minutes": 40,
+  "probes": 9,
+  "routing": {
+   "branch": "width",
+   "lane": "ultrapowers"
+  },
+  "questions": [
+   {
+    "question": "Next",
+    "options": [
+     "Third fixture deploy, carrying tags (fixture #25)",
+     "Fix #1271 inline, here",
+     "Housekeeping and stop"
+    ],
+    "recommended": "Third fixture deploy, carrying tags (fixture #25)",
+    "picked": "Third fixture deploy, carrying tags (fixture #25)",
+    "explain_rounds": 0
+   },
+   {
+    "question": "Run-45 task",
+    "options": [
+     "Search box: type words, see only matching todos",
+     "One browser per exam file (fixture #27)",
+     "Due-soon badge on the count line"
+    ],
+    "recommended": "Search box: type words, see only matching todos",
+    "picked": "Search box: type words, see only matching todos",
+    "explain_rounds": 0
+   },
+   {
+    "question": "Claim and summary",
+    "options": [
+     "Sign it as written",
+     "Sign, but keep the search local to the page"
+    ],
+    "recommended": "Sign it as written",
+    "picked": "Sign it as written",
+    "explain_rounds": 0
+   },
+   {
+    "question": "Execute",
+    "options": [
+     "Ultrapowers",
+     "Subagent-Driven",
+     "Inline"
+    ],
+    "recommended": "Ultrapowers",
+    "picked": "Ultrapowers",
+    "explain_rounds": 0
+   }
+  ]
+ }
+}
