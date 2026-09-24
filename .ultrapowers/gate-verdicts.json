@@ -1,0 +1,42 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "c4199c256fe17d78e61f333e7e03756282bee9615f8770c75a52baa9ae9d3606",
+      "verdict": "pass",
+      "reason": "M1's exit, six keys, attempts==1, walls and ready_ms floor; M2's exit inside 25-60 s; M3's presence and negation; the retry loop is the run-time reader's and the converging deploy is the publish move's."
+    }
+  },
+  "tally": {
+    "dispatched": 1,
+    "rejected": 0,
+    "rounds": {
+      "1": {
+        "dispatched": 1,
+        "rejected": 0
+      }
+    },
+    "base": "d71c0373494de1d9f122fff3962ca3cc9962fb62",
+    "question": "facts-only (2026-09-18)"
+  },
+  "authoring": {
+    "minutes": 10,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Claim and summary, or stop for tonight",
+        "options": [
+          "Sign and launch now",
+          "Stop for tonight",
+          "Please explain"
+        ],
+        "recommended": "Sign and launch now",
+        "picked": "Sign and launch now",
+        "explain_rounds": 0
+      }
+    ]
+  }
+}
