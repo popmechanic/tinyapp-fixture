@@ -1,0 +1,62 @@
+{
+ "tasks": {
+  "1": {
+   "hash": "fea02ba83d24997068ea9cea0357522b15055a383176f3f43b558ac2b7c2a67c",
+   "verdict": "pass",
+   "reason": "Every computable fact in M1-M4 has a tagged probe that would fail if false; literals mutually satisfiable; base pins nothing opposite."
+  }
+ },
+ "tally": {
+  "dispatched": 1,
+  "rejected": 0,
+  "rounds": {
+   "1": {
+    "dispatched": 1,
+    "rejected": 0
+   }
+  },
+  "base": "9a8a7347862a50a480bf332a26aee3730ed5c419"
+ },
+ "authoring": {
+  "minutes": 19,
+  "probes": 6,
+  "routing": {
+   "branch": "risk",
+   "lane": "ultrapowers"
+  },
+  "questions": [
+   {
+    "question": "Run-44 task",
+    "options": [
+     "The probe reports every attempt's wall",
+     "Tags with a tag filter (fixture #25)",
+     "A README line and nothing else"
+    ],
+    "recommended": "The probe reports every attempt's wall",
+    "picked": "The probe reports every attempt's wall",
+    "explain_rounds": 1
+   },
+   {
+    "question": "Claim and summary",
+    "options": [
+     "Sign it as written",
+     "Sign, but drop the failure line"
+    ],
+    "recommended": "Sign it as written",
+    "picked": "Sign it as written",
+    "explain_rounds": 0
+   },
+   {
+    "question": "Execute",
+    "options": [
+     "Ultrapowers",
+     "Subagent-Driven",
+     "Inline"
+    ],
+    "recommended": "Ultrapowers",
+    "picked": "Ultrapowers",
+    "explain_rounds": 1
+   }
+  ]
+ }
+}
