@@ -29,10 +29,43 @@ const client = async (facet: string) => {
   return {store, sync};
 };
 
+// Wait for the origin to answer before dialing it: a server that comes up a
+// few seconds late (or under a cold-starting celld) should be waited for,
+// not treated as a failure.
+const budgetMs = 30_000;
+const ready = async (limit: number) => {
+  while (true) {
+    try {
+      const res = await fetch(`${base}/`);
+      if (res.ok) return;
+    } catch {
+      // origin not up yet; keep polling
+    }
+    if (performance.now() - t0 > limit) throw new Error(`origin not answering within ${limit} ms`);
+    await Bun.sleep(500);
+  }
+};
+
+await ready(budgetMs);
+const ready_ms = ms();
+
+// A root that answers before its socket does is covered too: retry client(F)
+// for A within what remains of the same budget.
+const clientRetry = async (facet: string, limit: number) => {
+  while (true) {
+    try {
+      return await client(facet);
+    } catch (e) {
+      if (performance.now() - t0 > limit) throw e;
+      await Bun.sleep(500);
+    }
+  }
+};
+
 // A fresh facet for this probe so a rerun starts empty.
 const F = `todos@live-${Date.now().toString(36)}`;
 
-const A = await client(F);
+const A = await clientRetry(F, budgetMs);
 const B = await client(F);
 const connect_ms = ms();
 A.store.setRow('todos', '0', {text: 'buy milk', completed: false});
@@ -41,6 +74,6 @@ const sync_ms = await until('B equals A', () => same(A.store, B.store));
 const C = await client(F);
 const converge_ms = await until('C converges', () => same(A.store, C.store));
 
-console.log(JSON.stringify({facet: F, connect_ms, sync_ms, converge_ms}));
+console.log(JSON.stringify({facet: F, ready_ms, connect_ms, sync_ms, converge_ms}));
 for (const c of [A, B, C]) await c.sync.destroy();
 process.exit(0);
