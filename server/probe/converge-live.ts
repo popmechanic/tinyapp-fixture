@@ -109,29 +109,55 @@ const attempt = async (n: number) => {
 };
 
 let attempts = 0;
-let result: {facet: string; connect_ms: number; sync_ms: number; converge_ms: number};
+let result: {facet: string; connect_ms: number; sync_ms: number; converge_ms: number} | undefined;
+const tries: Array<{n: number; ms: number; error?: string}> = [];
 while (true) {
   attempts++;
+  const triedAt = performance.now();
   try {
     result = await attempt(attempts);
+    tries.push({n: attempts, ms: Math.round(performance.now() - triedAt)});
     break;
   } catch (err) {
+    tries.push({
+      n: attempts,
+      ms: Math.round(performance.now() - triedAt),
+      error: String((err as {message?: unknown})?.message ?? err),
+    });
     if (deadline - performance.now() >= 2_000) {
       await Bun.sleep(2_000);
       continue;
     }
-    throw err;
+    break;
   }
 }
 
-console.log(
-  JSON.stringify({
-    facet: result.facet,
-    attempts,
-    ready_ms,
-    connect_ms: result.connect_ms,
-    sync_ms: result.sync_ms,
-    converge_ms: result.converge_ms,
-  }),
-);
-process.exit(0);
+if (result) {
+  console.log(
+    JSON.stringify({
+      facet: result.facet,
+      attempts,
+      ready_ms,
+      connect_ms: result.connect_ms,
+      sync_ms: result.sync_ms,
+      converge_ms: result.converge_ms,
+      converged: true,
+      tries,
+    }),
+  );
+  process.exit(0);
+} else {
+  console.log(
+    JSON.stringify({
+      facet: null,
+      attempts,
+      ready_ms,
+      connect_ms: null,
+      sync_ms: null,
+      converge_ms: null,
+      converged: false,
+      tries,
+    }),
+  );
+  process.exit(1);
+}
