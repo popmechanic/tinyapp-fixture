@@ -1,0 +1,11 @@
+Running as unit: fleet-engine-41.service; invocation ID: 10db00f6284d45189e3e326e6cfded86
+jev: call failed: The operation was aborted due to timeout
+jev: landing: no answers
+adopted task 1 -> 5a254151  facts=1 k=2
+{"done":false,"adopted":["1"],"head":"e30de81ff6c9af50ae153241781464702ef5c552","wall_ms":1110245,"cost_usd":2.6755472000000005}
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=1
+Service runtime: 18min 30.320s
+CPU time consumed: 1min 19.008s
+Memory peak: 256.0K
+Memory swap peak: 0B
