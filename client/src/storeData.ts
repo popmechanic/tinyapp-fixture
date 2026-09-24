@@ -55,6 +55,11 @@ export const VALUES_SCHEMA = {
   // `getContent()`, rewriting every snapshot checked in before this value
   // existed. An absent value is how the app says unsorted.
   sort: {type: 'string'},
+  // The search box's text, or absent. No default, for `filter`, `tag` and
+  // `sort`'s reason — a default would materialise `{search: ...}` into every
+  // store's `getContent()`, rewriting every snapshot checked in before this
+  // value existed. An absent value is how the app says nobody has searched.
+  search: {type: 'string'},
 } as const;
 
 // What every row of a table must satisfy, whoever wrote the row: the UI, an
@@ -356,6 +361,23 @@ export const setSort = (store: TodosStore, sort: string): void => {
     store.delValue('sort');
   } else if (sort === 'due') {
     store.setValue('sort', 'due');
+  }
+};
+
+/**
+ * Sets the search text, or clears it when `query` is blank.
+ *
+ * Stored as typed, untrimmed: the box is bound to this value, so a trailing
+ * space on the way to the next word must survive the round trip. Blank
+ * (whitespace-only, including `''`) deletes the value rather than storing
+ * spaces, so an unsearched store is byte for byte the store it was before
+ * this value existed — exactly as `setSort` leaves `''` unstored.
+ */
+export const setSearch = (store: TodosStore, query: string): void => {
+  if (query.trim() === '') {
+    store.delValue('search');
+  } else {
+    store.setValue('search', query);
   }
 };
 
