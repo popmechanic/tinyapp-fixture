@@ -1,0 +1,65 @@
+{
+  "tasks": {
+    "1": {
+      "hash": "4f5422d88d714f42b4cf7dd9e3c6283f03a2ce9844f08d831e655a457e678354",
+      "verdict": "pass",
+      "reason": "M1's exit, five keys, walls and ready_ms floor; M2's exit and 25-60 s window; M3's presence and negation; BASE pins nothing opposite."
+    }
+  },
+  "tally": {
+    "dispatched": 2,
+    "rejected": 0,
+    "rounds": {
+      "1": {
+        "dispatched": 1,
+        "rejected": 0
+      },
+      "2": {
+        "dispatched": 1,
+        "rejected": 0,
+        "why": "author edit after run-41: the rehearsal line's grouping"
+      }
+    },
+    "base": "51a4cc071513e814d33a5c5a63f2b12812800984",
+    "question": "facts-only (2026-09-18)"
+  },
+  "authoring": {
+    "minutes": 31,
+    "probes": 0,
+    "routing": {
+      "branch": "risk",
+      "lane": "ultrapowers"
+    },
+    "questions": [
+      {
+        "question": "Next after run-40",
+        "options": [
+          "Fix the probe's first connect and relaunch",
+          "Stop here for tonight",
+          "Please explain"
+        ],
+        "recommended": "Fix the probe's first connect and relaunch",
+        "picked": "Fix the probe's first connect and relaunch",
+        "explain_rounds": 0
+      },
+      {
+        "question": "Claim and summary",
+        "options": [
+          "Sign as drafted",
+          "Please explain"
+        ],
+        "recommended": "Sign as drafted",
+        "picked": "Sign as drafted",
+        "explain_rounds": 0
+      }
+    ]
+  },
+  "history": [
+    {
+      "round": 1,
+      "hash": "a5ca76265c4df0a5be31e93e80ffb02956310492283729b9dec67d0e3af58701",
+      "verdict": "pass",
+      "note": "run-41 parked: the M1 rehearsal's & bound the whole cd chain; line regrouped"
+    }
+  ]
+}
