@@ -86,3 +86,21 @@ CELLD_BIN=/usr/local/bin/celld \
   TINYAPP_BROWSER="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
   bun test tests/state-exams/two-pages-converge.test.ts
 ```
+
+## Publishing
+
+A plan that deploys this app carries three header lines:
+
+**Publish:** `bun install --frozen-lockfile && bun run --cwd server deploy`
+**Verify:** `bun server/probe/converge-live.ts $ULTRA_PUBLISH_URL`
+**Rollback:** `cd server && bunx wrangler rollback --yes --message "…"`
+
+The sandbox runs them after its own merge, reaching the Cloudflare API through
+the fleet's edge and the account named by `account_id` in `server/wrangler.jsonc`;
+the token that authenticates that call never enters this repository. The
+`**Publish:**` line runs `wrangler deploy` (via `bun run --cwd server deploy`),
+which prints the app's `workers_dev` URL — that is `$ULTRA_PUBLISH_URL`, the
+origin the `**Verify:**` line checks. `server/probe/converge-live.ts <origin>`
+is that live check: a sockets-only script, usable by hand against any origin,
+that asks the same convergence question the state exams ask but of a deployed
+worker instead of a `celld dev` runtime.

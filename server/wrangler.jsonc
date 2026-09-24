@@ -3,6 +3,8 @@
   "name": "tinyapp-fixture-server",
   "main": "index.ts",
   "compatibility_date": "2026-09-01",
+  "account_id": "e33948793047032de7f5e18ec342a7d1",
+  "workers_dev": true,
   // The root: one AppRoot per app instance. Every module of the app is a facet
   // of it, loaded through LOADER from the bundled code in generated/facets.ts.
   "durable_objects": {
