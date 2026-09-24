@@ -1,0 +1,22 @@
+
+ ⛅️ wrangler 4.130.0 (update available 4.137.0)
+───────────────────────────────────────────────
+├ Fetching latest deployment
+│
+├ Your current deployment has 1 version(s):
+│
+│ (100%) 63571db0-2eb7-4a84-96f1-38ba8253f2ad
+│       Created:  2026-09-24T05:47:16.044623Z
+│           Tag:  -
+│       Message:  -
+│
+├ Finding latest stable Worker Version to rollback to
+│ 
+│
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mCould not find stable Worker Version to rollback to. Please try again with an explicit Version ID.[0m
+
+
+[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose[0m
+Note that there is a newer version of Wrangler available (4.137.0). Consider checking whether upgrading resolves this error.
+🪵  Logs were written to "/home/exedev/.config/.wrangler/logs/wrangler-2026-09-24_05-47-18_612.log"

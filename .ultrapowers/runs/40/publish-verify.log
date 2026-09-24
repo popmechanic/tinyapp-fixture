@@ -1,0 +1,11 @@
+2451 |           creating = false;
+2452 |           removeAttemptListeners();
+2453 |           resolve(synchronizer);
+2454 |         }),
+2455 |         addEventListener(webSocket, ERROR, (error) =>
+2456 |           rejectCreation(errorNew(ERROR_MULTIPLEX_SOCKET), error),
+                                ^
+error: tinybase:5
+      at <anonymous> (/home/exedev/target/node_modules/tinybase/synchronizers/synchronizer-ws-client/index.js:2456:26)
+
+Bun v1.4.2 (Linux x64)
