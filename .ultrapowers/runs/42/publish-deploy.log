@@ -1,0 +1,38 @@
+bun install v1.4.2 (744846f84)
+Resolving dependencies
+Resolved, downloaded and extracted [4]
+
+$ bun run build:facets
+$ bun run --cwd server build:facets
+$ bun build-facets.ts
+todos@e8acece173ce 250 KiB
+
++ @shadcn/lint@0.1.0
++ @types/bun@1.4.2
++ @typescript-eslint/parser@8.70.0
++ eslint@10.10.0
++ tailwindcss@4.3.3
++ tinyapp-exam@workspace:packages/tinyapp-exam
++ typescript@6.0.3 (v7.0.2 available)
+
+501 packages installed [408.00ms]
+$ bun build-facets.ts && wrangler deploy --env-file .env.deploy
+todos@e8acece173ce 250 KiB
+
+ ⛅️ wrangler 4.130.0
+────────────────────
+Total Upload: 568.97 KiB / gzip: 113.80 KiB
+Worker Startup Time: 2 ms
+Your Worker has access to the following bindings:
+Binding                                   Resource            
+env.APP (AppRoot)                         Durable Object      
+env.MODULES (Facet)                       Durable Object      
+env.SELF (tinyapp-fixture-server)         Worker              
+env.LOADER                                Worker Loader       
+
+Uploaded tinyapp-fixture-server (2.46 sec)
+Deployed tinyapp-fixture-server triggers (0.71 sec)
+  https://tinyapp-fixture-server.marcus-e.workers.dev
+Current Version ID: 06d52eeb-5cdc-47a6-bf8d-ec946b0df2c4
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md

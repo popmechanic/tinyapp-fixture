@@ -1,0 +1,11 @@
+15 | const ms = () => Math.round(performance.now() - t0);
+16 | const same = (a: MergeableStore, b: MergeableStore) => JSON.stringify(a.getContent()) === JSON.stringify(b.getContent());
+17 | const until = async (label: string, pred: () => boolean, limit = 10_000) => {
+18 |   const start = performance.now();
+19 |   while (!pred()) {
+20 |     if (performance.now() - start > limit) throw new Error(`${label}: not within ${limit} ms`);
+                                                          ^
+error: B equals A: not within 10000 ms
+      at <anonymous> (/home/exedev/target/server/probe/converge-live.ts:20:54)
+
+Bun v1.4.2 (Linux x64)

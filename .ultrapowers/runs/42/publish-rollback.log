@@ -1,0 +1,35 @@
+
+ ⛅️ wrangler 4.130.0 (update available 4.137.0)
+───────────────────────────────────────────────
+├ Fetching latest deployment
+│
+├ Your current deployment has 1 version(s):
+│
+│ (100%) 06d52eeb-5cdc-47a6-bf8d-ec946b0df2c4
+│       Created:  2026-09-24T06:21:59.160164Z
+│           Tag:  -
+│       Message:  -
+│
+├ Finding latest stable Worker Version to rollback to
+│ 
+│
+? Please provide an optional message for this rollback (120 characters max)
+🤖 Using default value in non-interactive context: fleet: the live check was red
+│
+├  WARNING  You are about to rollback to Worker Version 63571db0-2eb7-4a84-96f1-38ba8253f2ad.
+│ This will immediately replace the current deployment and become the active deployment across all your deployed triggers.
+│ However, your local development environment will not be affected by this rollback.
+│ Rolling back to a previous deployment will not rollback any of the bound resources (Durable Object, D1, R2, KV, etc).
+│
+│ (100%) 63571db0-2eb7-4a84-96f1-38ba8253f2ad
+│       Created:  2026-09-24T05:47:16.044623Z
+│           Tag:  -
+│       Message:  -
+│
+? Are you sure you want to deploy this Worker Version to 100% of traffic?
+🤖 Using fallback value in non-interactive context: yes
+Performing rollback...
+│
+╰  SUCCESS  Worker Version 63571db0-2eb7-4a84-96f1-38ba8253f2ad has been deployed to 100% of traffic.
+
+Current Version ID: 63571db0-2eb7-4a84-96f1-38ba8253f2ad
